@@ -12,10 +12,10 @@ var switchState = function(id, obj, action, type)
 {
     cx.jQuery.get('index.php', {cmd : '{MODULE_NAME}', act : 'switchState', id : id, state : action, type : type}).success(function() {
         if (action) {
-            path = '../core/Core/View/Media/icons/status_green.gif';
+            path = cx.variables.get('basePath', 'contrexx') + 'core/Core/View/Media/icons/status_green.gif';
             action = 0;
         } else {
-            path = '../core/Core/View/Media/icons/status_red.gif';
+            path = cx.variables.get('basePath', 'contrexx') + 'core/Core/View/Media/icons/status_red.gif';
             action = 1;
         }
         cx.jQuery(obj).children('img:first').attr('src', path);

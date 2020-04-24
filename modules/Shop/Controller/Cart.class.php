@@ -134,10 +134,22 @@ class Cart
 
         $arrCart = array(
             'items' => self::$products,
+            'total_price_cart' => Currency::formatPrice(
+                  self::get_price()
+                + self::get_discount_amount()
+                + (Vat::isEnabled() && !Vat::isIncluded()
+                    ? self::get_vat_amount() : 0)),
+            'total_price_cart_without_vat' => Currency::formatPrice(
+                  self::get_price()
+                + self::get_discount_amount()
+            ),
             'total_price' => Currency::formatPrice(
                   self::get_price()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
+            'total_price_without_vat' => Currency::formatPrice(
+                  self::get_price()
+            ),
             'item_count' => $itemCount,
             'unit' => Currency::getActiveCurrencySymbol()
         );
@@ -455,7 +467,6 @@ class Cart
     {
         global $_ARRAYLANG;
 
-//DBG::log("Cart::update(): Cart: ".var_export($_SESSION['shop']['cart'], true));
         if (!Shop::hasSession()) {
             return true;
         }
@@ -472,14 +483,16 @@ class Cart
         $payment_id = (isset($_SESSION['shop']['paymentId'])
             ? $_SESSION['shop']['paymentId'] : 0);
         $customer_id = ($objCustomer ? $objCustomer->id() : 0);
-//DBG::log("Cart::update(): Coupon Code: $coupon_code");
         self::$products = array();
         $items = 0;
         $total_price = 0;
         $total_vat_amount = 0;
         $total_weight = 0;
         $total_discount_amount = 0;
-//DBG::log("Cart::update(): Products: ".var_export($products, true));
+
+        // will contain all VAT rates of the products currently in cart
+        $usedVatRates = array();
+
         // Loop 1: Collect necessary Product data
         $products = $_SESSION['shop']['cart']['items']->toArray();
         foreach ($products as $cart_id => &$product) {
@@ -488,6 +501,7 @@ class Cart
                 unset($products[$cart_id]);
                 continue;
             }
+
             // Check minimum order quantity, when set
             // Do not add error message if it's an AJAX request
             if (
@@ -500,60 +514,24 @@ class Cart
             ) {
                 \Message::error($objProduct->name().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
             }
+
             // Limit Products in the cart to the stock available if the
             // stock_visibility is enabled.
             if ($objProduct->stock_visible()
              && $product['quantity'] > $objProduct->stock()) {
                 $product['quantity'] = $objProduct->stock();
             }
+
             // Remove Products with quatities of zero or less
             if ($product['quantity'] <= 0) {
                 unset($products[$cart_id]);
                 continue;
             }
+
             $options_price = 0;
             // Array!
             $options_strings = Attributes::getAsStrings(
                 $product['options'], $options_price);
-//DBG::log("Cart::update(): options_price $options_price");
-/* Replaced by Attributes::getAsStrings()
-            foreach ($product['options'] as $attribute_id => $arrOptionIds) {
-                $objAttribute = Attribute::getById($attribute_id);
-                // Should be tested!
-                if (!$objAttribute) {
-                    unset($product['options'][$attribute_id]);
-                    continue;
-                }
-                $arrOptions = $objAttribute->getOptionArray();
-                foreach ($arrOptionIds as $option_id) {
-                    $arrOption = null;
-                    // Note that the options are indexed starting from 1!
-                    // For types 4..7, the value entered in the text box is
-                    // stored in $option_id.  Overwrite the value taken from
-                    // the database.
-                    if ($objAttribute->getType() >= Attribute::TYPE_TEXT_OPTIONAL) {
-                        $arrOption = current($arrOptions);
-                        $arrOption['value'] = $option_id;
-                    } else {
-                        $arrOption = $arrOptions[$option_id];
-                    }
-                    if (!is_array($arrOption)) continue;
-                    $option_value = ShopLibrary::stripUniqidFromFilename($arrOption['value']);
-                    $path = Order::UPLOAD_FOLDER.$arrOption['value'];
-                    if (   $option_value != $arrOption['value']
-                        && File::exists($path)) {
-                        $option_value =
-                            '<a href="$path" target="uploadimage">'.
-                            $option_value.'</a>';
-                    }
-                    $options .= " [$option_value]";
-                    $options_price += $arrOption['price'];
-                }
-            }
-            if ($options_price != 0) {
-                $product['optionPrice'] = $options_price;
-            }
- */
             $quantity = $product['quantity'];
             $items += $quantity;
             $itemprice = $objProduct->get_custom_price(
@@ -564,15 +542,22 @@ class Cart
             $price = $itemprice * $quantity;
             $handler = $objProduct->distribution();
             $itemweight = ($handler == 'delivery' ? $objProduct->weight() : 0);
+
             // Requires shipment if the distribution type is 'delivery'
             if ($handler == 'delivery') {
-//DBG::log("Cart::update(): Product ID ".$objProduct->id()." needs delivery");
                 $_SESSION['shop']['cart']['shipment'] = true;
             }
             $weight = $itemweight * $quantity;
+
             $vat_rate = Vat::getRate($objProduct->vat_id());
             $total_price += $price;
             $total_weight += $weight;
+
+            // remember VAT rate of product
+            if (Vat::isEnabled()) {
+                $usedVatRates[] = $vat_rate;
+            }
+
             self::$products[$cart_id] = array(
                 'id' => $objProduct->id(),
                 'product_id' => $objProduct->code(),
@@ -586,9 +571,11 @@ class Cart
                             : utf8_encode($objProduct->name())),
                           ENT_QUOTES, CONTREXX_CHARSET)),
                 'options' => $product['options'],
+                'options_count' => count($product['options']),
                 'options_long' => $options_strings[0],
                 'options_cart' => $options_strings[1],
                 'price' => Currency::formatPrice($price),
+                'sale_price' => Currency::formatPrice($price),
                 'quantity' => $quantity,
                 'itemprice' => Currency::formatPrice($itemprice),
                 'vat_rate' => $vat_rate,
@@ -599,9 +586,13 @@ class Cart
                 'product_images' => $objProduct->pictures(),
                 'minimum_order_quantity' => $objProduct->minimum_order_quantity(),
             );
-//DBG::log("Cart::update(): Loop 1: Product: ".var_export(self::$products[$cart_id], true));
         }
+
+        // ensure each VAT rate only occurs once
+        $usedVatRates = array_unique($usedVatRates);
+
         $_SESSION['shop']['cart']['items'] = $products;
+
         // Loop 2: Calculate Coupon discounts and VAT
         $objCoupon = null;
         $hasCoupon = false;
@@ -609,6 +600,8 @@ class Cart
         foreach (self::$products as $cart_id => &$product) {
             $discount_amount = 0;
             $product['discount_amount'] = 0;
+
+            // Coupon case #1: Product specific coupon
             // Coupon:  Either the payment ID or the code are needed
             if ($payment_id || $coupon_code) {
                 $objCoupon = Coupon::available(
@@ -616,37 +609,38 @@ class Cart
                     $product['id'], $payment_id);
                 if ($objCoupon) {
                     $hasCoupon = true;
-//DBG::log("Cart::update(): PRODUCT; Coupon available: $coupon_code, Product ID {$product['id']}");
-//DBG::log("Cart::update(): Loop 2: Product: ".var_export($product, true));
                     $discount_amount = $objCoupon->getDiscountAmount(
                         $product['price'], $customer_id);
+                    // In case the loaded coupon is a coupon of type value (of
+                    // a certain amount) and if it has been used on a previous
+                    // product, then we have to check if the discount (to be
+                    // applied on the current product) will exceed the total
+                    // coupon value
                     if (   $objCoupon->discount_amount() > 0
                         && ($total_discount_amount + $discount_amount)
                             > $objCoupon->discount_amount()) {
-//DBG::log("Cart::update(): COUPON prelimit: PRODUCT: price ".$product['price'].", coupon discount amount ".$objCoupon->discount_amount().", discount_amount $discount_amount, total discount amount $total_discount_amount");
+                        // Already applied discounts plus the discount of this
+                        // product exceed the coupons total value. Therefore
+                        // we must subtract the applied discounts from the
+                        // coupon to get the remaining discount amount.
                         $discount_amount =
                             $objCoupon->discount_amount()
                           - $total_discount_amount;
-//DBG::log("Cart::update(): COUPON postlimit: PRODUCT: price ".$product['price'].", coupon discount amount ".$objCoupon->discount_amount().", discount_amount $discount_amount, total discount amount $total_discount_amount");
                     }
                     $total_discount_amount += $discount_amount;
-//                    $product['price'] = Currency::formatPrice(
-//                        $product['price'] - $discount_amount);
                     $product['discount_amount'] = $discount_amount;
-// UNUSED
-//                        $arrProduct['coupon_string'] =
-//                            $objCoupon->getString($discount_amount);
-//DBG::log("Cart::update(): PRODUCT: price ".$product['price'].", discount_amount $discount_amount, total discount $total_discount_amount");
                 }
             }
-            // Calculate the amount if it's excluded; we might add it later:
+
+            // Calculate the VAT amount if it's excluded.
+            // We might add it later:
             // - If it's included, we don't care.
             // - If it's disabled, it's set to zero.
             $vat_amount = Vat::amount($product['vat_rate'],
                 $product['price']
               - $product['discount_amount']
             );
-            if (!Vat::isIncluded()) {
+            if (Vat::isEnabled() && !Vat::isIncluded()) {
                 self::$products[$cart_id]['price'] += $vat_amount;
                 self::$products[$cart_id]['price'] = Currency::formatPrice(self::$products[$cart_id]['price']);
             }
@@ -654,44 +648,87 @@ class Cart
             self::$products[$cart_id]['vat_amount'] =
                 Currency::formatPrice($vat_amount);
         }
+
+        // Coupon case #2: Non-Product specific coupon
         // Global Coupon:  Either the payment ID or the code are needed
-        if (!$objCoupon && ($payment_id || $coupon_code)) {
+        if (!$hasCoupon && ($payment_id || $coupon_code)) {
             $discount_amount = 0;
-//DBG::log("Cart::update(): GLOBAL; Got Coupon code $coupon_code");
-            $total_price_incl_vat = $total_price;
-            if (!Vat::isIncluded()) {
-                $total_price_incl_vat += $total_vat_amount;
-            }
+
+            // supply $total_price (without VAT) to Coupon::available()
+            // for checking if minimum order amount has reached
             $objCoupon = Coupon::available(
-                $coupon_code, $total_price_incl_vat, $customer_id, 0, $payment_id);
+                $coupon_code, $total_price, $customer_id, 0, $payment_id);
+
+            // verify that coupon is valid with VAT
+            if ($objCoupon) {
+                // in case the coupon is of type value (amount of money)
+                // and the cart contains several products with different
+                // VAT rate, we can't process the coupon
+                // TODO: extend the Shop system to support different VAT
+                //       rates on coupons
+                if (Vat::isEnabled() &&
+                    $objCoupon->discount_amount() > 0 &&
+                    count($usedVatRates) > 1
+                ) {
+                    $objCoupon = null;
+                    \Message::information($_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_FOR_MULTIPLE_MWST']);
+                }
+            }
+
             if ($objCoupon) {
                 $hasCoupon = true;
                 $discount_amount = $objCoupon->getDiscountAmount(
-                    $total_price_incl_vat, $customer_id);
+                    $total_price, $customer_id);
                 $total_discount_amount = $discount_amount;
-//DBG::log("Cart::update(): GLOBAL; Coupon available: $coupon_code");
-//DBG::log("Cart::update(): GLOBAL; total price $total_price, discount_amount $discount_amount, total discount $total_discount_amount");
+
+                // in case VAT is being used, we have to subtract the VAT of
+                // the discount from the total VAT amount of the products
+                if (Vat::isEnabled()) {
+                    if ($objCoupon->discount_amount() > 0) {
+                        $vatRate = current($usedVatRates);
+                        // in case coupon is a discount of value, then we
+                        // have to subtract the VAT amount of that value
+                        if (Vat::isIncluded()) {
+                            $total_vat_amount -= $objCoupon->discount_amount() / (1 + $vatRate / 100) * $vatRate / 100;
+                        } else {
+                            $total_vat_amount -= $objCoupon->discount_amount() * $vatRate / 100;
+                        }
+                    } else {
+                        // in case coupon is a discount in percent, then we
+                        // have to subtract the same percentage from the total
+                        // VAT amount
+                        $total_vat_amount -= $total_vat_amount * $objCoupon->discount_rate() / 100;
+                    }
+                }
             }
         }
-        if ($objCoupon) {
-//DBG::log("Cart::update(): Got Coupon ".var_export($objCoupon, true));
-            $total_price -= $discount_amount;
-//DBG::log("Cart::update(): COUPON; total price $total_price, discount_amount $discount_amount, total discount $total_discount_amount");
+
+        // if coupon targets a specific product (Coupon case #1),
+        //      then $total_discount_amount is the discount for that specific product (incl. variations)
+        // if coupon targets a specific product and payment method (Coupon case #1),
+        //      then $total_discount_amount is the discount for that specific product (incl. variations)
+        // if coupon targets a specific payment method (Coupon case #2),
+        //      then $total_discount_amount is the discount for all products (of the cart)
+        if ($hasCoupon) {
+            $total_price -= $total_discount_amount;
         }
         if ($hasCoupon) {
             \Message::clear();
         }
 
+        // total discount amount
         $_SESSION['shop']['cart']['total_discount_amount'] =
             $total_discount_amount;
+
+        // order costs after discount subtraction (incl VAT) but without payment and shippment costs
         $_SESSION['shop']['cart']['total_price'] =
             Currency::formatPrice($total_price);
+
         $_SESSION['shop']['cart']['total_vat_amount'] =
             Currency::formatPrice($total_vat_amount);
-//DBG::log("Cart::update(): Updated Cart (session): VAT amount: ".$_SESSION['shop']['cart']['total_vat_amount']);
         $_SESSION['shop']['cart']['total_items'] = $items;
         $_SESSION['shop']['cart']['total_weight'] = $total_weight; // In grams!
-//DBG::log("Cart::update(): Updated Cart (session): ".var_export($_SESSION['shop']['cart'], true));
+
         return true;
     }
 
@@ -897,6 +934,7 @@ die("Cart::view(): ERROR: No template");
                     'SHOP_PRODUCT_CART_ID' => $arrProduct['cart_id'],
                     'SHOP_PRODUCT_TITLE' => str_replace('"', '&quot;', contrexx_raw2xhtml($arrProduct['title'])),
                     'SHOP_PRODUCT_PRICE' => $arrProduct['price'],  // items * qty
+                    'SHOP_PRODUCT_SALE_PRICE' => $arrProduct['sale_price'],  // items * qty (without added VAT, if VAT is configured as excl)
                     'SHOP_PRODUCT_PRICE_UNIT' => Currency::getActiveCurrencySymbol(),
                     'SHOP_PRODUCT_QUANTITY' => $arrProduct['quantity'],
                     'SHOP_PRODUCT_ITEMPRICE' => $arrProduct['itemprice'],
@@ -954,6 +992,10 @@ die("Cart::view(): ERROR: No template");
         $objTemplate->setGlobalVariable(array(
             'TXT_PRODUCT_ID' => $_ARRAYLANG['TXT_ID'],
             'SHOP_PRODUCT_TOTALITEM' => self::get_item_count(),
+            // total costs of goods (before subtraction of discount)
+            'SHOP_PRODUCT_TOTAL_GOODS' => Currency::formatPrice(
+                  self::get_price() + self::get_discount_amount()),
+            // total costs of goods (after subtraction of discount)
             'SHOP_PRODUCT_TOTALPRICE' => Currency::formatPrice(
                   self::get_price()),
             // Add the VAT in the intermediate sum, if active and excluded
@@ -1010,6 +1052,54 @@ die("Cart::view(): ERROR: No template");
                         Currency::formatPrice(self::get_price() - self::get_vat_amount()).'&nbsp;'.
                         Currency::getActiveCurrencySymbol(),
                 ));
+
+                if ($objTemplate->blockExists('shopVatIncl')) {
+                    // parse specific VAT-incl template block
+                    $objTemplate->touchBlock('shopVatIncl');
+
+                    // hide non-specific VAT template block
+                    if ($objTemplate->blockExists('shopVat')) {
+                        $objTemplate->hideBlock('shopVat');
+                    }
+                } elseif ($objTemplate->blockExists('shopVat')) {
+                    // parse non-specific VAT template block
+                    $objTemplate->touchBlock('shopVat');
+                }
+
+                // hide specific VAT-excl template block
+                if ($objTemplate->blockExists('shopVatExcl')) {
+                    $objTemplate->hideBlock('shopVatExcl');
+                }
+            } else {
+                if ($objTemplate->blockExists('shopVatExcl')) {
+                    // parse specific VAT-excl template block
+                    $objTemplate->touchBlock('shopVatExcl');
+
+                    // hide non-specific VAT template block
+                    if ($objTemplate->blockExists('shopVat')) {
+                        $objTemplate->hideBlock('shopVat');
+                    }
+                } elseif ($objTemplate->blockExists('shopVat')) {
+                    // parse non-specific VAT template block
+                    $objTemplate->touchBlock('shopVat');
+                }
+
+                // hide specific VAT-incl template block
+                if ($objTemplate->blockExists('shopVatIncl')) {
+                    $objTemplate->hideBlock('shopVatIncl');
+                }
+            }
+        } else {
+            // hide all VAT related template blocks
+            $vatBlocks = array(
+                'shopVat',
+                'shopVatIncl',
+                'shopVatExcl',
+            );
+            foreach ($vatBlocks as $vatBlock) {
+                if ($objTemplate->blockExists($vatBlock)) {
+                    $objTemplate->hideBlock($vatBlock);
+                }
             }
         }
         if (self::needs_shipment()) {

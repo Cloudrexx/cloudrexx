@@ -35,11 +35,25 @@
  * @todo        Edit PHP DocBlocks!
  */
 namespace Cx\Core_Modules\Stats\Controller;
+
+// detect system location
+$depth = 4;
+if (strpos(__FILE__, 'customizing/') !== false) {
+    // this files resides within the customizing directory, therefore we'll have to strip
+    // out one directory more than usually
+    $depth++;
+}
+if (strpos(__FILE__, 'codeBases/') !== false) {
+    // this files resides in a codeBase directory, therefore we'll have to strip
+    // out two directory more than usually
+    $depth += 2;
+}
+$contrexx_path = dirname(__FILE__, $depth);
+
 /**
  * @ignore
  */
-require_once dirname(dirname(dirname(dirname(__FILE__)))).'/core/Core/init.php';
-
+require_once($contrexx_path . '/core/Core/init.php');
 $cx = init('minimal');
 
 // those variables get defined in Data/spiders.inc.php, Data/referers.inc.php, Data/banned.inc.php

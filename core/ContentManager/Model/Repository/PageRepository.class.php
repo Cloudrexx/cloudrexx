@@ -312,6 +312,9 @@ class PageRepository extends EntityRepository {
 
         $return = array();
         foreach($pages as $page) {
+            if (!isset($return[$page->getLang()])) {
+                $return[$page->getLang()] = array();
+            }
             $return[$page->getLang()][] = $page;
         }
         return $return;
@@ -678,13 +681,22 @@ class PageRepository extends EntityRepository {
             $path = substr($path, 1);
         }
         $parts = explode('/', $path);
-        $lang = \FWLanguage::getLanguageIdByCode($parts[0]);
+        $lang = false;
+        if ($search_mode == self::SEARCH_MODE_PAGES_ONLY) {
+            if (\Cx\Core\Routing\Url::isVirtualLanguageDirsActive()) {
+                $lang = \FWLanguage::getLanguageIdByCode($parts[0]);
+            } else {
+                $lang = \FWLanguage::getDefaultLangId();
+            }
+        }
         // let's see if path starts with a language (which it should)
         if ($lang !== false) {
             if ($search_mode != self::SEARCH_MODE_PAGES_ONLY) {
                 return false;
             }
-            unset($parts[0]);
+            if (\Cx\Core\Routing\Url::isVirtualLanguageDirsActive()) {
+                unset($parts[0]);
+            }
         } else {
             if ($search_mode != self::SEARCH_MODE_ALIAS_ONLY) {
                 return false;
@@ -932,24 +944,43 @@ class PageRepository extends EntityRepository {
         $config  = \Env::get('config');
         $results = array();
         foreach($pages as $page) {
-            $isNotVisible  = ($config['searchVisibleContentOnly'] == 'on') && !$page->isVisible();
-            $hasPageAccess = true;
-            if ($config['coreListProtectedPages'] == 'off' && $page->isFrontendProtected()) {
-                $hasPageAccess = \Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true);
-            }
-            if (!$page->isActive() || $isNotVisible || !$hasPageAccess) {
+            // skip non-published page
+            if (!$page->isActive()) {
                 continue;
             }
+
+            // skip invisible page (if excluded from search)
+            if (
+                $config['searchVisibleContentOnly'] == 'on' &&
+                !$page->isVisible()
+            ) {
+                continue;
+            }
+
+            // skip protected page (if excluded from search)
+            if (
+                $config['coreListProtectedPages'] == 'off' &&
+                $page->isFrontendProtected() &&
+                $page->getComponent('Session')->getSession() &&
+                !\Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true)
+            ) {
+                continue;
+            }
+
+            // skip page if not located within specific content branch
             if ($rootPage && strpos($page->getPath(), $rootPage->getPath()) !== 0) {
                 continue;
             }
+
 // TODO: Add proper score with MATCH () AGAINST () or similar
             $results[] = array(
-                'Score' => 100,
-                'Title' => $page->getTitle(),
-                'Content' => \Cx\Core_Modules\Search\Controller\Search::shortenSearchContent(
-                    $page->getContent(), $config['searchDescriptionLength']),
-                'Link' => $this->getPath($page)
+                'Score'     => 100,
+                'Title'     => $page->getTitle(),
+                'Content'   => \Cx\Core_Modules\Search\Controller\Search::shortenSearchContent(
+                    $page->getContent(), $config['searchDescriptionLength']
+                ),
+                'Link'      => (string) \Cx\Core\Routing\Url::fromPage($page),
+                'Component' => $page->getComponentController()->getName(),
             );
         }
         return $results;

@@ -101,7 +101,7 @@ class LinkSanitizer {
 
         if (!empty($_GET['preview']) || (isset($_GET['appview']) && ($_GET['appview'] == 1))) {
             $content = preg_replace_callback("/
-                (\<(?:a|form)[^>]*?\s+(?:href|action)\s*=\s*)
+                (\<(?:a|form|iframe)[^>]*?\s+(?:href|action|src)\s*=\s*)
                 (['\"])
                 (?!\#)
                 ((?![a-zA-Z]+?:|\\\\).+?)
@@ -236,7 +236,15 @@ class LinkSanitizer {
         $after  = $matches[4];
 
         if (strpos($value, '?') !== false) {
-            list($path, $query) = explode('?', $value);
+            list($path, $query) = explode('?', $value, 2);
+            // TODO: this is basically wrong as question marks are valid
+            // characters within a query string. See rfc for reference:
+            // https://tools.ietf.org/html/rfc3986#section-3.4
+            // However, this is probably a workaround to fix javascript
+            // code, that wrongly produces infinite redirect loops in
+            // combination with the 'preview' URL argument.
+            // See CLX-1780
+            $query = str_replace('?', '&', $query);
             $query = \Cx\Core\Routing\Url::params2array($query);
         } else {
             $path = $value;

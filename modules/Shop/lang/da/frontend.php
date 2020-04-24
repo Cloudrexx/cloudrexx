@@ -96,7 +96,6 @@ $_ARRAYLANG['TXT_COMMENTS'] = "Meddelelse";
 $_ARRAYLANG['TXT_ID'] = "ID";
 $_ARRAYLANG['TXT_ADDRESS_CUSTOMER'] = "Kundeadresse";
 $_ARRAYLANG['TXT_TAC'] = "Vilkår og handelsbetingelser";
-$_ARRAYLANG['TXT_ACCEPT_TAC'] = "Jeg bekræfte at de indtastede data er korrekt og at jeg kender og har læst<a href=\"index.php?section=Agb\" target=\"_blank\">vilkår og handelsbetingelserne</a> og at jeg accepterer dem.";
 $_ARRAYLANG['TXT_TOTAL_PRICE'] = "Total price";
 $_ARRAYLANG['TXT_ORDER_INFOS'] = "Bestillingsinformationer";
 $_ARRAYLANG['TXT_ORDER_PREPARED'] = "Din bestiling er nu klar til betalingen.";

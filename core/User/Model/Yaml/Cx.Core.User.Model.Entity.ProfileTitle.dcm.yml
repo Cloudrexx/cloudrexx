@@ -5,7 +5,6 @@ Cx\Core\User\Model\Entity\ProfileTitle:
     id:
       id: true
       type: integer
-      length: 11
       unsigned: true
       generator:
         strategy: AUTO
@@ -13,12 +12,15 @@ Cx\Core\User\Model\Entity\ProfileTitle:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     orderId:
       type: integer
-      length: 10
       nullable: false
       unsigned: true
       column: order_id
+      options:
+        default: 0
   uniqueConstraints:
     title:
       columns: [title]

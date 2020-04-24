@@ -1,22 +1,22 @@
 <div>
-  <script>
-    (function($) {
-      $('#thumbnailSelector').find('.thumbnail-size').change(function() {
-        var size = parseInt($(this).val(), 10);
-        size = size === 0 ? '100%' : size;
-        $('#thumbnailSelector').find('.image').css({'width': size});
-      });
-    }(cx.variables.get('jquery', 'mediabrowser')));
-  </script>
-  <div id="thumbnailSelector">
-    <img src="" alt="" class="image"/>
-    <div class="form-horizontal">
-      <select name="size" class="form-control thumbnail-size">
-        <option value="0">{TXT_FILEBROWSER_THUMBNAIL_ORIGINAL_SIZE}</option>
-        <!-- BEGIN thumbnails -->
-        <option value="{THUMBNAIL_SIZE}">{THUMBNAIL_NAME}</option>
-        <!-- END thumbnails -->
-      </select>
+    <script>
+        (function ($) {
+            $('#thumbnailSelector').find('.thumbnail-size').change(function () {
+                var size = parseInt($(this).val(), 10);
+                size = size === 0 ? '100%' : size;
+                $('#thumbnailSelector').find('.image').css({'width': size});
+            });
+        }(cx.variables.get('jquery', 'mediabrowser')));
+    </script>
+    <div id="thumbnailSelector">
+        <img src="" alt="" class="image"/>
+        <div class="form-horizontal">
+            <select name="size" class="form-control thumbnail-size">
+                <option value="0">{TXT_FILEBROWSER_THUMBNAIL_ORIGINAL_SIZE}</option>
+                <!-- BEGIN thumbnails -->
+                <option value="{THUMBNAIL_SIZE}">{THUMBNAIL_NAME}</option>
+                <!-- END thumbnails -->
+            </select>
+        </div>
     </div>
-  </div>
 </div>

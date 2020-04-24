@@ -701,6 +701,12 @@ class YamlDriver extends FileDriver
             $mapping['columnDefinition'] = $column['columnDefinition'];
         }
 
+        // CUSTOMIZING BY CLOUDREXX: REQUIRED FOR ENUM MAPPING
+        // SEE core/Model/Controller/YamlDriver.class.php
+        if (isset($column['values'])) {
+            $mapping['values'] = $column['values'];
+        }
+
         return $mapping;
     }
 

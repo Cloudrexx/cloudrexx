@@ -458,10 +458,6 @@ END;
                     $SurveyOptionTexts  = $text_row;
                     $question_wrap      = "";
                 }
-                //set page title
-                \Env::get('cx')->getPage()->setTitle($QuestionDatas->fields['title']);
-                //set page metatitle
-                \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
                 $this->_objTpl->setVariable(array(
                     'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
@@ -678,6 +674,7 @@ END;
                                         if ($objChoiceAns->fields['votes'] != '') {
                                             $choiceVote[] = json_decode($objChoiceAns->fields['votes']);
                                         } else {
+                                            $choiceVote[$choice_count] = array();
                                             foreach ($choices as $key => $choice) {
                                                 $choiceVote[$choice_count][$key] = 0;
                                             }
@@ -728,6 +725,7 @@ END;
                                         if ($objChoiceAns->fields['votes'] != '' && strlen($objChoiceAns->fields['votes']) > 5) {
                                             $choiceVote[] = json_decode($objChoiceAns->fields['votes']);
                                         } else {
+                                            $choiceVote[$choice_count] = array();
                                             foreach ($choices as $key => $choice) {
                                                 $choiceVote[$choice_count][$key] = 0;
                                             }
@@ -1089,10 +1087,6 @@ END;
                     $SurveyOptionTexts  = $text_row;
                     $question_wrap      = "";
                 }
-                //set page title
-                \Env::get('cx')->getPage()->setTitle($QuestionDatas->fields['title']);
-                //set the page metatitle
-                \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
                 $this->_objTpl->setVariable(array(
                     'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
@@ -1309,6 +1303,7 @@ END;
                                         if ($objChoiceAns->fields['votes'] != '') {
                                             $choiceVote[] = json_decode($objChoiceAns->fields['votes']);
                                         } else {
+                                            $choiceVote[$choice_count] = array();
                                             foreach ($choices as $key => $choice) {
                                                 $choiceVote[$choice_count][$key] = 0;
                                             }
@@ -1359,6 +1354,7 @@ END;
                                         if ($objChoiceAns->fields['votes'] != '' && strlen($objChoiceAns->fields['votes']) > 5) {
                                             $choiceVote[] = json_decode($objChoiceAns->fields['votes']);
                                         } else {
+                                            $choiceVote[$choice_count] = array();
                                             foreach ($choices as $key => $choice) {
                                                 $choiceVote[$choice_count][$key] = 0;
                                             }
@@ -1628,10 +1624,6 @@ END;
                 $SurveyOptionTexts = $text_row;
                 $question_wrap = "";
             }
-            //set the page title
-            \Env::get('cx')->getPage()->setTitle(contrexx_raw2xhtml($QuestionDatas->fields['title']));
-            //set the page metatitle
-            \Env::get('cx')->getPage()->setMetatitle(contrexx_raw2xhtml($QuestionDatas->fields['title']));
             $this->_objTpl->setVariable(array(
                     'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
@@ -1662,6 +1654,75 @@ END;
         }
 
     }
+
+    /**
+     * Get the page title
+     *
+     * @return string
+     */
+    public function getPageTitle()
+    {
+        global $objDatabase;
+
+        $id = 0;
+        if (isset($_REQUEST['id'])) {
+            $id = contrexx_input2int($_REQUEST['id']);
+        }
+        $cmd = contrexx_input2raw($_GET['cmd']);
+
+        //Get surveyId by question id
+        if ($cmd === 'questionpreview') {
+            $surveyQuestions = $objDatabase->Execute('
+                SELECT
+                        `survey_id`
+                    FROM ' . DBPREFIX . 'module_survey_surveyQuestions
+                    WHERE
+                        `id` = ' . $id
+            );
+            $id = $surveyQuestions->fields['survey_id'];
+            if (!$id) {
+                return;
+            }
+        }
+
+        $filter = 'AND id = ' . $id;
+        //Set filter to the home page
+        if (in_array($cmd, array('', 'homesurvey'))) {
+            $filter = 'AND isHomeBox="1"';
+        }
+
+        //Fetch survey group details
+        $surveyGroup = $objDatabase->Execute('
+            SELECT
+                    `id`,
+                    `title`,
+                    `UserRestriction`
+                FROM ' . DBPREFIX . 'module_survey_surveygroup
+                WHERE
+                    `isActive` != "0" ' . $filter
+        );
+
+        //Check user restrictions
+        if (in_array($cmd, array('', 'homesurvey', 'surveybyId'))) {
+            $email = '';
+            if (isset($_POST['additional_email'])) {
+                $email = contrexx_input2raw($_POST['additional_email']);
+            }
+
+            $isRestricted = $this->checkUserRestriction(
+                $surveyGroup->fields['UserRestriction'],
+                $surveyGroup->fields['id'],
+                $email
+            );
+
+            if ($isRestricted === 'yes') {
+                return;
+            }
+        }
+
+        return $surveyGroup->fields['title'];
+    }
+
     /**
      * Show Preview of single question in question overview page
      *
@@ -1686,6 +1747,9 @@ END;
                                                 WHERE groups.isActive != "0"
                                                 AND Questions.id='.$id);
         $cou = 1;
+        if (!$QuestionDatas) {
+            return;
+        }
 
         while(!$QuestionDatas->EOF) {
             // This is the additional field information
@@ -1734,7 +1798,8 @@ END;
             if($InputType == 6) {
                 $SurveyOptionText .= "<table>";
             }
-            $j = 1;
+            $j        = 1;
+            $text_row = '';
             while (!$objResult->EOF) {
                 if(trim($objResult->fields['answer']) != "") {
                     if(!empty($InputType)) {
@@ -1803,16 +1868,12 @@ END;
                 $SurveyOptionTexts  = $text_row;
                 $question_wrap      = "";
             }
-            //set the page title
-            \Env::get('cx')->getPage()->setTitle($QuestionDatas->fields['title']);
-            //set the page metatitle
-            \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
             $this->_objTpl->setVariable(array(
                 'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                 'SURVEY_TITLE'          => $question_wrap,
                 'SURVEY_OPTIONS_TEXT'   => $SurveyOptionTexts,
                 'SURVEY_COMMENT_BOX'    => $commentBox,
-                'SURVEY_ID'             => $idOfSurvey,
+                'SURVEY_ID'             => $id,
                 'SURVEY_TEXT_ROW'       => $text_row,
                 'TXT_ADDINFO'           => '<input type="hidden" id="addInfo" name="addInfo" value="'.contrexx_raw2xhtml($additionalInfo).'">',
                 'TXT_HIDDENFIELD'       => '<input type="hidden" name="Survey_id_'.$cou.'" value="'.contrexx_raw2xhtml($QuestionDatas->fields['questionId']).'"/>'

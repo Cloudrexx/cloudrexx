@@ -148,12 +148,12 @@ class User extends \Cx\Model\Base\EntityBase {
     private $u2uActive;
 
     /**
-     * @var Cx\Core\User\Model\Entity\UserProfile
+     * @var \Cx\Core\User\Model\Entity\UserProfile
      */
     private $userProfile;
 
     /**
-     * @var Cx\Core\User\Model\Entity\Group
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $group;
 
@@ -591,7 +591,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->restoreKey = !empty($restoreKey)
                             ? $restoreKey
-                            : md5($this->email . $this->regdate . time());
+                            : md5($this->email . random_bytes(20));
     }
 
     /**
@@ -647,7 +647,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Set userProfile
      *
-     * @param Cx\Core\User\Model\Entity\UserProfile $userProfile
+     * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
      */
     public function setUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
     {
@@ -657,7 +657,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get userProfile
      *
-     * @return Cx\Core\User\Model\Entity\UserProfile $userProfile
+     * @return \Cx\Core\User\Model\Entity\UserProfile $userProfile
      */
     public function getUserProfile()
     {
@@ -667,10 +667,11 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Add group
      *
-     * @param Cx\Core\User\Model\Entity\Group $group
+     * @param \Cx\Core\User\Model\Entity\Group $group
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
+        $group->addUser($this);
         $this->group[] = $group;
     }
 
@@ -687,10 +688,29 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get group
      *
-     * @return Doctrine\Common\Collections\Collection $group
+     * @return \Doctrine\Common\Collections\Collection $group
      */
     public function getGroup()
     {
         return $this->group;
+    }
+    
+    /**
+     * Check if the user is backend group 
+     * 
+     * @return boolean
+     */
+    public function isBackendGroupUser()
+    {
+        if (!$this->group) {
+            return false;
+        }
+        
+        foreach ($this->group as $group) {
+            if ($group->getType() === 'backend') {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -62,11 +62,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objKnowledge = new Knowledge(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objKnowledge->getPage());
-                if (!empty($objKnowledge->pageTitle)) {
-                    \Env::get('cx')->getPage()->setTitle($objKnowledge->pageTitle);
-                    \Env::get('cx')->getPage()->setContentTitle($objKnowledge->pageTitle);
-                    \Env::get('cx')->getPage()->setMetaTitle($objKnowledge->pageTitle);
-                }
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
@@ -111,4 +106,31 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustResponse(
+        \Cx\Core\Routing\Model\Entity\Response $response
+    ) {
+        $page = $response->getPage();
+        if (
+            !$page ||
+            $page->getModule() !== $this->getName() ||
+            $page->getCmd() !== 'article'
+        ) {
+            return;
+        }
+
+        $objKnowledge = new Knowledge();
+        $pageTitle    = $objKnowledge->getPageTitle();
+        if (empty($pageTitle)) {
+            return;
+        }
+
+        $page->setTitle($pageTitle);
+        $page->setContentTitle($pageTitle);
+        $page->setMetaTitle($pageTitle);
+    }
+
 }

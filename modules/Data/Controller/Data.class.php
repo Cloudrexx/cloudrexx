@@ -92,9 +92,9 @@ class Data extends \Cx\Modules\Data\Controller\DataLibrary
             $this->curCmd = $_GET['cmd'];
         }
         if (isset($_GET['cid'])) {
-            $this->showCategory($_GET['cid']);
+            $this->showCategory(intval($_GET['cid']));
         } elseif (isset($_GET['id'])) {
-            $this->showDetails($_GET['id']);
+            $this->showDetails(intval($_GET['id']));
         } elseif ($this->curCmd == 'search') {
             $this->showSearch(isset($_POST['term']) ? contrexx_stripslashes($_POST['term']) : '');
         } else {
@@ -216,7 +216,7 @@ class Data extends \Cx\Modules\Data\Controller\DataLibrary
                 $indent = $level * 10;
 
                 $catList .= str_repeat("\t", $level+1)."<li style=\"padding-left: ".$indent."px\">\n";
-                $catList .= str_repeat("\t", $level+1)."<a href=\"index.php?section=Data&amp;cmd=".$this->curCmd."&amp;cid=".$key."\">".$catName."</a>\n";
+                $catList .= str_repeat("\t", $level+1)."<a href=\"index.php?section=Data&amp;cmd=".contrexx_raw2xhtml($this->curCmd)."&amp;cid=".$key."\">".$catName."</a>\n";
                 if (count($value) > 0) {
                     $catList .= $this->parseCategoryView($value, $arrCategories, $level+1);
                 }
@@ -262,7 +262,7 @@ class Data extends \Cx\Modules\Data\Controller\DataLibrary
                        "ENTRY_ID"      => $key,
                        "ENTRY_HREF"    => \Cx\Core\Routing\Url::fromModuleAndCmd('Data', $this->curCmd, '', array('id' => $key)),
                        "TXT_MORE"      => $_ARRAYLANG['TXT_DATA_MORE'],
-                       "CMD"           => $this->curCmd,
+                       "CMD"           => contrexx_raw2xhtml($this->curCmd),
                     ));
                     $this->_objTpl->parse("entry");
                 }

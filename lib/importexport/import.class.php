@@ -36,11 +36,6 @@
  */
 
 /**
- * @ignore
- */
-require_once ASCMS_LIBRARY_PATH."/importexport/lib/importexport.class.php";
-
-/**
  * Import Class
  * Class which handles the main import operations
  *
@@ -65,11 +60,13 @@ class Import extends ImportExport
 	{
 		$this->setType($_POST['importtype']);
 		$this->setFieldPairs($_POST['pairs_left_keys'], $_POST['pairs_right_keys']);
-                $uploaderId = isset($_POST['importUploaderId']) ? contrexx_input2raw($_POST['importUploaderId']) : '';
-                $file       = $this->getUploadedFileFromUploader($uploaderId);
-                if (!$file) {
-                    return;
-                }
+
+        $uploaderId = isset($_POST['importUploaderId']) ? contrexx_input2raw($_POST['importUploaderId']) : '';
+        $file       = $this->getUploadedFileFromUploader($uploaderId);
+        if (!$file) {
+            return;
+        }
+
 		$this->parseFile($file);
 
 		$retval = array();
@@ -105,6 +102,10 @@ class Import extends ImportExport
 		$rFields = explode(";", $right_fields);
 
 		foreach ($rFields as $key => $rField) {
+            // skip empty field associations
+            if ($key === '' || $rField === '') {
+                continue;
+            }
 			$this->pairs[$rField] = $lFields[$key];
 		}
 	}
@@ -159,23 +160,25 @@ class Import extends ImportExport
 	{
 		global $_ARRAYLANG;
 
-		$template = file_get_contents(ASCMS_LIBRARY_PATH . "/importexport/template/import.fileselect.html");
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+		$template = file_get_contents($cx->getCodeBaseLibraryPath() . '/importexport/template/import.fileselect.html');
 		$tpl->setTemplate($template,true,true);
 
-                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-                // init uploader to upload csv
-                $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
-                $uploader->setCallback('importUploaderCallback');
-                $uploader->setOptions(array(
-                    'id'                 => 'importCsvUploader',
-                    'allowed-extensions' => array('csv'),
-                    'data-upload-limit'  => 1,
-                ));
-                $uploader->setFinishedCallback(array(
-                    $cx->getCodeBaseLibraryPath().'/importexport/import.class.php',
-                    '\Import',
-                    'uploadFinished'
-                ));
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        // init uploader to upload csv
+        $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+        $uploader->setCallback('importUploaderCallback');
+        $uploader->setOptions(array(
+            'id'                 => 'importCsvUploader',
+            'allowed-extensions' => array('csv'),
+            'data-upload-limit'  => 1,
+        ));
+        $uploader->setFinishedCallback(array(
+            $cx->getCodeBaseLibraryPath().'/importexport/import.class.php',
+            '\Import',
+            'uploadFinished'
+        ));
+
 		$tpl->setVariable(array(
 			"TXT_IMPORT"		=> $_ARRAYLANG['TXT_IMPORT'],
 			"IMPORT_TYPELIST"	=> $this->getTypeSelectList(),
@@ -186,8 +189,8 @@ class Import extends ImportExport
 			"TXT_DESC_DELIMITER"	=> $_ARRAYLANG['TXT_DESC_DELIMITER'],
 			"TXT_DESC_ENCLOSURE"	=> $_ARRAYLANG['TXT_DESC_ENCLOSURE'],
 			"TXT_HELP"           => $_ARRAYLANG['TXT_HELP'],
-                        'IMPORT_UPLOADER_BUTTON' => $uploader->getXHtml($_ARRAYLANG['TXT_BROWSE']),
-                        'IMPORT_UPLOADER_ID'     => $uploader->getId(),
+            'IMPORT_UPLOADER_BUTTON' => $uploader->getXHtml($_ARRAYLANG['TXT_BROWSE']),
+            'IMPORT_UPLOADER_ID'     => $uploader->getId(),
 		));
 	}
 
@@ -202,7 +205,8 @@ class Import extends ImportExport
 	{
 		global $_ARRAYLANG;
 
-		$template = file_get_contents(ASCMS_LIBRARY_PATH . "/importexport/template/import.fieldselect.html");
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+		$template = file_get_contents($cx->getCodeBaseLibraryPath() . '/importexport/template/import.fieldselect.html');
 		$tpl->setTemplate($template, true, true);
 
 		// Pass the options
@@ -236,14 +240,12 @@ class Import extends ImportExport
 		 * Set the given fields
 		 */
 		foreach ($given_fields as $key => $field) {
-			if ($field['active']) {
-				$tpl->setVariable(array(
-					"IMPORT_FIELD_VALUE" => $key,
-					"IMPORT_FIELD_NAME"	=> $field
-				));
+            $tpl->setVariable(array(
+                "IMPORT_FIELD_VALUE" => $key,
+                "IMPORT_FIELD_NAME"	=> $field
+            ));
 
-				$tpl->parse("given_field_row");
-			}
+            $tpl->parse("given_field_row");
 		}
 
 		// Set the file fields
@@ -269,7 +271,8 @@ class Import extends ImportExport
             }
         $file = $_POST['importfile'];
 
-        $path = ASCMS_TEMP_PATH . "/";
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $path = $cx->getWebsiteTempPath() . '/';
         if (file_exists($path . $file)) {
             unlink($path);
         }

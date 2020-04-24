@@ -40,7 +40,7 @@ namespace Cx\Core_Modules\Widget\Model\Entity;
  * @package cloudrexx
  * @subpackage coremodules_widget
  */
-abstract class WidgetParseTarget extends \Cx\Model\Base\EntityBase {
+abstract class WidgetParseTarget extends \Cx\Core\View\Model\Entity\ParseTarget {
 
     /**
      * Returns the content for a widget

@@ -1,14 +1,19 @@
 <!-- START module_media_settings.html -->
+<style type="text/css">
+.group_div {
+    margin-left: 22px;
+}
+</style>
 <script language="javascript" type="text/javascript">
 
 cx.jQuery(function() {
     for(var i = 1; i <= 4; i++)
     {
-        cx.jQuery('#mediaSettings' + i + 'Group').change(function(){
+        cx.jQuery('#mediaSettings' + i + 'Group, #mediaSettings_Media' + i + 'PrettyFormatOn').change(function(){
             // show div with groups
             cx.jQuery(this).siblings('.group_div').show();
         });
-        cx.jQuery('#mediaSettings' + i + 'Off, #mediaSettings' + i + 'On').change(function(){
+        cx.jQuery('#mediaSettings' + i + 'Off, #mediaSettings' + i + 'On, #mediaSettings_Media' + i + 'PrettyFormatOff').change(function(){
             // hide div with groups
             cx.jQuery(this).siblings('.group_div').hide();
         });
@@ -170,14 +175,33 @@ function setArchiveTitle(archiveNumber) {
         <tr class="row1">
             <td>
                 <label>
-                    <input type="radio" {MEDIA_ALLOW_USER_SEARCH_ON} name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}FrontendSearch" value="on" />
-                    {TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY}
-                </label>
-                <br />
-                <label>
                     <input type="radio" {MEDIA_ALLOW_USER_SEARCH_OFF} name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}FrontendSearch" value="off" />
                     {TXT_CORE_MODULE_MEDIA_DISABLED}
                 </label>
+                <br />
+                <label>
+                    <input type="radio" {MEDIA_ALLOW_USER_SEARCH_ON} name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}FrontendSearch" value="on" />
+                    {TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY}
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="row3">
+            <td>{TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>
+                <input type="radio" {MEDIA_PRETTY_FORMAT_OFF} id="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormatOff" name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormat" value="off" />
+                <label for="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormatOff">{TXT_CORE_MODULE_MEDIA_DISABLED}</label>
+                <br />
+                <input type="radio" {MEDIA_PRETTY_FORMAT_ON} id="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormatOn" name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormat" value="on" />
+                <label for="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormatOn">{TXT_CORE_MODULE_MEDIA_ENABLE_PRETTY_FORMAT_FUNCTIONALITY}</label>
+                <div class="group_div" id="mediaSettings{MEDIA_ARCHIVE_NUMBER}PrettyFormat" style="display:{MEDIA_PRETTY_FORMAT_DISPLAY}">
+                    <input type="text" name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}PrettyFormatRegexp" value="{MEDIA_PRETTY_FORMAT_REGEX}" placeholder="#{TXT_CORE_MODULE_MEDIA_SEARCH}#{TXT_CORE_MODULE_MEDIA_REPLACE}#" />
+                    <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION_TOOLTIP}</span>
+                </div>
             </td>
         </tr>
     </table>

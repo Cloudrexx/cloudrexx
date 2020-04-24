@@ -53,7 +53,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
-        return array('EsiWidget');
+        return array('EsiWidget', 'RandomEsiWidget');
     }
 
     /**
@@ -67,10 +67,58 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of ComponentController classes
      */
     public function getControllersAccessableByJson() {
-        return array('EsiWidgetController');
+        return array('EsiWidgetController', 'RandomEsiWidgetController');
     }
 
-     /**
+    /**
+     * Returns a list of command mode commands provided by this component
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode() {
+        return array('Access');
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     * @param string $command The name of the command to fetch the description from
+     * @param boolean $short Wheter to return short or long description
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false) {
+        switch ($command) {
+            case 'Access':
+                if ($short) {
+                    return 'Provides cleanup functions for user profiles';
+                }
+                return './cx Access removeUselessProfileImages
+
+Drops all no-longer required profile images';
+                break;
+        }
+        return '';
+    }
+
+    /**
+     * Execute one of the commands listed in getCommandsForCommandMode()
+     * @see getCommandsForCommandMode()
+     * @param string $command Name of command to execute
+     * @param array $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     * @return void
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
+        switch ($command) {
+            case 'Access':
+                switch (current($arguments)) {
+                    case 'removeUselessProfileImages':
+                        \Cx\Core_Modules\Access\Controller\AccessLib::removeUselessImages();
+                        break;
+                }
+                break;
+        }
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -108,7 +156,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
 
-                global $plainCmd, $isRegularPageRequest;
+                global $plainCmd;
+
                 $objTemplate = $this->cx->getTemplate();
                 $objFWUser = \FWUser::getFWUserObject();
 
@@ -144,10 +193,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 if (!$objFWUser->objUser->login(true) && $plainCmd != 'JsonData') {
                     $plainCmd = 'Login';
                     // If the user isn't logged in, the login mask will be showed.
-                    // This mask has its own template handling.
-                    // So we don't need to load any templates in the index.php.
-                    $isRegularPageRequest = false;
-
                     // abort further processing
                     break;
                 } else {
@@ -169,7 +214,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
 
                 $objTemplate->setVariable(array(
-                    'TXT_PROFILE' => $txtProfile,
+                    'TXT_PROFILE' => contrexx_raw2xhtml($txtProfile),
                     'USER_ID' => $objFWUser->objUser->getId(),
                 ));
 
@@ -219,6 +264,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
+        $userSettings     = \User_Setting::getSettings();
         $widgetController = $this->getComponent('Widget');
         foreach (
             array(
@@ -234,7 +280,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
                     $this,
                     $widgetName,
-                    true
+                    \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
                 );
                 $widget->setEsiVariable(
                     \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
@@ -256,7 +302,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
                 $this,
                 $widgetName,
-                true
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
             );
             $widget->setEsiVariable(
                 \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
@@ -265,8 +311,45 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $widget
             );
         }
-    }
 
+        if ($userSettings['block_random_access_users']['status']) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\RandomEsiWidget(
+                $this,
+                'access_random_users',
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+            );
+            $widget->setUniqueRepetitionCount(
+                $userSettings['block_random_access_users']['value']
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'access_user',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_PLACEHOLDER
+        );
+        $widget->setEsiVariable(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'ACCESS_USER_COUNT'
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
+    }
+    
     /**
      * Do something before main template gets parsed
      *
@@ -320,11 +403,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getUserDataBasedWidgetNames() {
         return array_merge(
             array(
+                'ACCESS_USER_COUNT',
                 'access_currently_online_member_list',
                 'access_last_active_member_list',
                 'access_latest_registered_member_list',
                 'access_birthday_member_list',
                 'access_next_birthday_member_list',
+                'access_random_users',
+                'access_user',
             ),
             $this->getRepeatableWidgetNames('logged_in')
         );

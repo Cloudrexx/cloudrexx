@@ -139,6 +139,10 @@ class HTTP_Header extends HTTP
      * @access  public
      * @return  object  HTTP_Header
      */
+    public function __construct() {
+        $this->HTTP_Header();
+    }
+
     function HTTP_Header()
     {
         if (isset($_SERVER['SERVER_PROTOCOL'])) {

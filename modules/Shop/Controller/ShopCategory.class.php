@@ -54,6 +54,7 @@ class ShopCategory
      * Text keys
      */
     const TEXT_NAME = 'category_name';
+    const TEXT_SHORT_DESCRIPTION = 'category_short_description';
     const TEXT_DESCRIPTION = 'category_description';
 
     /**
@@ -71,6 +72,10 @@ class ShopCategory
      * @access  private
      */
     private $name = '';
+    /**
+     * @var     string      $shortDescription    ShopCategory short description
+     */
+    protected $shortDescription = '';
     /**
      * @var     string      $description    ShopCategory description
      * @access  private
@@ -106,6 +111,7 @@ class ShopCategory
      * @access  public
      * @param   string  $name           The category name
      * @param   string  $description    The optional category description
+     * @param   string  $shortDescription The optional category short description
      * @param   integer $parent_id      The optional parent ID of the category
      * @param   integer $active         The optional active status category.
      *                                  Defaults to null (unset)
@@ -115,11 +121,13 @@ class ShopCategory
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
     function __construct(
-        $name, $description=null, $parent_id=0, $active=null, $ord=0, $id=0
+        $name, $shortDescription=null,$description=null, $parent_id=0,
+        $active=null, $ord=0, $id=0
     ) {
         $this->id = intval($id);
         // Use access methods here, various checks included.
         $this->name($name);
+        $this->shortDescription($shortDescription);
         $this->description($description);
         $this->parent_id($parent_id);
         $this->active($active);
@@ -149,6 +157,20 @@ class ShopCategory
             $this->name = trim(strip_tags($name));
         }
         return $this->name;
+    }
+
+    /**
+     * Sets the short description, if present, and returns the current value
+     * @param   string  $description  The optional short description
+     * @return  string                The current short description
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    function shortDescription($shortDescription=null)
+    {
+        if (isset($shortDescription)) {
+            $this->shortDescription = trim($shortDescription);
+        }
+        return $this->shortDescription;
     }
 
     /**
@@ -413,6 +435,17 @@ class ShopCategory
             self::TEXT_NAME, $this->name)) {
             return false;
         }
+        if ($this->shortDescription == '') {
+            // Delete empty short description record (current language only)
+            if (!\Text::deleteById(
+                $this->id, 'Shop', self::TEXT_SHORT_DESCRIPTION, FRONTEND_LANG_ID))
+                return false;
+        } else {
+            if (!\Text::replace($this->id, FRONTEND_LANG_ID, 'Shop',
+                self::TEXT_SHORT_DESCRIPTION, $this->shortDescription)) {
+                return false;
+            }
+        }
         if ($this->description == '') {
             // Delete empty description record (current language only)
             if (!\Text::deleteById(
@@ -515,6 +548,7 @@ class ShopCategory
         }
         // Delete Text
         \Text::deleteById($this->id(), 'Shop', self::TEXT_NAME);
+        \Text::deleteById($this->id(), 'Shop', self::TEXT_SHORT_DESCRIPTION);
         \Text::deleteById($this->id(), 'Shop', self::TEXT_DESCRIPTION);
         // Delete Category
         $objResult = $objDatabase->Execute("
@@ -523,8 +557,7 @@ class ShopCategory
         if (!$objResult) {
             return false;
         }
-        $objDatabase->Execute("
-            OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_categories");
+
         return true;
     }
 
@@ -572,6 +605,7 @@ class ShopCategory
             FRONTEND_LANG_ID, 'Shop',
             array(
                 'name' => self::TEXT_NAME,
+                'shortDescription' => self::TEXT_SHORT_DESCRIPTION,
                 'description' => self::TEXT_DESCRIPTION,
             )
         );
@@ -595,6 +629,11 @@ class ShopCategory
             $objText = \Text::getById($id, 'Shop', self::TEXT_NAME);
             if ($objText) $strName = $objText->content();
         }
+        $strShortDescription = $objResult->fields['shortDescription'];
+        if ($strShortDescription === null) {
+            $objText = \Text::getById($id, 'Shop', self::TEXT_SHORT_DESCRIPTION);
+            if ($objText) $strShortDescription = $objText->content();
+        }
         $strDescription = $objResult->fields['description'];
         if ($strDescription === null) {
             $objText = \Text::getById($id, 'Shop', self::TEXT_DESCRIPTION);
@@ -603,6 +642,7 @@ class ShopCategory
 //DBG::log("ShopCategory::getById($category_id): Loaded '$strName' / '$strDescription'");
         $objCategory = new ShopCategory(
             $strName,
+            $strShortDescription,
             $strDescription,
             $objResult->fields['parent_id'],
             $objResult->fields['active'],
@@ -910,6 +950,7 @@ class ShopCategory
             if (\Cx\Lib\UpdateUtil::column_exist($table_name, 'catname')) {
                 // Migrate all ShopCategory names to the Text table first
                 \Text::deleteByKey('Shop', self::TEXT_NAME);
+                \Text::deleteByKey('Shop', self::TEXT_SHORT_DESCRIPTION);
                 \Text::deleteByKey('Shop', self::TEXT_DESCRIPTION);
                 $query = "
                     SELECT `catid`, `catname`

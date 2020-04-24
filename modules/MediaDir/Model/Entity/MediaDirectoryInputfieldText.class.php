@@ -63,9 +63,10 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         $intId = intval($arrInputfield['id']);
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -88,7 +89,7 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[$_LANGID]) ? $arrValue[$_LANGID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 } else {
                     $arrValue = null;
@@ -202,20 +203,23 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
     }
 
     function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
 
+        // check if entry has been translated into the current frontend language,
+        // if not, do show in entry's initial language
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            if(in_array($_LANGID, $arrTranslationStatus)) {
-                $intLangId = $_LANGID;
+            if(in_array($langId, $arrTranslationStatus)) {
+                $intLangId = $langId;
             } else {
                 $intLangId = $intEntryDefaultLang;
             }
         } else {
-            $intLangId = $_LANGID;
+            $intLangId = $langId;
         }
 
         $objInputfieldValue = $objDatabase->Execute("

@@ -3,7 +3,7 @@
     <span class="{MESSAGE_CLASS} text-danger">{MESSAGE_TEXT}</span>
     <!-- END core_message -->
     <div class="customer_old">
-        <form role="form" name="shop_login" action="index.php?section=Login" method="post">
+        <form role="form" name="shop_login" action="{NODE_LOGIN}" method="post">
             <input name="redirect" type="hidden" value="{SHOP_LOGIN_REDIRECT}" />
             <h2>{TXT_SHOP_ACCOUNT_EXISTING_CUSTOMER}</h2>
             <p>
@@ -18,14 +18,14 @@
                 <input class="btn btn-default" type="submit" value="{TXT_SHOP_ACCOUNT_LOGIN}" name="login" />
             </p>
             <p>
-                <a class="lostpw" href="index.php?section=Login&amp;cmd=lostpw" title="{TXT_SHOP_ACCOUNT_LOST_PASSWORD}">
+                <a class="lostpw" href="{NODE_LOGIN_LOSTPW}" title="{TXT_SHOP_ACCOUNT_LOST_PASSWORD}">
                 {TXT_SHOP_ACCOUNT_LOST_PASSWORD}
                 </a>
             </p>
         </form>
     </div>
     <div class="customer_new">
-        <form role="form" name="shop_register" action="index.php?section=Shop&amp;cmd=login" method="post">
+        <form role="form" name="shop_register" action="{NODE_SHOP_LOGIN}" method="post">
             <h2>{TXT_SHOP_ACCOUNT_NEW_CUSTOMER}</h2>
             {TXT_SHOP_ACCOUNT_NOTE}<br />
             <br />

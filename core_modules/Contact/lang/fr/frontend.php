@@ -59,6 +59,6 @@ $_ARRAYLANG['TXT_CONTACT_CAPTCHA_DESCRIPTION'] = "Veuillez saisir la séquence d
 $_ARRAYLANG['TXT_CONTACT_RESET'] = "Reculer ";
 $_ARRAYLANG['TXT_CONTACT_RECEIVER_ADDRESSES_SELECTION'] = "Liste d'adresse de destinataires";
 $_ARRAYLANG['TXT_CONTACT_CAPTCHA'] = "Captcha";
-$_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'] = "S'il vous plaît Choisir";
+$_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'] = "S'il vous plaît choisir";
 $_ARRAYLANG['TXT_CONTACT_NOT_SPECIFIED'] = "Non indiquée";
 $_ARRAYLANG['TXT_CONTACT_RECAPTCHA_ERROR'] = "S'il vous plaît confirmer le CAPTCHA";

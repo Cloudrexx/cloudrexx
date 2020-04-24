@@ -105,7 +105,6 @@ $_ARRAYLANG['TXT_ACTIVE_TEMPLATE'] = 'Etkin Template';
 $_ARRAYLANG['TXT_ACTIVE_PDF_TEMPLATE'] = 'PDF';
 $_ARRAYLANG['TXT_ACTIVE_PRINT_TEMPLATE'] = 'Etkin Yazımgörünüm Templatesi';
 $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO'] = 'Etkinlenen Diller';
-$_ARRAYLANG['TXT_THEME_ACTIVATE_INFO_BODY'] = 'Eğer dil pembe renkte  ise, öyelyse Frontend de <a href="index.php?cmd=LanguageManager">Dilayarları</a> etkinlendi';
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = 'Mobile';
 $_ARRAYLANG['TXT_APP'] = 'App';
 $_ARRAYLANG['TXT_DESIGN_VARIABLES_LIST'] = 'Yer tutacakları dizini';

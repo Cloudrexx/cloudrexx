@@ -18,6 +18,7 @@ Cx\Modules\Calendar\Model\Entity\Category:
       targetEntity: Cx\Modules\Calendar\Model\Entity\CategoryName
       mappedBy: category
       cascade: [persist]
+  manyToMany:
     events:
       targetEntity: Cx\Modules\Calendar\Model\Entity\Event
-      mappedBy: category
+      mappedBy: categories

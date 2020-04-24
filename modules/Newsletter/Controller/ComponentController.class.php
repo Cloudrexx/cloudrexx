@@ -51,6 +51,74 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array();
     }
 
+    /**
+     * Returns a list of command mode commands provided by this component
+     *
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode()
+    {
+        return array('Newsletter');
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     * @param string $command The name of the command to fetch the description from
+     * @param boolean $short Wheter to return short or long description
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false) {
+        switch ($command) {
+            case 'Newsletter':
+                $desc = 'Group-based newsletter system';
+                if ($short) {
+                    return $desc;
+                }
+                $desc .= PHP_EOL . PHP_EOL . 'autoclean' . "\t" . 'Cleanup unsuccessul registrations';
+                return $desc;
+                break;
+        }
+    }
+
+    /**
+     * Execute api command
+     *
+     * @param string $command Name of command to execute
+     * @param array  $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array())
+    {
+        $subcommand = null;
+        if (!empty($arguments[0])) {
+            $subcommand = $arguments[0];
+        }
+
+        // define frontend language
+        if (!defined('FRONTEND_LANG_ID')) {
+            define('FRONTEND_LANG_ID', 1);
+        }
+
+        switch ($command) {
+            case 'Newsletter':
+                switch ($subcommand) {
+                    case 'autoclean':
+                        $newsletterLib = new NewsletterLib();
+                        $newsletterLib->autoCleanRegisters();
+                        break;
+
+                    case 'View':
+                        Newsletter::displayInBrowser();
+                        // execution is never reached, as Newsletter::displayInBrowser
+                        // does generate its own response
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
      /**
      * Load your component.
      *
@@ -93,10 +161,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     *
                     */
                     Newsletter::trackLink();
-                    //execution should never reach this point, but let's be safe and call exit anyway
-                    exit;
-                } elseif ($command == 'displayInBrowser') {
-                    Newsletter::displayInBrowser();
                     //execution should never reach this point, but let's be safe and call exit anyway
                     exit;
                 }

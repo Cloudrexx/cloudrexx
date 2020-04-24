@@ -22,6 +22,7 @@ $_CONFIG['forceDomainUrl']                = "off";
 $_CONFIG['forceProtocolFrontend']         = "none";
 $_CONFIG['portFrontendHTTP']              = 80;
 $_CONFIG['portFrontendHTTPS']             = 443;
+$_CONFIG['favicon']                       = "favicon.ico";
 
 /**
 * -------------------------------------------------------------------------
@@ -80,6 +81,7 @@ $_CONFIG['searchDescriptionLength']       = 150;
 $_CONFIG['googleMapsAPIKey']              = "";
 $_CONFIG['googleAnalyticsTrackingId']     = "";
 $_CONFIG['defaultMetaimage']              = "/themes/standard_4_0/images/og_logo_social_media.jpg";
+$_CONFIG['dnsHostnameLookup']             = "off";
 
 /**
 * -------------------------------------------------------------------------
@@ -95,7 +97,6 @@ $_CONFIG['installationId']                = "OpenSourceId4ddd08c0115f967d5ca40af
 * Component
 * -------------------------------------------------------------------------
 */
-$_CONFIG['bannerStatus']                  = 0;
 $_CONFIG['spamKeywords']                  = "sex, viagra";
 $_CONFIG['newsTeasersStatus']             = 1;
 $_CONFIG['feedNewsMLStatus']              = 0;
@@ -167,6 +168,7 @@ $_CONFIG['cacheProxyCacheConfig']         = "{\"ip\":\"127.0.0.1\",\"port\":\"80
 $_CONFIG['cacheSsiProcessorConfig']       = "{\"ip\":\"127.0.0.1\",\"port\":\"8080\"}";
 $_CONFIG['internalSsiCache']              = "off";
 $_CONFIG['cacheUserCacheMemcacheConfig']  = "{\"ip\":\"127.0.0.1\",\"port\":11211}";
+$_CONFIG['cacheUserCacheMemcachedConfig'] = "{\"ip\":\"127.0.0.1\",\"port\":11211}";
 
 /**
 * -------------------------------------------------------------------------

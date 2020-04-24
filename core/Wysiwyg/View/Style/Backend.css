@@ -7,10 +7,13 @@
 #form-X-title, #imagePath, #form-X-description, #form-X-htmlContent {width: 500px;}
 #form-X-description {height: 50px;}
 #editor-htmlContent {height: 300px;width: 100%;}
+#toolbarModifierWrapper {
+    margin: 0;
+}
 #toolbarModifierWrapper .toolbar,
 body .staticContainer .inner .toolbar,
 div.toolbarModifier ul[data-type="table-header"] > li[data-type="header"] > p,
-div.toolbarModifier ul[data-type="table-header"] > li[data-type="header"] > ul li > p:first-child,
+div.toolbarModifier ul[data-type="table-header"] > li[data-type="header"] > ul li > p,
 div.toolbarModifier ul[data-type="table-body"] > li[data-type="group"] > p,
 div.toolbarModifier ul[data-type="table-body"] > li[data-type="group"] > ul > li[data-type="subgroup"] > p > span > button.move,
 div.toolbarModifier ul[data-type="table-body"] > li[data-type="separator"] {
@@ -23,8 +26,12 @@ div.toolbarModifier ul[data-type="table-header"] > li[data-type="header"] > ul >
 #toolbarModifierWrapper  div.toolbarModifier > ul > li > ul,
 div.toolbarModifier > ul > li > ul,
 div.toolbarModifier > ul > li,
+div.toolbarModifier > ul[data-type="table-body"],
 div.toolbarModifier {
     display: block;
+}
+div.toolbarModifier > ul[data-type="table-body"] {
+    border: 0;
 }
 div.toolbarModifier > ul > li > ul {
     margin: 0;
@@ -60,4 +67,14 @@ div.toolbarModifier span.cke_combo_arrow {
 div.toolbarModifier > ul > li[data-type="group"]:hover,
 div.toolbarModifier > ul > li[data-type="separator"]:hover {
     background: none;
+}
+.row-1.editorfunctions td {
+    padding: 0;
+    border-bottom: 0;
+}
+.row3.wysiwyg-title-txt {
+    display: none;
+}
+div#cke_editor-basic {
+    border: 0;
 }

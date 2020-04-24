@@ -41,7 +41,7 @@ class DataElement extends HtmlElement {
     protected $type;
 
 
-    public function __construct($name, $value = '', $type = self::TYPE_INPUT, $validator = null) {
+    public function __construct($name, $value = '', $type = self::TYPE_INPUT, $validator = null, $validData = array()) {
         parent::__construct($type);
         $this->validator = $validator;
         $this->type = $type;
@@ -51,9 +51,21 @@ class DataElement extends HtmlElement {
                 $this->setAttribute('value', $value);
             break;
             case self::TYPE_SELECT:
-                if (is_string($value)) {
-                    // this is for customizing only:
-                    $this->addChild(new \Cx\Core\Html\Model\Entity\TextElement($value));
+                foreach ($validData as $key=>$val) {
+                    $option = new \Cx\Core\Html\Model\Entity\HtmlElement('option');
+                    $option->setAttribute('value', $key);
+                    $option->addChild(
+                        new \Cx\Core\Html\Model\Entity\TextElement($val)
+                    );
+                    // Numeric array keys are automatically converted to int by
+                    // PHP http://ch1.php.net/manual/en/language.types.array.php#example-58
+                    if (is_numeric($value) || is_bool($value)) {
+                        $value = (int)$value;
+                    }
+                    if ($key === $value) {
+                        $option->setAttribute('selected');
+                    }
+                    $this->addChild($option);
                 }
             break;
         }
@@ -109,7 +121,11 @@ class DataElement extends HtmlElement {
     }
 
     public function render() {
-        $this->setAttribute('onkeyup', $this->getValidator()->getJavaScriptCode());
+        $this->setAttribute(
+            'onkeyup',
+            $this->getAttribute('onkeyup') . ';' .
+                $this->getValidator()->getJavaScriptCode()
+        );
         return parent::render();
     }
 }

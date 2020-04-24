@@ -105,7 +105,6 @@ $_ARRAYLANG['TXT_ACTIVE_TEMPLATE'] = 'Standard';
 $_ARRAYLANG['TXT_ACTIVE_PDF_TEMPLATE'] = 'PDF';
 $_ARRAYLANG['TXT_ACTIVE_PRINT_TEMPLATE'] = 'Udskrive';
 $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO'] = 'Aktiverede sprog';
-$_ARRAYLANG['TXT_THEME_ACTIVATE_INFO_BODY'] = 'Sprog med lyserød baggrund er blevet aktiveret for frontend-siden <a href="index.php?cmd=LanguageManager">settings.</a>';
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = 'Mobile';
 $_ARRAYLANG['TXT_APP'] = 'App';
 $_ARRAYLANG['TXT_DESIGN_VARIABLES_LIST'] = 'Pladsholder fortegnelse';

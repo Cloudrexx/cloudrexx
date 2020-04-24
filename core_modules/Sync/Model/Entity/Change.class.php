@@ -62,9 +62,9 @@ class Change extends \Cx\Model\Base\EntityBase {
     protected $originSync;
     
     /**
-     * @var array
+     * @var \Doctrine\Common\Collections\Collection
      */
-    protected $hosts = array();
+    protected $hosts;
     
     /**
      * @var string One of "delete", "put", "post"
@@ -117,6 +117,7 @@ class Change extends \Cx\Model\Base\EntityBase {
         } else {
             $this->entity = $entityOrContents;
         }
+        $this->hosts = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**
@@ -173,6 +174,20 @@ class Change extends \Cx\Model\Base\EntityBase {
      */
     public function addHost($host) {
         $this->hosts[] = $host;
+    }
+    
+    /**
+     * Removes a related Host object
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Host $host Host to remove
+     */
+    public function removeHost($host) {
+        $this->hosts->removeElement($host);
+        return;
+        $key = array_search($host, $this->hosts);
+        if ($key === false) {
+            return;
+        }
+        unset($this->hosts[$key]);
     }
     
     /**

@@ -1,353 +1,363 @@
 <div id="calendar">
-    {CALENDAR_JAVASCRIPT}
-    <!-- BEGIN calendarEventOkMessage -->
-    Eintrag erfolgreich gespeichert. Sie werden benachrichtigt, sobald dieser erfolgreich gepr?ft und aufgeschaltet wurde.<br /><br />
-    <!-- END calendarEventOkMessage -->
-    <!-- BEGIN calendarEventErrMessage -->
-    Bein Speichern trat ein Fehler auf. Bitte versuchen sie es erneut.<br /><br />
-    <!-- END calendarEventErrMessage -->
-    <!-- BEGIN calendarEventModifyForm -->
-    <form enctype="multipart/form-data" method="post" action="{NODE_CALENDAR_EDIT}" name="formModifyEvent" id="formModifyEvent">
-        <input type="hidden" name="id" value="{CALENDAR_EVENT_ID}" />
-        <input type="hidden" name="map_id" value="{CALENDAR_MAP_ID}" />
-        <input type="hidden" name="picture_id" value="{CALENDAR_PICTURE_ID}" />
-        <input type="hidden" name="attachment_id" value="{CALENDAR_ATTACHMENT_ID}" />
-        <fieldset class="show_in" style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
-            <legend>{TXT_CALENDAR_LANGUAGE}</legend>
-            <!-- BEGIN eventShowIn -->
-            <div class="checkbox"><label><input data-id="{CALENDAR_EVENT_LANG_ID}" class="lang_check" name="showIn[]" id="showIn_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_LANG_ID}" type="checkbox" {CALENDAR_EVENT_LANG_CHECKED} />
-                    {TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;&nbsp;&nbsp;
-                </label></div>
-            <!-- END eventShowIn -->
-        </fieldset>
-        <br />
-        <fieldset>
-            <legend>{TXT_CALENDAR_EVENT}</legend>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></label>
-                <input type="text"  name="startDate" class="startDate validate[required]" id="startDate" value="{CALENDAR_EVENT_START_DATE}" />
-                <div class="checkbox"><label style="float: none;">
-                        <input style="float: none;" type="checkbox" class="all_day" name="all_day" {CALENDAR_EVENT_ALL_DAY} value="1" /> {TXT_CALENDAR_EVENT_ALL_DAY} </label>
+  {CALENDAR_JAVASCRIPT}
+  <!-- BEGIN calendarEventOkMessage -->
+  Eintrag erfolgreich gespeichert. Sie werden benachrichtigt, sobald dieser erfolgreich gepr?ft und aufgeschaltet wurde.<br /><br />
+  <!-- END calendarEventOkMessage -->
+  <!-- BEGIN calendarEventErrMessage -->
+  Bein Speichern trat ein Fehler auf. Bitte versuchen sie es erneut.<br /><br />
+  <!-- END calendarEventErrMessage -->
+  <!-- BEGIN calendarEventModifyForm -->
+  <form enctype="multipart/form-data" method="post" action="{NODE_CALENDAR_EDIT}" name="formModifyEvent" id="formModifyEvent">
+    <input type="hidden" name="id" value="{CALENDAR_EVENT_ID}" />
+    <input type="hidden" name="map_id" value="{CALENDAR_MAP_ID}" />
+    <input type="hidden" name="picture_id" value="{CALENDAR_PICTURE_ID}" />
+    <input type="hidden" name="attachment_id" value="{CALENDAR_ATTACHMENT_ID}" />
+    <fieldset class="show_in" style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
+      <legend>{TXT_CALENDAR_LANGUAGE}</legend>
+      <!-- BEGIN eventShowIn -->
+      <div class="checkbox"><label><input data-id="{CALENDAR_EVENT_LANG_ID}" class="lang_check" name="showIn[]" id="showIn_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_LANG_ID}" type="checkbox" {CALENDAR_EVENT_LANG_CHECKED} />
+          {TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;&nbsp;&nbsp;
+        </label></div>
+      <!-- END eventShowIn -->
+    </fieldset>
+    <br />
+    <fieldset>
+      <legend>{TXT_CALENDAR_EVENT}</legend>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></label>
+        <input type="text"  name="startDate" class="startDate validate[required]" id="startDate" value="{CALENDAR_EVENT_START_DATE}" />
+        <div class="checkbox"><label style="float: none;">
+            <input style="float: none;" type="checkbox" class="all_day" name="all_day" {CALENDAR_EVENT_ALL_DAY} value="1" /> {TXT_CALENDAR_EVENT_ALL_DAY} </label>
+        </div>
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_END} <font color="#ff0000">*</font></label>
+        <input type="text" name="endDate" class="endDate validate[required]" id="endDate" value="{CALENDAR_EVENT_END_DATE}" />
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_TYPE}</label>
+        <select class="form-control" id="event-type" name="type">
+          <option value="0" {CALENDAR_EVENT_TYPE_EVENT}>{TXT_CALENDAR_EVENT_TYPE_EVENT}</option>
+          <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
+        </select>
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_DETAIL_VIEW}</label>
+        <div class="checkbox"><label class="eventDetailLink">
+          <input type="checkbox" name="show-detail-view" {CALENDAR_EVENT_SHOW_DETAIL_VIEW} value="1" /> {TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL} </label>
+        </div>
+      </div>
+      <div id="event-tabs">
+        <ul style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
+          <!-- BEGIN eventTabMenuDescTab -->
+          <li id="eventDescTab_{CALENDAR_EVENT_LANG_ID}"><a class="{CALENDAR_EVENT_TAB_CLASS}" href="#event-tab-{CALENDAR_EVENT_LANG_ID}" title="{TXT_CALENDAR_EVENT_LANG_NAME}">{TXT_CALENDAR_EVENT_LANG_NAME}</a></li>
+          <!-- END eventTabMenuDescTab -->
+        </ul>
+        <!-- BEGIN eventDescTab -->
+        <div class="event-tabs-des-box" id="event-tab-{CALENDAR_EVENT_LANG_ID}">
+          <div>
+            <label>{TXT_CALENDAR_EVENT_TITLE} <font color="#ff0000">*</font></label><input data-id="{CALENDAR_EVENT_LANG_ID}" name="title[{CALENDAR_EVENT_LANG_ID}]" class="validate[event_title]" type="text" value="{CALENDAR_EVENT_TITLE}" />
+          </div>
+          <div class="event-description" style="display: {CALENDAR_EVENT_TYPE_EVENT_DISPLAY};">
+            <div>{TXT_CALENDAR_EVENT_DESCRIPTION}</div>
+            {CALENDAR_EVENT_DESCRIPTION}
+          </div>
+          <div class="event-redirect" style="display: {CALENDAR_EVENT_TYPE_REDIRECT_DISPLAY};">
+            <label>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</label>
+            <input type="text" name="calendar-redirect[{CALENDAR_EVENT_LANG_ID}]" value="{CALENDAR_EVENT_REDIRECT}" />
+          </div>
+        </div>
+        <!-- END eventDescTab -->
+      </div>
+    </fieldset>
+    <br />
+    <fieldset id="place">
+      <legend>{TXT_CALENDAR_EVENT_PLACE}</legend>
+      <!-- BEGIN eventPlaceTypeRadio -->
+      <div>
+        <label>&nbsp;</label>
+        <div>
+          <div class="radio">
+            <label for="eventLocationTypeManual">
+              <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} />
+              {TXT_CALENDAR_PLACE_DATA_DEFAULT}
+            </label>
+          </div>
+          <div class="radio">
+            <label for="eventLocationTypeMediadir">
+              <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeMediadir" value="2" {CALENDAR_EVENT_LOCATION_TYPE_MEDIADIR} />
+              {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
+            </label>
+          </div>
+        </div>
+        <!-- END eventPlaceTypeRadio -->
+        <!-- BEGIN eventPlaceSelect -->
+        <div class="event_place_mediadir">
+          <label>{TXT_CALENDAR_EVENT_PLACE}</label>
+          <select class="form-control" name="placeMediadir">{CALENDAR_EVENT_PLACE_OPTIONS}</select>
+        </div>
+        <!-- END eventPlaceSelect -->
+        <!-- BEGIN eventPlaceInput -->
+        <div class="event_multilingual event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_PLACE}</label>
+          <div class="event_minimized_block" id="event_place_Minimized" style="display: block;">
+            <input type="text" data-id="place" class="eventInputfieldDefault" name="event_place[0]" id="event_place_0" value="{CALENDAR_EVENT_PLACE_DEFAULT}" >&nbsp;
+            <!-- BEGIN calendar_event_place_expand -->
+            <a class="input_field_expand" href="javascript:ExpandMinimize('place');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+            <!-- END calendar_event_place_expand -->
+          </div>
+          <div class="event_expanded_block" id="event_place_Expanded" style="display: none;">
+            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+              <tr>
+                <td width="325">
+                  <!-- BEGIN calendar_event_place -->
+                  <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                    <input type="text" data-id="place" name="event_place[{CALENDAR_EVENT_LANG_ID}]" id="event_place_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                  </div>
+                  <!-- END calendar_event_place -->
+                </td>
+                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_STREET}</label>
+          <input name="street" type="text" value="{CALENDAR_EVENT_STREET}" />
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_ZIP}</label>
+          <input name="zip" type="text" value="{CALENDAR_EVENT_ZIP}" />
+        </div>
+        <div class="event_multilingual event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_CITY}</label>
+          <div class="event_minimized_block" id="event_place_city_Minimized" style="display: block;">
+            <input type="text" data-id="place_city" class="eventInputfieldDefault" name="event_place_city[0]" id="event_place_city_0" value="{CALENDAR_EVENT_PLACE_CITY_DEFAULT}" >&nbsp;
+            <!-- BEGIN calendar_event_place_city_expand -->
+            <a class="input_field_expand" href="javascript:ExpandMinimize('place_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+            <!-- END calendar_event_place_city_expand -->
+          </div>
+          <div class="event_expanded_block" id="event_place_city_Expanded" style="display: none;">
+            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+              <tr>
+                <td width="325">
+                  <!-- BEGIN calendar_event_place_city -->
+                  <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                    <input type="text" data-id="place_city" name="event_place_city[{CALENDAR_EVENT_LANG_ID}]" id="event_place_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                  </div>
+                  <!-- END calendar_event_place_city -->
+                </td>
+                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="event_multilingual event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_COUNTRY}</label>
+          <div class="event_minimized_block" id="event_place_country_Minimized" style="display: block;">
+            <input type="text" data-id="place_country" class="eventInputfieldDefault" name="event_place_country[0]" id="event_place_country_0" value="{CALENDAR_EVENT_PLACE_COUNTRY_DEFAULT}" >&nbsp;
+            <!-- BEGIN calendar_event_place_country_expand -->
+            <a class="input_field_expand" href="javascript:ExpandMinimize('place_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+            <!-- END calendar_event_place_country_expand -->
+          </div>
+          <div class="event_expanded_block" id="event_place_country_Expanded" style="display: none;">
+            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+              <tr>
+                <td width="325">
+                  <!-- BEGIN calendar_event_place_country -->
+                  <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                    <input type="text" data-id="place_country" name="event_place_country[{CALENDAR_EVENT_LANG_ID}]" id="event_place_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                  </div>
+                  <!-- END calendar_event_place_country -->
+                </td>
+                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_WEBSITE}</label>
+          <input name="placeWebsite" type="text" value="{CALENDAR_EVENT_PLACE_WEBSITE}" />
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_LINK}</label>
+          <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_PHONE}</label>
+          <input name="placePhone" type="text" value="{CALENDAR_EVENT_PLACE_PHONE}" />
+        </div>
+        <div class="event_place_manual">
+          <label>{TXT_CALENDAR_EVENT_MAP}</label>
+          <div class="formUploadedFiles">
+            {CALENDAR_EVENT_PLACE_MAP_LINK}
+            {MAPUPLOAD_WIDGET_CODE}
+            <input type="file" name="mapUpload" id="mapUpload" />
+            <input type="hidden" name="placeMap" value="{CALENDAR_EVENT_PLACE_MAP}" />
+          </div>
+        </div>
+        <!-- END eventPlaceInput -->
+    </fieldset>
+    <br/>
+    <fieldset id="host">
+      <legend>{TXT_CALENDAR_EVENT_HOST}</legend>
+      <!-- BEGIN eventHostTypeRadio -->
+      <div>
+        <label>&nbsp;</label>
+        <div>
+          <div class="radio">
+            <label for="eventHostTypeManual">
+              <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeManual" value="1" {CALENDAR_EVENT_HOST_TYPE_MANUAL} />
+              {TXT_CALENDAR_PLACE_DATA_DEFAULT}
+            </label>
+          </div>
+          <div class="radio">
+            <label for="eventHostTypeMediadir">
+              <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeMediadir" value="2" {CALENDAR_EVENT_HOST_TYPE_MEDIADIR} />
+              {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
+            </label>
+          </div>
+        </div>
+      </div>
+      <!-- END eventHostTypeRadio -->
+      <!-- BEGIN eventHostSelect -->
+      <div class="event_host_mediadir">
+        <label>{TXT_CALENDAR_EVENT_PLACE}</label>
+        <select class="form-control" name="hostMediadir">{CALENDAR_EVENT_PLACE_OPTIONS}</select>
+      </div>
+      <!-- END eventHostSelect -->
+      <!-- BEGIN eventHostInput -->
+      <div class="event_multilingual event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_NAME}</label>
+        <div class="event_minimized_block" id="event_org_name_Minimized" style="display: block;">
+          <input type="text" data-id="org_name" class="eventInputfieldDefault" name="event_org_name[0]" id="event_org_name_0" value="{CALENDAR_EVENT_ORG_NAME_DEFAULT}" >&nbsp;
+          <!-- BEGIN calendar_event_org_name_expand -->
+          <a class="input_field_expand" href="javascript:ExpandMinimize('org_name');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+          <!-- END calendar_event_org_name_expand -->
+        </div>
+        <div class="event_expanded_block" id="event_org_name_Expanded" style="display: none;">
+          <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+            <tr>
+              <td width="325">
+                <!-- BEGIN calendar_event_org_name -->
+                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                  <input type="text" data-id="org_name" name="event_org_name[{CALENDAR_EVENT_LANG_ID}]" id="event_org_name_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
                 </div>
-            </div>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_END} <font color="#ff0000">*</font></label>
-                <input type="text" name="endDate" class="endDate validate[required]" id="endDate" value="{CALENDAR_EVENT_END_DATE}" />
-            </div>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_TYPE}</label>
-                <select class="form-control" id="event-type" name="type">
-                    <option value="0" {CALENDAR_EVENT_TYPE_EVENT}>{TXT_CALENDAR_EVENT_TYPE_EVENT}</option>
-                    <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
-                </select>
-            </div>
-            <div id="event-tabs">
-                <ul style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
-                    <!-- BEGIN eventTabMenuDescTab -->
-                    <li id="eventDescTab_{CALENDAR_EVENT_LANG_ID}"><a class="{CALENDAR_EVENT_TAB_CLASS}" href="#event-tab-{CALENDAR_EVENT_LANG_ID}" title="{TXT_CALENDAR_EVENT_LANG_NAME}">{TXT_CALENDAR_EVENT_LANG_NAME}</a></li>
-                    <!-- END eventTabMenuDescTab -->
-                </ul>
-                <!-- BEGIN eventDescTab -->
-                <div class="event-tabs-des-box" id="event-tab-{CALENDAR_EVENT_LANG_ID}">
-                    <div>
-                        <label>{TXT_CALENDAR_EVENT_TITLE} <font color="#ff0000">*</font></label><input data-id="{CALENDAR_EVENT_LANG_ID}" name="title[{CALENDAR_EVENT_LANG_ID}]" class="validate[event_title]" type="text" value="{CALENDAR_EVENT_TITLE}" />
-                    </div>
-                    <div class="event-description" style="display: {CALENDAR_EVENT_TYPE_EVENT_DISPLAY};">
-                        <div>{TXT_CALENDAR_EVENT_DESCRIPTION}</div>
-                        {CALENDAR_EVENT_DESCRIPTION}
-                    </div>
-                    <div class="event-redirect" style="display: {CALENDAR_EVENT_TYPE_REDIRECT_DISPLAY};">
-                        <label>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</label>
-                        <input type="text" name="calendar-redirect[{CALENDAR_EVENT_LANG_ID}]" value="{CALENDAR_EVENT_REDIRECT}" />
-                    </div>
+                <!-- END calendar_event_org_name -->
+              </td>
+              <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_name');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_STREET}</label>
+        <input name="organizerStreet" type="text" value="{CALENDAR_EVENT_HOST_ADDRESS}" />
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_ZIP}</label>
+        <input name="organizerZip" type="text" value="{CALENDAR_EVENT_HOST_ZIP}" />
+      </div>
+      <div class="event_multilingual event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_CITY}</label>
+        <div class="event_minimized_block" id="event_org_city_Minimized" style="display: block;">
+          <input type="text" data-id="org_city" class="eventInputfieldDefault" name="event_org_city[0]" id="event_org_city_0" value="{CALENDAR_EVENT_ORG_CITY_DEFAULT}" >&nbsp;
+          <!-- BEGIN calendar_event_org_city_expand -->
+          <a class="input_field_expand" href="javascript:ExpandMinimize('org_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+          <!-- END calendar_event_org_city_expand -->
+        </div>
+        <div class="event_expanded_block" id="event_org_city_Expanded" style="display: none;">
+          <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+            <tr>
+              <td width="325">
+                <!-- BEGIN calendar_event_org_city -->
+                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                  <input type="text" data-id="org_city" name="event_org_city[{CALENDAR_EVENT_LANG_ID}]" id="event_org_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
                 </div>
-                <!-- END eventDescTab -->
-            </div>
-        </fieldset>
-        <br />
-        <fieldset id="place">
-            <legend>{TXT_CALENDAR_EVENT_PLACE}</legend>
-            <!-- BEGIN eventPlaceTypeRadio -->
-            <div>
-                <label>&nbsp;</label>
-                <div>
-                    <div class="radio">
-                        <label for="eventLocationTypeManual">
-                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} />
-                            {TXT_CALENDAR_PLACE_DATA_DEFAULT}
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label for="eventLocationTypeMediadir">
-                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeMediadir" value="2" {CALENDAR_EVENT_LOCATION_TYPE_MEDIADIR} />
-                            {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
-                        </label>
-                    </div>
+                <!-- END calendar_event_org_city -->
+              </td>
+              <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="event_multilingual event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_COUNTRY}</label>
+        <div class="event_minimized_block" id="event_org_country_Minimized" style="display: block;">
+          <input type="text" data-id="org_country" class="eventInputfieldDefault" name="event_org_country[0]" id="event_org_country_0" value="{CALENDAR_EVENT_ORG_COUNTRY_DEFAULT}" >&nbsp;
+          <!-- BEGIN calendar_event_org_country_expand -->
+          <a class="input_field_expand" href="javascript:ExpandMinimize('org_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+          <!-- END calendar_event_org_country_expand -->
+        </div>
+        <div class="event_expanded_block" id="event_org_country_Expanded" style="display: none;">
+          <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+            <tr>
+              <td width="325">
+                <!-- BEGIN calendar_event_org_country -->
+                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                  <input type="text" data-id="org_country" name="event_org_country[{CALENDAR_EVENT_LANG_ID}]" id="event_org_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
                 </div>
-                <!-- END eventPlaceTypeRadio -->
-                <!-- BEGIN eventPlaceSelect -->
-                <div class="event_place_mediadir">
-                    <label>{TXT_CALENDAR_EVENT_PLACE}</label>
-                    <select class="form-control" name="placeMediadir">{CALENDAR_EVENT_PLACE_OPTIONS}</select>
-                </div>
-                <!-- END eventPlaceSelect -->
-                <!-- BEGIN eventPlaceInput -->
-                <div class="event_multilingual event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_PLACE}</label>
-                    <div class="event_minimized_block" id="event_place_Minimized" style="display: block;">
-                        <input type="text" data-id="place" class="eventInputfieldDefault" name="event_place[0]" id="event_place_0" value="{CALENDAR_EVENT_PLACE_DEFAULT}" >&nbsp;
-                        <!-- BEGIN calendar_event_place_expand -->
-                        <a class="input_field_expand" href="javascript:ExpandMinimize('place');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                        <!-- END calendar_event_place_expand -->
-                    </div>
-                    <div class="event_expanded_block" id="event_place_Expanded" style="display: none;">
-                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                            <tr>
-                                <td width="325">
-                                    <!-- BEGIN calendar_event_place -->
-                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                        <input type="text" data-id="place" name="event_place[{CALENDAR_EVENT_LANG_ID}]" id="event_place_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                    </div>
-                                    <!-- END calendar_event_place -->
-                                </td>
-                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_STREET}</label>
-                    <input name="street" type="text" value="{CALENDAR_EVENT_STREET}" />
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_ZIP}</label>
-                    <input name="zip" type="text" value="{CALENDAR_EVENT_ZIP}" />
-                </div>
-                <div class="event_multilingual event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_CITY}</label>
-                    <div class="event_minimized_block" id="event_place_city_Minimized" style="display: block;">
-                        <input type="text" data-id="place_city" class="eventInputfieldDefault" name="event_place_city[0]" id="event_place_city_0" value="{CALENDAR_EVENT_PLACE_CITY_DEFAULT}" >&nbsp;
-                        <!-- BEGIN calendar_event_place_city_expand -->
-                        <a class="input_field_expand" href="javascript:ExpandMinimize('place_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                        <!-- END calendar_event_place_city_expand -->
-                    </div>
-                    <div class="event_expanded_block" id="event_place_city_Expanded" style="display: none;">
-                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                            <tr>
-                                <td width="325">
-                                    <!-- BEGIN calendar_event_place_city -->
-                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                        <input type="text" data-id="place_city" name="event_place_city[{CALENDAR_EVENT_LANG_ID}]" id="event_place_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                    </div>
-                                    <!-- END calendar_event_place_city -->
-                                </td>
-                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="event_multilingual event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_COUNTRY}</label>
-                    <div class="event_minimized_block" id="event_place_country_Minimized" style="display: block;">
-                        <input type="text" data-id="place_country" class="eventInputfieldDefault" name="event_place_country[0]" id="event_place_country_0" value="{CALENDAR_EVENT_PLACE_COUNTRY_DEFAULT}" >&nbsp;
-                        <!-- BEGIN calendar_event_place_country_expand -->
-                        <a class="input_field_expand" href="javascript:ExpandMinimize('place_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                        <!-- END calendar_event_place_country_expand -->
-                    </div>
-                    <div class="event_expanded_block" id="event_place_country_Expanded" style="display: none;">
-                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                            <tr>
-                                <td width="325">
-                                    <!-- BEGIN calendar_event_place_country -->
-                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                        <input type="text" data-id="place_country" name="event_place_country[{CALENDAR_EVENT_LANG_ID}]" id="event_place_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                    </div>
-                                    <!-- END calendar_event_place_country -->
-                                </td>
-                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_WEBSITE}</label>
-                    <input name="placeWebsite" type="text" value="{CALENDAR_EVENT_PLACE_WEBSITE}" />
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_LINK}</label>
-                    <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_PHONE}</label>
-                    <input name="placePhone" type="text" value="{CALENDAR_EVENT_PLACE_PHONE}" />
-                </div>
-                <div class="event_place_manual">
-                    <label>{TXT_CALENDAR_EVENT_MAP}</label>
-                    <div class="formUploadedFiles">
-                        {MAPUPLOAD_WIDGET_CODE}
-                        <input type="file" name="mapUpload" id="mapUpload" />
-                        <input type="hidden" name="placeMap" value="{CALENDAR_EVENT_PLACE_MAP}" />
-                    </div>
-                </div>
-                <!-- END eventPlaceInput -->
-        </fieldset>
-        <br/>
-        <fieldset id="host">
-            <legend>{TXT_CALENDAR_EVENT_HOST}</legend>
-            <!-- BEGIN eventHostTypeRadio -->
-            <div>
-                <label>&nbsp;</label>
-                <div>
-                    <div class="radio">
-                        <label for="eventHostTypeManual">
-                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeManual" value="1" {CALENDAR_EVENT_HOST_TYPE_MANUAL} />
-                            {TXT_CALENDAR_PLACE_DATA_DEFAULT}
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label for="eventHostTypeMediadir">
-                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeMediadir" value="2" {CALENDAR_EVENT_HOST_TYPE_MEDIADIR} />
-                            {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <!-- END eventHostTypeRadio -->
-            <!-- BEGIN eventHostSelect -->
-            <div class="event_host_mediadir">
-                <label>{TXT_CALENDAR_EVENT_PLACE}</label>
-                <select class="form-control" name="hostMediadir">{CALENDAR_EVENT_PLACE_OPTIONS}</select>
-            </div>
-            <!-- END eventHostSelect -->
-            <!-- BEGIN eventHostInput -->
-            <div class="event_multilingual event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_NAME}</label>
-                <div class="event_minimized_block" id="event_org_name_Minimized" style="display: block;">
-                    <input type="text" data-id="org_name" class="eventInputfieldDefault" name="event_org_name[0]" id="event_org_name_0" value="{CALENDAR_EVENT_ORG_NAME_DEFAULT}" >&nbsp;
-                    <!-- BEGIN calendar_event_org_name_expand -->
-                    <a class="input_field_expand" href="javascript:ExpandMinimize('org_name');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                    <!-- END calendar_event_org_name_expand -->
-                </div>
-                <div class="event_expanded_block" id="event_org_name_Expanded" style="display: none;">
-                    <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                        <tr>
-                            <td width="325">
-                                <!-- BEGIN calendar_event_org_name -->
-                                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                    <input type="text" data-id="org_name" name="event_org_name[{CALENDAR_EVENT_LANG_ID}]" id="event_org_name_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                </div>
-                                <!-- END calendar_event_org_name -->
-                            </td>
-                            <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_name');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_STREET}</label>
-                <input name="organizerStreet" type="text" value="{CALENDAR_EVENT_HOST_ADDRESS}" />
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_ZIP}</label>
-                <input name="organizerZip" type="text" value="{CALENDAR_EVENT_HOST_ZIP}" />
-            </div>
-            <div class="event_multilingual event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_CITY}</label>
-                <div class="event_minimized_block" id="event_org_city_Minimized" style="display: block;">
-                    <input type="text" data-id="org_city" class="eventInputfieldDefault" name="event_org_city[0]" id="event_org_city_0" value="{CALENDAR_EVENT_ORG_CITY_DEFAULT}" >&nbsp;
-                    <!-- BEGIN calendar_event_org_city_expand -->
-                    <a class="input_field_expand" href="javascript:ExpandMinimize('org_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                    <!-- END calendar_event_org_city_expand -->
-                </div>
-                <div class="event_expanded_block" id="event_org_city_Expanded" style="display: none;">
-                    <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                        <tr>
-                            <td width="325">
-                                <!-- BEGIN calendar_event_org_city -->
-                                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                    <input type="text" data-id="org_city" name="event_org_city[{CALENDAR_EVENT_LANG_ID}]" id="event_org_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                </div>
-                                <!-- END calendar_event_org_city -->
-                            </td>
-                            <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="event_multilingual event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_COUNTRY}</label>
-                <div class="event_minimized_block" id="event_org_country_Minimized" style="display: block;">
-                    <input type="text" data-id="org_country" class="eventInputfieldDefault" name="event_org_country[0]" id="event_org_country_0" value="{CALENDAR_EVENT_ORG_COUNTRY_DEFAULT}" >&nbsp;
-                    <!-- BEGIN calendar_event_org_country_expand -->
-                    <a class="input_field_expand" href="javascript:ExpandMinimize('org_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
-                    <!-- END calendar_event_org_country_expand -->
-                </div>
-                <div class="event_expanded_block" id="event_org_country_Expanded" style="display: none;">
-                    <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
-                        <tr>
-                            <td width="325">
-                                <!-- BEGIN calendar_event_org_country -->
-                                <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
-                                    <input type="text" data-id="org_country" name="event_org_country[{CALENDAR_EVENT_LANG_ID}]" id="event_org_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
-                                </div>
-                                <!-- END calendar_event_org_country -->
-                            </td>
-                            <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_WEBSITE}</label>
-                <input name="organizerWebsite" type="text" value="{CALENDAR_EVENT_HOST_WEBSITE}" />
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_LINK}</label>
-                <input name="organizerLink" type="text" value="{CALENDAR_EVENT_HOST_LINK}" />
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_PHONE}</label>
-                <input name="organizerPhone" type="text" value="{CALENDAR_EVENT_HOST_PHONE}" />
-            </div>
-            <div class="event_host_manual">
-                <label>{TXT_CALENDAR_EVENT_EMAIL}</label>
-                <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />
-            </div>
-            <!-- END eventHostInput -->
-        </fieldset>
-        <br/>
-        <fieldset id="additionalinfos">
-            <legend>{TXT_CALENDAR_EVENT_DETAILS}</legend>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_LINK}</label>
-                <input name="link" type="text" value="{CALENDAR_EVENT_LINK}" />
-            </div>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_PICTURE}</label>
-                <div class="formUploadedFiles">
-                    {PICTUREUPLOAD_WIDGET_CODE}
-                    <input type="file" name="pictureUpload" id="pictureUpload" />
-                    <input type="hidden" name="picture" value="{CALENDAR_EVENT_PICTURE}" />
-                </div>
-            </div>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_ATTACHMENT}</label>
-                <div class="formUploadedFiles">
-                    {ATTACHMENTUPLOAD_WIDGET_CODE}
-                    <input type="file" name="attachmentUpload" id="attachmentUpload" />
-                    <input type="hidden" name="attachment" value="{CALENDAR_EVENT_ATTACHMENT}" />
-                </div>
-            </div>
-            <div>
-                <label>{TXT_CALENDAR_EVENT_CATEGORY} <font color="#ff0000">*</font></label>
-                <select id="category" name="category" class="form-control validate[required]">
-                    {CALENDAR_EVENT_CATEGORIES}
-                </select>
-            </div>
-        </fieldset>
-        <br />
-        <div><input class="btn btn-default" type="submit" value="{TXT_CALENDAR_SAVE}" name="submitFormModifyEvent" /></div>
-        <div style="display: none;" class="text-danger" id="calendarErrorMessage"><div>{TXT_CALENDAR_PLEASE_CHECK_INPUT}</div></div>
-    </form>
-    <!-- END calendarEventModifyForm -->
+                <!-- END calendar_event_org_country -->
+              </td>
+              <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_WEBSITE}</label>
+        <input name="organizerWebsite" type="text" value="{CALENDAR_EVENT_HOST_WEBSITE}" />
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_LINK}</label>
+        <input name="organizerLink" type="text" value="{CALENDAR_EVENT_HOST_LINK}" />
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_PHONE}</label>
+        <input name="organizerPhone" type="text" value="{CALENDAR_EVENT_HOST_PHONE}" />
+      </div>
+      <div class="event_host_manual">
+        <label>{TXT_CALENDAR_EVENT_EMAIL}</label>
+        <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />
+      </div>
+      <!-- END eventHostInput -->
+    </fieldset>
+    <br/>
+    <fieldset id="additionalinfos">
+      <legend>{TXT_CALENDAR_EVENT_DETAILS}</legend>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_LINK}</label>
+        <input name="link" type="text" value="{CALENDAR_EVENT_LINK}" />
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_PICTURE}</label>
+        <div class="formUploadedFiles">
+          {CALENDAR_EVENT_PICTURE_THUMB}
+          {PICTUREUPLOAD_WIDGET_CODE}
+          <input type="file" name="pictureUpload" id="pictureUpload" />
+          <input type="hidden" name="picture" value="{CALENDAR_EVENT_PICTURE}" />
+        </div>
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_ATTACHMENT}</label>
+        <div class="formUploadedFiles">
+          {CALENDAR_EVENT_ATTACHMENT_LINK}
+          {ATTACHMENTUPLOAD_WIDGET_CODE}
+          <input type="file" name="attachmentUpload" id="attachmentUpload" />
+          <input type="hidden" name="attachment" value="{CALENDAR_EVENT_ATTACHMENT}" />
+        </div>
+      </div>
+      <div>
+        <label>{TXT_CALENDAR_EVENT_CATEGORY} <font color="#ff0000">*</font></label>
+        <select multiple="multiple" id="category" name="category_ids[]"
+                class="form-control validate[required]">
+          {CALENDAR_EVENT_CATEGORIES}
+        </select>
+      </div>
+    </fieldset>
+    <br />
+    <div><input class="btn btn-default" type="submit" value="{TXT_CALENDAR_SAVE}" name="submitFormModifyEvent" /></div>
+    <div style="display: none;" class="text-danger" id="calendarErrorMessage"><div>{TXT_CALENDAR_PLEASE_CHECK_INPUT}</div></div>
+  </form>
+  <!-- END calendarEventModifyForm -->
 </div>

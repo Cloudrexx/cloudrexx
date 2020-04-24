@@ -59,7 +59,8 @@ class MediaDirectoryInputfieldGoogleWeather extends \Cx\Modules\MediaDir\Control
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit;
+        global $objDatabase, $objInit;
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -85,11 +86,11 @@ class MediaDirectoryInputfieldGoogleWeather extends \Cx\Modules\MediaDir\Control
                 }
 
                 if(empty($strValue)) {
-                    $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                    $strValue = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
                 }
 
                 if(!empty($arrInputfield['info'][0])){
-                    $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
+                    $strInfoValue = empty($arrInputfield['info'][$langId]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$langId].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
                 } else {
                     $strInfoValue = null;
@@ -137,14 +138,12 @@ class MediaDirectoryInputfieldGoogleWeather extends \Cx\Modules\MediaDir\Control
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $_LANGID;
-
         $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
 
         if(!empty($strValue)) {
             $strValue = strip_tags($strValue);
             $objGoogleWeather = new \googleWeather();
-            $objGoogleWeather->setWeatherLanguage($_LANGID);
+            $objGoogleWeather->setWeatherLanguage(static::getOutputLocale()->getId());
             $objGoogleWeather->setWeatherLocation($strValue);
             $objGoogleWeather->setWeatherForecastDays(4);
             $objGoogleWeather->setWeatherShowTitle(false);

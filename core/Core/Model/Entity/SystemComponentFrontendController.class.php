@@ -58,7 +58,7 @@ abstract class SystemComponentFrontendController extends Controller {
         global $_ARRAYLANG;
 
         // init component template
-        $componentTemplate = new \Cx\Core\Html\Sigma('.');
+        $componentTemplate = new \Cx\Core\Html\Sigma('.', '', $page);
         $componentTemplate->setErrorHandling(PEAR_ERROR_DIE);
         $componentTemplate->setTemplate($page->getContent());
 

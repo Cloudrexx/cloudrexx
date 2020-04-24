@@ -68,6 +68,20 @@ class Search
     protected $rootPage = null;
 
     /**
+     * List of valid options that can be applied to the search algorithm
+     * @var array
+     */
+    protected $validOptions = array(
+        'zipLookup',
+    );
+
+    /**
+     * Set options (of $validOptions) to be applied to the search algorithm
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * Resolves cmd. If it's a node placeholder, search is limited to the node's
      * branch
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Current page
@@ -114,6 +128,25 @@ class Search
     }
 
     /**
+     * Return the set options
+     * @return array List of set options
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+
+    /**
+     * Set the options to be applied on the search algorithms
+     * @param array Options to set
+     */
+    protected function setOptions($options) {
+        $this->options = array_intersect_key(
+            $options,
+            array_flip($this->validOptions)
+        );
+    }
+
+    /**
      * Add new set of results to the DataSet collection
      * @param \Cx\Core_Modules\Listing\Model\Entity\DataSet Set of search results to be added
      */
@@ -152,48 +185,7 @@ class Search
         if (strlen($term) >= 3) {
             $term = trim(contrexx_input2raw($_REQUEST['term']));
 
-            $this->setTerm($term);
-            $eventHandlerInstance = \Env::get('cx')->getEvents();
-            $eventHandlerInstance->triggerEvent('SearchFindContent', array($this));
-            if ($this->result->size() == 1) {
-                $arraySearchResults[] = $this->result->toArray();
-            } else {
-                $arraySearchResults = $this->result->toArray();
-            }
-            usort($arraySearchResults,
-                /**
-                 * Compares scores (and dates, if available) of two result array elements
-                 *
-                 * Compares the scores first; when equal, compares the dates, if available.
-                 * Returns
-                 *  -1 if $a  > $b
-                 *   0 if $a == $b
-                 *  +1 if $a  < $b
-                 * Used for ordering search results.
-                 * @author  Christian Wehrli <christian.wehrli@astalavista.ch>
-                 * @param      string  $a      The first element
-                 * @param      string  $b      The second element
-                 * @return     integer         The comparison result
-                 */
-                function($a, $b) {
-                    if ($a['Score'] == $b['Score']) {
-                        if (isset($a['Date'])) {
-                            if ($a['Date'] == $b['Date']) {
-                                return 0;
-                            }
-                            if ($a['Date'] > $b['Date']) {
-                                return -1;
-                            }
-                            return 1;
-                        }
-                        return 0;
-                    }
-                    if ($a['Score'] > $b['Score']) {
-                        return -1;
-                    }
-                    return 1;
-                }
-            );
+            $arraySearchResults = $this->getSearchResult($term);
             $countResults = sizeof($arraySearchResults);
             if (!is_numeric($pos)) {
                 $pos = 0;
@@ -223,21 +215,29 @@ class Search
 
                     // parse result into template
                     $objTpl->setVariable(array(
-                        'COUNT_MATCH' =>
-                        $_ARRAYLANG['TXT_RELEVANCE'].' '.$details['Score'].'%',
-                        'LINK' => '<b><a href="'.$link.
-                        '" title="'.contrexx_raw2xhtml($details['Title']).'">'.
-                        contrexx_raw2xhtml($details['Title']).'</a></b>',
-                        'SHORT_CONTENT' => contrexx_raw2xhtml($details['Content']),
+                        'COUNT_MATCH'             =>
+                            $_ARRAYLANG['TXT_RELEVANCE'].' '.$details['Score'].'%',
+                        'LINK'                    => '<b><a href="'.$link.
+                            '" title="'.contrexx_raw2xhtml($details['Title']).'">'.
+                            contrexx_raw2xhtml($details['Title']).'</a></b>',
+                        'TARGET_PATH' => contrexx_raw2xhtml($details['Link']),
+                        'SHORT_CONTENT'           => contrexx_raw2xhtml($details['Content']),
+                        'SEARCH_RESULT_SRC'       => $link,
+                        'SEARCH_RESULT_TITLE'     => contrexx_raw2xhtml($details['Title']),
+                        'SEARCH_RESULT_COMPONENT' => $details['Component'],
                     ));
                     $objTpl->parse('search_result');
                 }
                 return $objTpl->get();
             }
         }
-        $noresult = ($term != ''
-                ? sprintf($_ARRAYLANG['TXT_NO_SEARCH_RESULTS'], $term)
-                : $_ARRAYLANG['TXT_PLEASE_ENTER_SEARCHTERM']);
+        $noresult = $_ARRAYLANG['TXT_PLEASE_ENTER_SEARCHTERM'];
+        if (!empty($term)) {
+            $noresult = sprintf(
+                $_ARRAYLANG['TXT_NO_SEARCH_RESULTS'],
+                contrexx_raw2xhtml($term)
+            );
+        }
         $objTpl->setVariable('SEARCH_TITLE', $noresult);
         return $objTpl->get();
     }
@@ -262,22 +262,25 @@ class Search
         if (!empty($command)) {
             $criteria['cmd'] = $command;
         }
+
         // only list results in case the associated page of the module is active
         $page = $pageRepo->findOneBy($criteria);
         if (!$page || !$page->isActive()) {
             return null;
         }
+
         // don't list results in case the user doesn't have sufficient rights to access the page
         // and the option to list only unprotected pages is set (coreListProtectedPages)
-        $hasPageAccess = true;
         $config = \Env::get('config');
-        if ($config['coreListProtectedPages'] == 'off' && $page->isFrontendProtected()) {
-            $hasPageAccess = \Permission::checkAccess(
-                    $page->getFrontendAccessId(), 'dynamic', true);
-        }
-        if (!$hasPageAccess) {
+        if (
+            $config['coreListProtectedPages'] == 'off' &&
+            $page->isFrontendProtected() &&
+            $page->getComponent('Session')->getSession() &&
+            !\Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true)
+        ) {
             return null;
         }
+
         // In case a root node was specified, we have to check if the page is in
         // the root page's branch.
         if ($this->rootPage) {
@@ -350,7 +353,7 @@ class Search
         if (!$page) {
             return array();
         }
-        $pagePath = $page->getPath();
+        $pagePath = \Cx\Core\Routing\Url::fromPage($page);
         $objDatabase = \Env::get('db');
         $objResult = $objDatabase->Execute($query);
         if (!$objResult || $objResult->EOF) {
@@ -381,11 +384,12 @@ class Search
             $searchtitle = empty($objResult->fields['title'])
                 ? $_ARRAYLANG['TXT_UNTITLED'] : $objResult->fields['title'];
             $arraySearchResults[] = array(
-                'Score' => $scorePercent,
-                'Title' => $searchtitle,
-                'Content' => $content,
-                'Link' => $temp_pagelink,
-                'Date' => $date,
+                'Score'     => $scorePercent,
+                'Title'     => $searchtitle,
+                'Content'   => $content,
+                'Link'      => $temp_pagelink,
+                'Date'      => $date,
+                'Component' => $module,
             );
             $objResult->MoveNext();
         }
@@ -419,5 +423,65 @@ class Search
             $content = join(' ', $arrayContent).' ...';
         }
         return $content;
+    }
+
+    /**
+     * Get a result for search term
+     *
+     * @param string $term Search value
+     * @param array $options Options to be applied on the search algorithms
+     * @return array Return a array of result
+     */
+    public function getSearchResult($term, $options = array())
+    {
+        $this->setTerm($term);
+        $this->setOptions($options);
+        $eventHandlerInstance = \Env::get('cx')->getEvents();
+        $eventHandlerInstance->triggerEvent('SearchFindContent', array($this));
+        if ($this->result->size() == 1) {
+            $arraySearchResults[] = $this->result->toArray();
+        } else {
+            $arraySearchResults = $this->result->toArray();
+        }
+
+        usort($arraySearchResults,
+            /**
+             * Compares scores (and dates, if available) of two result array elements
+             *
+             * Compares the scores first; when equal, compares the dates, if available.
+             * Returns
+             *  -1 if $a  > $b
+             *   0 if $a == $b
+             *  +1 if $a  < $b
+             * Used for ordering search results.
+             * @author  Christian Wehrli <christian.wehrli@astalavista.ch>
+             * @param      string  $a      The first element
+             * @param      string  $b      The second element
+             * @return     integer         The comparison result
+             */
+            function($a, $b) {
+                if ($a['Score'] == $b['Score']) {
+                    if (isset($a['Date'])) {
+                        if (!isset($b['Date'])) {
+                            return -1;
+                        }
+                        if ($a['Date'] == $b['Date']) {
+                            return 0;
+                        }
+                        if ($a['Date'] > $b['Date']) {
+                            return -1;
+                        }
+                        return 1;
+                    }
+                    return 0;
+                }
+                if ($a['Score'] > $b['Score']) {
+                    return -1;
+                }
+                return 1;
+            }
+        );
+
+        return $arraySearchResults;
     }
 }

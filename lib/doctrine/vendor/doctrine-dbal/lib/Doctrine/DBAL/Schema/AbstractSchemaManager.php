@@ -773,7 +773,8 @@ abstract class AbstractSchemaManager
             }
 
             if ( ! $defaultPrevented) {
-                $column = $this->_getPortableTableColumnDefinition($tableColumn);
+                // CUSTOMIZING BY CLOUDREXX TO MAKE REVERSE LOOKUP OF ENUM TYPES POSSIBLE
+                $column = $this->_getPortableTableColumnDefinition($tableColumn, $table);
             }
 
             if ($column) {

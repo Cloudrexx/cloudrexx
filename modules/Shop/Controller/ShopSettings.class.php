@@ -217,6 +217,24 @@ class ShopSettings
                 intval($_POST['num_categories_per_row']), null,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         }
+        if (!\Cx\Core\Setting\Controller\Setting::set('activate_product_attribute_children',
+            !empty($_POST['shop_activate_product_attribute_children']))) {
+            \Cx\Core\Setting\Controller\Setting::add('activate_product_attribute_children',
+                !empty($_POST['shop_activate_product_attribute_children']), null,
+                \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+        }
+        if (!\Cx\Core\Setting\Controller\Setting::set('force_select_option',
+            !empty($_POST['shop_force_select_option']))) {
+            \Cx\Core\Setting\Controller\Setting::add('force_select_option',
+                !empty($_POST['shop_force_select_option']), null,
+                \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+        }
+        if (!\Cx\Core\Setting\Controller\Setting::set('verify_account_email',
+            !empty($_POST['shop_verify_account_email']))) {
+            \Cx\Core\Setting\Controller\Setting::add('verify_account_email',
+                !empty($_POST['shop_verify_account_email']), null,
+                \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+        }
     }
 
 
@@ -290,13 +308,14 @@ class ShopSettings
         Payment::reset();
         if (empty ($_POST['bpayment'])) return;
 // NOTE: All the following could be handled by Payment::settings()
+        // Payrexx
         \Cx\Core\Setting\Controller\Setting::set('payrexx_instance_name',
             trim(strip_tags(contrexx_input2raw($_POST['payrexx_instance_name']))));
         \Cx\Core\Setting\Controller\Setting::set('payrexx_api_secret',
             trim(strip_tags(contrexx_input2raw($_POST['payrexx_api_secret']))));
         \Cx\Core\Setting\Controller\Setting::set('payrexx_active',
             !empty($_POST['payrexx_active']));
-
+        // PostFinance
         \Cx\Core\Setting\Controller\Setting::set('postfinance_shop_id',
             trim(strip_tags(contrexx_input2raw($_POST['postfinance_shop_id']))));
         \Cx\Core\Setting\Controller\Setting::set('postfinance_active',
@@ -324,7 +343,7 @@ class ShopSettings
             !empty($_POST['postfinance_mobile_ijustwanttotest']));
         \Cx\Core\Setting\Controller\Setting::set('postfinance_mobile_status',
             !empty($_POST['postfinance_mobile_status']));
-        // Saferpay
+        // Legacy Saferpay
         \Cx\Core\Setting\Controller\Setting::set('saferpay_id',
             trim(strip_tags(contrexx_input2raw($_POST['saferpay_id']))));
         \Cx\Core\Setting\Controller\Setting::set('saferpay_active',
@@ -335,6 +354,19 @@ class ShopSettings
             !empty($_POST['saferpay_use_test_account']));
         \Cx\Core\Setting\Controller\Setting::set('saferpay_window_option',
             intval($_POST['saferpay_window_option']));
+        // JSON Saferpay
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_id',
+            trim(strip_tags(contrexx_input2raw($_POST['saferpay_json_id']))));
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_terminal_id',
+            trim(strip_tags(contrexx_input2raw($_POST['saferpay_json_terminal_id']))));
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_user',
+            trim(strip_tags(contrexx_input2raw($_POST['saferpay_json_user']))));
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_pass',
+            trim(strip_tags(contrexx_input2raw($_POST['saferpay_json_pass']))));
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_active',
+            !empty($_POST['saferpay_json_active']));
+        \Cx\Core\Setting\Controller\Setting::set('saferpay_json_use_test_account',
+            !empty($_POST['saferpay_json_use_test_account']));
         // Paypal
         \Cx\Core\Setting\Controller\Setting::set('paypal_account_email',
             trim(strip_tags(contrexx_input2raw($_POST['paypal_account_email']))));
@@ -375,7 +407,6 @@ class ShopSettings
 
         if (isset($_GET['currencyId']) && !empty($_GET['currencyId'])) {
             $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_currencies WHERE id=".intval($_GET['currencyId'])." AND is_default=0");
-            $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_currencies");
         }
     }
      */
@@ -776,7 +807,7 @@ class ShopSettings
         \Cx\Core\Setting\Controller\Setting::add('vat_other_id', 1, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('weight_enable', 0, ++$i,
-            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+            \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('show_products_default', 0, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('product_sorting', 0, ++$i,
@@ -791,6 +822,7 @@ class ShopSettings
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('thumbnail_quality', 90, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        // Legacy Saferpay
         \Cx\Core\Setting\Controller\Setting::add('saferpay_id', '1234', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('saferpay_active', 1, ++$i,
@@ -801,6 +833,20 @@ class ShopSettings
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('saferpay_window_option', 2, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        // JSON Saferpay
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_id', '', ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_terminal_id', '', ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_user', '', ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_pass', '', ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_active', 0, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('saferpay_json_use_test_account', 1, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        // Paypal
         \Cx\Core\Setting\Controller\Setting::add('paypal_active', 1, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('paypal_account_email', 'no-reply@comvation.com', ++$i,
@@ -808,12 +854,14 @@ class ShopSettings
         \Cx\Core\Setting\Controller\Setting::add('paypal_default_currency', 'CHF', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         // Also see Yellowpay.class
+        // Payrexx
         \Cx\Core\Setting\Controller\Setting::add('payrexx_instance_name', 'Instanz Name', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT);
         \Cx\Core\Setting\Controller\Setting::add('payrexx_api_secret', 'API Secret', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT);
         \Cx\Core\Setting\Controller\Setting::add('payrexx_active', '0', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, '1');
+        // PostFinance
         \Cx\Core\Setting\Controller\Setting::add('postfinance_shop_id', 'Ihr Kontoname', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT);
         \Cx\Core\Setting\Controller\Setting::add('postfinance_active', '0', ++$i,
@@ -848,12 +896,14 @@ class ShopSettings
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('datatrans_merchant_id', '1234', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        // DataTrans
         \Cx\Core\Setting\Controller\Setting::add('datatrans_active', 1, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('datatrans_request_type', 'CAA', ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('datatrans_use_testserver', 1, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        // LSV
         \Cx\Core\Setting\Controller\Setting::add('payment_lsv_active', 0, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         // New for V3.0
@@ -916,6 +966,16 @@ class ShopSettings
             \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN_USER_CUSTOM_ATTRIBUTE, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('num_categories_per_row', 4, ++$i,
             \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+
+
+        // New for v5.0.0
+        \Cx\Core\Setting\Controller\Setting::add('activate_product_attribute_children', 1, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('force_select_option', 0, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('verify_account_email', 1, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
+
         // Note that the Settings *MUST* be reinited after adding new entries!
 
         // Add more new/missing settings here

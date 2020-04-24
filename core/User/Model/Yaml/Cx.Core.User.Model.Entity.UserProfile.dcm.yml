@@ -5,84 +5,121 @@ Cx\Core\User\Model\Entity\UserProfile:
     userId:
       id: true
       type: integer
-      length: 11
       associationKey: true
-      unsigned: true
       column: user_id
     gender:
+      type: enum
+      values: ['gender_undefined','gender_female','gender_male']
+      options:
+        default: "gender_undefined"
+    designation:
       type: string
+      length: 255
       nullable: false
+      options:
+        default: ""
     firstname:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     lastname:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     company:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     address:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     city:
       type: string
       length: 50
       nullable: false
+      options:
+        default: ""
     zip:
       type: string
       length: 10
       nullable: false
+      options:
+        default: ""
     country:
       type: integer
-      length: 2
       nullable: false
       unsigned: true
+      options:
+        default: 0
     phoneOffice:
       type: string
       length: 20
       nullable: false
       column: phone_office
+      options:
+        default: ""
     phonePrivate:
       type: string
       length: 20
       nullable: false
       column: phone_private
+      options:
+        default: ""
     phoneMobile:
       type: string
       length: 20
       nullable: false
       column: phone_mobile
+      options:
+        default: ""
     phoneFax:
       type: string
       length: 20
       nullable: false
       column: phone_fax
+      options:
+        default: ""
     birthday:
       type: string
       length: 11
       nullable: true
+      options:
+        default: null
     website:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
     profession:
       type: string
       length: 150
       nullable: false
+      options:
+        default: ""
     interests:
-      type: string
+      type: text
+      length: 65535
       nullable: true
     signature:
-      type: string
+      type: text
+      length: 65535
       nullable: true
     picture:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ""
   indexes:
     profile:
       columns: [firstname, lastname, company]
@@ -94,6 +131,10 @@ Cx\Core\User\Model\Entity\UserProfile:
         user_id:
           referencedColumnName: id
           unique: true
+  oneToMany:
+    userAttributeValues:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
+      mappedBy: user
   manyToOne:
     userTitle:
       targetEntity: Cx\Core\User\Model\Entity\ProfileTitle
@@ -101,7 +142,4 @@ Cx\Core\User\Model\Entity\UserProfile:
       joinColumns:
         title:
           referencedColumnName: id
-  manyToMany:
-    userAttribute:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      mappedBy: userProfile
+          nullable: true

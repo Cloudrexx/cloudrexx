@@ -1,0 +1,42 @@
+Cx\Core\User\Model\Entity\UserAttributeValue:
+  type: entity
+  table: access_user_attribute_value
+  indexes:
+    value:
+      columns: [ value ]
+      flags: [ fulltext ]
+  fields:
+    attributeId:
+      id: true
+      type: integer
+      column: attribute_id
+      associationKey: true
+    userId:
+      id: true
+      type: integer
+      column: user_id
+      associationKey: true
+    history:
+      id: true
+      type: integer
+      nullable: false
+      column: history_id
+      options:
+        default: 0
+    value:
+      type: text
+      length: 65535
+      nullable: false
+  manyToOne:
+#    attribute:
+#      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+#      inversedBy: userAttributeValue
+#      joinColumns:
+#        attribute_id:
+#          referencedColumnName: id
+    user:
+      targetEntity: Cx\Core\User\Model\Entity\UserProfile
+      inversedBy: userAttributeValues
+      joinColumns:
+        user_id:
+          referencedColumnName: user_id

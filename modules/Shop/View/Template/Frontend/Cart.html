@@ -10,7 +10,6 @@
                     <th width="50%">{TXT_PRODUCT}</th>
                     <th width="12%">{TXT_UNIT_PRICE}</th>
                     <th width="12%">{TXT_QUANTITY}</th>
-                    <th width="14%" colspan="2">{TXT_TAX_PREFIX}</th>
                     <th width="12%" class="a_right">{TXT_TOTAL}</th>
                 </tr>
                 <!-- BEGIN shopCartRow -->
@@ -34,56 +33,62 @@
                         </a>
                         <input type="text" name="quantity[{SHOP_PRODUCT_CART_ID}]" value="{SHOP_PRODUCT_QUANTITY}" id="quantity-{SHOP_PRODUCT_CART_ID}" class="shop_quantity" />
                     </td>
-                    <td>{SHOP_PRODUCT_TAX_RATE}</td>
-                    <td>{SHOP_PRODUCT_TAX_AMOUNT}</td>
                     <td class="a_right">
-                        {SHOP_PRODUCT_PRICE}&nbsp;{SHOP_PRODUCT_PRICE_UNIT}
+                        {SHOP_PRODUCT_SALE_PRICE}&nbsp;{SHOP_PRODUCT_PRICE_UNIT}
                     </td>
                 </tr>
                 <!-- END shopCartRow -->
-                <!-- BEGIN totalExclTaxRow -->
-                <tr class="row1">
-                    <td colspan="5">{TXT_NET_PRICE}</td>
-                    <td style="text-align: right;">
-                        {SHOP_GRAND_TOTAL_EXCL_TAX}
+                <tr valign="top" class="row3 active">
+                    <td colspan="3">{TXT_TOTALLY_GOODS}</td>
+                    <td class="a_right">
+                        {SHOP_PRODUCT_TOTAL_GOODS}&nbsp;{SHOP_PRICE_UNIT}
                     </td>
                 </tr>
-                <!-- END totalExclTaxRow -->
-                <!-- BEGIN shopVat -->
+                <!-- BEGIN shopCouponTotal -->
+                <tr valign="top" class="row3 active">
+                    <td colspan="3">{SHOP_DISCOUNT_COUPON_TOTAL}</td>
+                    <td class="a_right">
+                        {SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT}&nbsp;{SHOP_PRICE_UNIT}
+                    </td>
+                </tr>
+                <!-- END shopCouponTotal -->
+                <!-- BEGIN shopVatExcl -->
                 <tr class="row1">
-                    <td colspan="5" valign="top">
+                    <td colspan="3" valign="top">
                         {TXT_TAX_PREFIX}
                     </td>
                     <td valign="top" nowrap="nowrap" class="a_right">
                         {SHOP_TOTAL_TAX_AMOUNT}
                     </td>
                 </tr>
-                <!-- END shopVat -->
-                <!-- BEGIN shopCouponTotal -->
-                <tr valign="top" class="row3 active">
-                    <td colspan="5">{SHOP_DISCOUNT_COUPON_TOTAL}</td>
-                    <td class="a_right">
-                        {SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT}&nbsp;{SHOP_PRICE_UNIT}
-                    </td>
-                </tr>
-                <!-- END shopCouponTotal -->
+                <!-- END shopVatExcl -->
                 <tr class="row3 active">
-                    <td colspan="5" valign="top">
+                    <td colspan="3" valign="top">
                         <strong>{TXT_INTER_TOTAL}</strong>
                     </td>
                     <td valign="top" nowrap="nowrap" class="a_right">
                         <strong>{SHOP_PRODUCT_TOTALPRICE_PLUS_VAT} {SHOP_PRODUCT_TOTALPRICE_UNIT}</strong>
                     </td>
                 </tr>
+                <!-- BEGIN shopVatIncl -->
+                <tr class="row1">
+                    <td colspan="3" valign="top">
+                        {TXT_TAX_PREFIX}
+                    </td>
+                    <td valign="top" nowrap="nowrap" class="a_right">
+                        {SHOP_TOTAL_TAX_AMOUNT}
+                    </td>
+                </tr>
+                <!-- END shopVatIncl -->
                 <!-- BEGIN shopCoupon -->
                 <tr>
-                    <td colspan="6">&nbsp;</td>
+                    <td colspan="4">&nbsp;</td>
                 </tr>
                 <tr class="row3 active">
                     <td>
                         {TXT_SHOP_DISCOUNT_COUPON_CODE}
                     </td>
-                    <td colspan="5" class="a_right">
+                    <td colspan="3" class="a_right">
                         <input type="text" maxlength="20" name="coupon_code" value="{SHOP_DISCOUNT_COUPON_CODE}" class="shop_cart_input" onchange="document.forms['shopForm'].submit();" />
                     </td>
                 </tr>
@@ -93,7 +98,7 @@
                     <td valign="top">
                         <label>{TXT_SHIP_COUNTRY}</label>
                     </td>
-                    <td colspan="5" valign="top" class="a_right">
+                    <td colspan="3" valign="top" class="a_right">
                         <select class="form-control" name="countryId2" class="shop_cart_input" onchange="document.forms['shopForm'].submit()">
                             {SHOP_COUNTRIES_MENUOPTIONS}
                         </select>

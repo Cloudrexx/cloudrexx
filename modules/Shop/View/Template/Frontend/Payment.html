@@ -59,7 +59,7 @@
                             <select name="paymentId" onchange="document.forms['shopForm'].submit();">
                                 <option value="">{TXT_SHOP_PLEASE_SELECT}</option>
                                 <!-- BEGIN shop_payment_payment_methods -->
-                                <option value="{SHOP_PAYMENT_PAYMENT_METHOD_ID}" {SHOP_PAYMENT_PAYMENT_METHOD_SELECTED}>{SHOP_PAYMENT_PAYMENT_METHOD_NAME}</option>
+                                <option value="{SHOP_PAYMENT_PAYMENT_METHOD_ID}"<!-- BEGIN shop_payment_payment_selected --> selected="selected"<!-- END shop_payment_payment_selected -->>{SHOP_PAYMENT_PAYMENT_METHOD_NAME}</option>
                                 <!-- END shop_payment_payment_methods -->
                             </select>
                         </td>
@@ -79,26 +79,6 @@
                         <td>&nbsp;</td>
                     </tr>
                     <!-- END shopCoupon -->
-                    <!-- BEGIN totalExclTaxRow -->
-                    <tr class="row1">
-                        <td colspan="2">
-                            {TXT_NET_PRICE}
-                        </td>
-                        <td style="text-align: right;">
-                            {SHOP_GRAND_TOTAL_EXCL_TAX} {SHOP_UNIT}
-                        </td>
-                    </tr>
-                    <!-- END totalExclTaxRow -->
-                    <!-- BEGIN shopTax -->
-                    <tr class="row1">
-                        <td colspan="2">
-                            {TXT_TAX_PREFIX}
-                        </td>
-                        <td style="text-align: right;">
-                            {SHOP_TAX_PRICE}
-                        </td>
-                    </tr>
-                    <!-- END shopTax -->
                     <!-- BEGIN lsv -->
                     <tr class="row3 active">
                         <td>{TXT_PAYMENT_LSV}</td>
@@ -118,6 +98,16 @@
                         </td>
                     </tr>
                     <!-- END lsv -->
+                    <!-- BEGIN shopVatExcl -->
+                    <tr class="row3 active">
+                        <td colspan="2">
+                            {TXT_TAX_PREFIX}
+                        </td>
+                        <td style="text-align: right;">
+                            {SHOP_TAX_PRICE}
+                        </td>
+                    </tr>
+                    <!-- END shopVatExcl -->
                     <tr class="row3 active">
                         <td colspan="2">
                             <strong>{TXT_TOTAL_PRICE}</strong>
@@ -126,6 +116,16 @@
                             <strong>{SHOP_GRAND_TOTAL} {SHOP_UNIT}</strong>
                         </td>
                     </tr>
+                    <!-- BEGIN shopVatIncl -->
+                    <tr class="row1">
+                        <td colspan="2">
+                            {TXT_TAX_PREFIX}
+                        </td>
+                        <td style="text-align: right;">
+                            {SHOP_TAX_PRICE}
+                        </td>
+                    </tr>
+                    <!-- END shopVatIncl -->
                     <tr class="row1">
                         <td colspan="3">&nbsp;</td>
                     </tr>

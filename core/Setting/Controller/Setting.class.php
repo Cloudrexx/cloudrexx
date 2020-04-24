@@ -90,14 +90,13 @@ class Setting{
     const TYPE_TEXTAREA = 'textarea';
     const TYPE_EMAIL = 'email';
     const TYPE_BUTTON = 'button';
-    // 20110224
     const TYPE_CHECKBOX = 'checkbox';
     const TYPE_CHECKBOXGROUP = 'checkboxgroup';
-    // 20120508
     const TYPE_RADIO = 'radio';
-    const TYPE_DATE  = 'date';
-    const TYPE_DATETIME  = 'datetime';
+    const TYPE_DATE = 'date';
+    const TYPE_DATETIME = 'datetime';
     const TYPE_IMAGE  = 'image';
+    const TYPE_FILECONTENT = 'file';
     // Not implemented
     //const TYPE_SUBMIT = 'submit';
     /**
@@ -121,17 +120,15 @@ class Setting{
 
     public static $arrSettings = array();
     protected static $engines = array(
-    'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
-    'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
-    'Yaml'    => '\Cx\Core\Setting\Model\Entity\YamlEngine',
+        'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
+        'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
+        'Yaml' => '\Cx\Core\Setting\Model\Entity\YamlEngine',
     );
-
     protected static $engine = 'Database';
     protected static $section = null;
     protected static $group = null;
     protected static $tab_index = 1;
     protected static $instanceId = null;
-
 
     /**
      * Returns the current value of the changed flag.
@@ -148,12 +145,13 @@ class Setting{
         }
         return $engine->changed();
     }
+
     /**
      * Optionally sets and returns the value of the tab index
      * @param   integer  $tab_index The optional new tab index
      * @return  integer             The current tab index
      */
-    static function tab_index($tab_index=null)
+    static function tab_index($tab_index = null)
     {
         $engine = self::getSectionEngine();
         if ($engine == null) {
@@ -161,6 +159,7 @@ class Setting{
         }
         return $engine->tab_index($tab_index);
     }
+
     /**
      * Initialize the settings entries from the database with key/value pairs
      * for the current section and the given group
@@ -189,17 +188,17 @@ class Setting{
      */
     static function init($section, $group = null, $engine = 'Database', $fileSystemConfigRepository = null, $populate = 0)
     {
-        if (self::setEngineType($section, $engine, $group)){
+        if (self::setEngineType($section, $engine, $group)) {
             $engineType = self::getEngineType();
             $engine = self::getSectionEngine();
-            /*$callers=debug_backtrace();
-            \DBG::log('*** INIT:' . $callers[1]['class'] . ' Line ' . $callers[1]['line'] . ':' . "\r\n"
-                    . ' Pop.mode: ' . $populate . ' (0 - ignore, 1 - add, 2 - replace) ' . "\r\n"
-                    . ' Section: ' . self::$section . "\r\n"
-                    . ' Engine: ' . self::$engine . "\r\n"
-                    . ' Group: ' .  $group . "\r\n"
-                    . ' Repo: ' .  $fileSystemConfigRepository . "\r\n"
-                . ' ***');*/
+            /* $callers=debug_backtrace();
+              \DBG::log('*** INIT:' . $callers[1]['class'] . ' Line ' . $callers[1]['line'] . ':' . "\r\n"
+              . ' Pop.mode: ' . $populate . ' (0 - ignore, 1 - add, 2 - replace) ' . "\r\n"
+              . ' Section: ' . self::$section . "\r\n"
+              . ' Engine: ' . self::$engine . "\r\n"
+              . ' Group: ' .  $group . "\r\n"
+              . ' Repo: ' .  $fileSystemConfigRepository . "\r\n"
+              . ' ***'); */
             if ($populate || $engine == null || $engine->getArraySetting() == null || $fileSystemConfigRepository) {
                 $oSectionEngine = new $engineType();
                 $oSectionEngine->init($section, $group, $fileSystemConfigRepository);
@@ -208,7 +207,7 @@ class Setting{
                 }
                 self::setSectionEngine($oSectionEngine, $populate);
             }
-        } else{
+        } else {
             throw new SettingException('Invalid engine supplied');
         }
         return true;
@@ -229,6 +228,7 @@ class Setting{
         }
         return $engine->flush();
     }
+
     /**
      * Returns the settings array for the given section and group
      *
@@ -241,14 +241,15 @@ class Setting{
      * @return  array                 The settings array on success,
      *                                false otherwise
      */
-    static function getArray($section = null, $group=null)
+    static function getArray($section = null, $group = null)
     {
         $engine = self::getSectionEngine($section);
         if ($engine == null) {
             return false;
         }
-        return $engine->getArray($section,$group);
+        return $engine->getArray($section, $group);
     }
+
     /**
      * Returns the settings value stored in the section for the name given.
      *
@@ -267,7 +268,7 @@ class Setting{
         /* if section is not null - loading from that section */
         if ($section != null) {
             $aSectionEngine = Setting::getSectionEngine($section, null);
-            /* if section is empty - initializin section first*/
+            /* if section is empty - initializin section first */
             if (empty($aSectionEngine)) {
                 $oldsection = self::$section;
                 self::$section = $section;
@@ -285,6 +286,7 @@ class Setting{
         }
         return $engine->getValue($name);
     }
+
     /**
      * Returns the true or false, if settings name is exist or not .
      *
@@ -303,6 +305,7 @@ class Setting{
         }
         return $engine->isDefined($name);
     }
+
     /**
      * Updates a setting
      *
@@ -323,6 +326,7 @@ class Setting{
         }
         return $engine->set($name, $value);
     }
+
     /**
      * Stores all settings entries present in the $arrSettings object
      * array variable
@@ -345,6 +349,7 @@ class Setting{
         }
         return $engine->updateAll();
     }
+
     /**
      * Updates the value for the given name in the settings table
      *
@@ -369,6 +374,7 @@ class Setting{
         }
         return $engine->update($name);
     }
+
     /**
      * Add a new record to the settings
      *
@@ -387,22 +393,21 @@ class Setting{
      * @param   string    $group    The optional group
      * @return  boolean             True on success, false otherwise
      */
-    static function add( $name, $value, $ord = false, $type = 'text', $values = '', $group = null)
+    static function add($name, $value, $ord = false, $type = 'text', $values = '', $group = null)
     {
-        $engine=self::getSectionEngine();
+        $engine = self::getSectionEngine();
         if ($engine == null) {
             return false;
         }
         if ($group == null) {
             $group = self::$group;
         }
-        return $engine->add( $name, $value, $ord, $type, $values, $group);
-
+        return $engine->add($name, $value, $ord, $type, $values, $group);
     }
 
     static function setGroup()
     {
-         return self::$group;
+        return self::$group;
     }
 
     static function getGroup()
@@ -432,6 +437,7 @@ class Setting{
         }
         return $engine->delete($name, $group);
     }
+
     /**
      * Display the settings present in the $arrSettings class array
      *
@@ -497,20 +503,16 @@ class Setting{
         \Html::replaceUriParameter($uriBase, 'active_tab=' . self::$tab_index);
         // Default headings and elements
         $objTemplateLocal->setGlobalVariable(
-            $_CORELANG
-          + array(
-            'URI_BASE' => $uriBase,
-        ));
-
-        if ($objTemplateLocal->blockExists('core_setting_row')){
-                $objTemplateLocal->setCurrentBlock('core_setting_row');
+            $_CORELANG + array('URI_BASE' => $uriBase)
+        );
+        if ($objTemplateLocal->blockExists('core_setting_row')) {
+            $objTemplateLocal->setCurrentBlock('core_setting_row');
         }
         if (!is_array($arrSettings)) {
             return \Message::error($_CORELANG['TXT_CORE_SETTING_ERROR_RETRIEVING']);
         }
         if (empty($arrSettings)) {
-            \Message::warning(
-                sprintf(
+            \Message::warning(sprintf(
                     $_CORELANG['TXT_CORE_SETTING_WARNING_NONE_FOUND_FOR_TAB_AND_SECTION'],
                     $tab_name, $section));
             return false;
@@ -530,12 +532,11 @@ class Setting{
                 'CORE_SETTING_GROUP' => self::$group,
                 'CORE_SETTING_TAB_CLASS' => (self::$tab_index == $active_tab ? 'active' : ''),
                 'CORE_SETTING_TAB_DISPLAY' => (self::$tab_index++ == $active_tab ? 'block' : 'none'),
-                'CORE_SETTING_CURRENT_TAB'=>'tab-'.$active_tab
+                'CORE_SETTING_CURRENT_TAB' => 'tab-' . $active_tab,
             ));
             $objTemplateLocal->touchBlock('core_setting_header');
             $objTemplateLocal->touchBlock('core_setting_tab_row');
             $objTemplateLocal->parse('core_setting_tab_row');
-
             // parse submit button (or hide if $readOnly is set)
             if ($objTemplateLocal->blockExists('core_setting_submit')) {
                 if ($readOnly) {
@@ -548,12 +549,9 @@ class Setting{
             $objTemplateLocal->touchBlock('core_setting_tab_div');
             $objTemplateLocal->parse('core_setting_tab_div');
         }
-
-// NOK
-//die(nl2br(contrexx_raw2xhtml(var_export($objTemplateLocal, true))));
-
         return true;
     }
+
     /**
      * Display a section of settings present in the $arrSettings class array
      *
@@ -575,8 +573,9 @@ class Setting{
         // This is set to multipart if necessary
         $enctype = '';
         $i = 0;
-        if ($objTemplateLocal->blockExists('core_setting_row'))
+        if ($objTemplateLocal->blockExists('core_setting_row')) {
             $objTemplateLocal->setCurrentBlock('core_setting_row');
+        }
         foreach ($arrSettings as $name => $arrSetting) {
             // Determine HTML element for type and apply values and selected
             $element = '';
@@ -605,6 +604,12 @@ class Setting{
               //Multiselect dropdown/Dropdown menu
               case self::TYPE_DROPDOWN_MULTISELECT:
                   $isMultiSelect = true;
+                  \JS::registerCode('
+                      cx.jQuery(document).ready(function() { 
+                        if (cx.jQuery(".chzn-select-multi").length > 0) { 
+                            cx.jQuery(".chzn-select-multi").chosen({width: "' . self::DEFAULT_INPUT_WIDTH  . 'px"}); 
+                        } 
+                      });');
               case self::TYPE_DROPDOWN:
                 $matches   = null;
                 $arrValues = $arrSetting['values'];
@@ -617,7 +622,7 @@ class Setting{
                 $elementName   = $isMultiSelect ? $name.'[]' : $name;
                 $value         = $isMultiSelect ? self::splitValues($value) : $value;
                 $elementValue  = is_array($value) ? array_flip($value) : $value;
-                $elementAttr   = $isMultiSelect ? ' multiple class="chzn-select"' : '';
+                $elementAttr   = $isMultiSelect ? ' multiple class="chzn-select-multi"' : '';
                 $element       = \Html::getSelect(
                                     $elementName, $arrValues, $elementValue,
                                     '', '',
@@ -631,7 +636,7 @@ class Setting{
               case self::TYPE_DROPDOWN_USER_CUSTOM_ATTRIBUTE:
                 $element = \Html::getSelect(
                     $name,
-                    User_Profile_Attribute::getCustomAttributeNameArray(),
+                    \User_Profile_Attribute::getCustomAttributeNameArray(),
                     $arrSetting['value'], '', '',
                     'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
                 );
@@ -639,7 +644,7 @@ class Setting{
               case self::TYPE_DROPDOWN_USERGROUP:
                 $element = \Html::getSelect(
                     $name,
-                    UserGroup::getNameArray(),
+                    \UserGroup::getNameArray(),
                     $arrSetting['value'],
                     '', '', 'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
                 );
@@ -673,7 +678,7 @@ class Setting{
                         // Set the ID only if the $value is non-empty.
                         // This toggles the file name and delete icon on or off
                         $name, ($value ? $name : false),
-                        Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
+                        \Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
                         // "values" defines the MIME types allowed
                         $arrSetting['values'],
                         'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : ''), true,
@@ -762,7 +767,7 @@ class Setting{
                     $element .= \Html::getHidden($name, $arrSetting['value'], $name);
                     $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                     $mediaBrowser->setCallback($name.'Callback');
-                    $mediaBrowser->setOptions(array('type' => 'button','data-cx-mb-views' => 'filebrowser'));
+                    $mediaBrowser->setOptions(array('type' => 'button','views' => 'filebrowser'));
                     $element .= $mediaBrowser->getXHtml($_ARRAYLANG['TXT_BROWSE']);
                     \JS::registerCode('
                         function ' . $name . 'Callback(data) {
@@ -778,6 +783,19 @@ class Setting{
                         });
                     ');
                     break;
+              case self::TYPE_FILECONTENT:
+                  $disable  = '';
+                  if ($readOnly) {
+                      $disable = \Html::ATTRIBUTE_DISABLED;
+                  }
+                  $element = \Html::getTextarea(
+                      $name,
+                      $value,
+                      80,
+                      8,
+                      $disable
+                  );
+                  break;
                 // Default to text input fields
               case self::TYPE_TEXT:
               case self::TYPE_EMAIL:
@@ -825,6 +843,7 @@ class Setting{
         }
         return true;
     }
+
     /**
      * Adds an external settings view to the current template
      *
@@ -838,22 +857,21 @@ class Setting{
      */
     static function show_external( &$objTemplateLocal, $tab_name, $content)
     {
-        if (empty($objTemplateLocal)|| !$objTemplateLocal->blockExists('core_setting_row'))
-        {
-            $objTemplateLocal = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
+        if (empty($objTemplateLocal) || !$objTemplateLocal->blockExists('core_setting_row')) {
+            $objTemplateLocal = new \Cx\Core\Html\Sigma(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
             if (!$objTemplateLocal->loadTemplateFile('Form.html'))
                 die("Failed to load template Form.html");
         }
-
         $active_tab = (isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : 1);
         // The tabindex must be set in the form name in any case
         $objTemplateLocal->setGlobalVariable(array(
-                                                    'CORE_SETTING_TAB_INDEX' => self::$tab_index,
-                                                    'CORE_SETTING_EXTERNAL' => $content,
-                                                ));
+            'CORE_SETTING_TAB_INDEX' => self::$tab_index,
+            'CORE_SETTING_EXTERNAL' => $content,
+        ));
         // Set up the tab, if any
-        if (!empty($tab_name))
-        {
+        if (!empty($tab_name)) {
             $objTemplateLocal->setGlobalVariable(array(
                                                         'CORE_SETTING_TAB_NAME' => $tab_name,
                                                         'CORE_SETTING_TAB_INDEX' => self::$tab_index,
@@ -868,6 +886,7 @@ class Setting{
         }
         return true;
     }
+
     /**
      * Ensures that a valid template is available
      *
@@ -878,19 +897,23 @@ class Setting{
      */
     static function verify_template(&$objTemplateLocal)
     {
-        //"instanceof" considers subclasses of Sigma to be a Sigma, too!
+        // "instanceof" considers subclasses of Sigma to be a Sigma, too!
         if (!($objTemplateLocal instanceof \Cx\Core\Html\Sigma)) {
-            $objTemplateLocal = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
+            $objTemplateLocal = new \Cx\Core\Html\Sigma(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
         }
         if (!$objTemplateLocal->blockExists('core_setting_row')) {
-            $objTemplateLocal->setRoot(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
-        //$objTemplateLocal->setCacheRoot('.');
+            $objTemplateLocal->setRoot(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
+            //$objTemplateLocal->setCacheRoot('.');
             if (!$objTemplateLocal->loadTemplateFile('Form.html')) {
                 die("Failed to load template Form.html");
             }
-            //die(nl2br(contrexx_raw2xhtml(var_export($objTemplateLocal, true))));
         }
     }
+
     /**
      * Update and store all settings found in the $_POST array
      *
@@ -923,83 +946,147 @@ class Setting{
         $result = true;
         // Compare POST with current settings and only store what was changed.
         foreach (array_keys($arrSettings) as $name) {
-            if (isset ($_POST[$name])) {
-                $value=contrexx_input2raw($_POST[$name]);
+            if (isset($_POST[$name])) {
+                $value = contrexx_input2raw($_POST[$name]);
                 //if (preg_match('/^'.preg_quote(CSRF::key(), '/').'$/', $name))
                 //continue;
                 switch ($arrSettings[$name]['type']) {
-                  case self::TYPE_FILEUPLOAD:
-                    // An empty folder path has been posted, indicating that the
-                    // current file should be removed
-                    if (empty($value)) {
-                        //echo("Empty value, deleting file...<br />");
-                        if ($arrSettings[$name]['value']) {
-                            if (\File::delete_file($arrSettings[$name]['value'])) {
-                        //echo("File deleted<br />");
-                                $value = '';
+                    case self::TYPE_FILEUPLOAD:
+                        // An empty folder path has been posted, indicating that the
+                        // current file should be removed
+                        if (empty($value)) {
+                            //echo("Empty value, deleting file...<br />");
+                            if ($arrSettings[$name]['value']) {
+                                if (\File::delete_file($arrSettings[$name]['value'])) {
+                                    //echo("File deleted<br />");
+                                    $value = '';
+                                } else {
+                                    //echo("Failed to delete file<br />");
+                                    \Message::error(\File::getErrorString());
+                                    $result = false;
+                                }
+                            }
+                        } else {
+                            // No file uploaded.  Skip.
+                            if (empty($_FILES[$name]['name'])) {
+                                continue 2;
+                            }
+                            // $value is the target folder path
+                            $target_path = $value . '/' . $_FILES[$name]['name'];
+                            // TODO: Test if this works in all browsers:
+                            // The path input field name is the same as the
+                            // file upload input field name!
+                            $result_upload = \File::upload_file_http(
+                                    $name, $target_path,
+                                    \Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
+                                    // The allowed file types
+                                    $arrSettings[$name]['values']
+                            );
+                            // If no file has been uploaded at all, ignore the no-change
+                            // TODO: Noop is not implemented in File::upload_file_http()
+                            // if ($result_upload === '') continue;
+                            if ($result_upload === true) {
+                                $value = $target_path;
                             } else {
-                        //echo("Failed to delete file<br />");
+                                //echo("self::storeFromPost(): Error uploading file for setting $name to $target_path<br />");
+                                // TODO: Add error message
                                 \Message::error(\File::getErrorString());
                                 $result = false;
                             }
                         }
-                    } else {
-                        // No file uploaded.  Skip.
-                        if (empty($_FILES[$name]['name'])) continue;
-                        // $value is the target folder path
-                        $target_path = $value.'/'.$_FILES[$name]['name'];
-                        // TODO: Test if this works in all browsers:
-                        // The path input field name is the same as the
-                        // file upload input field name!
-                        $result_upload = \File::upload_file_http(
-                            $name, $target_path,
-                            \Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
-                            // The allowed file types
-                            $arrSettings[$name]['values']
-                        );
-                        // If no file has been uploaded at all, ignore the no-change
-                        // TODO: Noop is not implemented in File::upload_file_http()
-                        // if ($result_upload === '') continue;
-                        if ($result_upload === true) {
-                            $value = $target_path;
-                        } else {
-                        //echo("self::storeFromPost(): Error uploading file for setting $name to $target_path<br />");
-                        // TODO: Add error message
-                            \Message::error(\File::getErrorString());
-                            $result = false;
-                        }
-                    }
-                    break;
-                  case self::TYPE_CHECKBOX:
-                      break;
-                  case self::TYPE_DROPDOWN_MULTISELECT:
-                      $value = array_flip($value);
-                  case self::TYPE_CHECKBOXGROUP:
-                    $value = (is_array($value)
-                        ? join(',', array_keys($value))
-                        : $value);
-                        // 20120508
-                  case self::TYPE_RADIO:
-                      break;
+                        break;
+                    case self::TYPE_CHECKBOX:
+                        break;
+                    case self::TYPE_DROPDOWN_MULTISELECT:
+                        $value = array_flip($value);
+                    case self::TYPE_CHECKBOXGROUP:
+                        $value = (is_array($value)
+                            ? join(',', array_keys($value))
+                            : $value);
+                    case self::TYPE_RADIO:
+                        break;
                   case self::TYPE_IMAGE:
-                      $cx      = \Cx\Core\Core\Controller\Cx::instanciate();
-                      $options = json_decode($arrSettings[$name]['values'], true);
-                      if ($options['type'] && $options['type'] == 'copy') {
-                          \Cx\Lib\FileSystem\FileSystem::copy_file(
-                              $cx->getWebsitePath() . $value,
-                              $cx->getWebsitePath() . '/' . $arrSettings[$name]['value'],
-                              true
-                          );
-                          $value = $arrSettings[$name]['value'];
-                      }
+                        $cx      = \Cx\Core\Core\Controller\Cx::instanciate();
+                        $filePath = $cx->getWebsiteDocumentRootPath() . '/' . $value;
+                        $options = json_decode($arrSettings[$name]['values'], true);
+                        if ($options['type'] && $options['type'] == 'copy' &&
+                            $value != $arrSettings[$name]['value']
+                        ) {
+                            try {
+                                $objFile  = new \Cx\Lib\FileSystem\File($filePath);
+                                $objFile->copy($cx->getWebsiteDocumentRootPath() . '/' . $arrSettings[$name]['value'], true);
+                            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                                \Message::error(
+                                    sprintf(
+                                        $_CORELANG['TXT_CORE_SETTING_ERROR_STORING_IMAGE'],
+                                        $name
+                                    )
+                                );
+                            }
+
+                            $value = $arrSettings[$name]['value'];
+                        }
+                        break;
+                    case self::TYPE_FILECONTENT:
+                        $cx       = \Cx\Core\Core\Controller\Cx::instanciate();
+                        $filePath = $cx->getWebsiteDocumentRootPath() . '/' .
+                            $arrSettings[$name]['values'];
+                        try {
+                            $objFile  = new \Cx\Lib\FileSystem\File($filePath);
+                            $objFile->write($value);
+                        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                            \Message::error(
+                                sprintf(
+                                    $_CORELANG['TXT_CORE_SETTING_ERROR_STORING_FILECONTENT'],
+                                    $name
+                                )
+                             );
+                        }
+                        $value = '';
                       break;
-                  default:
+
+                    case self::TYPE_TEXT:
+                        // option not changed -> abort
+                        if ($value == $arrSettings[$name]['value']) {
+                            break;
+                        }
+                        // fetch setting options
+                        $options = json_decode(
+                            $arrSettings[$name]['values'],
+                            true
+                        );
+                        if (!isset($options['type'])) {
+                            // setting not special -> abort
+                            break;
+                        }
+
+                        // process special parsing
+                        switch ($options['type']) {
+                            case 'filesize':
+                                $value = static::parseFileSizeValue($value);
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
+
+                    default:
                         // Regular value of any other type
-                    break;
+                        break;
                 }
                 //\DBG::log('setting value ' . $name . ' = ' . $value);
                 self::set($name, $value);
-            } elseif ($arrSettings[$name]['type'] == self::TYPE_CHECKBOX && $arrSettings[$name]['group'] == $submittedGroup) {
+            } elseif (
+                in_array(
+                    $arrSettings[$name]['type'],
+                    array(
+                        self::TYPE_CHECKBOX,
+                        self::TYPE_DROPDOWN_MULTISELECT,
+                    )
+                ) &&
+                $arrSettings[$name]['group'] == $submittedGroup
+            ) {
                 self::set($name, null);
             }
         }
@@ -1018,6 +1105,24 @@ class Setting{
         // There has been an error anyway
         return false;
     }
+
+    /**
+     * Parses value into literal file size notation
+     * @param   string  $value  File size in bytes or literal file size
+     *                          notation.
+     * @return  string  Literal file size notation. I.e.: 10 MB / 1 GB
+     */
+    protected static function parseFileSizeValue($value) {
+        // get bytes of set upload limit
+        if (preg_match('/^\d+$/', $value)) {
+            $bytes = $value;
+        } else {
+            $bytes = \FWSystem::getBytesOfLiteralSizeFormat($value);
+        }
+        // convert bytes into human readable format
+        return \FWSystem::getLiteralSizeFormat($bytes);
+    }
+
     /**
      * Deletes all entries for the current section
      *
@@ -1033,6 +1138,7 @@ class Setting{
         }
         return $engine->deleteModule();
     }
+
     /**
      * Splits the string value at commas and returns an array of strings
      *
@@ -1063,7 +1169,7 @@ class Setting{
             if (preg_match('/^(.+?)\s*(?<!\\\\):\s*(.+$)/', $value, $match)) {
                 $key = $match[1];
                 $value = $match[2];
-            // \DBG::log("Split $key and $value");
+                //\DBG::log("Split $key and $value");
             }
             str_replace(array('\\,', '\\:'), array(',', ':'), $value);
             if (isset($key)) {
@@ -1071,11 +1177,12 @@ class Setting{
             } else {
                 $arrValues[] = $value;
             }
-            // \DBG::log("Split $key and $value");
+            //\DBG::log("Split $key and $value");
         }
-            // \DBG::log("Array: ".var_export($arrValues, true));
+        //\DBG::log("Array: ".var_export($arrValues, true));
         return $arrValues;
     }
+
     /**
      * Joins the strings in the array with commas into a single values string
      *
@@ -1094,11 +1201,12 @@ class Setting{
             $value = str_replace(
                 array(',', ':'), array('\\,', '\\:'), $value);
             $strValues .=
-                ($strValues ? ',' : '').
+                ($strValues ? ',' : '') .
                 "$key:$value";
         }
         return $strValues;
     }
+
     /**
      * Should be called whenever there's a problem with the settings table
      *
@@ -1114,6 +1222,7 @@ class Setting{
         }
         return $engine->errorHandler();
     }
+
     /**
      * Returns the settings from the old settings table for the given module ID,
      * if available
@@ -1150,7 +1259,6 @@ class Setting{
         return $arrConfig;
     }
 
-
     /**
      * Returns engine from section
      *
@@ -1168,11 +1276,10 @@ class Setting{
             $engine = self::$engine;
         }
         if (isset(self::$arrSettings[self::getInstanceId()][$section][$engine])) {
-           return self::$arrSettings[self::getInstanceId()][$section][$engine];
+            return self::$arrSettings[self::getInstanceId()][$section][$engine];
         }
         $engine = self::$arrSettings[self::getInstanceId()][$section]['default_engine'];
-        if(isset(self::$arrSettings[self::getInstanceId()][$section][$engine]))
-        {
+        if (isset(self::$arrSettings[self::getInstanceId()][$section][$engine])) {
             return self::$arrSettings[self::getInstanceId()][$section][$engine];
         }
         // \DBG::log("Section engine don't exist. Section: $section, Engine: $engine");
@@ -1205,7 +1312,7 @@ class Setting{
                         self::addToArray($itemName, $item);
                     }
                     return;
-                case  self::REPOPULATE:
+                case self::REPOPULATE:
                     self::$arrSettings[self::getInstanceId()][self::$section][self::$engine] = $oSectionEngine;
                     return;
             }
@@ -1215,7 +1322,6 @@ class Setting{
 
     /**
      * Set engineType
-     *
      * @param string $engine
      */
     static function setEngineType($section, $engine, $group = null)
@@ -1229,8 +1335,8 @@ class Setting{
                 self::$arrSettings[self::getInstanceId()][$section]['default_engine'] = $engine;
             }
             return true;
-    }
-    return false;
+        }
+        return false;
     }
 
     /**
@@ -1271,13 +1377,13 @@ class Setting{
 
     /**
      * Adds element to array
-     *
      * @param  string  $name
      * @param  string  $value
      * @return boolean
      */
-    static function addToArray($name, $value) {
-        $engine=self::getSectionEngine();
+    static function addToArray($name, $value)
+    {
+        $engine = self::getSectionEngine();
         if ($engine == null) {
             return false;
         }
@@ -1285,7 +1391,6 @@ class Setting{
     }
 
     /**
-     *
      * Enhanced method of getting settins by section, engine and group;
      * Recommended for use in future; getArray() is just for backward compatibility
      * @param type $section
@@ -1297,7 +1402,7 @@ class Setting{
     {
         if ($section == null) {
             return self::$arrSettings[self::getInstanceId()];
-        }elseif ($engine == null) {
+        } elseif ($engine == null) {
             return self::$arrSettings[self::getInstanceId()][$section];
         } else {
             $engine = self::getSectionEngine($section, $engine);
@@ -1308,21 +1413,20 @@ class Setting{
         }
     }
 
-
     /**
      * Gets current settings based on currently set section, engine and group
-     *
      * @return array | false
      */
-    static function getCurrentSettings() {
+    static function getCurrentSettings()
+    {
         return self::getSettings(self::$section, self::$engine, self::$group);
     }
 
     /**
      * Returns Id of current instance
-     *
      */
-    static function getInstanceId() {
+    static function getInstanceId()
+    {
         return \Cx\Core\Core\Controller\Cx::instanciate()->getId();
     }
 }

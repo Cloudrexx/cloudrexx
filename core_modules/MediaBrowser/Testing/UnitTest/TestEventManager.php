@@ -47,10 +47,10 @@ class TestEventManager {
      * @param $name
      * @param $callback
      */
-    function triggerEvent($name,$callback){
+    function triggerEvent($name, $callback) {
         $mediaManager = current($callback);
-        foreach ($this->mediaSources as $mediaSource){
-           $mediaManager->addMediaType($mediaSource);
+        foreach ($this->mediaSources as $mediaSource) {
+            $mediaManager->addMediaType($mediaSource);
         }
     }
 

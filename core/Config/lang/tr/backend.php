@@ -81,7 +81,6 @@ $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIME_TOOLTIP_HELP'] = 'Sezon zamanı san
 $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIMEREMEMBERME'] = 'Session length (remember me)';
 $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIMEREMEMBERME_TOOLTIP_HELP'] = 'Session length in seconds for users which have set the checkbox "Remember me" at login.';
 $_ARRAYLANG['TXT_CORE_CONFIG_DNSSERVER'] = 'DNS-Sunucusu';
-$_ARRAYLANG['TXT_CORE_CONFIG_DNSSERVER_TOOLTIP_HELP'] = 'Bir DNS-Sunucusu Ağ Araçlarında  MX-Lookup"ların sorgulanmasında kullanıyor.';
 $_ARRAYLANG['TXT_CORE_CONFIG_COREADMINNAME'] = 'Yöneticinin ismi';
 $_ARRAYLANG['TXT_CORE_CONFIG_COREADMINEMAIL'] = 'Yöneticinin E-Mail Adresi ';
 $_ARRAYLANG['TXT_CORE_CONFIG_CONTACTFORMEMAIL'] = 'İrtibat formunun E-Mail Adresi  (Standart)';

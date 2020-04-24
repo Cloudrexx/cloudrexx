@@ -42,11 +42,11 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                 <table style="width: 100%">
                 <tr>
                     <td class="drag_handle" style="width: 75px;" onmousedown="lastDragged={ARTICLEID}; handlerEvent();">
-                        <img src="../modules/Knowledge/View/Media/sort.gif" style="boder: none;" />
+                        <img src="/modules/Knowledge/View/Media/sort.gif" style="boder: none;" />
                     </td>
                     <td style="width: 50px;">
                         <a href="javascript: void(0);" onclick="switchActive({ARTICLEID}, this, {ACTIVE_STATE})">
-                           <img src="../core/Core/View/Media/icons/led_{CATEGORY_ACTIVE_LED}.gif"  alt="switch active state" style="border: none;" />
+                           <img src="/core/Core/View/Media/icons/led_{CATEGORY_ACTIVE_LED}.gif"  alt="switch active state" style="border: none;" />
                         </a>
                     </td>
                     <td style="padding-right: 15px; vertical-align: top;">
@@ -66,7 +66,7 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                             var rating{ARTICLEID} = new Rating({ARTICLEID}, {VOTEVALUE}, {
                                 stars : {MAX_RATING},
                                 locked : true,
-                                starPath : '../modules/Knowledge/View/Media/'
+                                starPath : '/modules/Knowledge/View/Media/'
                             });
 
                             /* ]]> */
@@ -74,11 +74,11 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                     </td>
                     <td style="width: 50px; text-align: right;">
                         <a class="article-edit-link" href="index.php?cmd=Knowledge{MODULE_INDEX}&amp;act=articles&amp;tpl=edit&amp;id={ARTICLEID}" title="{TXT_IMGALT_EDIT}">
-                            <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" />
+                            <img src="/core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" />
                         </a>
 
                         <a href="javascript:deleteArticle({ARTICLEID});" title="{TXT_DELETE_CATEGORY}">
-                           <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
+                           <img src="/core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
                         </a>
                     </td>
                 </tr>

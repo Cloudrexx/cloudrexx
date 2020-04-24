@@ -111,9 +111,15 @@ class Shop extends ShopLibrary
     /**
      * The current page's title
      * If the user is on the detail page, show the product name
-     * @var null|string
+     * @var string
      */
-    protected static $pageTitle = null;
+    protected static $pageTitle = '';
+
+    /**
+     * Short description of current product or category.
+     * @var string
+     */
+    protected static $pageMetaDesc = '';
 
     /**
      * The current page's meta image
@@ -124,6 +130,12 @@ class Shop extends ShopLibrary
     protected static $pageMetaImage = '';
 
     /**
+     * Keywords of current product, separated by comma
+     * @var string
+     */
+    protected static $pageMetaKeys = '';
+
+    /**
      * Whether or not a session has been initialized
      * and is being used
      * @var boolean
@@ -131,14 +143,37 @@ class Shop extends ShopLibrary
     protected static $hasSession = false;
 
     /**
+     * List of field names with failed validation
+     *
+     * @var array List of field names
+     */
+    protected static $errorFields = array();
+    
+    /**
+     * List of mandatory fields of account page
+     *
+     * "email" and "password" are not in list in order to allow the user to
+     * order without registration.
+     * @var array List of field names
+     */
+    protected static $mandatoryAccountFields = array(
+        'gender',
+        'lastname',
+        'firstname',
+        'address',
+        'zip',
+        'city',
+        'phone',
+    );
+
+    /**
      * Initialize
      * @access public
      */
     static function init()
     {
-//\DBG::log("Shop::init(): Entered");
         if (self::$initialized) {
-die("Shop::init(): ERROR: Shop::init() called more than once!");
+            return;
         }
         self::init_session();
         if (   empty($_REQUEST['section'])
@@ -216,7 +251,7 @@ die("Shop::init(): ERROR: Shop::init() called more than once!");
             if (!self::use_session()) {
                 return;
             }
-            $sessionObj = $cx->getComponent('Session')->getSession();
+            $cx->getComponent('Session')->getSession();
         }
         if (empty($_SESSION['shop'])) {
             $_SESSION['shop'] = array();
@@ -241,20 +276,26 @@ die("Shop::init(): ERROR: Shop::init() called more than once!");
         self::$objTemplate->setTemplate($template);
         // Global module index for clones
         self::$objTemplate->setGlobalVariable('MODULE_INDEX', MODULE_INDEX);
+
         // Do this *before* calling our friends, especially Customer methods!
         // Pick the default Country for delivery
+        // countryId2 is used for shipment address
         if (empty($_SESSION['shop']['countryId2'])) {
             $_SESSION['shop']['countryId2'] =
                 (isset($_POST['countryId2'])
                   ? intval($_POST['countryId2'])
                   : \Cx\Core\Setting\Controller\Setting::getValue('country_id', 'Shop'));
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
+
 // TODO: This should be set up in a more elegant way
         Vat::is_reseller(self::$objCustomer && self::$objCustomer->is_reseller());
         // The coupon code may be set when entering the Shop already
         if (isset($_REQUEST['coupon_code'])) {
             $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
-            $sessionObj = $cx->getComponent('Session')->getSession();
+            $cx->getComponent('Session')->getSession();
             $_SESSION['shop']['coupon_code'] =
                 trim(strip_tags(contrexx_input2raw($_REQUEST['coupon_code'])));
 //\DBG::log("Coupon Code: Set to ".$_SESSION['shop']['coupon_code']);
@@ -397,23 +438,44 @@ die("Failed to get Customer for ID $customer_id");
     }
 
     /**
-     * Returns the product name if the user is on the product details page
-     * @return string|null the page title to show
+     * Returns the name of the current product
+     *
+     * @return string Name of current product
      */
     public static function getPageTitle() {
-        if (isset(self::$pageTitle)) {
-            return self::$pageTitle;
-        }
-        return null;
+        return static::$pageTitle;
+    }
+
+    /**
+     * Returns the short description of the current product or the short
+     * description of the current category
+     *
+     * @return string   Short description of product or category. If no
+     *                  product/category is selected, then an empty string is
+     *                  retured.
+     */
+    public static function getPageMetaDesc() {
+        return static::$pageMetaDesc;
     }
 
     /**
      * Returns the category or product image if the use is on
      * a product's or category's page
+     *
      * @return string Relative image URL
      */
     public static function getPageMetaImage() {
         return static::$pageMetaImage;
+    }
+
+    /**
+     * Returns the keywords of the current product
+     *
+     * @return string   Keywords of current product. If no product
+     *                  is selected, then an empty string is retured.
+     */
+    public static function getPageMetaKeys() {
+        return static::$pageMetaKeys;
     }
 
     /**
@@ -590,6 +652,8 @@ die("Failed to get Customer for ID $customer_id");
                 $objTpl->setVariable(array(
                     'SHOP_CATEGORY_STYLE' => $style,
                     'SHOP_CATEGORY_ID' => $id,
+                    'SHOP_CATEGORY_NAME_FLAT' =>
+                        str_replace('"', '&quot;', $arrShopCategory['name']),
                     'SHOP_CATEGORY_NAME' =>
                         str_repeat('&nbsp;', 3*$level).
                         str_replace('"', '&quot;', $arrShopCategory['name']),
@@ -792,8 +856,16 @@ die("Failed to get Customer for ID $customer_id");
     {
 //\DBG::log("Shop::cart(): Entered");
         Cart::init();
-        if (!empty($_POST['countryId2'])) {
+        if (
+            !empty($_POST['countryId2']) && (
+                !isset($_SESSION['shop']['countryId2']) ||
+                $_SESSION['shop']['countryId2'] != intval($_POST['countryId2'])
+            )
+        ) {
             $_SESSION['shop']['countryId2'] = intval($_POST['countryId2']);
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
         if (empty($_GET['remoteJs'])) {
 //\DBG::log("Shop::cart(): Receiving POST");
@@ -979,14 +1051,20 @@ die("Failed to update the Cart!");
                 $id = $objCategory->id();
                 $catName = contrexx_raw2xhtml($objCategory->name());
                 $imageName = $objCategory->picture();
+                $shortDescription = $objCategory->shortDescription();
+                $shortDescription = nl2br(contrexx_raw2xhtml($shortDescription));
+                $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
                 $description = $objCategory->description();
                 $description = nl2br(contrexx_raw2xhtml($description));
                 $description = preg_replace('/[\n\r]/', '', $description);
                 self::$objTemplate->setVariable(array(
                     'SHOP_CATEGORY_CURRENT_ID'          => $id,
                     'SHOP_CATEGORY_CURRENT_NAME'        => $catName,
+                    'SHOP_CATEGORY_CURRENT_SHORT_DESCRIPTION' => $shortDescription,
                     'SHOP_CATEGORY_CURRENT_DESCRIPTION' => $description,
                 ));
+                static::$pageTitle = $objCategory->name();
+                static::$pageMetaDesc = $objCategory->shortDescription();
                 if ($imageName) {
                     self::$objTemplate->setVariable(array(
                         'SHOP_CATEGORY_CURRENT_IMAGE'       => $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
@@ -1038,6 +1116,9 @@ die("Failed to update the Cart!");
             $catName = $objCategory->name();
             $imageName = $objCategory->picture();
             $thumbnailPath = self::$defaultImage;
+            $shortDescription = $objCategory->shortDescription();
+            $shortDescription = nl2br(htmlentities($shortDescription, ENT_QUOTES, CONTREXX_CHARSET));
+            $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
             $description = $objCategory->description();
             $description = nl2br(htmlentities($description, ENT_QUOTES, CONTREXX_CHARSET));
             $description = preg_replace('/[\n\r]/', '', $description);
@@ -1047,23 +1128,49 @@ die("Failed to update the Cart!");
                 self::scaleImageSizeToThumbnail($arrDefaultImageSize);
             }
             $arrSize = $arrDefaultImageSize;
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the Products.
                 $imageName = Products::getPictureByCategoryId($id);
             }
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the subcategories and their Products.
                 $imageName = ShopCategories::getPictureById($id);
             }
-            if ($imageName) {
-                if (file_exists(\ImageManager::getThumbnailFilename($cx->getWebsiteImagesShopPath() . '/' . $imageName))) {
-                    // Image found!  Use that instead of the default.
-                    $thumbnailPath = \ImageManager::getThumbnailFilename(
-                        $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
-                    );
-                    $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
-                    self::scaleImageSizeToThumbnail($arrSize);
-                }
+            if (
+                $imageName &&
+                file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
+                // Image found!  Use that instead of the default.
+                $thumbnailPath = \ImageManager::getThumbnailFilename(
+                    $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
+                );
+                $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
+                self::scaleImageSizeToThumbnail($arrSize);
+            } else {
+                // Fallback if no picture for category was found.
+                // This is intentionally in the else statement and not as
+                // assignement before this if-statement, as it would otherwise
+                // brake the regular thumbnail $thumbnailPath (which would be
+                // overwritten above )
+                $imageName = ShopLibrary::noPictureName;
             }
             if ($imageName) {
                 self::$objTemplate->setVariable(
@@ -1077,6 +1184,7 @@ die("Failed to update the Cart!");
                 'SHOP_CATEGORY_THUMBNAIL' => contrexx_raw2encodedUrl(
                     $thumbnailPath),
                 'SHOP_CATEGORY_THUMBNAIL_SIZE' => $arrSize[3],
+                'SHOP_CATEGORY_SHORT_DESCRIPTION' => $shortDescription,
                 'SHOP_CATEGORY_DESCRIPTION' => $description,
 // OBSOLETE since V3.0.0, as are any placeholders for Categories
 // containing "PRODUCT"!
@@ -1274,7 +1382,10 @@ die("Failed to update the Cart!");
 
 //\DBG::activate(DBG_ERROR_FIREPHP);
         // Use Sorting class for the Product order
-        $uri = \Html::getRelativeUri_entities();
+        $uri =
+// TODO: Use the alias, if any
+            '&amp;section=Shop'. MODULE_INDEX . $pagingCmd .
+            $pagingCatId.$pagingManId.$pagingTerm;
         $arrOrder = array(
             // Must be disambiguated from Category::ord using the table alias!
             'product.ord' => $_ARRAYLANG['TXT_SHOP_ORDER_PRODUCT_ORD'],
@@ -1305,11 +1416,15 @@ die("Failed to update the Cart!");
         } elseif ($product_id) {
             $arrProduct = self::getValidProducts(array($product_id));
         } else {
+            $sortOrder = $objSorting->getOrder();
+            if ($term != '') {
+                $sortOrder = 'score1 DESC, score2 DESC, score3 DESC';
+            }
             $arrProduct = Products::getByShopParams(
                 $count, \Paging::getPosition(),
                 $product_id, $category_id, $manufacturer_id, $term,
                 $flagSpecialoffer, $flagLastFive,
-                $objSorting->getOrder(),
+                $sortOrder,
                 self::$objCustomer && self::$objCustomer->is_reseller()
             );
         }
@@ -1324,7 +1439,16 @@ die("Failed to update the Cart!");
             if (self::$objTemplate->blockExists('no_product')) {
                 self::$objTemplate->touchBlock('no_product');
             }
+            // hide products template block if no products have been loaded
+            if (self::$objTemplate->blockExists('products')) {
+                self::$objTemplate->hideBlock('products');
+            }
             return true;
+        }
+        if ($count == 0) {
+            if (self::$objTemplate->blockExists('products')) {
+                self::$objTemplate->hideBlock('products');
+            }
         }
         if ($objCategory) {
         // Only indicate the category name when there are products
@@ -1380,6 +1504,8 @@ die("Failed to update the Cart!");
         $arrDefaultImageSize = $arrSize = null;
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $thumbnailFormats = $cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnails();
+        $isFileAttrExistsInPdt = false;
+        $uploader = false;
         foreach ($arrProduct as $objProduct) {
             $id = $objProduct->id();
             $productSubmitFunction = '';
@@ -1390,7 +1516,10 @@ die("Failed to update the Cart!");
                 $thumbnailPath = $pictureLink = '';
                 $imageFilePath = '';
                 if (   empty($image['img'])
-                    || $image['img'] == ShopLibrary::noPictureName) {
+                    || $image['img'] == ShopLibrary::noPictureName
+                ) {
+                    // set no-picture image
+                    $image['img'] = ShopLibrary::noPictureName;
                     // We have at least one picture on display already.
                     // No need to show "no picture" three times!
                     if ($havePicture) { continue; }
@@ -1454,7 +1583,9 @@ die("Failed to update the Cart!");
                 $havePicture = true;
             }
             if (!empty($product_id)) {
-                self::$pageTitle = $objProduct->name();
+                static::$pageTitle = $objProduct->name();
+                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->short());
+                static::$pageMetaKeys = $objProduct->keywords();
                 if (count($arrProductImages)) {
                     static::$pageMetaImage = current($arrProductImages)['IMAGE_PATH'];
                 }
@@ -1580,16 +1711,40 @@ die("Failed to update the Cart!");
                     $id, $formId, $cart_id, $flagMultipart
                 );
             }
+            if ($flagMultipart) {
+                $isFileAttrExistsInPdt = $flagMultipart;
+                if (!$uploader) {
+                    //initialize the uploader
+                    $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+                    $uploader->setCallback('productOptionsUploaderCallback');
+                    $uploader->setOptions(array(
+                        'id'                => 'productOptionsUploader',
+                        'data-upload-limit' => 1,
+                        'style'             => 'display:none'
+                    ));
+                }
+                self::$objTemplate->setVariable(array(
+                    'SHOP_PRODUCT_OPTIONS_UPLOADER_ID'   => $uploader->getId()
+                ));
+            }
             $shopProductFormName = "shopProductForm$formId";
             $row = $formId % 2 + 1;
+            $detailDescription = '';
+            if ($longDescription) {
+                $detailDescription = $longDescription;
+            } elseif (!self::$objTemplate->placeholderExists(
+                'SHOP_PRODUCT_DESCRIPTION'
+            )) {
+                // show short description as detail-description if the
+                // short-description placeholder is not being used
+                $detailDescription = $short;
+            }
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.$row,
                 'SHOP_PRODUCT_ID' => $objProduct->id(),
                 'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
                 'SHOP_PRODUCT_DESCRIPTION' => $short,
-// TODO: Test whether this produces double descriptions in some views
-                'SHOP_PRODUCT_DETAILDESCRIPTION' => ($longDescription
-                    ? $longDescription : $short),
+                'SHOP_PRODUCT_DETAILDESCRIPTION' => $detailDescription,
                 'SHOP_PRODUCT_FORM_NAME' => $shopProductFormName,
                 'SHOP_PRODUCT_SUBMIT_NAME' => $productSubmitName,
                 'SHOP_PRODUCT_SUBMIT_FUNCTION' => $productSubmitFunction,
@@ -1632,6 +1787,11 @@ die("Failed to update the Cart!");
                     'SHOP_MANUFACTURER_LINK' => $manufacturer_link,
                     'TXT_SHOP_MANUFACTURER_LINK' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_LINK'],
                 ));
+                if (self::$objTemplate->blockExists('shopProductManufacturer')) {
+                    self::$objTemplate->parse('shopProductManufacturer');
+                }
+            } elseif (self::$objTemplate->blockExists('shopProductManufacturer')) {
+                self::$objTemplate->hideBlock('shopProductManufacturer');
             }
 
             // This is the old Product field for the Manufacturer URI.
@@ -1647,6 +1807,11 @@ die("Failed to update the Cart!");
                     '" target="_blank">'.
                     $_ARRAYLANG['TXT_SHOP_EXTERNAL_LINK'].'</a>',
                 ));
+                if (self::$objTemplate->blockExists('shopProductExternalLink')) {
+                    self::$objTemplate->parse('shopProductExternalLink');
+                }
+            } elseif (self::$objTemplate->blockExists('shopProductExternalLink')) {
+                self::$objTemplate->hideBlock('shopProductExternalLink');
             }
 
             if ($price) {
@@ -1748,15 +1913,36 @@ die("Failed to update the Cart!");
                 self::$objTemplate->setVariable(
                         'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->minimum_order_quantity())
                 );
+                self::$objTemplate->touchBlock('orderQuantity');
             } elseif (self::$objTemplate->blockExists('orderQuantity') && !$minimum_order_quantity){
                 self::$objTemplate->hideBlock('orderQuantity');
             }
 
+            if ($objProduct->stock()) {
+                if (self::$objTemplate->blockExists('shop_product_in_stock')) {
+                    self::$objTemplate->touchBlock('shop_product_in_stock');
+                }
+                if (self::$objTemplate->blockExists('shop_product_not_in_stock')) {
+                    self::$objTemplate->hideBlock('shop_product_not_in_stock');
+                }
+            } else {
+                if (self::$objTemplate->blockExists('shop_product_in_stock')) {
+                    self::$objTemplate->hideBlock('shop_product_in_stock');
+                }
+                if (self::$objTemplate->blockExists('shop_product_not_in_stock')) {
+                    self::$objTemplate->touchBlock('shop_product_not_in_stock');
+                }
+            }
 
             if (self::$objTemplate->blockExists('shopProductRow')) {
                 self::$objTemplate->parse('shopProductRow');
             }
             ++$formId;
+        }
+        if ($isFileAttrExistsInPdt) {
+            self::$objTemplate->setVariable(array(
+                'SHOP_PRODUCT_OPTIONS_UPLOADER_CODE' => $uploader->getXHtml(),
+            ));
         }
         return true;
     }
@@ -1944,7 +2130,7 @@ die("Failed to update the Cart!");
                 self::$objTemplate->hideBlock('shopProductOptionsRow');
                 self::$objTemplate->hideBlock('shopProductOptionsValuesRow');
             } else {
-                $isUpload = false;
+                $forceSelectOption = \Cx\Core\Setting\Controller\Setting::getValue('force_select_option','Shop');
                 // Loop through the Attribute Names for the Product
                 foreach ($arrAttributes as $attribute_id => $objAttribute) {
                     $mandatory = false;
@@ -2006,6 +2192,7 @@ die("Failed to update the Cart!");
                         $checkOptionIds .= "$attribute_id;";
                         break;
                       case Attribute::TYPE_MENU_MANDATORY:
+                        $arrAssignedOptions = array_intersect_key($arrOptions, $arrRelation);
                         $selectValues =
                             '<input type="hidden" id="productOption-'.
                             $product_id.'-'.$attribute_id.
@@ -2016,8 +2203,7 @@ die("Failed to update the Cart!");
                             '" class="product-option-field" style="width:180px;">'."\n".
                             // If there is only one option to choose from,
                             // why bother the customer at all?
-// NOTE: To always prepend the default "please choose" option, comment the condition
-                            (count($arrOptions) > 1
+                            ($forceSelectOption || count($arrAssignedOptions) > 1
                                 ? '<option value="0">'.
                                   $objAttribute->getName().'&nbsp;'.
                                   $_ARRAYLANG['TXT_CHOOSE']."</option>\n"
@@ -2164,15 +2350,76 @@ die("Failed to update the Cart!");
                           case Attribute::TYPE_UPLOAD_OPTIONAL:
                           case Attribute::TYPE_UPLOAD_MANDATORY:
 //                            $option_price = '&nbsp;';
-                            $isUpload = true;
-                            $selectValues .='<input type="input" name="productOption['.$attribute_id.
-                                ']" id="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.
-                                '" style="width:180px; float:left" />'.
-                                  '<input type="button" name="productOption['.$attribute_id.
-                                ']" onClick="getUploader(cx.jQuery(this));" data-input-id="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.
-                                '" value="'.$_ARRAYLANG['TXT_SHOP_CHOOSE_FILE'].'"/>'.
-                                  '<label for="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.'">'.
-                                $option_price."</label><br />\n";
+                            $inputName = 'productOption[' . $attribute_id . ']';
+                            $inputId   = 'productOption-' . $product_id . '-' .
+                                $attribute_id . '-' . $domId;
+                            $inputText =
+                                new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                    'input'
+                                );
+                            $inputText->setAttribute('type', 'text');
+                            $inputText->setAttribute('id', $inputId);
+                            $inputText->setAttribute('disabled', 'disabled');
+                            $inputText->setClass(
+                                'product-option-upload-text
+                                 product-option-field ' . $inputId
+                            );
+                            if ($arrOption['price'] != 0) {
+                                $inputText->setAttribute(
+                                    'data-price',
+                                    $arrOption['price']
+                                );
+                            }
+                            $inputHidden =
+                                new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                    'input'
+                                );
+                            $inputHidden->setAttribute('type', 'text');
+                            $inputHidden->setAttribute('name', $inputName);
+                            $inputHidden->setClass(
+                                'product-option-upload-hidden
+                                 product-option-upload ' . $inputId
+                            );
+                            $inputButton =
+                                new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                    'input'
+                                );
+                            $inputButton->setAttribute('type', 'button');
+                            $inputButton->setClass(
+                                'product-option-upload-button'
+                            );
+                            $inputButton->setAttribute(
+                                'data-input-id',
+                                $inputId
+                            );
+                            $inputButton->setAttribute(
+                                'value',
+                                $_ARRAYLANG['TXT_SHOP_CHOOSE_FILE']
+                            );
+                            $removeIcon = new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                'img'
+                            );
+                            $removeIcon->setClass('product-option-remove-file');
+                            $removeIcon->setAttribute('data-input-id', $inputId);
+                            $removeIcon->setAttribute(
+                                'src',
+                                '/core/Core/View/Media/icons/delete.gif'
+                            );
+                            $removeIcon->setAttribute(
+                                'title',
+                                $_ARRAYLANG['TXT_SHOP_REMOVE_FILE']
+                            );
+                            $label = new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                'label'
+                            );
+                            $label->setAttribute('for', $inputId);
+                            $value = new \Cx\Core\Html\Model\Entity\TextElement(
+                                $option_price
+                            );
+                            $label->addChild($value);
+                            $br = new \Cx\Core\Html\Model\Entity\HtmlElement('br');
+                            $selectValues .= $inputText . $inputButton .
+                                $removeIcon. $inputHidden . $label . $br;
                             break;
                           case Attribute::TYPE_TEXTAREA_OPTIONAL:
                           case Attribute::TYPE_TEXTAREA_MANDATORY:
@@ -2249,21 +2496,6 @@ die("Failed to update the Cart!");
                     self::$objTemplate->parse('shopProductOptionsValuesRow');
                 }
                 self::$objTemplate->parse('shopProductOptionsRow');
-                if ($isUpload) {
-                    //initialize the uploader
-                    $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader(); //create an uploader
-                    $uploader->setCallback('productOptionsUploaderCallback');
-                    $uploader->setOptions(array(
-                        'id' => 'productOptionsUploader',
-                        'allowed-extensions' => array('jpg', 'png', 'gif'),
-                        'data-upload-limit' => 1,
-                        'style' => 'display:none'
-                    ));
-                    self::$objTemplate->setVariable(array(
-                        'SHOP_PRODUCT_OPTIONS_UPLOADER_CODE' => $uploader->getXHtml(),
-                        'SHOP_PRODUCT_OPTIONS_UPLOADER_ID'   => $uploader->getId()
-                    ));
-                }
             }
         }
         return
@@ -2309,18 +2541,49 @@ die("Failed to update the Cart!");
      *
      * @internal    A lot of this belongs to the Payment class.
      * @param       integer     $payment_id The payment ID
-     * @param       double      $totalPrice The total order price
+     * @param       float       $totalPrice The total order price (of goods)
+     * @param       float       $shipmentPrice The price of the shipment
      * @return      string                  The payment fee, formatted by
      *                                      {@link Currency::getCurrencyPrice()}
      */
-    static function _calculatePaymentPrice($payment_id, $totalPrice)
-    {
-        $paymentPrice = 0;
-        if (!$payment_id) return $paymentPrice;
-        if (  Payment::getProperty($payment_id, 'free_from') == 0
-           || $totalPrice < Payment::getProperty($payment_id, 'free_from')) {
-            $paymentPrice = Payment::getProperty($payment_id, 'fee');
+    static function _calculatePaymentPrice(
+        $payment_id,
+        $totalPrice,
+        $shipmentPrice
+    ) {
+        // no payment fee if payment method is invalid
+        if (!$payment_id) {
+            return 0;
         }
+        // no payment fee if payment method is invalid
+        if (Payment::getProperty($payment_id, 'fee') === false) {
+            return 0;
+        }
+        // no payment fee if order sum is greater then set boundary
+        if (
+            Payment::getProperty($payment_id, 'free_from') > 0 &&
+            $totalPrice >= Payment::getProperty($payment_id, 'free_from')
+        ) {
+            return 0;
+        }
+
+        // fetch fee data
+        $type = Payment::getProperty($payment_id, 'type');
+        $fee = Payment::getProperty($payment_id, 'fee');
+
+        // calculate fee based on selected payment method
+        $paymentPrice = 0;
+        switch ($type) {
+            case 'percent':
+                $paymentPrice = ($totalPrice + $shipmentPrice) * $fee / 100;
+                break;
+
+            case 'fix':
+            default:
+                $paymentPrice = $fee;
+                break;
+        }
+
         return Currency::getCurrencyPrice($paymentPrice);
     }
 
@@ -2390,11 +2653,14 @@ die("Failed to update the Cart!");
         if ($objUser->login()) {
             self::$objCustomer = Customer::getById($objUser->getId());
             if (self::$objCustomer) {
+                $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
+                $session = $cx->getComponent('Session')->getSession();
+
                 // This is still required in confirm() (TODO: remove)
                 $_SESSION['shop']['username'] = self::$objCustomer->username();
                 $_SESSION['shop']['email'] = self::$objCustomer->email();
 //\DBG::log("Shop::_authenticate(): Success! (".self::$objCustomer->firstname().' '.self::$objCustomer->lastname().', '.self::$objCustomer->username().', email '.self::$objCustomer->email().")");
-                $_SESSION->cmsSessionUserUpdate(self::$objCustomer->id());
+                $session->cmsSessionUserUpdate(self::$objCustomer->id());
                 return true;
             }
         }
@@ -2558,8 +2824,15 @@ die("Shop::processRedirect(): This method is obsolete!");
             ? $_SESSION['shop']['city']
             : (self::$objCustomer ? self::$objCustomer->city() : ''));
         $country_id = (isset($_SESSION['shop']['countryId'])
+            // load country for payment address from session ..
             ? $_SESSION['shop']['countryId']
-            : (self::$objCustomer ? self::$objCustomer->country_id() : 0));
+            : (self::$objCustomer ?
+                // .. or from signed-in customer
+                self::$objCustomer->country_id() :
+                // .. or use shipment country as pre-set value
+                $_SESSION['shop']['countryId2']
+            )
+        );
         $email = (isset($_SESSION['shop']['email'])
             ? $_SESSION['shop']['email']
             : (self::$objCustomer ? self::$objCustomer->email() : ''));
@@ -2569,6 +2842,33 @@ die("Shop::processRedirect(): This method is obsolete!");
         $fax = (isset($_SESSION['shop']['fax'])
             ? $_SESSION['shop']['fax']
             : (self::$objCustomer ? self::$objCustomer->fax() : ''));
+        $birthday = (isset($_SESSION['shop']['birthday'])
+            ? $_SESSION['shop']['birthday']
+            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : 0));
+        $selectedBirthdayDay = '0';
+        $selectedBirthdayMonth = '0';
+        $selectedBirthdayYear = '0';
+
+        // load pre-set date
+        if (!empty($birthday)) {
+            $selectedBirthdayDay = date('j', $birthday);
+            $selectedBirthdayMonth = date('n', $birthday);
+            $selectedBirthdayYear = date('Y', $birthday);
+        } else {
+            // if no valid date has been set so far, do check if
+            // a partial date selection has been submitted and if so,
+            // do use those values as presetting
+            if (!empty($_POST['shop_birthday_day'])) {
+                $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
+            }
+            if (!empty($_POST['shop_birthday_month'])) {
+                $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
+            }
+            if (!empty($_POST['shop_birthday_year'])) {
+                $selectedBirthdayYear = intval($_POST['shop_birthday_year']);
+            }
+        }
+
         self::$objTemplate->setVariable(array(
             'SHOP_ACCOUNT_COMPANY' => htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET),
             'SHOP_ACCOUNT_PREFIX' => Customers::getGenderMenuoptions($gender),
@@ -2582,12 +2882,97 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ACCOUNT_ACTION' =>
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'),
             // New template - since 2.1.0
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             // Old template
             // Compatibility with 2.0 and older versions
-            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id),
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
+            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
         ));
+
+        // parse birthday fields
+        if (self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY')) {
+            // build day dropdown
+            $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_day',
+                $selectedBirthdayDay,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_DAY'],
+                ) + array_combine(
+                    range(1, 31),
+                    range(1, 31)
+                )
+            );
+            $birthdayDaySelect->setAttribute('class', 'birthday');
+
+            // build month dropdown
+            $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_month',
+                $selectedBirthdayMonth,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_MONTH'],
+                ) + array_combine(
+                    range(1, 12),
+                    range(1, 12)
+                )
+            );
+            $birthdayMonthSelect->setAttribute('class', 'birthday');
+
+            // build year dropdown
+            $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_year',
+                $selectedBirthdayYear,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_YEAR'],
+                ) + array_combine(
+                    range(1900, date('Y')),
+                    range(1900, date('Y'))
+                )
+            );
+            $birthdayYearSelect->setAttribute('class', 'birthday');
+
+            self::$objTemplate->setVariable(
+                'SHOP_ACCOUNT_BIRTHDAY',
+                $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect
+            );
+        }
+        if (self::$objTemplate->blockExists('shop_account_birthday')) {
+            self::$objTemplate->setVariable(array(
+                'SHOP_ACCOUNT_BIRTHDAY_DAY' => $selectedBirthdayDay,
+                'SHOP_ACCOUNT_BIRTHDAY_MONTH' => $selectedBirthdayMonth,
+                'SHOP_ACCOUNT_BIRTHDAY_YEAR' => $selectedBirthdayYear,
+                'SHOP_ACCOUNT_BIRTHDAY_DATE_FORMAT' => ASCMS_DATE_FORMAT_DATE,
+            ));
+            if (!empty($birthday)) {
+                self::$objTemplate->setVariable(array(
+                    'SHOP_ACCOUNT_BIRTHDAY_DATE' => date(
+                        ASCMS_DATE_FORMAT_DATE,
+                        $birthday
+                    ),
+                    'SHOP_ACCOUNT_BIRTHDAY_TIMESTAMP' => $birthday,
+                ));
+            }
+            self::$objTemplate->parse('shop_account_birthday');
+        }
+
+        if (count(static::$errorFields)) {
+            $errorClassPlaceholders = array();
+            foreach (static::$errorFields as $field) {
+                $errorClassPlaceholders[
+                    'SHOP_ACCOUNT_' . strtoupper($field) . '_CLASS'
+                ] = 'error-validation ';
+            }
+            self::$objTemplate->setVariable($errorClassPlaceholders);
+        }
         $register = \Cx\Core\Setting\Controller\Setting::getValue('register','Shop');
 
 /**
@@ -2687,6 +3072,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 ? '' : htmlentities($_SESSION['shop']['zip2'], ENT_QUOTES, CONTREXX_CHARSET)),
             'SHOP_ACCOUNT_CITY2' => (empty($_SESSION['shop']['city2'])
                 ? '' : htmlentities($_SESSION['shop']['city2'], ENT_QUOTES, CONTREXX_CHARSET)),
+            // countryId2 is used for shipment address
             'SHOP_ACCOUNT_COUNTRY2' =>
                 \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
             'SHOP_ACCOUNT_COUNTRY2_ID' => $_SESSION['shop']['countryId2'],
@@ -2714,9 +3100,29 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function account_to_session()
     {
+        global $_ARRAYLANG;
+
 //\DBG::log("account_to_session(): POST: ".var_export($_POST, true));
-        if (empty($_POST) || !is_array($_POST)) return;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $request = $cx->getRequest();
+
+        if (
+            $request->getHttpRequestMethod() != 'post' ||
+            empty($_POST) ||
+            !is_array($_POST)
+        ) {
+            return;
+        }
+
 //\DBG::log("Shop::account_to_session(): Have POST");
+
+        // remember currently set country of shipping address.
+        // will be used in case an invalid shipping country has been submitted
+        $shippingCountryId = 0;
+        if (isset($_SESSION['shop']['countryId2'])) {
+            $shippingCountryId = $_SESSION['shop']['countryId2'];
+        }
+
         foreach ($_POST as $key => $value) {
             $_SESSION['shop'][$key] =
                 trim(strip_tags(contrexx_input2raw($value)));
@@ -2727,6 +3133,92 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['password'] = '';
         }
 
+        // set customer birthday
+        $birthday = 0;
+        if (
+            !empty($_POST['shop_birthday_day']) &&
+            !empty($_POST['shop_birthday_month']) &&
+            !empty($_POST['shop_birthday_year'])
+        ) {
+            $day = intval($_POST['shop_birthday_day']);
+            $month = intval($_POST['shop_birthday_month']);
+            $year = intval($_POST['shop_birthday_year']);
+            $birthday = mktime(
+                0,
+                0,
+                0,
+                $month,
+                $day,
+                $year
+            );
+        } elseif (!empty($_POST['shop_birthday_date'])) {
+            // get date format of submitted birthday date
+            if (
+                !empty($_POST['shop_birthday_date_format']) &&
+                is_string($_POST['shop_birthday_date_format'])
+            ) {
+                $birthdayDateFormat = contrexx_input2raw(
+                    $_POST['shop_birthday_date_format']
+                );
+            } else {
+                $birthdayDateFormat = ASCMS_DATE_FORMAT_DATE;
+            }
+            // parse submitted date based on the supplied date-format
+            $birthdayDate = date_parse_from_format(
+                $birthdayDateFormat,
+                $_POST['shop_birthday_date']
+            );
+            // if parsing of the submitted date was successful,
+            // then do generate a timestamp of it
+            if (
+                !empty($birthdayDate['day']) &&
+                !empty($birthdayDate['month']) &&
+                !empty($birthdayDate['year'])
+            ) {
+                $birthday = mktime(
+                    0,
+                    0,
+                    0,
+                    intval($birthdayDate['month']),
+                    intval($birthdayDate['day']),
+                    intval($birthdayDate['year'])
+                );
+            }
+        } elseif (
+            isset($_POST['shop_birthday_date']) || (
+                isset($_POST['shop_birthday_day']) &&
+                isset($_POST['shop_birthday_month']) &&
+                isset($_POST['shop_birthday_year'])
+            )
+        ) {
+            // clear birthday
+            $_SESSION['shop']['birthday'] = 0;
+        }
+
+        // update birthday property if a valid birthday date has been submitted
+        if (!empty($birthday)) {
+            $_SESSION['shop']['birthday'] = $birthday;
+        }
+
+        // fetch birthday property (-> will be used to determine if setting a
+        // birthday is mandatory)
+        $profileAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $birthdayAttribute = $profileAttribute->getById('birthday');
+
+        // in case no birthday has been set, do check if a birthday has been
+        // requested from the customer (placeholder or template-block exists)
+        // and if the setting is mandatory
+        if (
+            empty($_SESSION['shop']['birthday']) && (
+                self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY') ||
+                self::$objTemplate->blockExists('shop_account_birthday')
+            ) &&
+            $birthdayAttribute->isMandatory()
+        ) {
+            // birthday is mandatory, but has not been set
+            static::$errorFields[] = 'birthday';
+        }
+
         if (   empty($_SESSION['shop']['gender2'])
             || empty($_SESSION['shop']['lastname2'])
             || empty($_SESSION['shop']['firstname2'])
@@ -2735,9 +3227,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             || empty($_SESSION['shop']['city2'])
             || empty($_SESSION['shop']['phone2'])
             || empty($_SESSION['shop']['countryId2'])
+            || empty($_POST['equal_address'])
         ) {
             $_SESSION['shop']['equal_address'] = false;
-        } elseif (!empty($_POST['equal_address'])) {
+        } else {
             // Copy address
             $_SESSION['shop']['company2'] = $_SESSION['shop']['company'];
             $_SESSION['shop']['gender2'] = $_SESSION['shop']['gender'];
@@ -2750,10 +3243,38 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
             $_SESSION['shop']['equal_address'] = true;
         }
-        if (empty($_SESSION['shop']['countryId'])) {
-            // countryId2 is set in Cart::init() already
-            $_SESSION['shop']['countryId'] = $_SESSION['shop']['countryId2'];
+
+        // verify country of shipment address
+        if (Cart::needs_shipment()) {
+            $country = \Cx\Core\Country\Controller\Country::getById(
+                $_SESSION['shop']['countryId2']
+            );
+            // Ensure selected country of shipment adress is valid.
+            // Otherwise reset to previously set country
+            if (!$country['active']) {
+                \Message::error(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'],
+                    \Cx\Core\Country\Controller\Country::getNameById(
+                        $_SESSION['shop']['countryId2']
+                    )
+                ));
+                $_SESSION['shop']['countryId2'] = $shippingCountryId;
+
+                // disable payment and shipment address equality flag
+                $_SESSION['shop']['equal_address'] = false;
+            }
         }
+
+        if (
+            !Cart::needs_shipment() &&
+            !empty($_SESSION['shop']['countryId'])
+        ) {
+            // In case we have an order without shipment, shipment country
+            // will not be set. We set it to the customer's country in order
+            // to calculate VAT correctly.
+            $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
+        }
+
         // Fill missing arguments with empty strings
         if (empty($_SESSION['shop']['company2']))   $_SESSION['shop']['company2'] = '';
         if (empty($_SESSION['shop']['gender2']))    $_SESSION['shop']['gender2'] = '';
@@ -2764,6 +3285,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['city2']))      $_SESSION['shop']['city2'] = '';
         if (empty($_SESSION['shop']['phone2']))     $_SESSION['shop']['phone2'] = '';
         if (empty($_SESSION['shop']['countryId2'])) $_SESSION['shop']['countryId2'] = 0;
+
+        // we need to reset selected payment and shipment method
+        // in case we did just change the shipment country
+        if ($_SESSION['shop']['countryId2'] != $shippingCountryId) {
+            unset($_SESSION['shop']['shipperId']);
+        }
     }
 
 
@@ -2786,6 +3313,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             $status = \Message::error(
                 $_ARRAYLANG['TXT_FILL_OUT_ALL_REQUIRED_FIELDS']);
         }
+
+        // Check for any error messages.
+        // This is used by the verification of the shipment country
+        if (\Message::have()) {
+            return false;
+        }
+
         // Registered Customers are okay now
         if (self::$objCustomer) return $status;
         if (   \Cx\Core\Setting\Controller\Setting::getValue('register','Shop') == ShopLibrary::REGISTER_MANDATORY
@@ -2818,6 +3352,18 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (Customer::getUnregisteredByEmail($_SESSION['shop']['email'])) {
                 return true;
             }
+
+            // Allow registered Customers (active Users!) to place orders without logging in.
+            // Important: this does not ensure data privacy!!
+            $verifyAccountEmail = \Cx\Core\Setting\Controller\Setting::getValue('verify_account_email','Shop');
+            if (!$verifyAccountEmail) {
+                $objCustomer =
+                    Customer::getRegisteredByEmail($_SESSION['shop']['email']);
+                if ($objCustomer) {
+                    return $status;
+                }
+            }
+
             $objUser = new \User();
             $objUser->setUsername($_SESSION['shop']['email']);
             $objUser->setEmail($_SESSION['shop']['email']);
@@ -2925,7 +3471,10 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (   $cart_amount
             && empty($_SESSION['shop']['paymentId'])) {
             $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
-                $_SESSION['shop']['countryId'], Currency::getCurrencyArray());
+                // countryId is used for payment address
+                $_SESSION['shop']['countryId'],
+                Currency::getCurrencyArray()
+            );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
         if (empty($_SESSION['shop']['paymentId']))
@@ -2959,7 +3508,8 @@ die("Shop::processRedirect(): This method is obsolete!");
         $_SESSION['shop']['payment_price'] =
             self::_calculatePaymentPrice(
                 $_SESSION['shop']['paymentId'],
-                $cart_amount
+                $cart_amount,
+                $shipmentPrice
             );
         Cart::update(self::$objCustomer);
         self::update_session();
@@ -3057,13 +3607,16 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['paymentId'])) {
             // Use the first Payment ID
             $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
-                $_SESSION['shop']['countryId'], Currency::getCurrencyArray()
+                // countryId is used for payment address
+                $_SESSION['shop']['countryId'],
+                Currency::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
         return Payment::getPaymentMenu(
             $_SESSION['shop']['paymentId'],
             "document.forms['shopForm'].submit()",
+            // countryId is used for payment address
             $_SESSION['shop']['countryId']
         );
     }
@@ -3269,6 +3822,62 @@ die("Shop::processRedirect(): This method is obsolete!");
                     $_SESSION['shop']['shipment_price']),
                 'SHOP_SHIPMENT_MENU' => self::_getShipperMenu(),
             ));
+
+            if (static::$objTemplate->blockExists('shop_shipment_shipment_methods')) {
+                // Get available shipment IDs
+                $shipmentMethods = Shipment::getCountriesRelatedShippingIdArray(
+                    $_SESSION['shop']['countryId2']
+                );
+
+                // Fetch selected shipment
+                if (empty($_SESSION['shop']['shipperId'])) {
+                    // First is the default shipment ID
+                    $_SESSION['shop']['shipperId'] = current($shipmentMethods);
+                }
+
+                // parse blocks
+                $i = 0;
+                foreach ($shipmentMethods as $shipperId) {
+                    // Skip unavailable shipment methods
+                    if (
+                        Shipment::calculateShipmentPrice(
+                            $shipperId,
+                            $_SESSION['shop']['cart']['total_price'],
+                            $_SESSION['shop']['cart']['total_weight']
+                        ) < 0
+                    ) {
+                        continue;
+                    }
+                    self::$objTemplate->setVariable(array(
+                        'SHOP_SHIPMENT_SHIPMENT_METHOD_ID' => contrexx_raw2xhtml(
+                            $shipperId
+                        ),
+                        'SHOP_SHIPMENT_SHIPMENT_METHOD_NAME' => contrexx_raw2xhtml(
+                            Shipment::getShipperName($shipperId)
+                        ),
+                    ));
+
+                    // selected?
+                    if (self::$objTemplate->blockExists('shop_shipment_shipment_selected')) {
+                        if ($_SESSION['shop']['shipperId'] == $shipperId) {
+                            self::$objTemplate->touchBlock('shop_shipment_shipment_selected');
+                        } else {
+                            self::$objTemplate->hideBlock('shop_shipment_shipment_selected');
+                        }
+                    }
+                    self::$objTemplate->parse('shop_shipment_shipment_methods');
+                    $i++;
+                }
+
+                // no shipment method applicable
+                if (self::$objTemplate->blockExists('shop_shipment_no_shipment_methods')) {
+                    if (!$i) {
+                        self::$objTemplate->touchBlock('shop_shipment_no_shipment_methods');
+                    } else {
+                        self::$objTemplate->hideBlock('shop_shipment_no_shipment_methods');
+                    }
+                }
+            }
         }
         if (   Cart::get_price()
             || $_SESSION['shop']['shipment_price']
@@ -3280,18 +3889,30 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_PAYMENT_MENU' => self::get_payment_menu(),
             ));
 
+            // If cart has a value or needs a shipment (which might cost) we
+            // need to parse payment options
+            // TODO: Check if the first line is not already checked above
             if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
                 &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods($_SESSION['shop']['countryId'])
+                &&  $paymentMethods = Payment::getPaymentMethods(
+                    // countryId is used for payment address
+                    $_SESSION['shop']['countryId']
+                )
             ) {
                 foreach ($paymentMethods as $paymentId => $paymentName) {
-                    $selected = ($_SESSION['shop']['paymentId'] == $paymentId)
-                        ? 'selected="selected"' : '';
                     self::$objTemplate->setVariable(array(
                         'SHOP_PAYMENT_PAYMENT_METHOD_ID'       => contrexx_raw2xhtml($paymentId),
                         'SHOP_PAYMENT_PAYMENT_METHOD_NAME'     => contrexx_raw2xhtml($paymentName),
-                        'SHOP_PAYMENT_PAYMENT_METHOD_SELECTED' => $selected,
                     ));
+
+                    // selected?
+                    if (self::$objTemplate->blockExists('shop_payment_payment_selected')) {
+                        if ($_SESSION['shop']['paymentId'] == $paymentId) {
+                            self::$objTemplate->touchBlock('shop_payment_payment_selected');
+                        } else {
+                            self::$objTemplate->hideBlock('shop_payment_payment_selected');
+                        }
+                    }
                     self::$objTemplate->parse('shop_payment_payment_methods');
                 }
             }
@@ -3349,6 +3970,54 @@ die("Shop::processRedirect(): This method is obsolete!");
                         $_SESSION['shop']['grand_total_price'] - $_SESSION['shop']['vat_price']
                     ),
                 ));
+
+                if (self::$objTemplate->blockExists('shopVatIncl')) {
+                    // parse specific VAT-incl template block
+                    self::$objTemplate->touchBlock('shopVatIncl');
+
+                    // hide non-specific VAT template block
+                    if (self::$objTemplate->blockExists('shopTax')) {
+                        self::$objTemplate->hideBlock('shopTax');
+                    }
+                } elseif (self::$objTemplate->blockExists('shopTax')) {
+                    // parse non-specific VAT template block
+                    self::$objTemplate->touchBlock('shopTax');
+                }
+
+                // hide specific VAT-excl template block
+                if (self::$objTemplate->blockExists('shopVatExcl')) {
+                    self::$objTemplate->hideBlock('shopVatExcl');
+                }
+            } else {
+                if (self::$objTemplate->blockExists('shopVatExcl')) {
+                    // parse specific VAT-excl template block
+                    self::$objTemplate->touchBlock('shopVatExcl');
+
+                    // hide non-specific VAT template block
+                    if (self::$objTemplate->blockExists('shopTax')) {
+                        self::$objTemplate->hideBlock('shopTax');
+                    }
+                } elseif (self::$objTemplate->blockExists('shopTax')) {
+                    // parse non-specific VAT template block
+                    self::$objTemplate->touchBlock('shopTax');
+                }
+
+                // hide specific VAT-incl template block
+                if (self::$objTemplate->blockExists('shopVatIncl')) {
+                    self::$objTemplate->hideBlock('shopVatIncl');
+                }
+            }
+        } else {
+            // hide all VAT related template blocks
+            $vatBlocks = array(
+                'shopTax',
+                'shopVatIncl',
+                'shopVatExcl',
+            );
+            foreach ($vatBlocks as $vatBlock) {
+                if (self::$objTemplate->blockExists($vatBlock)) {
+                    self::$objTemplate->hideBlock($vatBlock);
+                }
             }
         }
         self::viewpart_lsv();
@@ -3454,18 +4123,26 @@ die("Shop::processRedirect(): This method is obsolete!");
             self::$objTemplate->setVariable(array(
                 'SHOP_DISCOUNT_COUPON_TOTAL' =>
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
+                // total discount amount
                 'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' =>
                     Currency::formatPrice(-$total_discount_amount),
+                'SHOP_DISCOUNT_COUPON_CODE' => $_SESSION['shop']['coupon_code'],
             ));
         }
         self::$objTemplate->setVariable(array(
             'SHOP_UNIT' => Currency::getActiveCurrencySymbol(),
             'SHOP_TOTALITEM' => Cart::get_item_count(),
+            // costs for payment handler (CC, invoice, etc.)
             'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
                 $_SESSION['shop']['payment_price']),
+            // costs of all goods (before subtraction of discount) without payment and shippment costs
+            'SHOP_PRODUCT_TOTAL_GOODS' => Currency::formatPrice(
+                  Cart::get_price() + Cart::get_discount_amount()),
+            // order costs after discount subtraction (incl VAT) but without payment and shippment costs
             'SHOP_TOTALPRICE' => Currency::formatPrice(Cart::get_price()),
             'SHOP_PAYMENT' =>
                 Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
+            // final order costs
             'SHOP_GRAND_TOTAL' => Currency::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
             'SHOP_COMPANY' => stripslashes($_SESSION['shop']['company']),
@@ -3478,11 +4155,25 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ADDRESS' => stripslashes($_SESSION['shop']['address']),
             'SHOP_ZIP' => stripslashes($_SESSION['shop']['zip']),
             'SHOP_CITY' => stripslashes($_SESSION['shop']['city']),
+            // countryId is used for payment address
             'SHOP_COUNTRY' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId']),
             'SHOP_EMAIL' => stripslashes($_SESSION['shop']['email']),
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
         ));
+
+        // only parse birthday if it had been set
+        if (!empty($_SESSION['shop']['birthday'])) {
+            self::$objTemplate->setVariable(
+                'SHOP_BIRTHDAY',
+                date(
+                    ASCMS_DATE_FORMAT_DATE,
+                    $_SESSION['shop']['birthday']
+                )
+            );
+        }
+
+        // parse shipment address
         if (!empty($_SESSION['shop']['lastname2'])) {
             self::$objTemplate->setVariable(array(
                 'SHOP_COMPANY2' => stripslashes($_SESSION['shop']['company2']),
@@ -3492,6 +4183,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_ADDRESS2' => stripslashes($_SESSION['shop']['address2']),
                 'SHOP_ZIP2' => stripslashes($_SESSION['shop']['zip2']),
                 'SHOP_CITY2' => stripslashes($_SESSION['shop']['city2']),
+                // countryId2 is used for shipment address
                 'SHOP_COUNTRY2' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
                 'SHOP_PHONE2' => stripslashes($_SESSION['shop']['phone2']),
             ));
@@ -3505,6 +4197,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (Vat::isEnabled()) {
             self::$objTemplate->setVariable(array(
                 'TXT_TAX_RATE' => $_ARRAYLANG['TXT_SHOP_VAT_RATE'],
+                // total VAT on products (after subtraction of discount)
                 'SHOP_TAX_PRICE' => Currency::formatPrice(
                     $_SESSION['shop']['vat_price']),
                 'SHOP_TAX_PRODUCTS_TXT' => $_SESSION['shop']['vat_products_txt'],
@@ -3517,14 +4210,65 @@ die("Shop::processRedirect(): This method is obsolete!");
             ));
             if (Vat::isIncluded()) {
                 self::$objTemplate->setVariable(array(
+                    // final order costs without VAT, but including
+                    // payment and shipping costs
                     'SHOP_GRAND_TOTAL_EXCL_TAX' =>
                         Currency::formatPrice(
                             $_SESSION['shop']['grand_total_price']
                             - $_SESSION['shop']['vat_price']
                     ),
                 ));
+
+                if (self::$objTemplate->blockExists('shopVatIncl')) {
+                    // parse specific VAT-incl template block
+                    self::$objTemplate->touchBlock('shopVatIncl');
+
+                    // hide non-specific VAT template block
+                    if (self::$objTemplate->blockExists('taxrow')) {
+                        self::$objTemplate->hideBlock('taxrow');
+                    }
+                } elseif (self::$objTemplate->blockExists('taxrow')) {
+                    // parse non-specific VAT template block
+                    self::$objTemplate->touchBlock('taxrow');
+                }
+
+                // hide specific VAT-excl template block
+                if (self::$objTemplate->blockExists('shopVatExcl')) {
+                    self::$objTemplate->hideBlock('shopVatExcl');
+                }
+            } else {
+                if (self::$objTemplate->blockExists('shopVatExcl')) {
+                    // parse specific VAT-excl template block
+                    self::$objTemplate->touchBlock('shopVatExcl');
+
+                    // hide non-specific VAT template block
+                    if (self::$objTemplate->blockExists('taxrow')) {
+                        self::$objTemplate->hideBlock('taxrow');
+                    }
+                } elseif (self::$objTemplate->blockExists('taxrow')) {
+                    // parse non-specific VAT template block
+                    self::$objTemplate->touchBlock('taxrow');
+                }
+
+                // hide specific VAT-incl template block
+                if (self::$objTemplate->blockExists('shopVatIncl')) {
+                    self::$objTemplate->hideBlock('shopVatIncl');
+                }
+            }
+        } else {
+            // hide all VAT related template blocks
+            $vatBlocks = array(
+                'taxrow',
+                'shopVatIncl',
+                'shopVatExcl',
+            );
+            foreach ($vatBlocks as $vatBlock) {
+                if (self::$objTemplate->blockExists($vatBlock)) {
+                    self::$objTemplate->hideBlock($vatBlock);
+                }
             }
         }
+
 // TODO: Make sure in payment() that those two are either both empty or
 // both non-empty!
         if (   !Cart::needs_shipment()
@@ -3575,19 +4319,18 @@ die("Shop::processRedirect(): This method is obsolete!");
         // No more confirmation
         self::$objTemplate->hideBlock('shopConfirm');
         // Store the customer, register the order
-        $customer_ip = $_SERVER['REMOTE_ADDR'];
         $net = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Net');
-        $customerHost = substr($net->getHostByAddr($_SERVER['REMOTE_ADDR']), 0, 100);
-        $customer_browser = substr(getenv('HTTP_USER_AGENT'), 0, 100);
         $new_customer = false;
 //\DBG::log("Shop::process(): E-Mail: ".$_SESSION['shop']['email']);
         if (self::$objCustomer) {
 //\DBG::log("Shop::process(): Existing User username ".$_SESSION['shop']['username'].", email ".$_SESSION['shop']['email']);
         } else {
+            $verifyAccountEmail = \Cx\Core\Setting\Controller\Setting::getValue('verify_account_email','Shop');
+
             // Registered Customers are required to be logged in!
             self::$objCustomer = Customer::getRegisteredByEmail(
                 $_SESSION['shop']['email']);
-            if (self::$objCustomer) {
+            if ($verifyAccountEmail && self::$objCustomer) {
                 \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_REGISTERED_EMAIL']);
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'login').
@@ -3597,8 +4340,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
 // Unregistered Customers are stored as well, as their information is needed
 // nevertheless.  Their active status, however, is set to false.
-            self::$objCustomer = Customer::getUnregisteredByEmail(
-                $_SESSION['shop']['email']);
+            if (!self::$objCustomer) {
+                self::$objCustomer = Customer::getUnregisteredByEmail(
+                    $_SESSION['shop']['email']);
+            }
             if (!self::$objCustomer) {
                 self::$objCustomer = new Customer();
                 // Currently, the e-mail address is set as the user name
@@ -3614,7 +4359,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     ? \User::make_password()
                     : $_SESSION['shop']['password']);
 //\DBG::log("Password: $password (session: {$_SESSION['shop']['password']})");
-                if (!self::$objCustomer->password($password)) {
+                if (!self::$objCustomer->setPassword($password)) {
                     \Message::error($_ARRAYLANG['TXT_INVALID_PASSWORD']);
                     \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd(
                         'Shop', 'account'));
@@ -3635,6 +4380,24 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objCustomer->country_id($_SESSION['shop']['countryId']);
         self::$objCustomer->phone($_SESSION['shop']['phone']);
         self::$objCustomer->fax($_SESSION['shop']['fax']);
+
+        // set birthday, but only if it has been set (or unset)
+        // otherwise, it shall not get overwitten
+        if (!empty($_SESSION['shop']['birthday'])) {
+            $birthday = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $_SESSION['shop']['birthday']
+            );
+            self::$objCustomer->setProfile(array(
+                'birthday' => array(0 => $birthday)
+            ));
+
+        // clear birthday if it has been unset
+        } elseif (isset($_SESSION['shop']['birthday'])) {
+            self::$objCustomer->setProfile(array(
+                'birthday' => array(0 => '')
+            ));
+        }
 
         $arrGroups = self::$objCustomer->getAssociatedGroupIds();
         $usergroup_id = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
@@ -3674,17 +4437,20 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Authenticate new Customer
         if ($new_customer) {
             // Fails for "unregistered" Customers!
-            if (self::$objCustomer->auth(
+// TODO: this feature did never work, as self::$objCustomer->auth() did
+//       expect a md5-hashed password. But now, since the method does no longer
+//       expect a md5-hashed password, but instead the raw password,
+//       the self::$objCustomer->auth() method does now work.
+//       As a result of this, the behavior of the Shop and the system is
+//       unknown if the new customer would suddenly be sign-in to the system.
+//       Therefore, the behavior must extensively be tested be fore the feature
+//       can be activated (by uncommenting it)
+            /*if (self::$objCustomer->auth(
                 $_SESSION['shop']['username'], $_SESSION['shop']['password'], false, true)) {
                 if (!self::_authenticate()) {
                     return \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_ERROR_STORING']);
                 }
-            }
-        }
-//die();
-        // Clear the ship-to country if there is no shipping
-        if (!Cart::needs_shipment()) {
-            $_SESSION['shop']['countryId2'] = 0;
+            }*/
         }
         $shipper_id = (empty($_SESSION['shop']['shipperId'])
             ? null : $_SESSION['shop']['shipperId']);
@@ -3716,17 +4482,22 @@ die("Shop::processRedirect(): This method is obsolete!");
         $objOrder->address($_SESSION['shop']['address2']);
         $objOrder->city($_SESSION['shop']['city2']);
         $objOrder->zip($_SESSION['shop']['zip2']);
-        $objOrder->country_id($_SESSION['shop']['countryId2']);
+        if (!Cart::needs_shipment()) {
+            $objOrder->country_id(0);
+        } else {
+            $objOrder->country_id($_SESSION['shop']['countryId2']);
+        }
         $objOrder->phone($_SESSION['shop']['phone2']);
         $objOrder->vat_amount($_SESSION['shop']['vat_price']);
         $objOrder->shipment_amount($_SESSION['shop']['shipment_price']);
         $objOrder->shipment_id($shipper_id);
         $objOrder->payment_id($payment_id);
         $objOrder->payment_amount($_SESSION['shop']['payment_price']);
-        $objOrder->ip($customer_ip);
-        $objOrder->host($customerHost);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objOrder->ip(
+            $cx->getComponent('Stats')->getCounterInstance()->getUniqueUserId()
+        );
         $objOrder->lang_id(FRONTEND_LANG_ID);
-        $objOrder->browser($customer_browser);
         $objOrder->note($_SESSION['shop']['note']);
         if (!$objOrder->insert()) {
             // $order_id is unset!
@@ -4018,8 +4789,11 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (empty($_POST['shopCurrentPassword'])) {
                 return \Message::error($_ARRAYLANG['TXT_SHOP_ENTER_CURRENT_PASSWORD']);
             }
-            $password_old = contrexx_input2raw($_POST['shopCurrentPassword']);
-            if (md5($password_old) != self::$objCustomer->password()) {
+            if (
+                !self::$objCustomer->checkPassword(
+                    contrexx_input2raw($_POST['shopCurrentPassword'])
+                )
+            ) {
                 return \Message::error($_ARRAYLANG['TXT_SHOP_WRONG_CURRENT_PASSWORD']);
             }
             $password = contrexx_input2raw($_POST['shopNewPassword']);
@@ -4033,10 +4807,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             if ($password != $password_confirm) {
                 return \Message::error($_ARRAYLANG['TXT_SHOP_PASSWORD_NOT_CONFIRMED']);
             }
-            if (strlen($password) < 6) {
-                return \Message::error($_ARRAYLANG['TXT_PASSWORD_MIN_CHARS']);
-            }
-            if (!self::$objCustomer->password($password)) {
+            if (!self::$objCustomer->setPassword($password)) {
                 return \Message::error($_ARRAYLANG['TXT_SHOP_PASSWORD_INVALID']);
             }
             if (!self::$objCustomer->store()) {
@@ -4315,7 +5086,17 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($uploaderId) || empty($fileName)) {
             return '';
         }
+
         $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            \Cx\Lib\FileSystem\FileSystem::exists(
+                $cx->getWebsiteDocumentRootPath() . '/' .
+                Order::UPLOAD_FOLDER . urldecode($fileName)
+            )
+        ) {
+            return urldecode($fileName);
+        }
+
         $objSession = $cx->getComponent('Session')->getSession();
         $tmpFile    = $objSession->getTempPath() . '/' . $uploaderId . '/' . $fileName;
         if (!\Cx\Lib\FileSystem\FileSystem::exists($tmpFile)) {
@@ -4323,34 +5104,33 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
         $originalFileName = $fileName;
         $arrMatch = array();
-        $filename = '';
-        $fileext = '';
         if (preg_match('/(.+)(\.[^.]+)/', $originalFileName, $arrMatch)) {
             $filename = $arrMatch[1];
             $fileext = $arrMatch[2];
         } else {
             $filename = $originalFileName;
+            $fileext  = '';
         }
-        if (   $fileext == '.jpg'
-            || $fileext == '.gif'
-            || $fileext == '.png') {
-            $newFileName = $filename.'['.uniqid().']'.$fileext;
-            $newFilePath = Order::UPLOAD_FOLDER.$newFileName;
-            //Move the uploaded file to the path specified in the variable $newFilePath
-            try {
-                $objFile = new \Cx\Lib\FileSystem\File($tmpFile);
-                if ($objFile->move(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteDocumentRootPath() . '/' . $newFilePath, false)) {
-                   return $newFileName;
-                } else {
-                    \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_UPLOADING_FILE']);
-                }
-            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
-                \DBG::msg($e->getMessage());
+
+        $newFileName = $filename.'['.uniqid().']'.$fileext;
+        $newFilePath = Order::UPLOAD_FOLDER.$newFileName;
+        //Move the uploaded file to the path specified in the variable $newFilePath
+        try {
+            $objFile = new \Cx\Lib\FileSystem\File($tmpFile);
+            if (
+                $objFile->move(
+                    $cx->getWebsiteDocumentRootPath() . '/' . $newFilePath,
+                false
+                )
+            ) {
+               return $newFileName;
+            } else {
+                \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_UPLOADING_FILE']);
             }
-        } else {
-            \Message::error(sprintf(
-                $_ARRAYLANG['TXT_SHOP_ERROR_WRONG_FILETYPE'], $fileext));
+        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+            \DBG::msg($e->getMessage());
         }
+
         return '';
     }
 
@@ -4365,29 +5145,20 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Note that the Country IDs are either set already, or chosen in a
         // dropdown menu, so if everything else is set, so are they.
         // They may thus be disabled entirely without affecting this.
-        if (   empty($_SESSION['shop']['gender'])
-            || empty($_SESSION['shop']['lastname'])
-            || empty($_SESSION['shop']['firstname'])
-            || empty($_SESSION['shop']['address'])
-            || empty($_SESSION['shop']['zip'])
-            || empty($_SESSION['shop']['city'])
-            || empty($_SESSION['shop']['phone'])
-// Must not check this here, would collide with Customers not willing
-// to register!
-//            || (empty($_SESSION['shop']['email']) && !self::$objCustomer)
-//            || (empty($_SESSION['shop']['password']) && !self::$objCustomer)
-            || (Cart::needs_shipment()
-            && (   empty($_SESSION['shop']['gender2'])
-                || empty($_SESSION['shop']['lastname2'])
-                || empty($_SESSION['shop']['firstname2'])
-                || empty($_SESSION['shop']['address2'])
-                || empty($_SESSION['shop']['zip2'])
-                || empty($_SESSION['shop']['city2'])
-                || empty($_SESSION['shop']['phone2'])))
-        ) return false;
+        foreach (static::$mandatoryAccountFields as $field) {
+            if (empty($_SESSION['shop'][$field])) {
+                static::$errorFields[] = $field;
+            }
+            if (
+                Cart::needs_shipment() &&
+                empty($_SESSION['shop'][$field . '2'])
+            ) {
+                static::$errorFields[] = $field . '2';
+            }
+        }
 // TODO: I don't see why this would be done here:
 //        $_SESSION['shop']['equal_address'] = false;
-        return true;
+        return !count(static::$errorFields);
     }
 
 

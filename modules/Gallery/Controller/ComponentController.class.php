@@ -124,6 +124,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
+     * Called for additional, component specific resolving
+     * 
+     * If /en/Path/to/Page is the path to a page for this component
+     * a request like /en/Path/to/Page/with/some/parameters will
+     * give an array like array('with', 'some', 'parameters') for $parts
+     * 
+     * This may be used to redirect to another page
+     * @param array $parts List of additional path parts
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
+     */
+    public function resolve($parts, $page) {
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $this->cx->getRequest()->getUrl()->getParamArray());
+        header('Link: <' . $canonicalUrl->toString() . '>; rel="canonical"');
+    }
+
+    /**
      * Do something with a Response object
      * You may do page alterations here (like changing the metatitle)
      * You may do response alterations here (like set headers)
@@ -132,15 +148,53 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
      */
-    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {
-        $params = $response->getRequest()->getUrl()->getParamArray();
-        unset($params['section']);
-        unset($params['cmd']);
-        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($response->getPage(), $params);
+    public function adjustResponse(
+        \Cx\Core\Routing\Model\Entity\Response $response
+    ) {
+        // in case of an ESI request, the request URL will be set through Referer-header
+        $headers = $response->getRequest()->getHeaders();
+        if (isset($headers['Referer'])) {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($headers['Referer']);
+        } else {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($response->getRequest()->getUrl()->toString());
+        }
+
+        $canonicalUrlArguments = array('cid', 'pos');
+        // filter out all non-relevant URL arguments
+        $params = array_filter(
+            $refUrl->getParamArray(),
+            function($key) use ($canonicalUrlArguments, $refUrl) {
+                if ($key == 'pos' && in_array($key, $canonicalUrlArguments)) {
+                    return !empty($refUrl->getParam($key));
+                }
+            
+                return in_array($key, $canonicalUrlArguments);
+            },
+            \ARRAY_FILTER_USE_KEY
+        );
+
+        $page   = $response->getPage();
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $params);
         $response->setHeader(
             'Link',
             '<' . $canonicalUrl->toString() . '>; rel="canonical"'
         );
+
+        if ($page->getModule() !== $this->getName()) {
+            return;
+        }
+        $gallery    = new Gallery('');
+        $pageValues = $gallery->getPageAttributes();
+        if ($pageValues) {
+            if ($pageValues['title']) {
+                $page->setTitle($pageValues['title']);
+                $page->setContentTitle($pageValues['title']);
+                $page->setMetaTitle($pageValues['title']);
+            }
+            if ($pageValues['desc']) {
+                $page->setMetadesc($pageValues['desc']);
+            }
+        }
     }
 
     /**

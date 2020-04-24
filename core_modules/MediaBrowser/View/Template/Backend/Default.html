@@ -7,17 +7,17 @@
 <p><code>{MEDIABROWSER_OPTIONS}</code></p>
 {MEDIABROWSER_CODE}
 <p><code>{MEDIABROWSER_CODE_RAW}</code></p>
-<hr />
+<hr/>
 <!-- END mediabrowser_demo -->
 <script>
-    function testfunction(){
+    function testfunction() {
         alert('test');
     }
 
     var gallery = {
-        fancyCallback: function(callback){
+        fancyCallback: function (callback) {
 
-            if (callback.type == 'close'){
+            if (callback.type == 'close') {
 //            bootbox.alert({
 //                message: 'Close Event',
 //                title: "Close"
@@ -25,19 +25,19 @@
                 return;
             }
 
-            if (callback.data[0].hasOwnProperty('level')){
+            if (callback.data[0].hasOwnProperty('level')) {
                 console.table(callback.data);
                 return;
             }
 
 
-            if (callback.data[0].hasOwnProperty('datainfo')){
+            if (callback.data[0].hasOwnProperty('datainfo')) {
                 var images = "Pictures:";
                 for (var i in callback.data) {
-                    if (callback.data.hasOwnProperty(i)){
-                        if (callback.data[i].datainfo.extension == 'Jpg' || callback.data[i].datainfo.extension == 'Png' || callback.data[i].datainfo.extension == 'Gif'){
+                    if (callback.data.hasOwnProperty(i)) {
+                        if (callback.data[i].datainfo.extension == 'Jpg' || callback.data[i].datainfo.extension == 'Png' || callback.data[i].datainfo.extension == 'Gif') {
                             console.log(callback.data[i].datainfo.filepath);
-                            images += "<img class='img-responsive' style=\"max-width:100%; height: auto;\" s"+"rc='"+callback.data[i].datainfo.filepath+"' />";
+                            images += "<img class='img-responsive' style=\"max-width:100%; height: auto;\" s" + "rc='" + callback.data[i].datainfo.filepath + "' />";
                         }
                         else {
                             images += callback.data[i].datainfo.filepath;
@@ -74,24 +74,36 @@
 </p>
 <table>
     <tr>
-        <td><b>Name</b></td><td><b>Auslöser</b></td>
+        <td><b>Name</b></td>
+        <td><b>Auslöser</b></td>
     </tr>
     <tr>
-        <td>modalopened</td><td>Nachdem Öffnen des Modals.</td>
-    </tr><tr>
-        <td>modalclosed</td><td>Nachdem dem Schliessen des Modals.</td>
-    </tr><tr>
-        <td>fileuploaded</td><td>Nachdem dem Upload einer Datei.</td>
-    </tr><tr>
-        <td>preupload</td><td>Kurz vor dem Uploaden einer Datei.</td>
-    </tr><tr>
-        <td>mediaselected</td><td>Nach der Auswahl einer Seite/Datei.</td>
-    </tr><tr>
-        <td>tabswitched</td><td>Nachdem switchen eines MenüTabs.</td>
+        <td>modalopened</td>
+        <td>Nachdem Öffnen des Modals.</td>
+    </tr>
+    <tr>
+        <td>modalclosed</td>
+        <td>Nachdem dem Schliessen des Modals.</td>
+    </tr>
+    <tr>
+        <td>fileuploaded</td>
+        <td>Nachdem dem Upload einer Datei.</td>
+    </tr>
+    <tr>
+        <td>preupload</td>
+        <td>Kurz vor dem Uploaden einer Datei.</td>
+    </tr>
+    <tr>
+        <td>mediaselected</td>
+        <td>Nach der Auswahl einer Seite/Datei.</td>
+    </tr>
+    <tr>
+        <td>tabswitched</td>
+        <td>Nachdem switchen eines MenüTabs.</td>
     </tr>
 </table>
 
-<hr />
+<hr/>
 <style>
     .imageList img, .imageList2 img {
         width: 300px;
@@ -113,7 +125,7 @@
 <div class="imageList2">
 </div>
 <script>
-    gallery.uploader = function(response) {
+    gallery.uploader = function (response) {
         console.log(response);
         for (var i in response) {
             var image = cx.jQuery(new Image()).appendTo('.imageList');
@@ -121,11 +133,11 @@
         }
     }
 
-    gallery.uploader2 = function(response) {
+    gallery.uploader2 = function (response) {
         console.log(response);
         for (var i in response) {
             var image = cx.jQuery(new Image()).appendTo('.imageList2');
-            image.attr('src',response[i]);
+            image.attr('src', response[i]);
         }
     }
 </script>
@@ -133,10 +145,10 @@
 
 <h2>Folder widget </h2>
 <div class="folderWidget">
-  {MEDIABROWSER_FOLDER_WIDGET}
+    {MEDIABROWSER_FOLDER_WIDGET}
 </div>
 
 <h2>Folder widget (View only) </h2>
 <div class="folderWidget">
-  {MEDIABROWSER_FOLDER_WIDGET_VIEW_MODE}
+    {MEDIABROWSER_FOLDER_WIDGET_VIEW_MODE}
 </div>

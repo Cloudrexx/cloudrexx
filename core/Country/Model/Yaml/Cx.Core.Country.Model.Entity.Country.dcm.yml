@@ -10,12 +10,14 @@ Cx\Core\Country\Model\Entity\Country:
     alpha3:
       type: string
       length: 3
+      options:
+        default: ""
     ord:
       type: integer
       unsigned: true
+      options:
+        default: 0 
   uniqueConstraints:
-    alpha2_UNIQUE:
-      columns: [ alpha2 ]
     alpha3_UNIQUE:
       columns: [ alpha3 ]
   oneToMany:

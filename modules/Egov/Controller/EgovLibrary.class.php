@@ -1358,4 +1358,33 @@ FORMTEMPLATE;
         \Cx\Core\Setting\Controller\Setting::updateAll();
     }
 
+    /**
+     * Get media browser button
+     *
+     * @param string $id       Id of the button
+     * @param string $callback Name of the callback function
+     * @return string HTML element of browse button
+     */
+    protected function getMediaBrowserButton($id, $callback = '')
+    {
+        global $_ARRAYLANG;
+
+        $dataMbViews = 'filebrowser';
+        if ($id === 'productTargetUrlButton') {
+            $dataMbViews = 'filebrowser,sitestructure';
+        }
+
+        $options = array(
+            'type'  => 'button',
+            'views' => $dataMbViews,
+            'id'    => $id,
+        );
+        $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
+        $mediaBrowser->setOptions($options);
+        if ($callback) {
+            $mediaBrowser->setCallback($callback);
+        }
+
+        return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_BROWSE']);
+    }
 }

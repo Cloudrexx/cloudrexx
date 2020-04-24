@@ -98,7 +98,10 @@ class Egov extends EgovLibrary
 
         $product_id = intval($_REQUEST['id']);
         $datum_db = date('Y-m-d H:i:s');
-        $ip_adress = $_SERVER['REMOTE_ADDR'];
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $ip_adress = $cx->getComponent(
+            'Stats'
+        )->getCounterInstance()->getUniqueUserId();
 
         $arrFields = self::getFormFields($product_id);
         $FormValue = '';
@@ -386,7 +389,10 @@ class Egov extends EgovLibrary
         }
         $objPaypal->add_field('business', self::GetProduktValue('product_paypal_sandbox', $product_id));
         $objPaypal->add_field('return', $paypalUriOk);
-        $objPaypal->add_field('cancel_return', $paypalUriNok);
+        // PayPal does no longer use 'return' by default for successfull payments.
+        // Instead is uses 'cancel_return'. Therefore we simply set the success-link
+        // as cancel-link
+        $objPaypal->add_field('cancel_return', $paypalUriOk);
         $objPaypal->add_field('notify_url', $paypalUriIpn);
         $objPaypal->add_field('item_name', $product_name);
         $objPaypal->add_field('amount', $product_amount);

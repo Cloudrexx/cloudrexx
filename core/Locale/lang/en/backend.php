@@ -47,10 +47,19 @@ $_ARRAYLANG['TXT_CORE_LOCALE_DESCRIPTION'] = 'Handles language versions by their
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_DEFAULT'] = 'Webiste';
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_LOCALE'] = 'Website';
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_BACKEND'] = 'Administration area';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE'] = 'Language placeholders';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE_DEFAULT'] = 'Frontend';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE_BACKEND'] = 'Backend';
+
+// Module ACLs:
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_LIST'] = 'List website & administration area';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_MANAGEMENT'] = 'Manage website & administration area';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_VARS'] = 'Manage language placeholders';
 
 // Module fields
 $_ARRAYLANG['TXT_CORE_LOCALE_LOCALE_NAME'] = 'Locale';
 $_ARRAYLANG['TXT_CORE_LOCALE_BACKEND_NAME'] = 'Edit languages';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NAME'] = 'Edit language placeholders';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_ID'] = 'ID';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_ISO1'] = 'Language';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_LABEL'] = 'Label';
@@ -84,3 +93,21 @@ $_ARRAYLANG['TXT_NO'] = 'No';
 $_ARRAYLANG['TXT_CORE_LOCALE_LABEL_LANG_REMOVAL'] = 'Confirm language data removal';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANG_REMOVAL_CONTENT'] = 'Remove all language related data of the deactivated language from all applications.';
 $_ARRAYLANG['TXT_CORE_LOCALE_SAVE'] = 'Apply changes';
+
+// Messages
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_SUCCESSFULLY_UPDATED'] = 'The language placeholders were succesfully updated.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOTHING_CHANGED'] = 'No language placeholder was edited.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_LANGUAGE_NOT_SET'] = 'The language file cannot be loaded, because the source language is not set.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_EXPORT_FAILED'] = 'Exporting the overwritten language placeholders to the YAML file failed!';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_IMPORT_FAILED'] = 'Importing the language placeholders from the YAML file failed!';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOT_FOUND'] = 'Language file not found.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_SUCCESS'] = 'Default value successfully loaded.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_ERROR'] = 'Default value not found.';
+$_ARRAYLANG['TXT_CORE_LOCALE_ADD_NEW_INFORMATION'] = 'To add additional locales, the option %1$s (in %2$s) must be deactivated first.';
+
+// Translation view
+$_ARRAYLANG['id'] = 'Placeholder';
+$_ARRAYLANG['sourceLang'] = 'Origin language';
+$_ARRAYLANG['destLang'] = 'Target language';
+$_ARRAYLANG['TXT_CORE_LOCALE_RESET'] = 'Reset';
+$_ARRAYLANG['TXT_CORE_LOCALE_UNSAVED_CHANGES'] = 'Please press "Apply changes"';

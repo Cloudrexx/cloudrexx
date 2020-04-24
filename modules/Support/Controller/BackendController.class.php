@@ -74,7 +74,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         // this class inherits from Controller, therefore you can get access to
         // Cx like this:
         $this->cx;
@@ -107,7 +107,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             // instantiate the default View Controller
             $objController = new DefaultController($this->getSystemComponentController(), $this->cx);
         }
-        $objController->parsePage($this->template);
+        $objController->parsePage($this->template, array());
     }
 
     /**

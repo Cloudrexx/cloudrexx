@@ -64,10 +64,10 @@ class Form extends \Cx\Core_Modules\Contact\Model\Entity\Form implements \Doctri
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'mails', 'showForm', 'useCaptcha', 'useCustomStyle', 'saveDataInCrm', 'sendCopy', 'useEmailOfSender', 'htmlMail', 'crmCustomerGroups', 'sendAttachment');
+            return array('__isInitialized__', 'id', 'mails', 'showForm', 'useCaptcha', 'useCustomStyle', 'saveDataInCrm', 'sendCopy', 'sendMultipleReply', 'useEmailOfSender', 'htmlMail', 'crmCustomerGroups', 'sendAttachment');
         }
 
-        return array('__isInitialized__', 'id', 'mails', 'showForm', 'useCaptcha', 'useCustomStyle', 'saveDataInCrm', 'sendCopy', 'useEmailOfSender', 'htmlMail', 'crmCustomerGroups', 'sendAttachment');
+        return array('__isInitialized__', 'id', 'mails', 'showForm', 'useCaptcha', 'useCustomStyle', 'saveDataInCrm', 'sendCopy', 'sendMultipleReply', 'useEmailOfSender', 'htmlMail', 'crmCustomerGroups', 'sendAttachment');
     }
 
     /**
@@ -253,6 +253,17 @@ class Form extends \Cx\Core_Modules\Contact\Model\Entity\Form implements \Doctri
     /**
      * {@inheritDoc}
      */
+    public function setSendMultipleReply($sendMultipleReply)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSendMultipleReply', array($sendMultipleReply));
+
+        return parent::setSendMultipleReply($sendMultipleReply);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setUseEmailOfSender($useEmailOfSender)
     {
 
@@ -362,6 +373,17 @@ class Form extends \Cx\Core_Modules\Contact\Model\Entity\Form implements \Doctri
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSendCopy', array());
 
         return parent::getSendCopy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSendMultipleReply()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSendMultipleReply', array());
+
+        return parent::getSendMultipleReply();
     }
 
     /**

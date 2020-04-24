@@ -252,13 +252,9 @@ class SystemComponent extends \Cx\Model\Base\EntityBase
     public function getEntityClasses() {
         $entities = array();
         $em = $this->cx->getDb()->getEntityManager();
-$ms = microtime(true);
-        $meta = $em->getMetadataFactory()->getAllMetadata();
-$msMeta = microtime(true) - $ms;
-        foreach ($meta as $m) {
-            reset($m->reflFields);
-            $className = current($m->reflFields);
-            $className = $className->class;
+        $config = $em->getConfiguration();
+        $metaDataDriver = $config->getMetadataDriverImpl();
+        foreach ($metaDataDriver->getAllClassNames() as $className) {
             if (!is_subclass_of($className, 'Cx\Model\Base\EntityBase')) {
                 continue;
             }
@@ -267,7 +263,6 @@ $msMeta = microtime(true) - $ms;
             }
             $entities[] = $className;
         }
-//echo 'Needed ' . (microtime(true) - $ms) . 'us (' . $msMeta . 'us for gathering metadata) to gather entity data<br />';
         return $entities;
     }
 }

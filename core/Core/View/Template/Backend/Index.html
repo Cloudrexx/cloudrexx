@@ -10,7 +10,10 @@
         <meta http-equiv="pragma" content="no-cache" />
         <meta http-equiv="cache-control" content="no-cache" />
         <meta http-equiv="X-UA-Compatible" content="requiresActiveX=true" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
         <link href="../core/Core/View/Style/base.css" rel="stylesheet" type="text/css" />
+        <link href="../core/Core/View/Style/Responsive.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="../core/Core/View/Script/Responsive.js"></script>
 
         <!-- BEGIN additional_style -->
         <link href="{ADD_STYLE_URL}" rel="stylesheet" type="text/css" />
@@ -28,24 +31,44 @@
                     <!-- BEGIN upgradable -->
                     <a class="license-upgrade_bg" href="index.php?cmd=License" target="_self"><span class="license-upgrade first"></span></a>
                     <!-- END upgradable -->
-                    <!-- BEGIN backend_language_navigation -->
-                    <ul>
+                    <ul id="metanav-entries">
+                        <!-- BEGIN backend_language_navigation -->
                         <li>
                             <a href="#">{TXT_LANGUAGE}</a>
                             <ul>
                                 <!-- BEGIN backend_language_navigation_item -->
-                                <li><a class="{LANGUAGE_CSS}" href="{LANGUAGE_URL}">{LANGUAGE_NAME}</a></li>
+                                <li>
+                                    <a class="{LANGUAGE_CSS}" href="{LANGUAGE_URL}">
+                                        {LANGUAGE_NAME}
+                                    </a>
+                                </li>
                                 <!-- END backend_language_navigation_item -->
                             </ul>
                         </li>
+                        <!-- END backend_language_navigation -->
+                        <li>
+                            <!-- BEGIN feedback_help -->
+                            <a class="feedback" href="index.php?cmd=Support">
+                                {TXT_FEEDBACK_AND_HELP}
+                            </a>
+                            <!-- END feedback_help -->
+                        </li>
+                        <li>
+                            <a class="frontend" href="../index.php" target="_blank">
+                                {TXT_FRONTEND}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="profile" href="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={USER_ID}">
+                                {TXT_PROFILE}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="logout" href="javascript:logout()">
+                                {TXT_LOGOUT}
+                            </a>
+                        </li>
                     </ul>
-                    <!-- END backend_language_navigation -->
-                    <!-- BEGIN feedback_help -->
-                    <a class="feedback" href="index.php?cmd=Support">{TXT_FEEDBACK_AND_HELP}</a>
-                    <!-- END feedback_help -->
-                    <a class="frontend" href="../index.php" target="_blank">{TXT_FRONTEND}</a>
-                    <a class="profile" href="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={USER_ID}">{TXT_PROFILE}</a>
-                    <a class="logout" href="javascript:logout()">{TXT_LOGOUT}</a>
                 </div>
                 <!-- END backend_metanavigation -->
             </div>

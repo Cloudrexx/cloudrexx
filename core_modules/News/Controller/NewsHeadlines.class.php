@@ -57,34 +57,35 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
     function __construct($pageContent)
     {
         parent::__construct();
-        $this->getSettings();
         $this->_pageContent = $pageContent;
         $this->_objTemplate = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTemplate);
     }
 
-
-    function getSettings()
+    /**
+     * Parses the home headlines
+     * If there are any news with scheduled publishing $nextUpdateDate will
+     * contain the date when the next news changes its publishing state.
+     * If there are are no news with scheduled publishing $nextUpdateDate will
+     * be null.
+     * @param integer $catId Category ID
+     * @param integer $langId Language ID
+     * @param boolean $includeSubCategories Whether to include subcategories or not, default false
+     * @param \DateTime $nextUpdateDate (reference) DateTime of the next change
+     * @return string Parsed HTML code
+     */
+    function getHomeHeadlines($catId = 0, $langId = 0, $includeSubCategories = false, &$nextUpdateDate = null)
     {
-        global $objDatabase;
-
-        $objResult = $objDatabase->Execute("
-            SELECT name, value FROM ".DBPREFIX."module_news_settings");
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
-                $this->arrSettings[$objResult->fields['name']] = $objResult->fields['value'];
-                $objResult->MoveNext();
-            }
-        }
-    }
-
-
-    function getHomeHeadlines($catId=0)
-    {
-        global $_CORELANG, $_ARRAYLANG, $objDatabase, $_LANGID;
+        global $_CORELANG, $_ARRAYLANG, $objDatabase;
 
         $i = 0;
         $catId= intval($catId);
+        $catIds = array();
+        $offset = 0;
+
+        if (empty($langId)) {
+            $langId = \Env::get('init')->getDefaultFrontendLangId();
+        }
 
         $this->_objTemplate->setTemplate($this->_pageContent,true,true);
 
@@ -92,6 +93,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
             'TXT_MORE_NEWS'         => $_CORELANG['TXT_MORE_NEWS'],
             'TXT_NEWS_MORE'         => $_ARRAYLANG['TXT_NEWS_MORE'],
             'TXT_NEWS_MORE_INFO'    => $_ARRAYLANG['TXT_NEWS_MORE_INFO'],
+            'TXT_NEWS_READ_MORE'    => $_ARRAYLANG['TXT_NEWS_READ_MORE'],
             'TXT_NEWS_HEADLINE'     => $_ARRAYLANG['TXT_NEWS_HEADLINE'],
         ));
 
@@ -103,9 +105,17 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
         if ($newsLimit<1) { //do not get any news if 0 was specified as the limit.
             $objResult=false;
         } else {//fetch news
-            $objResult = $objDatabase->SelectLimit("
-                SELECT DISTINCT(tblN.id) AS id,
-                       tblN.`date`,
+
+            if ($catId && $includeSubCategories) {
+                $catIds = $this->getCatIdsFromNestedSetArray($this->getNestedSetCategories($catId));
+            } elseif ($catId) {
+                $catIds = array($catId);
+            }
+
+            $query = "
+                SELECT DISTINCT(tblN.id) AS newsid,
+                       tblN.`date` AS newsdate,
+                       tblN.typeid,
                        tblN.teaser_image_path,
                        tblN.teaser_image_thumbnail_path,
                        tblN.redirect,
@@ -114,19 +124,27 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                        tblN.author,
                        tblN.author_id,
                        tblN.redirect_new_window AS redirectNewWindow,
+                       tblN.changelog,
+                       tblN.source,
+                       tblN.allow_comments AS commentactive,
+                       tblN.enable_tags,
+                       tblN.url1,
+                       tblN.url2,
+                       tblN.startdate,
+                       tblN.enddate,
                        tblL.text NOT REGEXP '^(<br type=\"_moz\" />)?\$' AS newscontent,
-                       tblL.title AS title,
+                       tblL.text AS text,
+                       tblL.title AS newstitle,
                        tblL.teaser_text
                   FROM ".DBPREFIX."module_news AS tblN
             INNER JOIN ".DBPREFIX."module_news_locale AS tblL ON tblL.news_id=tblN.id
             INNER JOIN ".DBPREFIX."module_news_rel_categories AS tblC ON tblC.news_id=tblL.news_id
                   WHERE tblN.status=1".
-                   ($catId > 0 ? " AND tblC.category_id=$catId" : '')."
+                   ($catIds ? " AND tblC.category_id IN (" . join(',', $catIds) . ')' : '')."
                    AND tblN.teaser_only='0'
-                   AND tblL.lang_id=".$_LANGID."
+                   AND tblL.lang_id=".$langId."
                    AND tblL.is_active=1
-                   AND (startdate<='".date('Y-m-d H:i:s')."' OR startdate='0000-00-00 00:00:00')
-                   AND (enddate>='".date('Y-m-d H:i:s')."' OR enddate='0000-00-00 00:00:00')".
+                   ".
                    ($this->arrSettings['news_message_protection'] == '1' && !\Permission::hasAllAccess()
                       ? (($objFWUser = \FWUser::getFWUserObject()) && $objFWUser->objUser->login()
                           ? " AND (frontend_access_id IN (".
@@ -134,87 +152,90 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                             ") OR userid=".$objFWUser->objUser->getId().") "
                           : " AND frontend_access_id=0 ")
                       : '').
-                   "ORDER BY date DESC", $newsLimit);
+                   "ORDER BY date DESC";
+            $objResult = $objDatabase->SelectLimit($query, $newsLimit, $offset);
         }
 
+        $nextUpdateDate = null;
         if ($objResult !== false && $objResult->RecordCount() >= 0) {
-            while (!$objResult->EOF) {
-                $newsid    = $objResult->fields['id'];
-                $newstitle = $objResult->fields['title'];
-                $newsCategories = $this->getCategoriesByNewsId($newsid);
-                $newsUrl   = empty($objResult->fields['redirect'])
-                                ? (empty($objResult->fields['newscontent'])
-                                    ? ''
-                                    : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid)))
-                                : $objResult->fields['redirect'];
-
-                $redirectNewWindow = !empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow']);
-                $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
-                $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
-                $linkTarget = $redirectNewWindow ? '_blank' : '_self';
-                // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
-                if (empty($htmlLinkTitle)) {
-                    $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
+            while (
+                !$objResult->EOF &&
+                $i < $newsLimit
+            ) {
+                // check next update date
+                if (
+                    $objResult->fields['startdate'] != '0000-00-00 00:00:00' ||
+                    $objResult->fields['enddate'] != '0000-00-00 00:00:00'
+                ) {
+                    $startDate = new \DateTime($objResult->fields['startdate']);
+                    $endDate = new \DateTime($objResult->fields['enddate']);
+                    if (
+                        $endDate > new \DateTime() &&
+                        (
+                            !$nextUpdateDate ||
+                            $endDate < $nextUpdateDate
+                        )
+                    ) {
+                        $nextUpdateDate = $endDate;
+                    }
+                    if (
+                        $startDate > new \DateTime() &&
+                        (
+                            !$nextUpdateDate ||
+                            $startDate < $nextUpdateDate
+                        )
+                    ) {
+                        $nextUpdateDate = $startDate;
+                    }
                 }
 
-                list($image, $htmlLinkImage, $imageSource) = self::parseImageThumbnail($objResult->fields['teaser_image_path'],
-                                                                                       $objResult->fields['teaser_image_thumbnail_path'],
-                                                                                       $newstitle,
-                                                                                       $newsUrl);
+                // check if article shall be published
+                if (
+                    (
+                        $objResult->fields['startdate'] <= date('Y-m-d H:i:s') ||
+                        $objResult->fields['startdate'] == '0000-00-00 00:00:00'
+                    ) && (
+                        $objResult->fields['enddate'] > date('Y-m-d H:i:s') ||
+                        $objResult->fields['enddate'] == '0000-00-00 00:00:00'
+                    )
+                ) {
+                    $newsid = $objResult->fields['newsid'];
+                    $newsCategories = $this->getCategoriesByNewsId(
+                        $newsid,
+                        array($catId)
+                    );
+                    $newsUrl   = empty($objResult->fields['redirect'])
+                                    ? (empty($objResult->fields['newscontent'])
+                                        ? ''
+                                        : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid)))
+                                    : $objResult->fields['redirect'];
 
-                $author     = \FWUser::getParsedUserTitle($objResult->fields['author_id'], $objResult->fields['author']);
-                $publisher  = \FWUser::getParsedUserTitle($objResult->fields['publisher_id'], $objResult->fields['publisher']);
+                    //Parse all the news placeholders
+                    $this->parseNewsPlaceholders(
+                        $this->_objTemplate,
+                        $objResult,
+                        $newsUrl,
+                        '',
+                        array($catId)
+                    );
 
-                $this->_objTemplate->setVariable(array(
-                    'NEWS_ID'           => $newsid,
-                    'NEWS_CSS'          => 'row'.($i % 2 + 1),
-                    'NEWS_LONG_DATE'    => date(ASCMS_DATE_FORMAT, $objResult->fields['date']),
-                    'NEWS_DATE'         => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
-                    'NEWS_TIME'         => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['date']),
-                    'NEWS_TITLE'        => contrexx_raw2xhtml($newstitle),
-                    'NEWS_TEASER'       => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
-                    'NEWS_LINK_TITLE'   => $htmlLinkTitle,
-                    'NEWS_LINK'         => $htmlLink,
-                    'NEWS_LINK_URL'     => contrexx_raw2xhtml($newsUrl),
-                    'NEWS_LINK_TARGET'  => $linkTarget,
-                    'NEWS_AUTHOR'       => contrexx_raw2xhtml($author),
-                    'NEWS_PUBLISHER'    => contrexx_raw2xhtml($publisher),
-
-                    // Backward compatibility for templates pre 3.0
-                    'HEADLINE_ID'       => $newsid,
-                    'HEADLINE_DATE'     => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
-                    'HEADLINE_TEXT'     => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
-                    'HEADLINE_LINK'     => $htmlLinkTitle,
-                    'HEADLINE_AUTHOR'   => contrexx_raw2xhtml($author),
-                ));
-
-                if (!empty($image)) {
                     $this->_objTemplate->setVariable(array(
-                        'NEWS_IMAGE'         => $image,
-                        'NEWS_IMAGE_SRC'     => contrexx_raw2xhtml($imageSource),
-                        'NEWS_IMAGE_ALT'     => contrexx_raw2xhtml($newstitle),
-                        'NEWS_IMAGE_LINK'    => $htmlLinkImage,
-
-                        // Backward compatibility for templates pre 3.0
-                        'HEADLINE_IMAGE_PATH'     => contrexx_raw2xhtml($objResult->fields['teaser_image_path']),
-                        'HEADLINE_THUMBNAIL_PATH' => contrexx_raw2xhtml($imageSource),
+                        'NEWS_CSS'          => 'row'.($i % 2 + 1),
                     ));
 
-                    if ($this->_objTemplate->blockExists('news_image')) {
-                        $this->_objTemplate->parse('news_image');
-                    }
-                } else {
-                    if ($this->_objTemplate->blockExists('news_image')) {
-                        $this->_objTemplate->hideBlock('news_image');
-                    }
+                    $this->_objTemplate->parse('headlines_row');
+                    $i++;
                 }
 
-                self::parseImageBlock($this->_objTemplate, $objResult->fields['teaser_image_thumbnail_path'], $newstitle, $newsUrl, 'image_thumbnail');
-                self::parseImageBlock($this->_objTemplate, $objResult->fields['teaser_image_path'], $newstitle, $newsUrl, 'image_detail');
-
-                $this->_objTemplate->parse('headlines_row');
-                $i++;
                 $objResult->MoveNext();
+
+                if (
+                    $objResult->EOF &&
+                    $i < $newsLimit
+                ) {
+                    $offset += $newsLimit;
+                    $objResult = $objDatabase->SelectLimit($query, $newsLimit, $offset);
+                }
             }
         } else {
             $this->_objTemplate->hideBlock('headlines_row');
@@ -223,3 +244,4 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
         return $this->_objTemplate->get();
     }
 }
+

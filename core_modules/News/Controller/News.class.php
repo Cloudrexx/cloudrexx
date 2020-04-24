@@ -76,8 +76,6 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     {
         parent::__construct();
 
-        $this->getSettings();
-
         $this->_objTpl = new \Cx\Core\Html\Sigma();
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
@@ -95,9 +93,18 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $_REQUEST['cmd'] = '';
         }
 
+        $expirationDate = null;
         switch ($_REQUEST['cmd']) {
         case 'details':
-            return $this->getDetails();
+            $newsId = 0;
+            if (!empty($_GET['newsid'])) {
+                $newsId = intval($_GET['newsid']);
+            }
+            // cache timeout: this article's end date
+            $details  = $this->getDetails($newsId, $expirationDate);
+            $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+            $response->setExpirationDate($expirationDate);
+            return $details;
             break;
         case 'submit':
             return $this->_submit();
@@ -106,39 +113,77 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             return $this->_showFeed();
             break;
         case 'archive':
-            return $this->getArchive();
+            // cache timeout: next start or end date over all articles
+            $archive  = $this->getArchive($expirationDate);
+            $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+            $response->setExpirationDate($expirationDate);
+            return $archive;
             break;
         case 'topnews':
-             return $this->getTopNews();
+            // cache timeout: next start or end date over all articles
+            $topNews  = $this->getTopNews($expirationDate);
+            $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+            $response->setExpirationDate($expirationDate);
+            return $topNews;
             break;
         default:
             if (substr($_REQUEST['cmd'], 0, 7) == 'details') {
-                return $this->getDetails();
+                $newsId = 0;
+                if (!empty($_GET['newsid'])) {
+                    $newsId = intval($_GET['newsid']);
+                }
+                // cache timeout: this article's end date
+                $categoryId = intval(substr($_REQUEST['cmd'], 7));
+                $details  = $this->getDetails($newsId, $expirationDate, $categoryId);
+                $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+                $response->setExpirationDate($expirationDate);
+                return $details;
             } elseif (substr($_REQUEST['cmd'], 0, 7) == 'archive') {
-                return $this->getArchive();
+                // cache timeout: next start or end date over all articles
+                $archives = $this->getArchive($expirationDate);
+                $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+                $response->setExpirationDate($expirationDate);
+                return $archives;
             } else {
-                return $this->getHeadlines();
+                // cache timeout: next start or end date over all articles
+                $headLines = $this->getHeadlines($expirationDate);
+                $response  = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+                $response->setExpirationDate($expirationDate);
+                return $headLines;
             }
             break;
         }
     }
 
     /**
-    * Gets the news details
-    *
-    * @global    array
-    * @global    ADONewConnection
-    * @global    array
-    * @return    string    parsed content
-    */
-    private function getDetails()
+     * Gets the news details
+     *
+     * @param   integer $newsId ID of news article to display. If left empty
+     *                          and the functional placeholder NEWS_LIST_LATEST
+     *                          is not present in the application template,
+     *                          then the user gets redirected to the main
+     *                          application page of the news component.
+     * @param  string $expirationDate Expiration date
+     * @param  integer $categoryId ID of category to output the latest news
+     *                             article from, in case the URL-argument
+     *                             newsid is not set and the placeholder
+     *                             NEWS_LIST_LATEST is present in the
+     *                             application template.
+     * @return string parsed content
+     */
+    public function getDetails($newsId = 0, &$expirationDate = null, $categoryId = 0)
     {
         global $_CONFIG, $objDatabase, $_ARRAYLANG;
 
+        if (!empty($newsId)) {
+            $newsid = $newsId;
+        } elseif ($this->_objTpl->placeholderExists('NEWS_LIST_LATEST')) {
+            try {
+                $newsid = $this->getIdOfLatestNewsArticle($categoryId);
+            } catch (NewsLibraryException $e) {}
+        }
 
-        $newsid = intval($_GET['newsid']);
-
-        if (!$newsid) {
+        if (empty($newsid)) {
             header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('News'));
             exit;
         }
@@ -157,136 +202,221 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 //       in case the message doesn't exist in the requested language. But only try load the
 //       the message in the fallback-language in case the associated news-detail content page
 //       is setup to use the content of the fallback-language
-        $objResult = $objDatabase->SelectLimit('SELECT  news.id                 AS id,
-                                                        news.userid             AS userid,
-                                                        news.redirect           AS redirect,
-                                                        news.source             AS source,
-                                                        news.changelog          AS changelog,
-                                                        news.url1               AS url1,
-                                                        news.url2               AS url2,
-                                                        news.date               AS date,
-                                                        news.publisher          AS publisher,
-                                                        news.publisher_id       AS publisherid,
-                                                        news.author             AS author,
-                                                        news.author_id          AS authorid,
-                                                        news.changelog          AS changelog,
-                                                        news.teaser_image_path  AS newsimage,
-                                                        news.enable_related_news AS enableRelatedNews,
-                                                        news.enable_tags         AS enableTags,
-                                                        news.teaser_image_thumbnail_path AS newsThumbImg,
-                                                        news.typeid             AS typeid,
-                                                        news.allow_comments     AS commentactive,
-                                                        locale.text,
-                                                        locale.title            AS title,
-                                                        locale.teaser_text
-                                                  FROM  '.DBPREFIX.'module_news AS news
-                                            INNER JOIN  '.DBPREFIX.'module_news_locale AS locale ON news.id = locale.news_id
-                                                WHERE   ' . $whereStatus . '
-                                                        news.id = '.$newsid.' AND
-                                                        locale.is_active=1 AND
-                                                        locale.lang_id ='.FRONTEND_LANG_ID
-                                                        // ignore time for previews
-                                                        .((!$newsPreview) ? ' AND (news.startdate <= \''.date('Y-m-d H:i:s').'\' OR news.startdate="0000-00-00 00:00:00") AND
-                                                        (news.enddate >= \''.date('Y-m-d H:i:s').'\' OR news.enddate="0000-00-00 00:00:00")' : '')
-                                                       .($this->arrSettings['news_message_protection'] == '1' && !\Permission::hasAllAccess() ? (
-                                                            ($objFWUser = \FWUser::getFWUserObject()) && $objFWUser->objUser->login() ?
-                                                                " AND (frontend_access_id IN (".implode(',', array_merge(array(0), $objFWUser->objUser->getDynamicPermissionIds())).") OR userid = ".$objFWUser->objUser->getId().") "
-                                                                :   " AND frontend_access_id=0 ")
-                                                            :   '')
-                                                , 1);
+        $query = '
+            SELECT
+                news.id                 AS id,
+                news.userid             AS userid,
+                news.redirect           AS redirect,
+                news.source             AS source,
+                news.changelog          AS changelog,
+                news.url1               AS url1,
+                news.url2               AS url2,
+                news.date               AS date,
+                news.publisher          AS publisher,
+                news.publisher_id       AS publisherid,
+                news.enddate            AS enddate,
+                news.author             AS author,
+                news.author_id          AS authorid,
+                news.changelog          AS changelog,
+                news.teaser_image_path  AS newsimage,
+                news.enable_related_news AS enableRelatedNews,
+                news.enable_tags        AS enableTags,
+                news.teaser_image_thumbnail_path AS newsThumbImg,
+                news.typeid             AS typeid,
+                news.allow_comments     AS commentactive,
+                news.frontend_access_id,
+                locale.text,
+                locale.title            AS title,
+                locale.teaser_text
+            FROM
+                ' . DBPREFIX . 'module_news AS news
+            INNER JOIN
+                ' . DBPREFIX . 'module_news_locale AS locale
+            ON
+                news.id = locale.news_id
+            WHERE
+                ' . $whereStatus . '
+                news.id = ' . $newsid . ' AND
+                locale.is_active = 1 AND
+                locale.lang_id = ' . FRONTEND_LANG_ID . '
+        ';
+        // ignore time for previews
+        if (!$newsPreview) {
+            $query .= ' AND
+                (
+                    news.startdate <= \'' . date('Y-m-d H:i:s') . '\' OR
+                    news.startdate="0000-00-00 00:00:00"
+                ) AND
+                (
+                    news.enddate >= \'' . date('Y-m-d H:i:s') . '\' OR
+                    news.enddate="0000-00-00 00:00:00"
+                )
+            ';
+        }
 
+        $objResult = $objDatabase->SelectLimit($query, 1);
 
         if (!$objResult || $objResult->EOF) {
             header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('News'));
             exit;
         }
 
+        if (
+            $this->arrSettings['news_message_protection'] == '1' &&
+            !\Permission::hasAllAccess()
+        ) {
+            $validAccessIds = array(0);
+            if (
+                ($objFWUser = \FWUser::getFWUserObject()) &&
+                $objFWUser->objUser->login()
+            ) {
+                $validAccessIds = array_merge(
+                    array(0),
+                    $objFWUser->objUser->getDynamicPermissionIds()
+                );
+            }
+            if (
+                !in_array(
+                    $objResult->fields['frontend_access_id'],
+                    $validAccessIds
+                )
+            ) {
+                if ($this->arrSettings['login_redirect'] == '1') {
+                    \Permission::noAccess($base64Redirect);
+                }
+                header(
+                    'Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('News')
+                );
+                exit;
+            }
+        }
+
         $newsCommentActive  = $objResult->fields['commentactive'];
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
         $newsTeaser         = '';
-        $redirect           = contrexx_raw2xhtml($objResult->fields['redirect']);
-        $sourceHref         = contrexx_raw2xhtml($objResult->fields['source']);
-        $url1Href           = contrexx_raw2xhtml($objResult->fields['url1']);
-        $url2Href           = contrexx_raw2xhtml($objResult->fields['url2']);
+        $redirect           = $objResult->fields['redirect'];
         $source             = contrexx_raw2xhtml($objResult->fields['source']);
-        $url1               = contrexx_raw2xhtml($objResult->fields['url1']);
-        $url2               = contrexx_raw2xhtml($objResult->fields['url2']);
-        $newsUrl            = '';
-        $newsSource         = '';
-        $newsLastUpdate     = '';
+        $url1               = $objResult->fields['url1'];
+        $url2               = $objResult->fields['url2'];
+        $newsLastUpdate     = !empty($lastUpdate)
+                               ? $_ARRAYLANG['TXT_LAST_UPDATE'].'<br />'.date(ASCMS_DATE_FORMAT, $lastUpdate)
+                               : '';
 
-        if (!empty($url1)) {
-          $strUrl1 = contrexx_raw2xhtml($objResult->fields['url1']);
-            if (strlen($strUrl1) > 40) {
-                $strUrl1 = substr($strUrl1,0,26).'...'.substr($strUrl1,(strrpos($strUrl1,'.')));
-            }
-            $newsUrl = $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'].'<br /><a target="_blank" href="'.$url1Href.'" title="'.$url1.'">'.$strUrl1.'</a><br />';
-        }
-        if (!empty($url2)) {
-          $strUrl2 = contrexx_raw2xhtml($objResult->fields['url2']);
-            if (strlen($strUrl2) > 40) {
-                $strUrl2 = substr($strUrl2,0,26).'...'.substr($strUrl2,(strrpos($strUrl2,'.')));
-            }
-            $newsUrl .= '<a target="_blank" href="'.$url2Href.'" title="'.$url2.'">'.$strUrl2.'</a><br />';
-        }
-        if (!empty($source)) {
-          $strSource = contrexx_raw2xhtml($objResult->fields['source']);
-            if (strlen($strSource) > 40) {
-                $strSource = substr($strSource,0,26).'...'.substr($strSource,(strrpos($strSource,'.')));
-            }
-            $newsSource = $_ARRAYLANG['TXT_NEWS_SOURCE'].'<br /><a target="_blank" href="'.$sourceHref.'" title="'.$source.'">'.$strSource.'</a><br />';
-        }
-        if (!empty($lastUpdate)) {
-            $newsLastUpdate = $_ARRAYLANG['TXT_LAST_UPDATE'].'<br />'.date(ASCMS_DATE_FORMAT,$objResult->fields['changelog']);
+        if ($objResult->fields['enddate'] != '0000-00-00 00:00:00') {
+            $expirationDate = new \DateTime($objResult->fields['enddate']);
         }
 
         $this->newsTitle = $objResult->fields['title'];
         $newstitle = $this->newsTitle;
         $this->newsText = $text;
-        $this->newsThumbnail = $objResult->fields['newsThumbImg'];
+
+        // use main image as METAIMAGE
+        if (!empty($objResult->fields['newsimage'])) {
+            $this->newsThumbnail = $objResult->fields['newsimage'];
+        } else {
+            $this->newsThumbnail = $objResult->fields['newsThumbImg'];
+        }
         if ($this->arrSettings['news_use_teaser_text']) {
             $newsTeaser = nl2br($objResult->fields['teaser_text']);
             \LinkGenerator::parseTemplate($newsTeaser);
         }
 
-        $objSubResult = $objDatabase->Execute('SELECT count(`id`) AS `countComments` FROM `'.DBPREFIX.'module_news_comments` WHERE `newsid` = '.$newsid);
-        //Get the Category list
-        $newsCategories = $this->getCategoriesByNewsId($newsid);
-        if (!empty($newsCategories) && $this->_objTpl->blockExists('news_category_list')) {
-            foreach ($newsCategories as $catId => $catTitle) {
-                $this->_objTpl->setVariable(array(
-                    'NEWS_CATEGORY_TITLE'   => contrexx_raw2xhtml($catTitle),
-                    'NEWS_CATEGORY_ID'      => contrexx_input2int($catId)
-                ));
-                $this->_objTpl->parse('news_category');
-            }
-        }
+        $newsCategories = $this->getCategoriesByNewsId(
+            $newsid,
+            array($categoryId)
+        );
+        // Parse the Category list
+        $this->parseCategoryList($this->_objTpl, $newsCategories);
 
         $this->_objTpl->setVariable(array(
+           'NEWS_ID'             => $newsid,
            'NEWS_LONG_DATE'      => date(ASCMS_DATE_FORMAT,$objResult->fields['date']),
            'NEWS_DATE'           => date(ASCMS_DATE_FORMAT_DATE,$objResult->fields['date']),
            'NEWS_TIME'           => date(ASCMS_DATE_FORMAT_TIME,$objResult->fields['date']),
+           'NEWS_TIMESTAMP'      => $objResult->fields['date'],
            'NEWS_TITLE'          => $newstitle,
            'NEWS_TEASER_TEXT'    => $newsTeaser,
            'NEWS_LASTUPDATE'     => $newsLastUpdate,
-           'NEWS_SOURCE'         => $newsSource,
-           'NEWS_URL'            => $newsUrl,
            'NEWS_CATEGORY_NAME'  => implode(', ', contrexx_raw2xhtml($newsCategories)),
-           'NEWS_COUNT_COMMENTS' => ($newsCommentActive && $this->arrSettings['news_comments_activated']) ? contrexx_raw2xhtml($objSubResult->fields['countComments'].' '.$_ARRAYLANG['TXT_NEWS_COMMENTS']) : '',
-// TODO: create a new methode from which we can fetch the name of the 'type' (do not fetch it from within the same SQL query of which we collect any other data!)
-           //'NEWS_TYPE_NAME' => ($this->arrSettings['news_use_types'] == 1 ? htmlentities($objResult->fields['typename'], ENT_QUOTES, CONTREXX_CHARSET) : '')
+           'NEWS_TYPE_ID'        => $objResult->fields['typeid'],
+           'NEWS_TYPE_NAME'      => contrexx_raw2xhtml($this->getTypeNameById($objResult->fields['typeid'])),
         ));
 
-        if (!$newsCommentActive || !$this->arrSettings['news_comments_activated']) {
-            if ($this->_objTpl->blockExists('news_comments_count')) {
-                $this->_objTpl->hideBlock('news_comments_count');
+        // parse 'combined' external link
+        $newsUrl = '';
+        if (!empty($url1)) {
+            $newsUrl = $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'] . '<br />' . $this->getNewsLink($url1) . '<br />';
+        }
+        if (!empty($url2)) {
+            $newsUrl .= $this->getNewsLink($url2).'<br />';
+        }
+        $this->_objTpl->setVariable(
+            'NEWS_URL',
+            $newsUrl
+        );
+
+        // parse external source
+        $newsSourceLink = '';
+        $newsSource = '';
+        if (!empty($source)) {
+            $newsSourceLink = $this->getNewsLink($source);
+            $newsSource = $_ARRAYLANG['TXT_NEWS_SOURCE'] . '<br />'. $newsSourceLink . '<br />';
+        }
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_SOURCE' => $_ARRAYLANG['TXT_NEWS_SOURCE'],
+            'NEWS_SOURCE'     => $newsSource,
+            'NEWS_SOURCE_LINK'=> $newsSourceLink,
+            'NEWS_SOURCE_SRC' => $source,
+        ));
+        if ($this->_objTpl->blockExists('news_source')) {
+            if (empty($source)) {
+                $this->_objTpl->hideBlock('news_source');
+            } else {
+                $this->_objTpl->touchBlock('news_source');
             }
         }
 
-        if ($this->arrSettings['news_use_teaser_text'] != '1' && $this->_objTpl->blockExists('news_use_teaser_text')) {
+        // parse external link 1
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_LINK1' =>
+                $_ARRAYLANG['TXT_NEWS_LINK1'],
+            'NEWS_LINK1_SRC' =>
+                $url1,
+        ));
+        if ($this->_objTpl->blockExists('news_link1')) {
+            if (empty($url1)) {
+                $this->_objTpl->hideBlock('news_link1');
+            } else {
+                $this->_objTpl->touchBlock('news_link1');
+            }
+        }
+
+        // parse external link 2
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_LINK2' =>
+                $_ARRAYLANG['TXT_NEWS_LINK2'],
+            'NEWS_LINK2_SRC' =>
+                $url2,
+        ));
+        if ($this->_objTpl->blockExists('news_link2')) {
+            if (empty($url2)) {
+                $this->_objTpl->hideBlock('news_link2');
+            } else {
+                $this->_objTpl->touchBlock('news_link2');
+            }
+        }
+
+        // hide teaser container if the use of teasers has been deactivated
+        if (
+            $this->arrSettings['news_use_teaser_text'] != '1' &&
+            $this->_objTpl->blockExists('news_use_teaser_text')
+        ) {
             $this->_objTpl->hideBlock('news_use_teaser_text');
         }
+
+        // Parse the news comments count
+        $this->parseNewsCommentsCount($this->_objTpl, $newsid, $newsCommentActive);
 
         // parse author
         self::parseUserAccountData($this->_objTpl, $objResult->fields['authorid'], $objResult->fields['author'], 'news_author');
@@ -294,14 +424,34 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         self::parseUserAccountData($this->_objTpl, $objResult->fields['publisherid'], $objResult->fields['publisher'], 'news_publisher');
 
         // show comments
-        $this->parseMessageCommentForm($newsid, $newstitle, $newsCommentActive);
-        $this->parseCommentsOfMessage($newsid, $newsCommentActive);
+        $this->parseMessageCommentForm($this->_objTpl, $newsid, $newstitle, $newsCommentActive);
+        $this->parseCommentsOfMessage($this->_objTpl, $newsid, $newsCommentActive);
 
         // Show related_messages
-        $this->parseRelatedMessagesOfMessage($newsid, 'category', array_keys($newsCategories));
-        $this->parseRelatedMessagesOfMessage($newsid, 'type', $objResult->fields['typeid']);
-        $this->parseRelatedMessagesOfMessage($newsid, 'publisher', $objResult->fields['publisherid']);
-        $this->parseRelatedMessagesOfMessage($newsid, 'author', $objResult->fields['authorid']);
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'category',
+            array_keys($newsCategories),
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'type',
+            $objResult->fields['typeid'],
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'publisher',
+            $objResult->fields['publisherid'],
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'author',
+            $objResult->fields['authorid'],
+            array($categoryId)
+        );
 
         /*
          * save the teaser text.
@@ -312,19 +462,20 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         if (    !empty($this->arrSettings['news_use_tags'])
             &&  !empty($objResult->fields['enableTags'])
         ) {
-            $this->parseNewsTags($this->_objTpl, $newsid);
+            \JS::registerCss('core_modules/News/View/Style/Tags.css');
+            $this->parseNewsTags($this->_objTpl, $newsid, 'news_tag_list', true);
         }
 
+        // parse related news
         if (    !empty($this->arrSettings['use_related_news'])
             &&  !empty($objResult->fields['enableRelatedNews'])
         ) {
             $this->parseRelatedNews(
                 $this->_objTpl,
                 $newsid,
-                FRONTEND_LANG_ID,
-                'related_news',
-                3
+                array($categoryId)
             );
+            \JS::registerCss('core_modules/News/View/Style/RelatedSearch.css');
         }
 
         if (!empty($objResult->fields['newsimage'])) {
@@ -337,51 +488,34 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             if ($this->_objTpl->blockExists('news_image')) {
                 $this->_objTpl->parse('news_image');
             }
+            if ($this->_objTpl->blockExists('news_no_image')) {
+                $this->_objTpl->hideBlock('news_no_image');
+            }
         } else {
             if ($this->_objTpl->blockExists('news_image')) {
                 $this->_objTpl->hideBlock('news_image');
             }
+            if ($this->_objTpl->blockExists('news_no_image')) {
+                $this->_objTpl->touchBlock('news_no_image');
+            }
         }
 
-        self::parseImageBlock($this->_objTpl, $objResult->fields['newsThumbImg'], $newstitle, $newsUrl, 'image_thumbnail');
-        self::parseImageBlock($this->_objTpl, $objResult->fields['newsimage'], $newstitle, $newsUrl, 'image_detail');
+        self::parseImageBlock($this->_objTpl, $objResult->fields['newsThumbImg'], $newstitle, '', 'image_thumbnail');
+        self::parseImageBlock($this->_objTpl, $objResult->fields['newsimage'], $newstitle, '', 'image_detail');
         //previous next newslink
-        if ($this->_objTpl->blockExists('previousNextLink')) {
-            $this->parseNextAndPreviousLinks($this->_objTpl);
+        if (    !empty($this->arrSettings['use_previous_next_news_link']) 
+            &&  $this->_objTpl->blockExists('news_details_previous_next_links')
+        ) {
+            //Register the RelatedLinks.css for styling the previous and next link
+            \JS::registerCss('core_modules/News/View/Style/RelatedLinks.css');
+            $this->parseNextAndPreviousLinks(
+                $this->_objTpl,
+                array($categoryId)
+            );
         }
 
-        if (empty($redirect)) {
-            $text = preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $text);
-            $newsTeaser = preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $newsTeaser);
-            \LinkGenerator::parseTemplate($text);
-            $this->_objTpl->setVariable('NEWS_TEXT', $text);
-            if ($this->_objTpl->blockExists('news_text')) {
-                $this->_objTpl->parse('news_text');
-            }
-            if ($this->_objTpl->blockExists('news_redirect')) {
-                $this->_objTpl->hideBlock('news_redirect');
-            }
-        } else {
-            if (\FWValidator::isUri($redirect)) {
-                $redirectName = preg_replace('#^https?://#', '', $redirect);
-            //} elseif (\FWValidator::isEmail($redirect)) {
-                //$redirectName
-            } else {
-                $redirectName = basename($redirect);
-            }
-
-            $this->_objTpl->setVariable(array(
-                'TXT_NEWS_REDIRECT_INSTRUCTION' => $_ARRAYLANG['TXT_NEWS_REDIRECT_INSTRUCTION'],
-                'NEWS_REDIRECT_URL'             => $redirect,
-                'NEWS_REDIRECT_NAME'            => $redirectName,
-            ));
-            if ($this->_objTpl->blockExists('news_redirect')) {
-                $this->_objTpl->parse('news_redirect');
-            }
-            if ($this->_objTpl->blockExists('news_text')) {
-                $this->_objTpl->hideBlock('news_text');
-            }
-        }
+        // The news_text block will be hidden if the news is set to redirect type
+        $this->showNewsTextOrRedirectLink($this->_objTpl, $text, $redirect);
 
         $this->countNewsMessageView($newsid);
         $objResult->MoveNext();
@@ -435,184 +569,6 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     }
 
     /**
-     * Lists all active comments of the news message specified by $messageId
-     *
-     * @param   integer News message-ID
-     * @global  ADONewConnection
-     */
-    private function parseCommentsOfMessage($messageId, $newsCommentActive)
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        // abort if template block is missing
-        if (!$this->_objTpl->blockExists('news_comments')) {
-            return;
-        }
-
-        // abort if commenting system is not active
-        if (!$this->arrSettings['news_comments_activated']) {
-            $this->_objTpl->hideBlock('news_comments');
-            return;
-        }
-
-        // abort if comment deactivated for this news
-        if (!$newsCommentActive) {
-            return;
-        }
-
-        $query = '  SELECT      `title`,
-                                `date`,
-                                `poster_name`,
-                                `userid`,
-                                `text`
-                    FROM        `'.DBPREFIX.'module_news_comments`
-                    WHERE       `newsid` = '.$messageId.' AND `is_active` = "1"
-                    ORDER BY    `date` DESC';
-
-        $objResult = $objDatabase->Execute($query);
-
-        // no comments for this message found
-        if (!$objResult || $objResult->EOF) {
-            if ($this->_objTpl->blockExists('news_no_comment')) {
-                $this->_objTpl->setVariable('TXT_NEWS_COMMENTS_NONE_EXISTING', $_ARRAYLANG['TXT_NEWS_COMMENTS_NONE_EXISTING']);
-                $this->_objTpl->parse('news_no_comment');
-            }
-
-            $this->_objTpl->hideBlock('news_comment_list');
-            $this->_objTpl->parse('news_comments');
-
-            return;
-        }
-
-// TODO: Add AJAX-based paging
-        /*$count = $objResult->RecordCount();
-        if ($count > intval($_CONFIG['corePagingLimit'])) {
-            $paging = getPaging($count, $pos, '&amp;section=News&amp;cmd=details&amp;newsid='.$messageId, $_ARRAYLANG['TXT_NEWS_COMMENTS'], true);
-        }
-        $this->_objTpl->setVariable('COMMENTS_PAGING', $paging);*/
-
-        $i = 0;
-        while (!$objResult->EOF) {
-            self::parseUserAccountData($this->_objTpl, $objResult->fields['userid'], $objResult->fields['poster_name'], 'news_comments_poster');
-
-            $this->_objTpl->setVariable(array(
-               'NEWS_COMMENTS_CSS'          => 'row'.($i % 2 + 1),
-               'NEWS_COMMENTS_TITLE'        => contrexx_raw2xhtml($objResult->fields['title']),
-               'NEWS_COMMENTS_MESSAGE'      => nl2br(contrexx_raw2xhtml($objResult->fields['text'])),
-               'NEWS_COMMENTS_LONG_DATE'    => date(ASCMS_DATE_FORMAT, $objResult->fields['date']),
-               'NEWS_COMMENTS_DATE'         => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
-               'NEWS_COMMENTS_TIME'         => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['date']),
-            ));
-
-            $this->_objTpl->parse('news_comment');
-            $i++;
-            $objResult->MoveNext();
-        }
-
-        $this->_objTpl->parse('news_comment_list');
-        $this->_objTpl->hideBlock('news_no_comment');
-    }
-
-    /**
-     * Validates the submitted comment data and writes it to the databse if valid.
-     * Additionally, a notification is send out to the administration about the comment
-     * by e-mail (only if the corresponding configuration option is set to do so).
-     *
-     * @param   integer News message ID for which the comment shall be stored
-     * @param   string  Title of the news message for which the comment shall be stored.
-     *                  The title will be used in the notification e-mail
-     *                  {@link news::storeMessageComment()}
-     * @global    array
-     * @global    array
-     * @return  array   Returns an array of two elements. The first is either TRUE on success or FALSE on failure.
-     *                  The second element contains an error message on failure.
-     */
-    private function parseMessageCommentForm($newsMessageId, $newsMessageTitle, $newsCommentActive)
-    {
-        global $_CORELANG, $_ARRAYLANG;
-
-        // abort if template block is missing
-        if (!$this->_objTpl->blockExists('news_add_comment')) {
-            return;
-        }
-
-        // abort if comment system is deactivated
-        if (!$this->arrSettings['news_comments_activated']) {
-            return;
-        }
-
-        // abort if comment deactivated for this news
-        if (!$newsCommentActive) {
-            return;
-        }
-
-        // abort if request is unauthorized
-        if (   $this->arrSettings['news_comments_anonymous'] == '0'
-            && !\FWUser::getFWUserObject()->objUser->login()
-        ) {
-            $this->_objTpl->hideBlock('news_add_comment');
-            return;
-        }
-
-        $name = '';
-        $title = '';
-        $message = '';
-        $error = '';
-
-        $arrData = $this->fetchSubmittedCommentData();
-        if ($arrData) {
-            $name    = $arrData['name'];
-            $title   = $arrData['title'];
-            $message = $arrData['message'];
-            list($status, $error) = $this->storeMessageComment($newsMessageId, $newsMessageTitle, $name, $title, $message);
-
-            // new comment added successfully
-            if ($status) {
-                $this->_objTpl->hideBlock('news_add_comment');
-                return;
-            }
-        }
-
-        \JS::activate('cx');
-
-        // create submit from
-        if (\FWUser::getFWUserObject()->objUser->login()) {
-            $this->_objTpl->hideBlock('news_add_comment_name');
-            $this->_objTpl->hideBlock('news_add_comment_captcha');
-        } else {
-            // Anonymous guests must enter their name as well as validate a CAPTCHA
-
-            $this->_objTpl->setVariable(array(
-                'NEWS_COMMENT_NAME' => contrexx_raw2xhtml($name),
-                'TXT_NEWS_NAME'     => $_ARRAYLANG['TXT_NEWS_NAME'],
-            ));
-            $this->_objTpl->parse('news_add_comment_name');
-
-            // parse CAPTCHA
-            $this->_objTpl->setVariable(array(
-                'TXT_NEWS_CAPTCHA'          => $_CORELANG['TXT_CORE_CAPTCHA'],
-                'NEWS_COMMENT_CAPTCHA_CODE' => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getCode(),
-            ));
-            $this->_objTpl->parse('news_add_comment_captcha');
-        }
-
-        $this->_objTpl->setVariable(array(
-            'NEWS_ID'               => $newsMessageId,
-            'NEWS_ADD_COMMENT_ERROR'=> $error,
-            'NEWS_COMMENT_TITLE'    => contrexx_raw2xhtml($title),
-            'NEWS_COMMENT_MESSAGE'  => contrexx_raw2xhtml($message),
-            'TXT_NEWS_ADD_COMMENT'  => $_ARRAYLANG['TXT_NEWS_ADD_COMMENT'],
-            'TXT_NEWS_TITLE'        => $_ARRAYLANG['TXT_NEWS_TITLE'],
-            'TXT_NEWS_COMMENT'      => $_ARRAYLANG['TXT_NEWS_COMMENT'],
-            'TXT_NEWS_ADD'          => $_ARRAYLANG['TXT_NEWS_ADD'],
-            'TXT_NEWS_WRITE_COMMENT'=> $_ARRAYLANG['TXT_NEWS_WRITE_COMMENT']
-        ));
-
-        $this->_objTpl->parse('news_add_comment');
-    }
-
-
-    /**
      * Parses a list of news messages that are related to a specific news message
      * (specified by $messageId) by the same relation object. The relation object
      * is specified by its kind ($relatedByKind) and its ID ($relatedKindId).
@@ -628,8 +584,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
      * @global  ADONewConnection
      *
      */
-    private function parseRelatedMessagesOfMessage($messageId, $relatedByKind, $relatedKindId)
-    {
+    private function parseRelatedMessagesOfMessage(
+        $messageId,
+        $relatedByKind,
+         $relatedKindId,
+         $selectedCategories
+    ) {
         global $objDatabase, $_ARRAYLANG;
 
         static $arrRelatedKinds = array('category', 'type', 'publisher', 'author');
@@ -704,7 +664,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 
         while (!$objResult->EOF) {
             $newsid         = $objResult->fields['newsid'];
-            $newsCategories = $this->getCategoriesByNewsId($newsid);
+            $newsCategories = $this->getCategoriesByNewsId(
+                $newsid,
+                $selectedCategories
+            );
             $newstitle      = $objResult->fields['newstitle'];
             $newsUrl        = empty($objResult->fields['redirect'])
                                 ? (empty($objResult->fields['newscontent'])
@@ -736,6 +699,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
+               'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TIMESTAMP'     => $objResult->fields['newsdate'],
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK_TITLE'    => $htmlLinkTitle,
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK'          => $htmlLink,
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK_TARGET'   => $linkTarget,
@@ -779,14 +743,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     }
 
     /**
-    * Gets the list with the headlines
-    *
-    * @global    array
-    * @global    ADONewConnection
-    * @global    array
-    * @return    string    parsed content
-    */
-    private function getHeadlines() {
+     * Gets the list with the headlines
+     *
+     * @param string $expirationDate Expiration date
+     * @return string parsed content
+     */
+    private function getHeadlines(&$expirationDate = null) {
         global $_CONFIG, $objDatabase, $_ARRAYLANG, $_LANGID;
 
         // load source code if cmd value is integer
@@ -818,7 +780,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $pos = intval($_GET['pos']);
         }
 
-        $catFromCmd = !empty($_REQUEST['cmd']) ? explode(',', $_REQUEST['cmd']) : array();
+        $catFromCmd = !empty($_REQUEST['cmd']) ? explode('-', $_REQUEST['cmd']) : array();
         $catFromReq = !empty($_REQUEST['category']) ? explode(',', $_REQUEST['category']) : array();
 
         if (!empty($catFromCmd)) {
@@ -828,7 +790,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
         }
 
-        $newsCategories = $categories = !empty($catFromReq) ? $catFromReq : (!empty($catFromCmd) ? $catFromCmd : array());
+        $newsCategories = $categories = !empty($catFromReq) ? $catFromReq : (!empty($menuCategories) ? $menuCategories : array());
         if ((count($newsCategories) == 1) && $this->categoryExists($newsCategories[0])) {
             $selectedCat = intval($newsCategories[0]);
         }
@@ -837,13 +799,20 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         }
         $newsCategories = $this->getCatIdsFromNestedSetArray($this->getNestedSetCategories($newsCategories));
         if (!empty($newsCategories)) {
-            $newsfilter .= ' AND (`nc`.`category_id` IN (' . implode(',', $newsCategories) . '))';
+            $newsfilter .= ' AND n.`id` IN (SELECT nc.`news_id` FROM `'.DBPREFIX.'module_news_rel_categories` AS nc WHERE nc.`category_id` IN (' . implode(',', $newsCategories) . '))';
         }
 
         if ($this->_objTpl->placeholderExists('NEWS_CAT_DROPDOWNMENU')) {
             $catMenu =  '<select onchange="this.form.submit()" name="category">'."\n";
             $catMenu .= '<option value="">'.$_ARRAYLANG['TXT_CATEGORY'].'</option>'."\n";
-            $catMenu .= $this->getCategoryMenu((!empty($menuCategories) ? $menuCategories : array()), array($selectedCat))."\n";
+            $catMenu .= $this->getCategoryMenu(
+                (!empty($menuCategories) ? $menuCategories : array()),
+                array($selectedCat),
+                array(),
+                false,
+                true,
+                false
+            )."\n";
             $catMenu .= '</select>'."\n";
             $this->_objTpl->setVariable('NEWS_CAT_DROPDOWNMENU', $catMenu);
         }
@@ -903,6 +872,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $authorMenu   .= '</select>'."\n";
             $this->_objTpl->setVariable('NEWS_AUTHOR_DROPDOWNMENU', $authorMenu);
         }
+        
+        if (!empty($this->arrSettings['news_use_tags'])) {
+            \JS::registerCss('core_modules/News/View/Style/Tags.css');
+        }
 
         //Filter by tag
         if (!empty($_REQUEST['tag'])) {
@@ -911,20 +884,24 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                     : contrexx_input2raw(array($_REQUEST['tag']));
             $parameters['filterTag[]'] = implode('&filterTag[]=', $searchTag);
             $searchedTag   = $this->getNewsTags(null, $searchTag);
+            if ($searchedTag['tagList']) {
+                $requestedTagString = implode(' ', $searchedTag['tagList']);
+                \Cx\Core\Core\Controller\Cx::instanciate()->getPage()->setMetaTitle($requestedTagString);
+            }
             if (!empty($searchedTag['newsIds'])) {
                 $this->incrementViewingCount(array_keys($searchedTag['tagList']));
                 $newsfilter .= ' AND n.`id` IN ('
-                    . implode(',', $searchedTag['newsIds'])
+                    . implode(',', contrexx_raw2db($searchedTag['newsIds']))
                     . ')';
-                if ($this->_objTpl->blockExists('news_headlines_filter_tags')) {
-                    foreach ($searchedTag['tagList'] as $tagId => $tagName) {
-                        $this->_objTpl->setVariable(array(
-                           'NEWS_FILTER_TAG_ID'   => contrexx_raw2xhtml($tagId),
-                           'NEWS_FILTER_TAG_NAME' => ucfirst(contrexx_raw2xhtml($tagName))
-                        ));
-                        $this->_objTpl->parse('news_headlines_filter_tag');
-                    }
-                    $this->_objTpl->parse('news_headlines_filter_tags');
+                foreach ($searchedTag['tagList'] as $tagId => $tagName) {
+                    $this->_objTpl->setVariable(array(
+                       'NEWS_TAG_FILTER_ID'   => contrexx_raw2xhtml($tagId),
+                       'NEWS_TAG_FILTER_NAME' => ucfirst(contrexx_raw2xhtml($tagName))
+                    ));
+                    break;
+                }
+                if ($this->_objTpl->blockExists('news_tag_filter_container')) {
+                    $this->_objTpl->parse('news_tag_filter_container');
                 }
             } else {
                 $validToShowList = false;
@@ -945,9 +922,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'TXT_NEWS_MORE_INFO'            => $_ARRAYLANG['TXT_NEWS_MORE_INFO'],
         ));
 
-        $query = '  SELECT      n.id                AS newsid,
+        $selectFields = ',
                                 n.userid            AS newsuid,
                                 n.date              AS newsdate,
+                                n.typeid,
                                 n.teaser_image_path,
                                 n.teaser_image_thumbnail_path,
                                 n.redirect,
@@ -958,12 +936,19 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                 n.allow_comments    AS commentactive,
                                 n.redirect_new_window AS redirectNewWindow,
                                 n.enable_tags,
+                                n.changelog,
+                                n.source,
+                                n.url1,
+                                n.url2,
                                 nl.title            AS newstitle,
                                 nl.text NOT REGEXP \'^(<br type="_moz" />)?$\' AS newscontent,
+                                nl.text AS text,
                                 nl.teaser_text
+        ';
+        $query = '  SELECT      n.id                AS newsid
+                    %s
                     FROM        '.DBPREFIX.'module_news AS n
                     INNER JOIN  '.DBPREFIX.'module_news_locale AS nl ON nl.news_id = n.id
-                    INNER JOIN  '.DBPREFIX.'module_news_rel_categories AS nc ON nc.news_id = n.id
                     WHERE       status = 1
                                 AND nl.is_active=1
                                 AND nl.lang_id='.FRONTEND_LANG_ID.'
@@ -974,12 +959,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     ($objFWUser = \FWUser::getFWUserObject()) && $objFWUser->objUser->login() ?
                                         " AND (frontend_access_id IN (".implode(',', array_merge(array(0), $objFWUser->objUser->getDynamicPermissionIds())).") OR userid = ".$objFWUser->objUser->getId().") "
                                         :   " AND frontend_access_id=0 ")
-                                    :   '')
-                    .' GROUP BY newsid '
-                    .' ORDER BY newsdate DESC';
+                                    :   '');
 
         /***start paging ****/
-        $objResult = $objDatabase->Execute($query);
+        $objResult = $objDatabase->Execute(sprintf($query, ''));
         $count = $objResult->RecordCount();
 
         $category = '';
@@ -1002,18 +985,18 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $paging = getPaging($count, $pos, '&section=News'.$category.$type, $_ARRAYLANG['TXT_NEWS_MESSAGES'], true);
         }
         $this->_objTpl->setVariable('NEWS_PAGING', $paging);
-        $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'], $pos);
+        $expirationDate = $this->getExpirationDate();
+        $objResult = $objDatabase->SelectLimit(sprintf($query, $selectFields).' ORDER BY newsdate DESC', $_CONFIG['corePagingLimit'], $pos);
         /*** end paging ***/
-
         if (    $count>=1
             &&  $validToShowList
         ) {
             while (!$objResult->EOF) {
-                $newsid         = $objResult->fields['newsid'];
-                $newstitle      = $objResult->fields['newstitle'];
-                $newsCommentActive = $objResult->fields['commentactive'];
-                $arrNewsCategories = $this->getCategoriesByNewsId($newsid);
-                $parameters['newsid'] = $newsid;
+                $newsid = $parameters['newsid'] = $objResult->fields['newsid'];
+                $arrNewsCategories = $this->getCategoriesByNewsId(
+                    $newsid,
+                    $categories
+                );
                 $newsUrl        = empty($objResult->fields['redirect'])
                                     ? (empty($objResult->fields['newscontent'])
                                         ? ''
@@ -1026,79 +1009,19 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $redirectNewWindow = !empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow']);
-                $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
-                $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
-                $linkTarget = $redirectNewWindow ? '_blank' : '_self';
-                // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
-                if (empty($htmlLinkTitle)) {
-                    $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
-                }
-
-                list($image, $htmlLinkImage, $imageSource) = self::parseImageThumbnail($objResult->fields['teaser_image_path'],
-                                                                                       $objResult->fields['teaser_image_thumbnail_path'],
-                                                                                       $newstitle,
-                                                                                       $newsUrl);
-                $author = \FWUser::getParsedUserTitle($objResult->fields['author_id'], $objResult->fields['author']);
-                $publisher = \FWUser::getParsedUserTitle($objResult->fields['publisher_id'], $objResult->fields['publisher']);
-
-                $objSubResult = $objDatabase->Execute('SELECT count(`id`) AS `countComments` FROM `'.DBPREFIX.'module_news_comments` WHERE `newsid` = '.$objResult->fields['newsid']);
-
-                if (    empty($arrNewsCategories)
-                    &&  $this->_objTpl->blockExists('newsCategories')) {
-                    $this->_objTpl->hideBlock('newsCategories');
-                }
+                // Parse all the news placeholders
+                $this->parseNewsPlaceholders(
+                    $this->_objTpl,
+                    $objResult,
+                    $newsUrl,
+                    '',
+                    $categories
+                );
 
                 $this->_objTpl->setVariable(array(
-                   'NEWS_ID'             => $newsid,
                    'NEWS_CSS'            => 'row'.($i % 2 + 1),
-                   'NEWS_TEASER'         => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
-                   'NEWS_TITLE'          => contrexx_raw2xhtml($newstitle),
-                   'NEWS_LONG_DATE'      => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
-                   'NEWS_DATE'           => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
-                   'NEWS_TIME'           => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
-                   'NEWS_LINK_TITLE'     => $htmlLinkTitle,
-                   'NEWS_LINK'           => $htmlLink,
-                   'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'    => $linkTarget,
-                   'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
-// TODO: fetch typename from a newly to be created separate methode
-                   //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
-                   'NEWS_PUBLISHER'      => contrexx_raw2xhtml($publisher),
-                   'NEWS_AUTHOR'         => contrexx_raw2xhtml($author),
-                   'NEWS_COUNT_COMMENTS' => contrexx_raw2xhtml($objSubResult->fields['countComments'].' '.$_ARRAYLANG['TXT_NEWS_COMMENTS']),
                 ));
 
-                if (!$newsCommentActive || !$this->arrSettings['news_comments_activated']) {
-                    if ($this->_objTpl->blockExists('news_comments_count')) {
-                        $this->_objTpl->hideBlock('news_comments_count');
-                    }
-                }
-
-                if (!empty($image)) {
-                    $this->_objTpl->setVariable(array(
-                        'NEWS_IMAGE'               => $image,
-                        'NEWS_IMAGE_SRC'           => contrexx_raw2xhtml($imageSource),
-                        'NEWS_IMAGE_ALT'           => contrexx_raw2xhtml($newstitle),
-                        'NEWS_IMAGE_LINK'          => $htmlLinkImage,
-                    ));
-
-                    if ($this->_objTpl->blockExists('news_image')) {
-                        $this->_objTpl->parse('news_image');
-                    }
-                } else {
-                    if ($this->_objTpl->blockExists('news_image')) {
-                        $this->_objTpl->hideBlock('news_image');
-                    }
-                }
-
-                self::parseImageBlock($this->_objTpl, $objResult->fields['teaser_image_thumbnail_path'], $newstitle, $newsUrl, 'image_thumbnail');
-                self::parseImageBlock($this->_objTpl, $objResult->fields['teaser_image_path'], $newstitle, $newsUrl, 'image_detail');
-                if (    !empty($this->arrSettings['news_use_tags'])
-                    &&  !empty($objResult->fields['enable_tags'])
-                ) {
-                    $this->parseNewsTags($this->_objTpl, $newsid);
-                }
                 $this->_objTpl->parse('newsrow');
                 $i++;
                 $objResult->MoveNext();
@@ -1210,12 +1133,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     /**
     * Gets the list with the top news
     *
-    * @global    array
-    * @global    ADONewConnection
-    * @global    array
-    * @return    string    parsed content
+    * @param string $expirationDate Expiration date
+    * @return string parsed content
     */
-    private function getTopNews() {
+    private function getTopNews(&$expirationDate = null) {
         global $_CONFIG, $objDatabase, $_ARRAYLANG;
 
         $newsfilter = '';
@@ -1274,6 +1195,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $paging = getPaging($count, $pos, '&section=News&cmd=topnews', $_ARRAYLANG['TXT_NEWS_MESSAGES'], true);
         }
         $this->_objTpl->setVariable('NEWS_PAGING', $paging);
+        $expirationDate = $this->getExpirationDate();
         $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'], $pos);
         /*** end paging ***/
 
@@ -1312,6 +1234,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
                    'NEWS_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
                    'NEWS_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
+                   'NEWS_TIMESTAMP'     => $objResult->fields['newsdate'],
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
                    'NEWS_LINK_TARGET'   => $linkTarget,
@@ -1325,18 +1248,26 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 
                 if (!empty($image)) {
                     $this->_objTpl->setVariable(array(
+                        'NEWS_IMAGE_ID'            => $newsid,
                         'NEWS_IMAGE'               => $image,
                         'NEWS_IMAGE_SRC'           => contrexx_raw2xhtml($imageSource),
                         'NEWS_IMAGE_ALT'           => contrexx_raw2xhtml($newstitle),
                         'NEWS_IMAGE_LINK'          => $htmlLinkImage,
+                        'NEWS_IMAGE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                     ));
 
                     if ($this->_objTpl->blockExists('news_image')) {
                         $this->_objTpl->parse('news_image');
                     }
+                    if ($this->_objTpl->blockExists('news_no_image')) {
+                        $this->_objTpl->hideBlock('news_no_image');
+                    }
                 } else {
                     if ($this->_objTpl->blockExists('news_image')) {
                         $this->_objTpl->hideBlock('news_image');
+                    }
+                    if ($this->_objTpl->blockExists('news_no_image')) {
+                        $this->_objTpl->touchBlock('news_no_image');
                     }
                 }
 
@@ -1373,18 +1304,6 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         return $this->_objTpl->get();
     }
 
-
-    /**
-    * Gets the global page title
-    *
-    * @param     string    (optional)$pageTitle
-    */
-    public function getPageTitle($pageTitle='')
-    {
-        if (empty($this->newsTitle)) {
-            $this->newsTitle = $pageTitle;
-        }
-    }
 
     private function notifyWebmasterAboutNewlySubmittedNewsMessage($news_id)
     {
@@ -1604,9 +1523,9 @@ JSCODE;
         $data['newsCat']  = !empty($_POST['newsCat']) ? contrexx_input2raw($_POST['newsCat']) : array();
         $data['newsType'] = !empty($_POST['newsType']) ? intval($_POST['newsType']) : 0;
         $data['newsTypeRedirect'] = !empty($_POST['newsTypeRedirect']) ? true : false;
-        $data['enableRelatedNews'] = !empty($this->arrSettings['use_related_news']) ? 1 : 0;
-        $data['relatedNews'] = !empty($_POST['relatedNews'])
-            ? contrexx_input2raw($_POST['relatedNews'])
+        $data['newsEnableRelatedNews'] = intval(!empty($this->arrSettings['use_related_news']));
+        $data['newsRelatedNews'] = !empty($_POST['newsRelatedNews'])
+            ? contrexx_input2raw($_POST['newsRelatedNews'])
             : array();
         $data['enableTags'] = !empty($this->arrSettings['news_use_tags']) ? 1 : 0;
         $data['newsTags'] = !empty($_POST['newsTags'])
@@ -1629,23 +1548,25 @@ JSCODE;
         }
 
         $newsTagId = 'newsTags';
-        if (!empty($this->arrSettings['news_use_tags'])) {
-            \JS::registerJS('lib/javascript/tag-it/js/tag-it.min.js');
-            \JS::registerCss('lib/javascript/tag-it/css/tag-it.css');
-            $this->registerTagJsCode();
-            if (    $this->_objTpl->blockExists('newsTags')
-                &&  !empty($data['newsTags'])
-            ) {
-                foreach ($data['newsTags'] as $newsTag) {
-                    $this->_objTpl->setVariable(array(
-                        'NEWS_TAGS' => contrexx_raw2xhtml($newsTag)
-                    ));
-                    $this->_objTpl->parse('newsTags');
+        if ($this->_objTpl->blockExists('news_tags_container')) {
+            if (!empty($this->arrSettings['news_use_tags'])) {
+                \JS::activate('tag-it');
+                \JS::registerCss('core_modules/News/View/Style/Tags.css');
+                $this->registerTagJsCode();
+                if (    $this->_objTpl->blockExists('news_tags')
+                    &&  !empty($data['newsTags'])
+                ) {
+                    foreach ($data['newsTags'] as $newsTag) {
+                        $this->_objTpl->setVariable(array(
+                            'NEWS_TAGS' => contrexx_raw2xhtml($newsTag)
+                        ));
+                        $this->_objTpl->parse('news_tags');
+                    }
                 }
+                $this->_objTpl->touchBlock('news_tags_container');
+            } else {
+                $this->_objTpl->hideBlock('news_tags_container');
             }
-            $this->_objTpl->touchBlock('newsTagsBlock');
-        } else {
-            $this->_objTpl->hideBlock('newsTagsBlock');
         }
 
         \JS::activate('chosen');
@@ -1655,30 +1576,53 @@ JSCODE;
 });
 EOF;
         \JS::registerCode($jsCodeCategoryChosen);
-        // TODO: this block must be renamed to news_related_container
-        if ($this->_objTpl->blockExists('relatedNewsBlock')) {
-            if (!empty($this->arrSettings['use_related_news'])) {
-                $objCx = \ContrexxJavascript::getInstance();
-                $objCx->setVariable(
+        if ($this->_objTpl->blockExists('news_related_news_container')) {
+            if (
+                !$this->arrSettings['use_related_news'] ||
+                !$this->_objTpl->blockExists('news_related_news')
+            ) {
+                $this->_objTpl->hideBlock('news_related_news_container');
+            } else {
+                \ContrexxJavascript::getInstance()->setVariable(
                     array(
                         'noResultsMsg' => $_ARRAYLANG['TXT_NEWS_NOT_FOUND'],
                         'langId' => FRONTEND_LANG_ID,
                     ),
-                    'news/news-live-search'
+                    'News/RelatedSearch'
                 );
-                \JS::registerJS('core_modules/News/View/Script/news-live-search.js');
-                if (!empty($data['relatedNews'])) {
-                    $this->parseRelatedNewsTags(
-                        $this->_objTpl,
-                        $data['relatedNews'],
-                        FRONTEND_LANG_ID
-                    );
+                \JS::registerJS('core_modules/News/View/Script/RelatedSearch.js');
+                \JS::registerCss('core_modules/News/View/Style/RelatedSearch.css');
+                if (!empty($data['newsEnableRelatedNews'])) {
+                    try {
+                        $relatedNews = $this->getRelatedNews(0, $data['newsRelatedNews'], false);
+                        // parse related news
+                        while (!$relatedNews->EOF) {
+                            $relatedNewsTitle = $relatedNews->fields['newstitle'];
+                            $relatedNewsTitleShort = strip_tags($relatedNewsTitle);
+                            if (strlen($relatedNewsTitleShort) > 35) {
+                                $relatedNewsTitleShort = substr($relatedNewsTitleShort, 0, 35) . '...';
+                            }
+                            $this->_objTpl->setVariable(
+                                array(
+                                    'NEWS_RELATED_NEWS_ID'          => $relatedNews->fields['newsid'],
+                                    'NEWS_RELATED_NEWS_TITLE'       => contrexx_raw2xhtml($relatedNewsTitle),
+                                    'NEWS_RELATED_NEWS_TITLE_SHORT' => contrexx_raw2xhtml($relatedNewsTitleShort),
+                                )
+                            );
+                            $relatedNews->MoveNext();
+                            $this->_objTpl->parse('news_related_news');
+                        }
+                    } catch (NewsLibraryException $e) {
+                        $this->_objTpl->hideBlock('news_related_new');
+                    }
+                } else {
+                    $this->_objTpl->hideBlock('news_related_new');
                 }
-                $this->_objTpl->touchBlock('relatedNewsBlock');
-            } else {
-                $this->_objTpl->hideBlock('relatedNewsBlock');
+
+                $this->_objTpl->touchBlock('news_related_news_container');
             }
         }
+
         $this->_objTpl->setVariable(array(
             'TXT_NEWS_MESSAGE'          => $_ARRAYLANG['TXT_NEWS_MESSAGE'],
             'TXT_TITLE'                 => $_ARRAYLANG['TXT_TITLE'],
@@ -1702,7 +1646,14 @@ EOF;
             'TXT_NEWS_SEARCH_PLACEHOLDER'   => $_ARRAYLANG['TXT_NEWS_SEARCH_PLACEHOLDER'],
             'TXT_NEWS_TAGS'                 => $_ARRAYLANG['TXT_NEWS_TAGS'],
             'NEWS_TEXT'                 => new \Cx\Core\Wysiwyg\Wysiwyg('newsText', $data['newsText'], 'bbcode'),
-            'NEWS_CAT_MENU'             => $this->getCategoryMenu($this->nestedSetRootId, array($data['newsCat'])),
+            'NEWS_CAT_MENU'             => $this->getCategoryMenu(
+                $this->nestedSetRootId,
+                array($data['newsCat']),
+                array(),
+                false,
+                true,
+                false
+            ),
             'NEWS_TYPE_MENU'            => ($this->arrSettings['news_use_types'] == 1 ? $this->getTypeMenu($data['newsType']) : ''),
             'NEWS_TITLE'                => contrexx_raw2xhtml($data['newsTitle']),
             'NEWS_SOURCE'               => contrexx_raw2xhtml($data['newsSource']),
@@ -1852,8 +1803,8 @@ EOF;
                 `author_id` = $userId,
                 `author` = '" . contrexx_raw2db($userName) . "',
                 `changelog` = '$date',
-                `enable_tags`='" . $data['enableTags'] . "',
-                `enable_related_news`=" . $data['enableRelatedNews'] . ",
+                `enable_tags`='" . contrexx_raw2db($data['enableTags']) . "',
+                `enable_related_news`=" . $data['newsEnableRelatedNews'] . ",
                 `redirect_new_window` = '" . $data['redirectNewWindow'] . "',
                 # the following are empty defaults for the text fields.
                 # text fields can't have a default and we need one in SQL_STRICT_TRANS_MODE
@@ -1872,13 +1823,23 @@ EOF;
 // TODO: add fail check
         if (    !$this->storeLocalesOfSubmittedNewsMessage($ins_id, $data['newsTitle'], $data['newsText'], $data['newsTeaserText'])
             ||  !$this->manipulateCategories($data['newsCat'], $ins_id)
-            ||  !$this->manipulateRelatedNews($data['relatedNews'], $ins_id)
+            ||  !$this->manipulateRelatedNews($data['newsRelatedNews'], $ins_id)
             ||  !$this->manipulateTags($data['newsTags'], $ins_id)
         ) {
             $errorMessage = empty($this->errMsg)
                 ? $_ARRAYLANG['TXT_NEWS_SUBMIT_ERROR']
                 : implode('<br>', $this->errMsg);
             return array(false, $errorMessage . '<br /><br />');
+        }
+        if ($enable) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array(
+                    'Widget',
+                    $this->getNewsGlobalPlaceholderNames()
+                )
+            );
         }
 
         return array($ins_id, $_ARRAYLANG['TXT_NEWS_SUCCESSFULLY_SUBMITED'].'<br /><br />');
@@ -1985,232 +1946,30 @@ RSS2JSCODE;
         return $this->_teaser;
     }
 
-
-    /**
-     * Fetch news comment data that has been submitted via POST
-     * and return it as array with three elements.
-     * Where the first element is the name of the poster (if poster is anonymous),
-     * the second is the title of the comment and the third is the comment
-     * message by it self.
-     *
-     * @return array
-     */
-    private function fetchSubmittedCommentData()
-    {
-        // only proceed if the user did submit any data
-        if (!isset($_POST['news_add_comment'])) {
-            return false;
-        }
-
-        $arrData = array(
-            'name'    => '',
-            'title'   => '',
-            'message' => '',
-        );
-
-        if (isset($_POST['news_comment_name'])) {
-            $arrData['name'] = contrexx_input2raw(trim($_POST['news_comment_name']));
-        }
-
-        if (isset($_POST['news_comment_title'])) {
-            $arrData['title'] = contrexx_input2raw(trim($_POST['news_comment_title']));
-        }
-
-        if (isset($_POST['news_comment_message'])) {
-            $arrData['message'] = contrexx_input2raw(trim($_POST['news_comment_message']));
-        }
-
-        return $arrData;
-    }
-
-
-    /**
-     * Validates the submitted comment data and writes it to the databse if valid.
-     * Additionally, a notification is send out to the administration about the comment
-     * by e-mail (only if the corresponding configuration option is set to do so).
-     *
-     * @param   integer News message ID for which the comment shall be stored
-     * @param   string  Title of the news message for which the comment shall be stored.
-     *                  The title will be used in the notification e-mail
-     * @param   string  The poster's name of the comment
-     * @param   string  The comment's title
-     * @param   string  The comment's message text
-     * @global    ADONewConnection
-     * @global    array
-     * @global    array
-     * @global    array
-     * @return  array   Returns an array of two elements. The first is either TRUE on success or FALSE on failure.
-     *                  The second element contains an error message on failure.
-     */
-    private function storeMessageComment($newsMessageId, $newsMessageTitle, $name, $title, $message)
-    {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG, $_CONFIG;
-
-        if (!isset($_SESSION['news'])) {
-            $_SESSION['news'] = array();
-            $_SESSION['news']['comments'] = array();
-        }
-
-        // just comment
-        if ($this->checkForCommentFlooding($newsMessageId)) {
-            return array(
-                false,
-                sprintf($_ARRAYLANG['TXT_NEWS_COMMENT_INTERVAL_MSG'],
-                        //DateTimeTool::getLiteralStringOfSeconds($this->arrSettings['news_comments_timeout'])),
-                        $this->arrSettings['news_comments_timeout']),
-            );
-        }
-
-        if (empty($title)) {
-            return array(false, $_ARRAYLANG['TXT_NEWS_MISSING_COMMENT_TITLE']);
-        }
-
-        if (empty($message)) {
-            return array(false, $_ARRAYLANG['TXT_NEWS_MISSING_COMMENT_MESSAGE']);
-        }
-
-
-        $date = time();
-        $userId = 0;
-        if (\FWUser::getFWUserObject()->objUser->login()) {
-            $userId = \FWUser::getFWUserObject()->objUser->getId();
-            $name = \FWUser::getParsedUserTitle($userId);
-        } elseif ($this->arrSettings['news_comments_anonymous'] == '1') {
-            // deny comment if the poster did not specify his name
-            if (empty($name)) {
-                return array(false, $_ARRAYLANG['TXT_NEWS_POSTER_NAME_MISSING']);
-            }
-
-            // check CAPTCHA for anonymous posters
-            if (!\Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->check()) {
-                return array(false, null);
-            }
-        } else {
-            // Anonymous comments are not allowed
-            return array(false, null);
-        }
-
-        $isActive  = $this->arrSettings['news_comments_autoactivate'];
-        $ipAddress = contrexx_input2raw($_SERVER['REMOTE_ADDR']);
-
-        $objResult = $objDatabase->Execute("
-            INSERT INTO `".DBPREFIX."module_news_comments`
-                    SET `title` = '".contrexx_raw2db($title)."',
-                        `text` = '".contrexx_raw2db($message)."',
-                        `newsid` = '".contrexx_raw2db($newsMessageId)."',
-                        `date` = '".contrexx_raw2db($date)."',
-                        `poster_name` = '".contrexx_raw2db($name)."',
-                        `userid` = '".contrexx_raw2db($userId)."',
-                        `ip_address` = '".contrexx_raw2db($ipAddress)."',
-                        `is_active` = '".contrexx_raw2db($isActive)."'");
-        if (!$objResult) {
-            return array(false, $_ARRAYLANG['TXT_NEWS_COMMENT_SAVE_ERROR']);
-        }
-
-        /* Prevent comment flooding from same user:
-           Either user is authenticated or had to validate a CAPTCHA.
-           In either way, a Cloudrexx session had been initialized,
-           therefore we are able to use the $_SESSION to log this comment */
-        $_SESSION['news']['comments'][$newsMessageId] = $date;
-
-        // Don't send a notification e-mail to the administrator
-        if (!$this->arrSettings['news_comments_notification']) {
-            return array(true, null);
-        }
-
-        // Send a notification e-mail to administrator
-        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
-
-        $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
-        $objMail->IsHTML(false);
-        $objMail->Subject   = sprintf($_ARRAYLANG['TXT_NEWS_COMMENT_NOTIFICATION_MAIL_SUBJECT'], $newsMessageTitle);
-
-        $manageCommentsUrl = \Cx\Core\Routing\Url::fromDocumentRoot(array(
-            'cmd' => 'News',
-            'act' => 'comments',
-            'newsId' => $newsMessageId,
-        ));
-        $manageCommentsUrl->setPath(
-            substr(
-                \Cx\Core\Core\Controller\Cx::instanciate()->getBackendFolderName(),
-                1
-            ) .
-            '/index.php'
-        );
-        $manageCommentsUrl->setMode('backend');
-        $manageCommentsUrl = $manageCommentsUrl->toString();
-
-        $activateCommentTxt = $this->arrSettings['news_comments_autoactivate']
-                              ? ''
-                              : sprintf($_ARRAYLANG['TXT_NEWS_COMMENT_NOTIFICATION_MAIL_LINK'], $manageCommentsUrl);
-        $objMail->Body      = sprintf($_ARRAYLANG['TXT_NEWS_COMMENT_NOTIFICATION_MAIL_BODY'],
-                                      $_CONFIG['domainUrl'],
-                                      $newsMessageTitle,
-                                      \FWUser::getParsedUserTitle($userId, $name),
-                                      $title,
-                                      nl2br($message),
-                                      $activateCommentTxt);
-        $objMail->AddAddress($_CONFIG['coreAdminEmail']);
-        if (!$objMail->Send()) {
-            \DBG::msg('Sending of notification e-mail failed');
-            //DBG::stack();
-        }
-
-        return array(true, null);
-    }
-
-
-    /**
-     * Check if the current user has already written a comment within
-     * the definied timeout-time set by news_comments_timeout.
-     *
-     * @param   integer News message-ID
-     * @global  object
-     * @return  boolean TRUE, if the user hast just written a comment before.
-     */
-    private function checkForCommentFlooding($newsMessageId)
-    {
-        global $objDatabase;
-
-        //Check cookie first
-        if (!empty($_SESSION['news']['comments'][$newsMessageId])) {
-            $intLastCommentTime = intval($_SESSION['news']['comments'][$newsMessageId]);
-            if (time() < $intLastCommentTime + intval($this->arrSettings['news_comments_timeout'])) {
-                //The current system-time is smaller than the time in the session plus timeout-time, so the user just submitted a comment
-                return true;
-            }
-        }
-
-        //Now check database (make sure the user didn't delete the cookie
-        $objResult = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_news_comments`
-                                                 WHERE  `ip_address` = '".contrexx_input2db($_SERVER['REMOTE_ADDR'])."'
-                                                        AND `date` > ".(time() - intval($this->arrSettings['news_comments_timeout'])));
-        if ($objResult && !$objResult->EOF) {
-            return true;
-        }
-
-        //Nothing found, i guess the user didn't comment within the timeout-period.
-        return false;
-    }
-
-
     /**
      * Get a list of all news messages sorted by year and month.
      *
-     * @access  private
-     * @return  string      parsed content
+     * @param string $expirationDate Expiration date
+     * @return string parsed content
      */
-    private function getArchive()
+    private function getArchive(&$expirationDate = null)
     {
         global $objDatabase, $_ARRAYLANG;
 
         $categories = '';
+        $selectedCategories = array();
         $i          = 0;
         if ($categories = substr($_REQUEST['cmd'], 7)) {
-            $categories = $this->getCatIdsFromNestedSetArray($this->getNestedSetCategories(explode(',', $categories)));
+            $selectedCategories = contrexx_input2int(
+                explode('-', $categories)
+            );
+            $categories = $this->getCatIdsFromNestedSetArray(
+                $this->getNestedSetCategories($selectedCategories)
+            );
         }
 
-        $monthlyStats = $this->getMonthlyNewsStats($categories);
+        $monthlyStats   = $this->getMonthlyNewsStats($categories);
+        $expirationDate = $this->getExpirationDate();
 
         if (!empty($monthlyStats)) {
             foreach ($monthlyStats as $key => $value) {
@@ -2224,7 +1983,10 @@ RSS2JSCODE;
                 foreach ($value['news'] as $news) {
                     $newsid         = $news['id'];
                     $newstitle      = $news['newstitle'];
-                    $newsCategories = $this->getCategoriesByNewsId($newsid);
+                    $newsCategories = $this->getCategoriesByNewsId(
+                        $newsid,
+                        $selectedCategories
+                    );
                     $newsCommentActive = $news['commentactive'];
                     $newsUrl        = empty($news['newsredirect'])
                                         ? (empty($news['newscontent'])
@@ -2252,11 +2014,12 @@ RSS2JSCODE;
                        'NEWS_ARCHIVE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$news['date']),
                        'NEWS_ARCHIVE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $news['date']),
                        'NEWS_ARCHIVE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $news['date']),
+                       'NEWS_ARCHIVE_TIMESTAMP'     => $news['date'],
                        'NEWS_ARCHIVE_LINK_TITLE'    => contrexx_raw2xhtml($newstitle),
                        'NEWS_ARCHIVE_LINK'          => $htmlLink,
                        'NEWS_ARCHIVE_LINK_TARGET'   => $linkTarget,
                        'NEWS_ARCHIVE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
-                       'NEWS_ARCHIVE_CATEGORY'      => stripslashes($news['name']),
+                       'NEWS_ARCHIVE_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
                        'NEWS_ARCHIVE_AUTHOR'        => contrexx_raw2xhtml($author),
                        'NEWS_ARCHIVE_PUBLISHER'     => contrexx_raw2xhtml($publisher),
                        'NEWS_ARCHIVE_COUNT_COMMENTS'=> contrexx_raw2xhtml($objResult->fields['countComments'].' '.$_ARRAYLANG['TXT_NEWS_COMMENTS']),
@@ -2312,5 +2075,37 @@ RSS2JSCODE;
 
 
         return $this->_objTpl->get();
+    }
+
+    /**
+     * Get a expiration date
+     *
+     * @return \DateTime \DateTime object for expiration date
+     */
+    protected function getExpirationDate()
+    {
+        $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $query       = 'SELECT startdate AS expirationdate
+            FROM ' . DBPREFIX . 'module_news as tblStart
+                WHERE (
+                    tblStart.startdate !="0000-00-00 00:00:00" AND
+                    tblStart.startdate >= "'. date('Y-m-d H:i:s') .'"
+                )
+            UNION
+                SELECT enddate AS expirationdate
+                    FROM ' . DBPREFIX . 'module_news as tblEnd
+                WHERE (
+                    tblEnd.enddate !="0000-00-00 00:00:00" AND
+                    tblEnd.enddate >= "'. date('Y-m-d H:i:s') .'"
+                )
+            ORDER BY expirationdate LIMIT 1';
+
+        $result = $objDatabase->Execute($query);
+
+        if (empty($result->fields['expirationdate'])) {
+            return;
+        }
+
+        return new \DateTime($result->fields['expirationdate']);
     }
 }

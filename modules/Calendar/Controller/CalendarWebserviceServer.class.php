@@ -411,12 +411,11 @@ class CalendarWebserviceEvent
     public $status;
 
     /**
-     * Event category id
-     *
+     * Category IDs
      * @access public
-     * @var integer
+     * @var     array
      */
-    public $catId;
+    public $category_ids = null;
 
     /**
      * Event series status
@@ -605,72 +604,65 @@ class CalendarWebserviceEvent
      *
      * @return null
      */
-    private function get($eventId, $langId) {
+    private function get($eventId, $langId)
+    {
         \Env::get('ClassLoader')->loadFile($this->dirPath . '/config/configuration.php');
-
-
         if($langId == null) {
             $lang_where = "AND field.lang_id = '".intval($this->langId)."' ";
         } else {
             $lang_where = "AND field.lang_id = '".intval($langId)."' ";
         }
-
-        //$lang_where = "AND field.lang_id = '".intval($this->langId)."' ";
-        //$showIn_where = "AND FIND_IN_SET('".intval($this->langId)."',event.show_in)>0 ";
-
-        $query = "SELECT event.id AS id,
-                         event.type AS type,
-                         event.startdate AS startdate,
-                         event.enddate AS enddate,
-                         event.showStartDateList AS showStartDateList,
-                         event.showEndDateList AS showEndDateList,
-                         event.showStartTimeList AS showStartTimeList,
-                         event.showEndTimeList AS showEndTimeList,
-                         event.showTimeTypeList AS showTimeTypeList,
-                         event.showStartDateDetail AS showStartDateDetail,
-                         event.showEndDateDetail AS showEndDateDetail,
-                         event.showStartTimeDetail AS showStartTimeDetail,
-                         event.showEndTimeDetail AS showEndTimeDetail,
-                         event.showTimeTypeDetail AS showTimeTypeDetail,
-                         event.access AS access,
-                         event.pic AS pic,
-                         event.attach AS attach,
-                         event.priority AS priority,
-                         event.catid AS catid,
-                         event.status AS status,
-                         event.show_in AS show_in,
-                         event.google AS google,
-                         event.invited_groups AS invited_groups,
-                         event.invited_mails AS invited_mails,
-                         event.invitation_sent AS invitation_sent,
-                         event.registration AS registration,
-                         event.registration_num AS registration_num,
-                         event.registration_notification AS registration_notification,
-                         event.series_status AS series_status,
-                         event.series_type AS series_type,
-                         event.series_pattern_count AS series_pattern_count,
-                         event.series_pattern_weekday AS series_pattern_weekday,
-                         event.series_pattern_day AS series_pattern_day,
-                         event.series_pattern_week AS series_pattern_week,
-                         event.series_pattern_month AS series_pattern_month,
-                         event.series_pattern_type AS series_pattern_type,
-                         event.series_pattern_dourance_type AS series_pattern_dourance_type,
-                         event.series_pattern_end AS series_pattern_end,
-                         event.series_pattern_end_date AS series_pattern_end_date,
-                         event.series_pattern_begin AS series_pattern_begin,
-                         event.series_pattern_exceptions AS series_pattern_exceptions,
-                         field.title AS title,
-                         field.description AS description,
+        $query = "
+            SELECT event.id,
+                event.type,
+                event.startdate,
+                event.enddate,
+                event.showStartDateList,
+                event.showEndDateList,
+                event.showStartTimeList,
+                event.showEndTimeList,
+                event.showTimeTypeList,
+                event.showStartDateDetail,
+                event.showEndDateDetail,
+                event.showStartTimeDetail,
+                event.showEndTimeDetail,
+                event.showTimeTypeDetail,
+                event.access,
+                event.pic,
+                event.attach,
+                event.priority,
+                event.status,
+                event.show_in,
+                event.google,
+                event.invited_groups,
+                event.invited_mails,
+                event.invitation_sent,
+                event.registration,
+                event.registration_num,
+                event.registration_notification,
+                event.series_status,
+                event.series_type,
+                event.series_pattern_count,
+                event.series_pattern_weekday,
+                event.series_pattern_day,
+                event.series_pattern_week,
+                event.series_pattern_month,
+                event.series_pattern_type,
+                event.series_pattern_dourance_type,
+                event.series_pattern_end,
+                event.series_pattern_end_date,
+                event.series_pattern_begin,
+                event.series_pattern_exceptions,
+                field.title,
+                field.description,
                          field.place AS place
                     FROM ".$this->tablePrefix."module_calendar_event AS event,
                          ".$this->tablePrefix."module_calendar_event_field AS field
                    WHERE event.id = '".intval($eventId)."'
-                     AND (event.id = field.event_id ".$lang_where.")
+            AND (event.id=field.event_id $lang_where)
                    LIMIT 1";
-
         $result = mysql_query($query);
         $count = mysql_num_rows($result);
-
         if($this->showEventsOnlyInActiveLanguage == 2) {
             if($count == 0) {
                 if($langId == null) {
@@ -718,10 +710,8 @@ class CalendarWebserviceEvent
                 $this->showIn = htmlentities(stripslashes($row['show_in']),ENT_QUOTES,$this->coreCharacterEncoding);
                 $this->availableLang = intval($langId);
                 $this->status = intval($row['status']);
-                $this->catId = intval($row['catid']);
                 $this->map = intval($row['google']);
                 $this->seriesStatus = intval($row['series_status']);
-
                 if($this->seriesStatus == 1) {
                     $this->seriesData['seriesPatternCount'] = intval($row['series_pattern_count']);
                     $this->seriesData['seriesType'] = intval($row['series_type']);
@@ -737,13 +727,17 @@ class CalendarWebserviceEvent
                     $this->seriesData['seriesPatternBegin'] = intval($row['series_pattern_begin']);
                     $this->seriesData['seriesPatternExceptions'] = array_map('strtotime', (array) explode(",", $row['series_pattern_exceptions']));
                 }
-
                 $this->invitedGroups = explode(',', $row['invited_groups']);
-                $this->invitedMails =  htmlentities(stripslashes($row['invited_mails']), ENT_QUOTES, $this->coreCharacterEncoding);
+                $this->invitedMails =  htmlentities(
+                    stripslashes($row['invited_mails']),
+                    ENT_QUOTES, $this->coreCharacterEncoding);
                 $this->registration = intval($row['registration']);
                 $this->numSubscriber = intval($row['registration_num']);
-                $this->notificationTo = htmlentities(stripslashes($row['registration_notification']), ENT_QUOTES,$this->coreCharacterEncoding);
-
+                $this->notificationTo = htmlentities(
+                    stripslashes($row['registration_notification']),
+                    ENT_QUOTES, $this->coreCharacterEncoding);
+                $calendarCategory = new CalendarCategory();
+                $this->category_ids = $calendarCategory->getIdsByEventId($eventId);
                 $this->getData();
             }
         }

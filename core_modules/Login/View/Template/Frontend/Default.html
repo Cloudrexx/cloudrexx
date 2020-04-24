@@ -18,7 +18,9 @@
             <!-- END login_social_networks -->
             <div id="right-login" class="col-md-6 col-sm-12 col-xs-12">
                 <div id="login">
+                    <!-- BEGIN login_status_message -->
                     <p class="login-error-msg text-danger">{LOGIN_STATUS_MESSAGE}</p>
+                    <!-- END login_status_message -->
                     <form role="form" method="post" action="{NODE_LOGIN}" name="loginForm">
                         <input type="hidden" value="{LOGIN_REDIRECT}" name="redirect" />
                         <p><label for="USERNAME">{TXT_EMAIL}</label><input id="USERNAME" name="USERNAME" value="" placeholder="{TXT_EMAIL}" type="text"></p>

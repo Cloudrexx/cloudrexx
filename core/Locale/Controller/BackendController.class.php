@@ -49,6 +49,23 @@ namespace Cx\Core\Locale\Controller;
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController
 {
+    /**
+     * The language file which is used to parse the placeholder list
+     * @var \Cx\Core\Locale\Model\Entity\SettingsLanguageFile
+     */
+    protected $languageFile;
+
+    /**
+     * The doctrine repository of the locale entities
+     * @var \Cx\Core\Locale\Model\Repository\LocaleRepository
+     */
+    protected $localeRepo;
+
+    /**
+     * The doctrine repository of the language entities
+     * @var \Cx\Core\Locale\Model\Repository\LanguageRepository
+     */
+    protected $languageRepo;
 
     /**
      * Returns a list of available commands (?act=XY)
@@ -56,7 +73,30 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      */
     public function getCommands()
     {
-        return array('Locale', 'Backend');
+        $cx = $this->cx;
+
+        // permission for Locale and Language management
+        $localeMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(50));
+
+        // permission for frontend variable management
+        $variableMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(48));
+
+        // backend variable management shall only be available if component SystemInfo is present
+        $variableBackendMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(48),
+            function() use ($cx) {
+                return in_array('SystemInfo', $cx->getLicense()->getLegalComponentsList());
+            }
+        );
+
+        return array(
+            'Locale'        => array('permission' => $localeMgmtPermission),
+            'Backend'       => array('permission' => $localeMgmtPermission),
+            // Default is frontend
+            'LanguageFile'  => array(
+                'permission' => $variableMgmtPermission,
+                'Backend' => array('permission' => $variableBackendMgmtPermission),
+            ),
+        );
     }
 
     /**
@@ -77,12 +117,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         global $_ARRAYLANG;
 
         switch (current($cmd)) {
             case 'Backend':
                 if (!empty($_POST)) {
+                    \Permission::checkAccess(49, 'static');
                     $this->updateBackends($_POST);
                 }
                 // We don't want to parse the entity view
@@ -91,6 +132,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 break;
             case 'Locale':
                 if (isset($_POST) && isset($_POST['updateLocales'])) {
+                    \Permission::checkAccess(49, 'static');
                     $this->updateLocales($_POST);
                 }
                 $isEdit = false;
@@ -130,6 +172,100 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     $template->touchBlock('form_actions');
                 }
                 break;
+            case 'LanguageFile':
+                // activate cx and load neccessary js files
+                \JS::activate('cx');
+                // set js variables
+                $cxjs = \ContrexxJavascript::getInstance();
+                $cxjs->setVariable('resetText', $_ARRAYLANG['TXT_CORE_LOCALE_RESET'], 'Locale/LanguageFile');
+                $cxjs->setVariable('resetSuccess', $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_SUCCESS'], 'Locale/LanguageFile');
+                $cxjs->setVariable('resetError', $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_ERROR'], 'Locale/LanguageFile');
+
+                // check which language file is wanted (front- or backend)
+                $frontend = !in_array('Backend', $cmd);
+
+                // load the language file's locale
+                if (isset($_GET)) {
+                    if (isset($_GET['sourceLang'])) {
+                        // use language selected by user
+                        $sourceLang = contrexx_input2raw($_GET['sourceLang']);
+                    }
+                    if (isset($_GET['destLang'])) {
+                        // use language selected by user
+                        $destLang = contrexx_input2raw($_GET['destLang']);
+                    }
+                }
+
+                if (!isset($sourceLang) || !isset($destLang)) {
+                    \Cx\Core\Setting\Controller\Setting::init('Config',null,'Yaml');
+                    // use system's default locale
+                    $languageId = $frontend ?
+                        \Cx\Core\Setting\Controller\Setting::getValue('defaultLocaleId','Config') :
+                        \Cx\Core\Setting\Controller\Setting::getValue('defaultLanguageId','Config');
+                    if ($frontend) {
+                        $languageCode = $this->getLocaleRepo()->find($languageId)->getSourceLanguage()->getIso1();
+                    } else {
+                        $languageCode = $this->cx->getDb()->getEntityManager()->find('Cx\Core\Locale\Model\Entity\Backend', $languageId)->getIso1();
+                    }
+                }
+                if (!isset($sourceLang)) {
+                    $sourceLang = $languageCode;
+                }
+                if (!isset($destLang)) {
+                    $destLang = $languageCode;
+                }
+                $sourceLang = $this->getLanguageRepository()->find($sourceLang);
+                $destLang = $this->getLanguageRepository()->find($destLang);
+
+                // get requested component name
+                if (isset($_GET['componentName'])) {
+                    $componentName = $_GET['componentName'];
+                } else {
+                    $componentName = 'Core';
+                }
+
+                // verify that we are allowed to alter the language file
+                // of the selected component
+                if (!$this->isComponentCustomizable($componentName, $frontend ? $this->cx::MODE_FRONTEND : $this->cx::MODE_BACKEND)) {
+                    break;
+                }
+
+                try {
+                    // set language file by source language
+                    $this->languageFile = new \Cx\Core\Locale\Model\Entity\SettingsLanguageFile(
+                        $sourceLang,
+                        $destLang,
+                        $componentName,
+                        $frontend,
+                        false
+                    );
+                } catch (\Cx\Core\Locale\Model\Entity\LanguageFileException $e) {
+                    \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+                } catch (\InitCMSException $e) {
+                    \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+                    // set language file by default source language
+                    $sourceLang = $this->getLanguageRepository()->find('en');
+                    $this->languageFile = new \Cx\Core\Locale\Model\Entity\SettingsLanguageFile(
+                        $sourceLang,
+                        $destLang,
+                        $componentName,
+                        $frontend,
+                        false
+                    );
+                }
+
+                // check if user changed placeholders
+                if (isset($_POST['placeholders'])) {
+                    $this->updateLanguageFile($_POST['placeholders']);
+                }
+
+                // set entity class name (equal to identifier of LanguageFile)
+                $entityClassName = 'Cx\Core\Locale\Model\Entity\SettingsLanguageFile';
+
+                // parse view for language file (always single)
+                $isSingle = false;
+                $this->parseEntityClassPage($template, $entityClassName, $cmd, array(), $isSingle);
+                break;
             default:
                 parent::parsePage($template, $cmd);
                 break;
@@ -151,6 +287,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         // register backend settings css file
         \JS::registerCSS(substr($this->getDirectory(false, true) . '/View/Style/BackendSettings.css', 1));
 
+        $allowModification = \Permission::checkAccess(49, 'static', true);
+
         // simulate entity for view generator
         $simulatedEntity = array(
             1 => array(
@@ -169,7 +307,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'fields' => array(
                     'active' => array(
                         'header' => $_ARRAYLANG['TXT_CORE_LOCALE_ACTIVE_LANGUAGES'],
-                        'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
+                        'readonly' => !$allowModification,
+                        'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) use ($allowModification) {
                             global $_ARRAYLANG;
 
                             $em = $this->cx->getDb()->getEntityManager();
@@ -184,6 +323,9 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                 '',
                                 \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
                             );
+                            if (!$allowModification) {
+                                $select->setAttribute('disabled');
+                            }
                             $select->setAttribute('multiple');
                             $select->setAttribute('data-placeholder', $_ARRAYLANG['TXT_CORE_LOCALE_BACKEND_SELECT_ACTIVE_LANGUAGES']);
                             // build options for select with source languages
@@ -202,12 +344,18 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     ),
                     'default' => array(
                         'header' => $_ARRAYLANG['TXT_CORE_LOCALE_DEFAULT_LANGUAGE'],
-                        'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
+                        'readonly' => !$allowModification,
+                        'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) use ($allowModification) {
                             global $_CONFIG;
 
                             $em = $this->cx->getDb()->getEntityManager();
                             // get already active backend languages
                             $backendRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Backend');
+
+                            if (!$allowModification) {
+                                return $backendRepo->findOneById($_CONFIG['defaultLanguageId'])->getIso1();
+                            }
+
                             $backendLanguages = $backendRepo->findAll();
 
                             // build select for default language
@@ -229,6 +377,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         }
                     ),
                 ),
+                'functions' => array(
+                    'edit' => $allowModification,
+                    'formButtons' => $allowModification,
+                ),
             ),
         );
         $view = new \Cx\Core\Html\Controller\ViewGenerator(
@@ -245,10 +397,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @global $_ARRAYLANG
      * @global $_CONFIG
      * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used for better partition
      * @return array with options
      */
-    protected function getViewGeneratorOptions($entityClassName)
-    {
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts = explode('\\', $entityClassName);
@@ -261,11 +413,55 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             $header = $_ARRAYLANG['TXT_CORE_LOCALE_ACT_DEFAULT'];
         }
 
+        $allowModification = \Permission::checkAccess(49, 'static', true);
+
         switch ($entityClassName) {
             case 'Cx\Core\Locale\Model\Entity\Locale':
                 if (!isset($_GET['order'])) {
                     $_GET['order'] = 'id';
                 }
+
+                $showAddButton = $allowModification;
+                if (
+                    $allowModification &&
+                    \Cx\Core\Setting\Controller\Setting::getValue(
+                        'useVirtualLanguageDirectories',
+                        'Config'
+                    ) === 'off'
+                ) {
+                    $showAddButton = false;
+                    $languageData  = \Env::get('init')->getComponentSpecificLanguageData(
+                        'Config',
+                        false
+                    );
+                    $textElement   = $_ARRAYLANG['TXT_ADMINISTRATION'] . ' > '
+                        . $languageData['TXT_SYSTEM_SETTINGS'] . ' > '
+                        . $languageData['TXT_SETTINGS_MENU_SYSTEM'] . ' > '
+                        . $languageData['TXT_CORE_CONFIG_SITE'];
+                    // Set anchor tag to the text
+                    $link = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+                    $link->setAttribute(
+                        'href',
+                        \Cx\Core\Routing\Url::fromBackend('Config')
+                    );
+                    $link->addChild(new \Cx\Core\Html\Model\Entity\TextElement($textElement));
+
+                    // Set strong tag to the text
+                    $strongText = new \Cx\Core\Html\Model\Entity\HtmlElement('strong');
+                    $strongText->addChild(
+                        new \Cx\Core\Html\Model\Entity\TextElement(
+                            $languageData['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']
+                        )
+                    );
+                    \Message::information(sprintf(
+                        $_ARRAYLANG['TXT_CORE_LOCALE_ADD_NEW_INFORMATION'],
+                        // %1$s
+                        $strongText,
+                        // %2$s
+                        $link
+                    ));
+                }
+
                 return array(
                     'entityName' => $_ARRAYLANG['TXT_CORE_LOCALE_LOCALE_NAME'],
                     'header' => $_ARRAYLANG['TXT_CORE_LOCALE_ACT_LOCALE'],
@@ -303,17 +499,24 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                 'attributes' => array(
                                     'class' => 'localeDefault',
                                 ),
-                                'parse' => function ($value, $rowData) {
-                                    global $_CONFIG;
+                                'parse' => function ($value, $rowData) use ($allowModification) {
+                                    global $_CONFIG, $_ARRAYLANG;
+
+                                    if (!$allowModification) {
+                                        return $rowData['id'] == $_CONFIG['defaultLocaleId'] ? $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_DEFAULT'] : '';
+                                    }
+
                                     $radioButton = new \Cx\Core\Html\Model\Entity\DataElement('langDefaultStatus', $rowData['id'], 'input');
                                     $radioButton->setAttribute('type', 'radio');
                                     $radioButton->setAttribute('onchange', 'updateCurrent()');
+                                    $radioButton->setAttribute('form', 'localeLocaleList');
                                     if ($rowData['id'] == $_CONFIG['defaultLocaleId']) {
                                         $radioButton->setAttribute('checked', 'checked');
                                     }
                                     return $radioButton;
                                 },
                             ),
+                            'readonly' => !$allowModification,
                         ),
                         'fallback' => array(
                             'header' => $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_FALLBACK'],
@@ -322,18 +525,22 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                 'attributes' => array(
                                     'class' => 'localeFallback',
                                 ),
-                                'parse' => function ($value, $rowData) {
+                                'parse' => function ($value, $rowData) use ($allowModification) {
                                     global $_ARRAYLANG;
+
+                                    if (!$allowModification) {
+                                        return is_object($value) ? $value->getLabel() : $_ARRAYLANG['TXT_CORE_NONE'];
+                                    }
+
                                     $selectedVal = is_object($value) ? $value->getId() : 'NULL';
-                                    $em = $this->cx->getDb()->getEntityManager();
-                                    $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
-                                    $locales = $localeRepo->findAll();
+                                    $locales = $this->getLocaleRepo()->findAll();
                                     // build select for fallbacks
                                     $select = new \Cx\Core\Html\Model\Entity\DataElement(
                                         'fallback[' . $rowData['id'] . ']',
                                         '',
                                         \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
                                     );
+                                    $select->setAttribute('form', 'localeLocaleList');
                                     $fallbackOptions = array(
                                         'NULL' => $_ARRAYLANG['TXT_CORE_NONE'],
                                     );
@@ -388,10 +595,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         ),
                     ),
                     'functions' => array(
-                        'add' => true,
-                        'edit' => true,
-                        'delete' => true,
-                        'actions' => function($rowData) {
+                        'add' => $showAddButton,
+                        'edit' => $allowModification,
+                        'delete' => $allowModification,
+                        'actions' => !$allowModification ? null : function($rowData) {
                             global $_ARRAYLANG;
                             // parse copy/link functionality only for locales with fallback
                             if (!$rowData['fallback']) {
@@ -432,7 +639,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             return $copyLink . $linkLink;
                         },
                         'sorting'   => true,
-                        'sortBy' => array(
+                        'sortBy' => !$allowModification ? null : array(
                             'field' => array('orderNo' => SORT_ASC),
                         ),
                         'paging' => false,
@@ -458,13 +665,126 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     ),
                 );
                 break;
+            case 'Cx\Core_Modules\Listing\Model\Entity\DataSet':
+                    return array(
+                        $dataSetIdentifier => array(
+                            'entityName' => $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NAME'],
+                            'header' => $_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE'],
+                            'fields' => array(
+                                'id' => array(
+                                    'filterOptionsField' => function(
+                                        $parseObject,
+                                        $fieldName,
+                                        $elementName
+                                    ) {
+                                        return $this->createComponentSelect(
+                                            'componentName',
+                                            $this->languageFile->getComponentName(),
+                                            $this->languageFile->getMode()
+                                        );
+                                    },
+                                ),
+                                'sourceLang' => array(
+                                    'filterOptionsField' => function(
+                                        $parseObject,
+                                        $fieldName,
+                                        $elementName
+                                    ) {
+                                        return $this->createLanguageSelect(
+                                            'sourceLang',
+                                            $this->languageFile->getLanguage()->getIso1()
+                                        );
+                                    },
+                                ),
+                                'destLang' => array(
+                                    'filterOptionsField' => function(
+                                        $parseObject,
+                                        $fieldName,
+                                        $elementName
+                                    ) {
+                                        return $this->createLanguageSelect(
+                                            'destLang',
+                                            $this->languageFile->getDestLang()->getIso1()
+                                        );
+                                    },
+                                    'table' => array(
+                                        'parse' => function ($value, $rowData) {
+                                            $input = new \Cx\Core\Html\Model\Entity\DataElement(
+                                                'placeholders[' . $rowData['id'] . ']',
+                                                $value
+                                            );
+                                            $input->addClass('placeholder');
+                                            $input->setAttribute('form', 'languageFileSave');
+                                            $input->setAttribute('size', '100');
+                                            $input->setAttribute(
+                                                'onchange',
+                                                'var resetFunc = cx.jQuery(this).closest(\'tr\').find(\'a\');if (resetFunc.data(\'init\') != cx.jQuery(this).val()) {resetFunc.show();}'
+                                            );
+                                            return $input;
+                                        },
+                                    ),
+                                ),
+                                'initData' => array(
+                                    'showOverview' => false,
+                                    'allowFiltering' => false,
+                                ),
+                            ),
+                            'functions' => array(
+                                'add' => false,
+                                'edit' => false,
+                                'delete' => false,
+                                'sorting' => false,
+                                'paging' => true,
+                                'searching' => true,
+                                'filtering' => true,
+                                'autoHideFiltering' => false,
+                                'actions' => function($rowData) {
+                                    global $_ARRAYLANG;
+                                    $resetLink = new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                        'a'
+                                    );
+                                    $resetLink->setAttribute('src', '#');
+                                    $resetLink->setAttribute(
+                                        'data-init',
+                                        $rowData['initData']
+                                    );
+                                    $resetLink->setAttribute(
+                                        'onclick',
+                                        'cx.jQuery(this).closest(\'tr\').find(\'.placeholder\').val(
+                                            cx.jQuery(this).data(\'init\')
+                                        );cx.jQuery(this).hide();cx.ui.messages.add(\'' . $_ARRAYLANG['TXT_CORE_LOCALE_UNSAVED_CHANGES'] . '\');'
+                                    );
+                                    $resetLink->setAttribute(
+                                        'title',
+                                        $_ARRAYLANG['TXT_CORE_LOCALE_RESET']
+                                    );
+                                    if ($rowData['initData'] == $rowData['destLang']) {
+                                        $resetLink->setAttribute(
+                                            'style',
+                                            'display:none;'
+                                        );
+                                    }
+                                    $resetImg = new \Cx\Core\Html\Model\Entity\HtmlElement(
+                                        'img'
+                                    );
+                                    $resetImg->setAttribute(
+                                        'src',
+                                        '../core/Core/View/Media/icons/reset.png'
+                                    );
+                                    $resetLink->addChild($resetImg);
+                                    return $resetLink;
+                                }
+                            ),
+                        ),
+                    );
+                break;
             default:
                 return array(
                     'header' => $header,
                     'functions' => array(
-                        'add' => true,
-                        'edit' => true,
-                        'delete' => true,
+                        'add' => $allowModification,
+                        'edit' => $allowModification,
+                        'delete' => $allowModification,
                         'sorting' => true,
                         'paging' => true,
                         'filtering' => false,
@@ -474,22 +794,44 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     }
 
     /**
-     * Returns the object to parse a wiew with
+     * Returns the object to parse a view with
      *
-     * If you overwrite this and return anything else than string, filter will not work
+     * Returns a LanguageFile object for language file view
+     *
      * @return string|array|object An entity class name, entity, array of entities or DataSet
      */
     protected function getViewGeneratorParseObjectForEntityClass($entityClassName) {
-        if ($entityClassName == 'Cx\Core\Locale\Model\Entity\Locale') {
-            $em = $this->cx->getDb()->getEntityManager();
-            $localeRepo = $em->getRepository($entityClassName);
-            $parseObject = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($localeRepo->findAll());
-            foreach ($parseObject as $index => $value) {
-                $parseObject->add($index, array('default' => false));
-            }
-            return $parseObject;
+        switch ($entityClassName) {
+            case 'Cx\Core\Locale\Model\Entity\Locale':
+                $em = $this->cx->getDb()->getEntityManager();
+                $parseObject = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($this->getLocaleRepo()->findAll());
+                foreach ($parseObject as $index => $value) {
+                    $parseObject->add($index, array('default' => false));
+                }
+                return $parseObject;
+                break;
+            case 'Cx\Core\Locale\Model\Entity\SettingsLanguageFile':
+                return $this->languageFile;
+            break;
+            default:
+                return $entityClassName;
+            break;
         }
-        return $entityClassName;
+    }
+
+    /**
+     * Returns all entities of this component which can have an auto-generated view
+     *
+     * Adds DataSet to the entity classes with view, which is neccessary
+     * to auto-generate the language file view
+     *
+     * @access protected
+     * @return array
+     */
+    protected function getEntityClassesWithView() {
+        $entityClasses = parent::getEntityClassesWithView();
+        $entityClasses[] = 'Cx\Core_Modules\Listing\Model\Entity\DataSet';
+        return $entityClasses;
     }
 
     /**
@@ -516,7 +858,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             return;
         }
         $em = $this->cx->getDb()->getEntityManager();
-        $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+        $localeRepo = $this->getLocaleRepo();
         foreach ($post['fallback'] as $localeId => $fallbackId) {
             $locale = $localeRepo->find($localeId);
             $fallback = $localeRepo->find($fallbackId);
@@ -593,5 +935,284 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         ) {
             \Cx\Core\Setting\Controller\Setting::update('defaultLanguageId');
         }
+    }
+
+    /**
+     * Compares the placeholders from post to the current set placeholders
+     * and stores the effectively changed ones
+     * @param array $placeholders The placeholders submitted by the user
+     */
+    protected function updateLanguageFile($placeholders) {
+        global $_ARRAYLANG;
+
+        // get old placeholder values
+        $init = \Env::get('init');
+        $basePlaceholders = $init->getComponentSpecificLanguageDataByCode(
+            $this->languageFile->getComponentName(),
+            $this->languageFile->getMode() == 'frontend',
+            'en',
+            false
+        );
+        $oldPlaceholders = array();
+        try {
+            $oldPlaceholders = $init->getComponentSpecificLanguageDataByCode(
+                $this->languageFile->getComponentName(),
+                $this->languageFile->getMode() == 'frontend',
+                $this->languageFile->getDestLang()->getIso1(),
+                false
+            );
+        } catch (\InitCMSException $e) {}
+        foreach ($basePlaceholders as $name=>$value) {
+            if (!isset($oldPlaceholders[$name])) {
+                $oldPlaceholders[$name] = $value;
+            }
+        }
+
+        // check for changed values
+        foreach ($placeholders as $name => $value) {
+            // ignore line breaks
+            $oldValue = str_replace(array("\r", "\n"), '', $oldPlaceholders[$name]);
+            $newValue = str_replace(array("\r", "\n"), '', $value);
+            if ($oldValue == $newValue) {
+                // not changed, remove it if it exists
+                $this->languageFile->removePlaceholder($name, $oldPlaceholders[$name]);
+                continue;
+            }
+            // add changed placeholders to language file
+            $placeholder = new \Cx\Core\Locale\Model\Entity\Placeholder($name, $value);
+            $this->languageFile->addPlaceholder($placeholder);
+        }
+
+        // store changed values to the yaml file
+        if ($this->languageFile->getPlaceholders()) {
+            $this->languageFile->save();
+            //inform user about success
+            \Message::add(
+                $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_SUCCESSFULLY_UPDATED'],
+                \Message::CLASS_OK
+            );
+        } else {
+            // no changed placeholder, delete the file (if any)
+            $this->languageFile->delete();
+            \Message::add(
+                $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOTHING_CHANGED'],
+                \Message::CLASS_INFO
+            );
+        }
+
+        // drop page and ESI cache
+        $this->getComponent('Cache')->clearCache();
+    }
+
+    /**
+     * Creates a select field with all source languages as options
+     * @param string $name Name of the select field
+     * @param string $selectedValue Pre-selected value
+     * @return \Cx\Core\Html\Model\Entity\DataElement Select field
+     */
+    protected function createLanguageSelect($name, $selectedValue) {
+        // load all source languages
+        $em = $this->cx->getDb()->getEntityManager();
+        $languageRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Language');
+        $languages = $languageRepo->findBy(
+            array('source' => true)
+        );
+
+        $validData = array();
+        foreach($languages as $language) {
+            $validData[$language->getIso1()] = (string) $language;
+        }
+        return $this->createSelect($name, $validData, $selectedValue);
+    }
+
+    /**
+     * Creates a select field with all componentss as options
+     * @param string $name Name of the select field
+     * @param string $selectedValue Pre-selected value
+     * @return \Cx\Core\Html\Model\Entity\DataElement Select field
+     */
+    protected function createComponentSelect($name, $selectedValue, $mode) {
+        $em = $this->cx->getDb()->getEntityManager();
+        $query = 'SELECT `name` FROM '.DBPREFIX.'component ORDER BY name ASC';
+        $stmt = $em->getConnection()->prepare($query);
+        $stmt->execute();
+
+        $validData = array();
+        foreach($stmt->fetchAll() as $component) {
+            // skip components with no language files
+            if (!$this->isComponentCustomizable($component['name'], $mode)) {
+                continue;
+            }
+            $componentCtrl = $this->cx->getComponent($component['name']);
+            if (!$componentCtrl || !$componentCtrl->isActive()) {
+                continue;
+            }
+            // custom hack for Media1, Media2, Media3, Media4
+            if ($component['name'] == 'Media1') {
+                $component['name'] = 'Media';
+            }
+            $validData[$component['name']] = $component['name'];
+        }
+        return $this->createSelect($name, $validData, $selectedValue);
+    }
+
+    /**
+     * Creates a select field with the given values as options
+     * @param string $name Name of the select field
+     * @param array $options Key=>value type array
+     * @param string $selectedValue Pre-selected value
+     * @return \Cx\Core\Html\Model\Entity\DataElement Select field
+     */
+    protected function createSelect($name, $options, $selectedValue) {
+        // build html select
+        $select = new \Cx\Core\Html\Model\Entity\DataElement(
+            $name,
+            $selectedValue,
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+            null,
+            $options
+        );
+        $select->setAttribute('form', 'vg-0-searchForm');
+        $select->addClass('vg-searchSubmit');
+        return $select;
+    }
+
+    /**
+     * Gets the locale repository from the entity manager
+     * @return \Cx\Core\Locale\Model\Repository\LocaleRepository
+     */
+    protected function getLocaleRepo() {
+        // return directly if locale repo is already set
+        if (isset($this->localeRepo)) {
+            return $this->localeRepo;
+        }
+        // load locale repo from entity manager
+        $em = $this->cx->getDb()->getEntityManager();
+        $this->localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+        return $this->localeRepo;
+    }
+
+    /**
+     * Gets the language repository from the entity manager
+     * @return \Cx\Core\Locale\Model\Repository\LanguageRepository
+     */
+    protected function getLanguageRepository() {
+        // return directly if language repo is already set
+        if (isset($this->languageRepo)) {
+            return $this->languageRepo;
+        }
+        // load language repo from entity manager
+        $em = $this->cx->getDb()->getEntityManager();
+        $this->languageRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Language');
+        return $this->languageRepo;
+    }
+
+    protected function isComponentCustomizable($component, $mode) {
+        // TODO: this should be done dynamically
+        if ($mode == $this->cx::MODE_FRONTEND) {
+            $skipList = array(
+                'Agb',
+                'Alias',
+                'Cache',
+                'Captcha',
+                'ComponentManager',
+                'Config',
+                'ContentManager',
+                'ContentWorkflow',
+                'Country',
+                'Crm',
+                'Cron',
+                'Csrf',
+                'DataAccess',
+                'DataSource',
+                'DateTime',
+                'Error',
+                'GeoIp',
+                'Home',
+                'Html',
+                'Ids',
+                'Imprint',
+                'JavaScript',
+                'JsonData',
+                'LanguageManager',
+                'License',
+                'LinkManager',
+                'Locale',
+                'Media2',
+                'Media3',
+                'Media4',
+                'MediaBrowser',
+                'MediaSource',
+                'Message',
+                'Model',
+                'MultiSite',
+                'Net',
+                'NetManager',
+                'NetTools',
+                'Order',
+                'Pdf',
+                'Pim',
+                'Routing',
+                'Security',
+                'Session',
+                'Setting',
+                'Shell',
+                'Sitemap',
+                'Stats',
+                'Support',
+                'Sync',
+                'SysLog',
+                'SystemInfo',
+                'SystemLog',
+                'TemplateEditor',
+                'Test',
+                'User',
+                'View',
+                'ViewManager',
+                'Widget',
+                'Workbench',
+            );
+        } else {
+            $skipList = array(
+                'Agb',
+                'Captcha',
+                'ContentManager',
+                'Country',
+                'Csrf',
+                'DataAccess',
+                'DataSource',
+                'DateTime',
+                'Error',
+                'FrontendEditing',
+                'Home',
+                'Ids',
+                'Imprint',
+                'JavaScript',
+                'JsonData',
+                'License',
+                'Media2',
+                'Media3',
+                'Media4',
+                'MediaSource',
+                'Message',
+                'Model',
+                'Net',
+                'Pim',
+                'Privacy',
+                'Security',
+                'Session',
+                'Setting',
+                'Shell',
+                'Sitemap',
+                'Sync',
+                'SysLog',
+                'Test',
+                'User',
+                'View',
+                'Widget',
+                'Workbench',
+            );
+        }
+        return !in_array($component, $skipList);
     }
 }

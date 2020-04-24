@@ -49,6 +49,7 @@ class MailRecipient {
     protected $lang;
     protected $type;
     protected $address;
+    protected $salutationId;
     protected $firstname = '';
     protected $lastname = '';
     protected $username = '';
@@ -100,6 +101,15 @@ class MailRecipient {
 
     public function getAddress() {
         return $this->address;
+    }
+
+    public function setSalutationId($salutationId) {
+        $this->salutationId = $salutationId;
+        return $this;
+    }
+
+    public function getSalutationId() {
+        return $this->salutationId;
     }
 
     public function setFirstname($firstname) {

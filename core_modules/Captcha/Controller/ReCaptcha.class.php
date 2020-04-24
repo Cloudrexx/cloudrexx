@@ -152,4 +152,14 @@ JSCaptchaValidation;
         $this->securityCheck = false;
         return false;
     }
+
+    /**
+     * Disable the captcha check
+     *
+     * @return void
+     */
+    public function disable()
+    {
+        $this->securityCheck = true;
+    }
 }

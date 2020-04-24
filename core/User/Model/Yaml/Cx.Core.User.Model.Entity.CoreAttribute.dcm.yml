@@ -7,32 +7,49 @@ Cx\Core\User\Model\Entity\CoreAttribute:
       type: string
       length: 25
     mandatory:
-      type: string
-      nullable: false
+      type: enum
+      values: ['0','1']
+      options:
+        default: "0"
     sortType:
-      type: string
-      nullable: false
+      type: enum
+      values: ['asc','desc','custom']
       column: sort_type
+      options:
+        default: "asc"
     orderId:
       type: integer
       length: 10
       nullable: false
       unsigned: true
       column: order_id
+      options:
+        default: 0
     accessSpecial:
-      type: string
-      nullable: false
+      type: enum
+      values: ['','menu_select_higher','menu_select_lower']
       column: access_special
-  manyToOne:
+      options:
+        default: ""
+# Temporarily adds these fields so they don't get dropped
     accessId:
-      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-      inversedBy: coreAttribute
-      joinColumns:
-        access_id:
-          referencedColumnName: id
+      type: integer
+      column: access_id
     readAccessId:
-      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-      inversedBy: coreAttributeRead
-      joinColumns:
-        read_access_id:
-          referencedColumnName: id
+      type: integer
+      column: read_access_id
+#  manyToOne:
+#    accessId:
+#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
+#      inversedBy: coreAttribute
+#      joinColumns:
+#        access_id:
+#          referencedColumnName: id
+#          nullable: false
+#    readAccessId:
+#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
+#      inversedBy: coreAttributeRead
+#      joinColumns:
+#        read_access_id:
+#          referencedColumnName: id
+#          nullable: false

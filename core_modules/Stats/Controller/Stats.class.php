@@ -111,8 +111,6 @@ class Stats extends StatsLibrary
     function getContent(){
         global $objTemplate;
 
-        $this->_optimizeTables();
-
         if(!isset($_GET['stat'])){
             $_GET['stat'] = "";
         }
@@ -163,27 +161,6 @@ class Stats extends StatsLibrary
 
         $this->act = $_REQUEST['stat'];
         $this->setNavigation();
-    }
-
-    function _optimizeTables() {
-        global $objDatabase;
-        $query = "OPTIMIZE TABLE `".DBPREFIX."stats_browser`,
-                                 `".DBPREFIX."stats_colourdepth`,
-                                 `".DBPREFIX."stats_config`,
-                                 `".DBPREFIX."stats_country`,
-                                 `".DBPREFIX."stats_hostname`,
-                                 `".DBPREFIX."stats_javascript`,
-                                 `".DBPREFIX."stats_operatingsystem`,
-                                 `".DBPREFIX."stats_referer`,
-                                 `".DBPREFIX."stats_requests`,
-                                 `".DBPREFIX."stats_requests_summary`,
-                                 `".DBPREFIX."stats_screenresolution`,
-                                 `".DBPREFIX."stats_search`,
-                                 `".DBPREFIX."stats_spiders`,
-                                 `".DBPREFIX."stats_spiders_summary`,
-                                 `".DBPREFIX."stats_visitors`,
-                                 `".DBPREFIX."stats_visitors_summary`";
-        $objDatabase->Execute($query);
     }
 
     private function showVisitors() {
@@ -314,9 +291,13 @@ class Stats extends StatsLibrary
 
         // set javascript statistics
         if ($this->supportJavaScriptSum>0) {
+            $javascriptSupport = isset($this->arrSupportJavaScript[1])
+                ? $this->arrSupportJavaScript[1] : 0;
+            $noJavascriptSupport = isset($this->arrSupportJavaScript[0])
+                ? $this->arrSupportJavaScript[0] : 0;
             $this->_objTpl->setVariable(array(
-                'STATS_CLIENTS_JAVASCRIPT_SUPPORT'        => $this->_makePercentBar(200,10,100/$this->supportJavaScriptSum*$this->arrSupportJavaScript[1],100,1,'Javascript Support unterst�tzt').' '.round(100/$this->supportJavaScriptSum*$this->arrSupportJavaScript[1],2).'% ('.$this->arrSupportJavaScript[1].')',
-                'STATS_CLIENTS_JAVASCRIPT_NO_SUPPORT'    => $this->_makePercentBar(200,10,100/$this->supportJavaScriptSum*$this->arrSupportJavaScript[0],100,1,'Javascript wird nicht unters�tzt').' '.round(100/$this->supportJavaScriptSum*$this->arrSupportJavaScript[0],2).'% ('.$this->arrSupportJavaScript[0].')'
+                'STATS_CLIENTS_JAVASCRIPT_SUPPORT'    => $this->_makePercentBar(200, 10, 100/$this->supportJavaScriptSum * $javascriptSupport, 100, 1,'Javascript Support unterstützt') . ' ' . round(100/$this->supportJavaScriptSum * $javascriptSupport, 2).'% ('. $javascriptSupport .')',
+                'STATS_CLIENTS_JAVASCRIPT_NO_SUPPORT' => $this->_makePercentBar(200, 10, 100/$this->supportJavaScriptSum * $noJavascriptSupport, 100, 1,'Javascript wird nicht unterstützt') . ' ' . round(100/$this->supportJavaScriptSum * $noJavascriptSupport, 2).'% ('. $noJavascriptSupport .')'
             ));
             $this->_objTpl->hideBlock('stats_clients_javascript_nodata');
         } else {
@@ -547,8 +528,10 @@ class Stats extends StatsLibrary
         foreach ($arrRange as $hour) {
             $pHour = str_pad($hour, 2, 0, STR_PAD_LEFT);
             if (isset($this->arrRequests[$pHour])) {
-                $visitors = $this->arrRequests[$pHour]['visitors'];
-                $requests = $this->arrRequests[$pHour]['requests'];
+                $visitors = isset($this->arrRequests[$pHour]['visitors'])
+                    ? $this->arrRequests[$pHour]['visitors'] : 0;
+                $requests = isset($this->arrRequests[$pHour]['requests'])
+                    ? $this->arrRequests[$pHour]['requests'] : 0;
             } else {
                 $visitors = 0;
                 $requests = 0;
@@ -620,8 +603,9 @@ class Stats extends StatsLibrary
         $arrDayNames = explode(',',$_ARRAYLANG['TXT_DAY_ARRAY']);
         $arrRange = array();
         if (date('d') < date('t')) {
+            $previousYear = (date('m') == 1 ? date('Y') -1 : date('Y'));
             $arrRange[$previousMonth = (date('m') == 1 ? 12 : date('m')-1)] = range(
-                date('d') + 1 > ($daysOfPreviousMonth = date('t', mktime(0,0,0,$previousMonth,1,$previousYear,$previousYear = (date('m') == 1 ? date('Y') -1 : date('Y')))))
+                date('d') + 1 > ($daysOfPreviousMonth = date('t', mktime( 0, 0, 0, $previousMonth, 1, $previousYear)))
                     ?    $daysOfPreviousMonth
                     :    date('d') + 1,
                 $daysOfPreviousMonth
@@ -1177,7 +1161,8 @@ class Stats extends StatsLibrary
             'TXT_INDEXED_PAGES'                    => $_ARRAYLANG['TXT_INDEXED_PAGES'],
             'TXT_MARKED'                        => $_ARRAYLANG['TXT_MARKED'],
             'TXT_SELECT_ALL'                    => $_ARRAYLANG['TXT_SELECT_ALL'],
-            'TXT_REMOVE_SELECTION'                => $_ARRAYLANG['TXT_REMOVE_SELECTION']
+            'TXT_REMOVE_SELECTION'                => $_ARRAYLANG['TXT_REMOVE_SELECTION'],
+            'TXT_STATS_BDSG'                          => $_ARRAYLANG['TXT_STATS_BDSG'],
         ));
 
         $this->_objTpl->setVariable(array(

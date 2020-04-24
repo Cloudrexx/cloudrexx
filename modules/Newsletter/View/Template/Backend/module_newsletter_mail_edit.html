@@ -78,6 +78,7 @@ function mediaBrowserCallback(data) {
 }
 
 $J(document).ready(function() {
+    $J("#newsletter_mail_crm_memberships").chosen();
     $J("#newsletter_mail_crm_filter_memberships_include").chosen();
     $J("#newsletter_mail_crm_filter_memberships_exclude").chosen();
 });
@@ -160,6 +161,7 @@ $J(document).ready(function() {
     </td>
   </tr>
 
+  <!-- BEGIN deliver_user_recipients -->
   <tr class="row2" style="vertical-align:top;">
     <td width="15%">
         {TXT_NEWSLETTER_ASSOCIATED_GROUPS}
@@ -200,7 +202,27 @@ $J(document).ready(function() {
 <!-- END newsletter_mail_associated_group_2 -->
     </td>
   </tr>
+  <!-- END deliver_user_recipients -->
 
+  <!-- BEGIN deliver_crm_recipients -->
+  <tr class="row1" style="vertical-align:top;">
+        <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP}
+            <!-- BEGIN crmMembershipAssociatedToolTipBeforeSend --><span class="icon-warning tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND}</span><!-- END crmMembershipAssociatedToolTipBeforeSend -->
+            <!-- BEGIN crmMembershipAssociatedToolTipAfterSend --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END crmMembershipAssociatedToolTipAfterSend -->
+        </td>
+        <td width="85%" colspan="3">
+            <div>
+                <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_memberships[associate][]" id="newsletter_mail_crm_memberships" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
+                    <!-- BEGIN crmMembership -->
+                    <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
+                    <!-- END crmMembership -->
+                </select>
+            </div>
+        </td>
+    </tr>
+  <!-- END deliver_crm_recipients -->
+
+  <!-- BEGIN use_crm_filter -->
   <tr class="row1" style="vertical-align:top;">
     <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER}
         <span class="tooltip-trigger icon-info"></span>
@@ -228,6 +250,7 @@ $J(document).ready(function() {
         </div>
     </td>
   </tr>
+  <!-- END use_crm_filter -->
 
   <tr class="row2" style="vertical-align:top;">
     <td valign="top">{TXT_NEWSLETTER_ATTACH}</td>
@@ -302,7 +325,7 @@ $J(document).ready(function() {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_INDUSTRY_SECTOR}</td>
-    <td>[[industry_sector]]</td>
+    <td>[[industry_sector]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_ADDRESS}</td>
@@ -318,7 +341,7 @@ $J(document).ready(function() {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_COUNTRY}</td>
-    <td>[[country]]</td>
+    <td>[[country]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_PHONE}</td>
@@ -326,19 +349,19 @@ $J(document).ready(function() {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_PHONE_PRIVATE}</td>
-    <td>[[phone_private]]</td>
+    <td>[[phone_private]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_PHONE_MOBILE}</td>
-    <td>[[phone_mobile]]</td>
+    <td>[[phone_mobile]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_FAX}</td>
-    <td>[[fax]]</td>
+    <td>[[fax]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_BIRTHDAY}</td>
-    <td>[[birthday]]</td>
+    <td>[[birthday]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_WEBSITE}</td>
@@ -355,8 +378,16 @@ $J(document).ready(function() {
     <td>[[profile_setup]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
   </tr>
   <tr class="row1">
+    <td>{TXT_NEWSLETTER_MODIFY_PROFILE} (URL)</td>
+    <td>[[profile_setup_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+  </tr>
+  <tr class="row2">
     <td>{TXT_NEWSLETTER_UNSUBSCRIBE} (Link)</td>
     <td>[[unsubscribe]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_NEWSLETTER_UNSUBSCRIBE} (URL)</td>
+    <td>[[unsubscribe_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_DATE}</td>

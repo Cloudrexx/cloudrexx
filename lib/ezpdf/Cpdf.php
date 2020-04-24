@@ -1014,11 +1014,11 @@
           if (isset($fontFileName) && isset($this->fonts[$fontFileName]['CIDWidths'])) {
             $cid_widths = &$this->fonts[$fontFileName]['CIDWidths'];
             $res.= ' /W [';
-            reset($cid_widths);
 			$opened = false;
-			while (list($k,$v) = each($cid_widths)) {
-				list($nextk, $nextv) = each($cid_widths);
-				//echo "\n$k ($v) == $nextk ($nextv)";
+			foreach ($cid_widths as $k => $v) {
+                $nextv = next($cid_widths);
+                $nextk = key($cid_widths);
+
 				if(($k + 1) == $nextk){
 					if(!$opened){
 						$res.= " $k [$v";
@@ -1026,7 +1026,6 @@
 					} else if($opened) {
 						$res.= ' '.$v;
 					}
-					prev($cid_widths);
 				} else {
 					if($opened){
 						$res.=" $v]";
@@ -1035,7 +1034,6 @@
 					}
 					
 					$opened = false;
-					prev($cid_widths);
 				}
 			}
 			
@@ -2755,7 +2753,7 @@
             reset($regs[0]);
             
             $prevEndTagIndex = 0;
-            while(list($k,$curTag) = each($regs[0])){
+            foreach ($regs[0] as $k => $curTag) {
                 $curTagIndex = mb_strlen(substr($text, 0, $curTag[1]), 'UTF-8');
                 $endTagIndex = $curTagIndex + strlen($curTag[0]);
                 

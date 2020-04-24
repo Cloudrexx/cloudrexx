@@ -49,9 +49,14 @@ function accessChangeProtection(triggerLink, nodeId, lang, backend)
 #site-tree .publishing {
     margin-top: 0;
 }
-#modifyGroup2 > div > div:last-child > table th {
+#modifyGroup2 th.wysiwyg-head {
 	display: none;
 }
+#modifyGroup2 .row3.wysiwyg-title-txt {
+    display: table-row;
+}
+#modifyGroup2 > div > div:last-child > table th,
+cke_editor-basic
 </style>
 <ul id="tabmenu">
 <li><a id="groupTab_modifyGroup1" class="active" href="javascript:void(0);" onclick="selectTab('modifyGroup1')" title="{TXT_ACCESS_GENERAL}">{TXT_ACCESS_GENERAL}</a></li>

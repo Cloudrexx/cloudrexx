@@ -73,10 +73,10 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'defaultUrlTemplate', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'defaultUrlTemplate', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
     }
 
     /**
@@ -321,6 +321,17 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function removeHostEntity(\Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntities)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeHostEntity', array($hostEntities));
+
+        return parent::removeHostEntity($hostEntities);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getHostEntities()
     {
 
@@ -376,6 +387,17 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function removeChange($change)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeChange', array($change));
+
+        return parent::removeChange($change);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setState($state)
     {
 
@@ -393,6 +415,28 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getState', array());
 
         return parent::getState();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setLastUpdate($lastUpdate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setLastUpdate', array($lastUpdate));
+
+        return parent::setLastUpdate($lastUpdate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLastUpdate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLastUpdate', array());
+
+        return parent::getLastUpdate();
     }
 
     /**
@@ -493,6 +537,17 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

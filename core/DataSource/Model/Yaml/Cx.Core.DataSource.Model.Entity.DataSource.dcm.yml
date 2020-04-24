@@ -6,6 +6,7 @@ Cx\Core\DataSource\Model\Entity\DataSource:
   discriminatorColumn:
     name: type
     type: string
+    length: 50
   discriminatorMap:
     dataSource: DataSource
     mediaSource: \Cx\Core\MediaSource\Model\Entity\MediaSource
@@ -22,7 +23,7 @@ Cx\Core\DataSource\Model\Entity\DataSource:
     identifier:
       type: string
     options:
-      type: text
+      type: array
   uniqueConstraints:
     key_UNIQUE:
       columns: [ identifier ]

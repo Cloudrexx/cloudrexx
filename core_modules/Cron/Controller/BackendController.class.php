@@ -69,7 +69,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         // this class inherits from Controller, therefore you can get access to
         // Cx like this:
         $this->cx;
@@ -100,7 +100,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             // instantiate the default View Controller
             $objController = new DefaultController($this->getSystemComponentController(), $this->cx);
         }
-        $objController->parsePage($this->template);
+        $objController->parsePage($this->template, array());
     }
 
     /**
@@ -109,9 +109,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @access protected
      * @global $_ARRAYLANG
      * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used for better partition
      * @return array with options
      */
-    public function getViewGeneratorOptions($entityClassName){
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts = explode('\\', $entityClassName);
@@ -156,14 +157,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                 $value = explode(' ', $value, 2);
                                 $commandSelect = new \Cx\Core\Html\Model\Entity\DataElement(
                                     $name . '[command]',
-                                    \Html::getOptions(
-                                        array_combine(
-                                            array_values($commandSelectOptions),
-                                            array_values($commandSelectOptions)
-                                        ),
-                                        isset($value[0]) ? $value[0] : ''
-                                    ),
-                                    \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
+                                    isset($value[0]) ? $value[0] : '',
+                                    \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                                    null,
+                                    array_combine(
+                                        array_values($commandSelectOptions),
+                                        array_values($commandSelectOptions)
+                                    )
                                 );
                                 $commandArguments = new \Cx\Core\Html\Model\Entity\DataElement(
                                     $name . '[arguments]',

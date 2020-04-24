@@ -44,7 +44,7 @@ namespace Cx\Lib\FileSystem;
  * @package     cloudrexx
  * @subpackage  lib_filesystem
  */
-class FileSystemFileException extends \Exception {};
+class FileSystemFileException extends FileException {};
 
 /**
  * File System File

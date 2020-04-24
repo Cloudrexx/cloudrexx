@@ -101,7 +101,7 @@ class BackendController extends SystemComponentBackendController
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array               $cmd      CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd)
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
     {
         \Permission::checkAccess(\Cx\Core\ViewManager\Controller\ViewManager::TEMPLATE_EDITOR_ACCESS_ID, 'static');
         $fileStorage                 = new OptionSetFileStorage(
@@ -304,7 +304,7 @@ class BackendController extends SystemComponentBackendController
                         'templateEditor' => 1
                     )
                 ),
-                'TEMPLATEEDITOR_BACKURL' => './index.php?cmd=ViewManager'
+                'TEMPLATEEDITOR_BACKURL' => Url::fromBackend('ViewManager')
             )
         );
         $template->setGlobalVariable($_ARRAYLANG);

@@ -5,10 +5,23 @@
 </script>
 <table class="adminlist" with="100%" >
 	<tr>
-		<th>{TXT_WYSIWYG_TOOLBAR_CONFIGURATOR}</th>
+		<th class="wysiwyg-head" colspan="2">{TXT_WYSIWYG_TOOLBAR_CONFIGURATOR}</th>
 	</tr>
+	<tr class="row3 wysiwyg-title-txt">
+        <td width="100%">
+            {TXT_WYSIWYG_TOOLBAR_CONFIGURATOR}
+        </td>
+        <td></td>
+    </tr>
+	<tr class="row1 wysiwyg-help-txt">
+        <td width="100%">
+            {TXT_WYSIWYG_TOOLBAR_FUNC_DESC} <br />
+            {TXT_WYSIWYG_TOOLBAR_FUNC_DESC_INFO_GROUPS}
+        </td>
+        <td></td>
+    </tr>
 	<tr class="row-1 editorfunctions">
-		<td>
+		<td colspan="2">
 			<div class="editors-container">
 				<div id="editor-basic"></div>
 			</div>
@@ -23,14 +36,11 @@
 			</div>
 		</td>
 	</tr>
-	<!-- BEGIN wysiwyg_toolbar_store_button -->
-	<tr class="row-2">
-		<td>
-			<input type="submit" name="save" value="{TXT_WYSIWYG_TOOLBAR_SAVE}" />
-		</td>
-	</tr>
-	<!-- END wysiwyg_toolbar_store_button -->
 </table>
+<!-- BEGIN wysiwyg_toolbar_store_button -->
+<br />
+<input type="submit" name="save" value="{TXT_WYSIWYG_TOOLBAR_SAVE}" />
+<!-- END wysiwyg_toolbar_store_button -->
 
 <script>
 	( function() {

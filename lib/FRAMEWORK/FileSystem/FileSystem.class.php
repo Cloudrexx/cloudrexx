@@ -338,19 +338,8 @@ class FileSystem
             return 'error';
         } else {
             @unlink($path.$fileName);
-            clearstatcache();
-//            if (@file_exists($path.$fileName)) {
-//                $filesys = eregi_replace('/', '\\', $path.$fileName);
-////                @system("del $filesys");
-////                clearstatcache();
-////                // Doesn't work in safe mode
-////                if (@file_exists($path.$fileName)) {
-//                    @chmod ($path.$fileName, 0775);
-//                    @unlink($path.$fileName);
-//                    @system("del $filesys");
-////                }
-//            }
-//            clearstatcache();
+            // unlink() clears the file status cache automatically
+            //clearstatcache();
             if (@file_exists($path.$fileName)) return 'error';
         }
         return $fileName;
@@ -977,7 +966,6 @@ class FileSystem
 //DBG::log("File::delete_file_ftp($file_path): Failed to delete file ".self::$ftpPath.'/'.$file_path);
             return false;
         }
-        clearstatcache();
         if (self::exists($file_path)) {
 //DBG::log("File::delete_file_ftp($file_path): File still exists: ".self::$ftpPath.'/'.$file_path);
             return false;
@@ -1140,9 +1128,9 @@ class FileSystem
      */
     static function exists($path)
     {
-        // Clear the file cache.  file_exists() relies on that too much
-        clearstatcache();
         self::path_relative_to_root($path);
+        // Clear the file cache.  file_exists() relies on that too much
+        clearstatcache(true, \Env::get('cx')->getWebsiteDocumentRootPath().'/'.$path);
         $result = file_exists(\Env::get('cx')->getWebsiteDocumentRootPath().'/'.$path);
 //if ($result) {
 //DBG::log("File::exists($path): file ".\Env::get('cx')->getWebsiteDocumentRootPath()."/$path exists<br />");

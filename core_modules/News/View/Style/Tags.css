@@ -1,0 +1,114 @@
+/*For tags*/
+.news-info .tagCont {
+    background-image: url('../Media/Tag.png');
+    background-position: -4px -4px;
+    background-repeat: no-repeat;
+    padding-left: 16px;
+    background-size: 20px;
+}
+.news-info span.newsTags {
+    margin-right: 4px;
+}
+#tag-filter p {
+    width: auto;
+    float: left;
+    margin: 6px 0 6px 12px;
+    padding: 0;
+    color: #fff;
+    line-height: 20px;
+}
+
+#tag-filter {
+    float: left;
+    width: auto;
+    background-color: #0A85C8;
+}
+ul#newsTags:hover {
+    background: transparent;
+    border: 1px solid #BBBBBB;
+}
+ul#newsTags:focus {
+    border: 1px solid #BBBBBB;
+}
+.rel-news-field {
+    width: 300px;
+    float: left;
+}
+/** TAGS **/
+#newsFormTags input[type="text"] {
+    color: #7D7D7D !important;
+    font-size: inherit;
+    width:100%;
+}
+#newsFormTags ul.ui-widget-content {
+    float : left;
+    width : 95%;
+    padding: 3px 14px;
+}
+#newsFormTags {
+    float:left;
+}
+#newsFormTags ul.tagit li.tagit-new {
+    width:100%;
+    margin:0;
+    padding:0;
+}
+#newsFormTags ul.tagit li {
+    line-height: 18px;
+    font-size: 14px;
+    font-weight: normal;
+}
+#newsFormTags ul.tagit li.tagit-choice-editable {
+    border: 1px solid #CAD8F3;
+    background: #DEE7F8;
+    color: #333;
+    border-radius: 3px;
+    margin : 12px;
+    margin-left: 0;
+}
+#newsFormTags ul.ui-widget-content:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.news-frm-full-width {
+    width:100%;
+    float:left;
+}
+.tag-filter-cont {
+    margin-top: 20px;
+}
+.news-frm-12 {
+    width:100%;
+    padding: 6px 12px;
+}
+p#remove-tag-filter {
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    background-image: url('../Media/Close.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px;
+    float: left;
+    margin-right: 8px;
+    padding-right: 12px;
+}
+.cl-news-40 {
+    width: 40%;
+    float: left;
+    height: auto;
+}
+#newsFormTags ul.ui-widget-content
+{
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    width: 100%;
+    padding: 0px 12px;
+    margin: 0;
+    color: #7D7D7D;
+    outline: 0;
+}

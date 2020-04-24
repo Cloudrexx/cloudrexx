@@ -73,10 +73,10 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'toUri', 'apiKey', 'active', 'dataAccess', 'relations', 'hostEntities', 'changes', 'oldHostEntities', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'toUri', 'apiKey', 'active', 'dataAccess', 'relations', 'hostEntities', 'changes', 'originChanges', 'oldHostEntities', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'toUri', 'apiKey', 'active', 'dataAccess', 'relations', 'hostEntities', 'changes', 'oldHostEntities', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'toUri', 'apiKey', 'active', 'dataAccess', 'relations', 'hostEntities', 'changes', 'originChanges', 'oldHostEntities', 'validators', 'virtual');
     }
 
     /**
@@ -311,6 +311,17 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function removeRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relations)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRelation', array($relations));
+
+        return parent::removeRelation($relations);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getRelations()
     {
 
@@ -344,6 +355,17 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function removeHostEntity(\Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntities)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeHostEntity', array($hostEntities));
+
+        return parent::removeHostEntity($hostEntities);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getHostEntities()
     {
 
@@ -355,12 +377,12 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
     /**
      * {@inheritDoc}
      */
-    public function getHostEntitiesIncludingLegacy($cached = true)
+    public function getHostEntitiesIncludingLegacy($cached = true, $host = '')
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getHostEntitiesIncludingLegacy', array($cached));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getHostEntitiesIncludingLegacy', array($cached, $host));
 
-        return parent::getHostEntitiesIncludingLegacy($cached);
+        return parent::getHostEntitiesIncludingLegacy($cached, $host);
     }
 
     /**
@@ -421,6 +443,17 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function removeChange(\Cx\Core_Modules\Sync\Model\Entity\Change $changes)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeChange', array($changes));
+
+        return parent::removeChange($changes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getChanges()
     {
 
@@ -438,6 +471,39 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setChanges', array($changes));
 
         return parent::setChanges($changes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addOriginChange(\Cx\Core_Modules\Sync\Model\Entity\Change $originChanges)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addOriginChange', array($originChanges));
+
+        return parent::addOriginChange($originChanges);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeOriginChange(\Cx\Core_Modules\Sync\Model\Entity\Change $originChanges)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeOriginChange', array($originChanges));
+
+        return parent::removeOriginChange($originChanges);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOriginChanges()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOriginChanges', array());
+
+        return parent::getOriginChanges();
     }
 
     /**
@@ -493,6 +559,17 @@ class Sync extends \Cx\Core_Modules\Sync\Model\Entity\Sync implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

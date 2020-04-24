@@ -81,6 +81,7 @@ function MultiAction(){
         <a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_NOTIFY_ON_UNSUBSCRIBE}">&nbsp;{NEWSLETTER_NOTIFICATION_EMAIL}</a>
       </td>
       <td style="text-align:right; white-space:nowrap;">
+        <a href="javascript:void(0);" onclick="if (confirm('{TXT_NEWSLETTER_CONSENT_MAIL_SEND}?')) { document.location='index.php?cmd=Newsletter&amp;act=lists&amp;tpl=consentMail&amp;id={NEWSLETTER_LIST_ID}&{CSRF_PARAM}'; }" title="{TXT_NEWSLETTER_CONSENT_MAIL_SEND}"><img src="../core/Core/View/Media/icons/email.gif" border="0" alt="{TXT_NEWSLETTER_CONSENT_MAIL_SEND}" /> </a>
         <a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=export&amp;listId={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_EXPORT}"><img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_NEWSLETTER_EXPORT}" /> </a>
         <a href="index.php?cmd=Newsletter&amp;act=gethtml&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}"><img src="../core/Core/View/Media/icons/html.gif" border="0" alt="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}" /></a>
         <a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_NEWSLETTER_MODIFY}" /></a>

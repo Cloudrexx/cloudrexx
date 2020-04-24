@@ -46,156 +46,72 @@ namespace Cx\Core_Modules\Sitemap\Controller;
  */
 class Sitemap
 {
-    var $pageContent;
-    var $_objTpl;
-    var $_sitemapPageName = array();
-    var $_sitemapPageURL = array();
-    var $_sitemapPageLevel = array();
-    var $_sitemapPageTarget = array();
-    var $_arrName = array();
-    var $_arrUrl = array();
-    var $_arrTarget = array();
-    var $_doSitemap = true;
-    var $_sitemapBlock;
-    var $_cssPrefix = "sitemap_level_";
-    var $_subTagStart = "<ul>";
-    var $_subTagEnd = "</ul>";
-
+    protected $_objTpl;
 
     /**
     * Constructor
     *
     * @param  string
-    * @access public
     */
-    function __construct($pageContent, $license)
+    public function __construct($pageContent, $license)
     {
-        $this->pageContent = $pageContent;
         $this->_objTpl = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
 
-        $this->_objTpl->setTemplate($this->pageContent);
+        $this->_objTpl->setTemplate($pageContent);
 
-        if(isset($this->_objTpl->_blocks['sitemap'])) {
-            $sm = new \Cx\Core\PageTree\SitemapPageTree(\Env::get('em'), $license, 0, null, FRONTEND_LANG_ID, null, true, true);
-            $sm->setVirtualLanguageDirectory(\Env::get('virtualLanguageDirectory'));
-            $sm->setTemplate($this->_objTpl);
-            $sm->render();
+        // load default application template if it does not exist
+        // for the specified CMD
+        if ($this->_objTpl->placeholderExists('APPLICATION_DATA')) {
+            $page = new \Cx\Core\ContentManager\Model\Entity\Page();
+            $page->setVirtual(true);
+            $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
+            $page->setModule('Sitemap');
+            // load source code
+            $applicationTemplate = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page);
+            \LinkGenerator::parseTemplate($applicationTemplate);
+            $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
         }
 
-        /*        if (isset($this->_objTpl->_blocks['sitemap'])) {
-            $this->_initialize();
-            $this->_doSitemapArray();
-        } else {
-            $this->_doSitemap = false;
-            }*/
+        if (!isset($this->_objTpl->_blocks['sitemap'])) {
+            return;
+        }
+
+        $rootNode = null;
+
+        // check if sitemap is limited to a specific branch of the tree
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $page = $cx->getPage();
+        if (!empty($page->getCmd())) {
+            // Try to resolve node placeholder
+            try {
+                $nodePlaceholder = \Cx\Core\Routing\NodePlaceholder::fromPlaceholder(
+                    $page->getCmd()
+                );
+                $rootNode = $nodePlaceholder->getPage()->getNode();
+            } catch (\Cx\Core\Routing\NodePlaceholderException $e) {}
+        }
+
+        // generate sitemap
+        $em = $cx->getDb()->getEntityManager();
+        $sm = new \Cx\Core\PageTree\SitemapPageTree(
+            $em,
+            $license,
+            0,
+            $rootNode,
+            FRONTEND_LANG_ID,
+            null,
+            true,
+            true
+        );
+        $sm->setVirtualLanguageDirectory(\Env::get('virtualLanguageDirectory'));
+        $sm->setTemplate($this->_objTpl);
+        $sm->render();
     }
 
-
-
-    function getSitemapContent() {
+    public function getSitemapContent() {
         return $this->_objTpl->get();
-        //        return $this->doSitemap();
-    }
-
-
-    /*
-    * Do shop categories menu
-    *
-    * @param    integer  $parcat
-    * @param    integer  $level
-    * @param    integer  $selectedid
-    * @return   string   $result
-    */
-    function _doSitemapArray($parcat=0,$level=0)
-    {
-        $list = $this->_arrName[$parcat];
-        if (is_array($list)) {
-            while (list($key,$val) = each($list)) {
-                $this->_sitemapPageName[$key] = $val;
-                $this->_sitemapPageURL[$key] = $this->_arrUrl[$key];
-                $this->_sitemapPageLevel[$key] = $level;
-                $this->_sitemapPageTarget[$key] = $this->_arrTarget[$key];
-
-                if (isset($this->_arrName[$key])) {
-                    $this->_doSitemapArray($key,$level+1);
-                }
-            }
-        }
-    }
-
-
-    /**
-    * Do Sitemap rows
-    *
-    */
-    function doSitemap()
-    {
-
-        if ($this->_doSitemap && is_array($this->_sitemapPageName)) {
-            $this->_sitemapBlock = trim($this->_objTpl->_blocks['sitemap']);
-            if (strpos('{SUB_MENU}', $this->_sitemapBlock) !== false) {
-                $nestedSitemap = $this->_subTagStart.$this->_buildNestedSitemap().$this->_subTagEnd."\n";
-                return preg_replace('/<!-- BEGIN sitemap -->.*<!-- END sitemap -->/', $nestedSitemap, $this->pageContent);
-            } else {
-                while (list($key,$val) = each($this->_sitemapPageName)) {
-                    $lvl = $this->_sitemapPageLevel[$key]+1;
-                    $cssStyle = $this->_cssPrefix.$lvl;
-                    if ($this->_sitemapPageLevel[$key]!=0){
-                        $width=$this->_sitemapPageLevel[$key]*25;
-                    } else {
-                        $width=1;
-                    }
-                    $spacer = "<img src='".ASCMS_CORE_MODULE_FOLDER."/Sitemap/Media/spacer.gif' width='$width' height='12' alt='' />";
-
-                    $this->_objTpl->setVariable(array(
-                        'STYLE'     => $cssStyle,
-                        'SPACER'    => $spacer,
-                        'NAME'      => $val,
-                        'TARGET'    => $this->_sitemapPageTarget[$key],
-                        'URL'       => $this->_sitemapPageURL[$key]
-                    ));
-                    $this->_objTpl->parse("sitemap");
-                }
-            }
-        }
-        return $this->_objTpl->get();
-    }
-
-
-
-
-    function _buildNestedSitemap($key = 0)
-    {
-        $sitemapBlock = "";
-
-        foreach ($this->_arrName[$key] as $pageId => $pageTitle) {
-            if (isset($this->_arrName[$pageId])) {
-                $subPages = $this->_subTagStart.$this->_buildNestedSitemap($pageId).$this->_subTagEnd."\n";
-            } else {
-                $subPages = "";
-            }
-
-            if ($this->_sitemapPageLevel[$pageId] != 0) {
-                $width = $this->_sitemapPageLevel[$pageId]*25;
-            } else {
-                $width = 1;
-            }
-            $spacer = "<img src='".ASCMS_CORE_MODULE_FOLDER."/Sitemap/Media/spacer.gif' width='$width' height='12' alt='' />";
-
-            $tmpSitemapBlock = $this->_sitemapBlock;
-
-            $tmpSitemapBlock = str_replace('{STYLE}', $this->_cssPrefix.($this->_sitemapPageLevel[$pageId]+1), $tmpSitemapBlock);
-            $tmpSitemapBlock = str_replace('{SPACER}', $spacer, $tmpSitemapBlock);
-            $tmpSitemapBlock = str_replace('{NAME}', $this->_sitemapPageName[$pageId], $tmpSitemapBlock);
-            $tmpSitemapBlock = str_replace('{TARGET}', $this->_sitemapPageTarget[$pageId], $tmpSitemapBlock);
-            $tmpSitemapBlock = str_replace('{URL}', $this->_sitemapPageURL[$pageId], $tmpSitemapBlock);
-            $tmpSitemapBlock = str_replace('{SUB_MENU}', $subPages, $tmpSitemapBlock);
-
-            $sitemapBlock .= $tmpSitemapBlock."\n";
-        }
-        return $sitemapBlock;
     }
 }
-?>
+

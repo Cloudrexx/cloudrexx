@@ -132,6 +132,26 @@ class EsiWidget extends Widget {
     const ESI_VAR_NAME_COUNTRY = 'country';
 
     /**
+     * @const int Index for ESI variable for additional path parts
+     */
+    const ESI_VAR_ID_PATH = 128;
+
+    /**
+     * @const string Name of ESI variable for additional path parts
+     */
+    const ESI_VAR_NAME_PATH = 'path';
+
+    /**
+     * @const int Index for ESI variable for query string
+     */
+    const ESI_VAR_ID_QUERY = 256;
+
+    /**
+     * @const string Name of ESI variable for query string
+     */
+    const ESI_VAR_NAME_QUERY = 'query';
+
+    /**
      * ESI variables configured to be sent for this Widget
      *
      * @var int Combination of the constants
@@ -142,13 +162,13 @@ class EsiWidget extends Widget {
      * Instanciates a new widget
      * @param \Cx\Core\Core\Model\Entity\SystemComponentController $component Component registering this widget
      * @param string $name Name of this widget
-     * @param boolean $hasContent (optional) Wheter this widget has content or not
+     * @param string $type (optional) Whether this widget represents a template placeholder, block or callback, default: placeholder
      * @param string $jsonAdapterName (optional) Name of the JsonAdapter to call. If not specified, $component->getName() is used
      * @param string $jsonMethodName (optional) Name of the JsonAdapter method to call. If not specified, "getWidget" is used
      * @param array $jsonParams (optional) Params to pass on JsonAdapter call. If not specified, a default list is used, see getEsiParams()
      */
-    public function __construct($component, $name, $hasContent = false, $jsonAdapterName = '', $jsonMethodName = '', $jsonParams = array()) {
-        parent::__construct($component, $name, $hasContent);
+    public function __construct($component, $name, $type = self::TYPE_PLACEHOLDER, $jsonAdapterName = '', $jsonMethodName = '', $jsonParams = array()) {
+        parent::__construct($component, $name, $type);
         $this->jsonAdapterName = $jsonAdapterName;
         $this->jsonMethodName = $jsonMethodName;
         $this->jsonParams = $jsonParams;
@@ -185,15 +205,19 @@ class EsiWidget extends Widget {
      * @param string $targetComponent Parse target component name
      * @param string $targetEntity Parse target entity name
      * @param string $targetId Parse target entity ID
+     * @param array $params (optional) List of params for widgets of type 'callback'
      * @return string Replacement for widgets without content, NULL otherwise
      */
-    public function internalParse($template, $response, $targetComponent, $targetEntity, $targetId) {
+    public function internalParse($template, $response, $targetComponent, $targetEntity, $targetId, $params = array()) {
         $esiContent = $this->getComponent('Cache')->getEsiContent(
             $this->getJsonAdapterName(),
             $this->getJsonMethodName(),
-            $this->getEsiParams($targetComponent, $targetEntity, $targetId)
+            array_merge(
+                $params,
+                $this->getEsiParams($targetComponent, $targetEntity, $targetId)
+            )
         );
-        if (!$this->hasContent()) {
+        if ($this->getType() != static::TYPE_BLOCK) {
             return $esiContent;
         }
         $template->replaceBlock($this->getName(), $esiContent);
@@ -210,7 +234,7 @@ class EsiWidget extends Widget {
             $this->esiVariables = 0;
             $this->esiVariables |= static::ESI_VAR_ID_PAGE;
             $this->esiVariables |= static::ESI_VAR_ID_LOCALE;
-            if ($this->hasContent()) {
+            if ($this->getType() == static::TYPE_BLOCK) {
                 $this->esiVariables |= static::ESI_VAR_ID_THEME;
                 $this->esiVariables |= static::ESI_VAR_ID_CHANNEL;
             }
@@ -257,6 +281,9 @@ class EsiWidget extends Widget {
 
     /**
      * Returns the params for the JsonAdapter call
+     * If you add an ESI variable core_module Cache needs to be updated as well:
+     * - Controller\CacheLib (multiple times)
+     * - Model\Entity\ReverseProxyCloudrexx::globDrop()
      * @param string $targetComponent Parse target component name
      * @param string $targetEntity Parse target entity name
      * @param string $targetId Parse target entity ID
@@ -283,6 +310,8 @@ class EsiWidget extends Widget {
             static::ESI_VAR_ID_USER => static::ESI_VAR_NAME_USER,
             static::ESI_VAR_ID_CURRENCY => static::ESI_VAR_NAME_CURRENCY,
             static::ESI_VAR_ID_COUNTRY => static::ESI_VAR_NAME_COUNTRY,
+            static::ESI_VAR_ID_PATH => static::ESI_VAR_NAME_PATH,
+            static::ESI_VAR_ID_QUERY => static::ESI_VAR_NAME_QUERY,
         );
         foreach ($esiVars as $esiVarId=>$esiVarName) {
             if (!$this->isEsiVariableActive($esiVarId)) {
@@ -323,6 +352,20 @@ class EsiWidget extends Widget {
                         $esiVarValue = $this->getComponent(
                             'GeoIp'
                         )->getCountryCode(array());
+                        break;
+                    case static::ESI_VAR_NAME_PATH:
+                        $esiVarValue = $this->getComponent('Widget')->encode(
+                            \Env::get('Resolver')->getAdditionalPath()
+                        );
+                        break;
+                    case static::ESI_VAR_NAME_QUERY:
+                        $params = $this->cx->getRequest()->getUrl()->getParamArray();
+                        unset($params['__cap']);
+                        unset($params['section']);
+                        unset($params['cmd']);
+                        $esiVarValue = $this->getComponent('Widget')->encode(
+                            http_build_query($params, '', '&')
+                        );
                         break;
                 }
             }

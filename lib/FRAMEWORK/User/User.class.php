@@ -314,6 +314,13 @@ class User extends User_Profile
     private $defaultEmailAccessType;
 
     /**
+     * Contains the default hash algorithm to be used for password generation
+     *
+     * @var string
+     */
+    protected $defaultHashAlgorithm;
+
+    /**
      * Contains the message if an error occurs
      * @var string
      */
@@ -339,6 +346,7 @@ class User extends User_Profile
 // TODO:  Provide default values here in case the settings are missing!
         $this->defaultProfileAccessTyp = $arrSettings['default_profile_access']['value'];
         $this->defaultEmailAccessType = $arrSettings['default_email_access']['value'];
+        $this->defaultHashAlgorithm = \PASSWORD_BCRYPT;
         $this->clean();
     }
 
@@ -351,7 +359,7 @@ class User extends User_Profile
      * and the users last authentication time gets updated.
      * Returns TRUE on success or FALSE on failure.
      * @param   string    $username   The username
-     * @param   string    $password   The MD5 hash of the password
+     * @param   string    $password   The raw password
      * @param   boolean   $backend    Tries to authenticate for the backend
      *                                if true, false otherwise
      * @return  boolean               True on success, false otherwise
@@ -362,6 +370,13 @@ class User extends User_Profile
 
         if (!$userId || !$this->load($userId) || !$this->hasModeAccess($backend) || !$this->updateLastAuthTime()) {
             return false;
+        }
+
+        // ensure the password is properly hashed 
+        try {
+            $this->updatePasswordHash($password);
+        } catch (UserException $e) {
+            \DBG::log($e->getMessage());
         }
 
         return true;
@@ -405,30 +420,37 @@ class User extends User_Profile
         }
 
         if ($loginByEmail) {
-            $loginCheck = '`email` = "' . addslashes($username) . '"';
+            $loginCheck = '`email` = "' . contrexx_raw2db($username) . '"';
         } else {
-            $loginCheck = '`username` = "' . addslashes($username) . '"';
+            $loginCheck = '`username` = "' . contrexx_raw2db($username) . '"';
         }
 
         $loginStatusCondition = $captchaCheckResult == false ? 'AND `last_auth_status` = 1' : '';
 
 // TODO: add verificationTimeout as configuration option
         $verificationExpired = time() - 30 * 86400;
-        $objResult = $objDatabase->SelectLimit('
-            SELECT `id`
+        $objResult = $objDatabase->SelectLimit(
+            'SELECT `id`, `password`
               FROM `' . DBPREFIX . 'access_users`
              WHERE ' . $loginCheck . '
-               AND `password` = "'.addslashes($password).'"
                AND `active` = 1
                AND (`verified` = 1 OR `regdate` >= '.$verificationExpired.')
                ' . $loginStatusCondition . '
                AND (`expiration` = 0 OR `expiration` > ' . time() . ')
-        ', 1);
+            ',
+            1
+        );
 
+        // verify that the user is valid and active
         if (!$objResult || $objResult->RecordCount() != 1) {
             return false;
         }
+        // verify that the supplied password is valid
+        if (!$this->checkPassword($password, $objResult->fields['password'])) {
+            return false;
+        }
 
+        // user account is valid and supplied password is also valid
         return $objResult->fields['id'];
     }
 
@@ -465,24 +487,121 @@ class User extends User_Profile
     /**
      * Returns TRUE if the given password matches the current user,
      * FALSE otherwise.
-     * @param string $password
+     *
+     * @param   string  $password     Raw password to be verified
+     * @param   string  $passwordHash The hash of the password to verify the
+     *                                supplied password with. If not supplied,
+     *                                it will be fetched from the database.
      * @return boolean
      */
-    public function checkPassword($password)
+    public function checkPassword($password, $passwordHash = '')
     {
-        global $objDatabase;
+        // do not allow empty passwords
+        if ($password == '') {
+            return false;
+        }
 
-        $query = '
-            SELECT 1
-              FROM `'.DBPREFIX.'access_users`
-             WHERE `id` = '.$this->id.'
-               AND `password` = "'.md5($password).'"
-        ';
-        $objResult = $objDatabase->Execute($query);
+        try {
+            // fetch hash of password from database,
+            // if it has not been supplied as argument
+            if (
+                $passwordHash == '' &&
+                $this->getId()
+            ) {
+                $passwordHash = $this->fetchPasswordHashFromDatabase();
+            }
 
-        return $objResult->RecordCount() ? true : false;
+            // check if password is hashed with legacy algorithm (md5)
+            if (
+                preg_match('/^[a-f0-9]{32}$/i', $passwordHash) &&
+                md5($password) == $passwordHash
+            ) {
+                return true;
+            }
+
+            // verify password
+            if (password_verify($password, $passwordHash)) {
+                return true;
+            }
+
+            return false;
+        } catch (UserException $e) {
+            \DBG::log($e->getMessage());
+            return false;
+        }
     }
 
+    /**
+     * Verify that the password is properly hashed
+     *
+     * If the hashed password is outdated it will be updated in the database.
+     *
+     * @param   string  $password     Current raw password
+     * @param   string  $passwordHash The matching hash of the password. If not
+     *                                supplied, it will be fetched from the
+     *                                database.
+     * @throws  UserException         In case the password hash could not be
+     *                                updated, a UserException is thrown.
+     */
+    protected function updatePasswordHash($password, $passwordHash = '') {
+        // fetch hash of password from database,
+        // if it has not been supplied as argument
+        if (
+            $passwordHash == '' &&
+            $this->getId()
+        ) {
+            $passwordHash = $this->fetchPasswordHashFromDatabase();
+        }
+
+        // verify the supplied password to ensure that a newly
+        // generated password hash will be valid
+        if (!$this->checkPassword($password, $passwordHash)) {
+            throw new UserException('Supplied password does not match hash');
+        }
+
+        if (
+            // verify that password is not hashed by legacy algorithm (md5)
+            !preg_match('/^[a-f0-9]{32}$/i', $passwordHash) &&
+            // and that the password has been hashed by using the prefered
+            // hash algorithm
+            !password_needs_rehash($passwordHash, $this->defaultHashAlgorithm)
+        ) {
+            return;
+        }
+
+        // regenerate hash using new algorithm
+        if (!$this->setPassword($password, null, false, false)) {
+            throw new UserException('New password hash generation failed');
+        }
+        if (!$this->store()) {
+            throw new UserException('Storing new password hash failed');
+        }
+    }
+
+    /**
+     * Fetch the password hash of the currently loaded user from the database
+     *
+     * @return  string  Password hash of currently loaded user.
+     */
+    protected function fetchPasswordHashFromDatabase() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+
+        $query = '
+            SELECT `password`
+              FROM `'.DBPREFIX.'access_users`
+            WHERE `id` = ' . $this->id;
+        $objResult = $db->Execute($query);
+
+        if (
+            !$objResult ||
+            $objResult->RecordCount() != 1
+        ) {
+            throw new UserException('Unable to load unknown user');
+        }
+
+        return $objResult->fields['password'];
+    }
 
     /**
      * Clean user metadata
@@ -545,18 +664,31 @@ class User extends User_Profile
         if ($deleteOwnAccount || $this->id != $objFWUser->objUser->getId()) {
             if (!$this->isLastAdmin()) {
                 \Env::get('cx')->getEvents()->triggerEvent('model/preRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
-                if ($objDatabase->Execute(
-                'DELETE tblU, tblP, tblG, tblA, tblN
-                FROM `'.DBPREFIX.'access_users` AS tblU
-                INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id` = tblU.`id`
-                LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id` = tblU.`id`
-                LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id` = tblU.`id`
-                LEFT JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id` = tblU.`id`
-                WHERE tblU.`id` = '.$this->id) !== false
-            ) {
-                \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
-                return true;
+                $objDatabase->startTrans();
+                if (
+                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_attribute_value` WHERE `user_id` = ' . $this->id) !== false &&
+                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_profile` WHERE `user_id` = ' . $this->id) !== false &&
+                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `user_id` = ' . $this->id) !== false &&
+                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_network` WHERE `user_id` = ' . $this->id) !== false &&
+                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_users` WHERE `id` = ' . $this->id) !== false
+                ) {
+                    $objDatabase->completeTrans();
+                    \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
+                    //Clear cache
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $cx->getEvents()->triggerEvent(
+                        'clearEsiCache',
+                        array(
+                            'Widget',
+                            $cx->getComponent('Access')->getUserDataBasedWidgetNames(),
+                        )
+                    );
+                    \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Access');
+
+                    return true;
                 } else {
+                    $objDatabase->failTrans();
+                    $objDatabase->completeTrans();
                     $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_USER_DELETE_FAILED'], $this->username);
                 }
             } else {
@@ -685,6 +817,10 @@ class User extends User_Profile
 
     public function getBackendLanguage()
     {
+        if (!$this->backend_language) {
+            global $_LANGID;
+            $this->backend_language = $_LANGID;
+        }
         return $this->backend_language;
     }
 
@@ -974,6 +1110,41 @@ class User extends User_Profile
      * );
      * $objUser = \User::getUsers($filter);
      * </pre>
+     * <h5>Fetch all active users named 'John Doe' or 'Max Muster'</h5>
+     * <pre class="brush: php">
+     * $filter = array(
+     *      'AND' => array(
+     *          0 => array(
+     *              'active' => true,
+     *          ),
+     *          1 => array(
+     *              'OR' => array(
+     *                  0 => array(
+     *                      'AND' => array(
+     *                          0 => array(
+     *                              'firstname' => 'John',
+     *                          ),
+     *                          1 => array(
+     *                              'lastname' => 'Doe',
+     *                          ),
+     *                      ),
+     *                  ),
+     *                  1 => array(
+     *                      'AND' => array(
+     *                          0 => array(
+     *                              'firstname' => 'Max',
+     *                          ),
+     *                          1 => array(
+     *                              'lastname' => 'Muster',
+     *                          ),
+     *                      ),
+     *                  ),
+     *              ),
+     *          ),
+     *      ),
+     * );
+     * $objUser = \User::getUsers($filter);
+     * </pre>
      * @param   string  $search        The optional parameter $search can be used to do a fulltext search on the user accounts.
      *                                 $search is an array whereas its key-value pairs represent a user-account's attribute
      *                                 and its search pattern to apply to. If multiple search conditions are set, only one
@@ -1014,6 +1185,7 @@ class User extends User_Profile
      * </pre>
      * @param   integer $limit The maximal number of Users to load from the database. If not set, all matched users will be loaded.
      * @param   integer $offset The optional parameter $offset can be used to specify the number of found records to skip in the result set.
+     *                          <i>Note that this parameter only works if the limit is set!</i>
      * @return  User
      */
     public function getUsers(
@@ -1110,7 +1282,7 @@ class User extends User_Profile
         $arrSelectCoreExpressions = array();
         $arrSelectCustomExpressions = null;
         $this->filtered_search_count = 0;
-        $sqlCondition = '';
+        $sqlCondition = array();
 
         // set filter
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
@@ -1137,7 +1309,13 @@ class User extends User_Profile
                 $crmUser = true;
             }
         }
-        if (!($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser))) {
+        try {
+            if (!($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser))) {
+                $this->clean();
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // catch invalid $filter or $search definitions
             $this->clean();
             return false;
         }
@@ -1229,11 +1407,20 @@ class User extends User_Profile
      *                                          filtering the custom attributes
      * @param   boolean $groupTables Will be set to TRUE if the SQL statement
      *                               should be grouped (GROUP BY)
+     * @param   boolean $uniqueJoins Whether the filter arguments shall be
+     *                               joined by separate unique JOINs or by
+     *                               a single common JOIN statement.
+     * @param   integer $joinIdx     The current index used for separate
+     *                               unique JOINs.
      * @return  array   List of SQL statements to be used as WHERE arguments
      */
-    protected function parseFilterConditions($filter, &$tblCoreAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables)
+    protected function parseFilterConditions($filter, &$tblCoreAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
     {
         $arrConditions = array();
+
+        // somehow the pointer on $filter is sometimes wrong
+        // therefore we need to reset it
+        reset($filter);
 
         // check if $filter is constructed by an OR or AND condition
         if (count($filter) == 1 && in_array(strtoupper(key($filter)), array('OR', 'AND'))) {
@@ -1243,9 +1430,22 @@ class User extends User_Profile
             // arguments that shall be joined by $joinMethod
             $filterArguments = current($filter);
 
+            // generate new join to custom attribute table
+            if ($uniqueJoins) {
+                $joinIdx++;
+            }
+
             // parse filter arguments (generate SQL statements)
             foreach ($filterArguments as $argument) {
-                $filterConditions = $this->parseFilterConditions($argument, $tblCoreAttributes, $tblGroup, $customAttributeJoins, $groupTables);
+                $filterConditions = $this->parseFilterConditions(
+                    $argument,
+                    $tblCoreAttributes,
+                    $tblGroup,
+                    $customAttributeJoins,
+                    $groupTables,
+                    $joinMethod == 'AND',
+                    $joinIdx
+                );
 
                 // don't add empty arguments to SQL query (through $arrConditions)
                 if (!$filterConditions) {
@@ -1269,12 +1469,21 @@ class User extends User_Profile
             $arrConditions[] = implode(' AND ', $arrCoreAttributeConditions);
             $tblCoreAttributes = true;
         }
-        if (count($arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions($filter))) {
+        $arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions(
+            $filter,
+            null,
+            $uniqueJoins,
+            $joinIdx
+        );
+        if (count($arrCustomAttributeConditions)) {
             $groupTables = true;
             $arrConditions[] = implode(' AND ', $arrCustomAttributeConditions);
             foreach (array_keys($arrCustomAttributeConditions) as $customAttributeTable) {
                 $customAttributeJoins[] = ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS ' . $customAttributeTable . ' ON ' . $customAttributeTable . '.`user_id` = tblU.`id` ';
             }
+
+            // drop redundant joins
+            $customAttributeJoins = array_unique($customAttributeJoins);
         }
 
         // filter by user group membership (if set)
@@ -1360,7 +1569,7 @@ class User extends User_Profile
 
 
     private function setSortedUserIdList(
-        $arrSort, $sqlCondition=null, $limit=null, $offset=null, $groupless=false, $crmUser=false
+        $arrSort, $sqlCondition=array(), $limit=null, $offset=null, $groupless=false, $crmUser=false
     ) {
         global $objDatabase;
 
@@ -1435,7 +1644,7 @@ class User extends User_Profile
             ).
             ($joinGroupTbl && !FWUser::getFWUserObject()->isBackendMode() ? ' INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblGF ON tblGF.`group_id`=tblG.`group_id`' : '').
             (count($arrCustomJoins) ? ' '.implode(' ',$arrCustomJoins) : '').
-            (count($arrCustomSelection) ? ' WHERE '.implode(' AND ', $arrCustomSelection) : '').
+            (count($arrCustomSelection) ? ' WHERE ('.implode(') AND (', $arrCustomSelection).')' : '').
             (count($arrSortExpressions) ? ' ORDER BY '.implode(', ', $arrSortExpressions) : '');
         $objUserId = false;
         if (empty($limit)) {
@@ -1502,7 +1711,7 @@ class User extends User_Profile
             return;
         }
 
-        $this->restore_key = md5($this->email.$this->regdate.time());
+        $this->restore_key = md5($this->email . random_bytes(20));
         $this->restore_key_time = time() + 3600;
     }
 
@@ -1815,6 +2024,7 @@ class User extends User_Profile
                         $cx->getComponent('Access')->getUserDataBasedWidgetNames(),
                     )
                 );
+                \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Access');
             }
         } else {
             \Env::get('cx')->getEvents()->triggerEvent('model/postPersist', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
@@ -1828,6 +2038,7 @@ class User extends User_Profile
                     $cx->getComponent('Access')->getUserDataBasedWidgetNames(),
                 )
             );
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Access');
         }
 
 
@@ -1841,6 +2052,7 @@ class User extends User_Profile
      * @param string $generatedPassword
      */
     protected function sendUserAccountInvitationMail($generatedPassword) {
+
         $objUserMail = \FWUser::getFWUserObject()->getMail();
         if (
             (
@@ -1860,7 +2072,8 @@ class User extends User_Profile
                             '[[EMAIL]]',
                             '[[PASSWORD]]',
                             '[[LINK]]',
-                            '[[SENDER]]'
+                            '[[SENDER]]',
+                            '[[YEAR]]',
                         );
             $domainRepository = new \Cx\Core\Net\Model\Repository\DomainRepository();
             $mainDomain = $domainRepository->getMainDomain()->getName();
@@ -1871,7 +2084,8 @@ class User extends User_Profile
                             $this->getEmail(),
                             $generatedPassword,
                             ASCMS_PROTOCOL . '://'.$mainDomain.\Cx\Core\Core\Controller\Cx::getBackendFolderName(),
-                            contrexx_raw2xhtml($objUserMail->getSenderName())
+                            contrexx_raw2xhtml($objUserMail->getSenderName()),
+                            date('Y'),
                         );
 
             if (in_array($objUserMail->getFormat(), array('multipart', 'text'))) {
@@ -1945,7 +2159,9 @@ class User extends User_Profile
         }
         if ($passwordHasChanged) {
             // deletes all sessions which are using this user (except the session changing the password)
-            $_SESSION->cmsSessionDestroyByUserId($this->id);
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $session = $cx->getComponent('Session')->getSession();
+            $session->cmsSessionDestroyByUserId($this->id);
         }
     }
 
@@ -2072,6 +2288,7 @@ class User extends User_Profile
         $arrCurrentGroups = $this->loadGroups();
         $arrAddedGroups = array_diff($this->getAssociatedGroupIds(), $arrCurrentGroups);
         $arrRemovedGroups = array_diff($arrCurrentGroups, $this->getAssociatedGroupIds());
+        $groupAssociationChange = false;
         foreach ($arrRemovedGroups as $groupId) {
             if (!$objDatabase->Execute('
                 DELETE FROM `'.DBPREFIX.'access_rel_user_group`
@@ -2080,7 +2297,7 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
         }
         foreach ($arrAddedGroups as $groupId) {
@@ -2093,8 +2310,17 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
+        }
+        if ($groupAssociationChange) {
+            $associationChange = true;
+
+            // flush all user based cache to ensure new permissions are enforced
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cache = $cx->getComponent('Cache');
+            $cache->clearUserBasedPageCache();
+            $cache->clearUserBasedEsiCache();
         }
         return $status;
     }
@@ -2248,13 +2474,22 @@ class User extends User_Profile
     {
 
         if ($this->loggedIn) return true;
-        if(isset($_SESSION)
-            && is_object($_SESSION)
-            && $_SESSION->userId
-            && $this->load($_SESSION->userId)
-            && $this->getActiveStatus()
-            && $this->hasModeAccess($backend)
-            && $this->updateLastActivityTime()) {
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $session = $cx->getComponent('Session');
+
+        if (
+            $session &&
+            $session->getSession(false) &&
+            $session->isInitialized() &&
+            isset($_SESSION) &&
+            is_object($_SESSION) &&
+            $session->getSession()->userId &&
+            $this->load($session->getSession()->userId) &&
+            $this->getActiveStatus() &&
+            $this->hasModeAccess($backend) &&
+            $this->updateLastActivityTime()
+        ) {
             $this->loggedIn = true;
             return true;
         }
@@ -2416,15 +2651,23 @@ class User extends User_Profile
         
         $this->updateLastAuthTime();
         
-        // drop user specific ESI cache:
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $esiFiles = glob($cx->getWebsiteTempPath() . '/cache/*u' . session_id() . '*');
-        foreach ($esiFiles as $esiFile) {
-            try {
-                $file = new \Cx\Lib\FileSystem\File($esiFile);
-                $file->delete();
-            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {}
-        }
+
+        // Flush all cache attached to the current session.
+        // This is required as after the sign-in, the user might have a
+        // greater access level which provides access to more or different
+        // content.
+        $cx->getComponent('Cache')->clearUserBasedPageCache(session_id());
+        $cx->getComponent('Cache')->clearUserBasedEsiCache(session_id());
+
+        // flush access block widgets (currently signed-in users, etc.)
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array(
+                'Widget',
+                 $cx->getComponent('Access')->getSessionBasedWidgetNames(),
+            )
+        );
 
         return $objDatabase->Execute("
             UPDATE `".DBPREFIX."access_users`
@@ -2447,17 +2690,17 @@ class User extends User_Profile
     {
         global $objDatabase;
 
-        $column = 'email';
+        $usernameCondition = '';
         $arrUserSettings = \User_Setting::getSettings();
         if ($arrUserSettings['use_usernames']['status']) {
-            $column = 'username';
+            $usernameCondition = ' OR `username` = "' . contrexx_raw2db($username) . '"';
         }
 
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
-        ');
+             WHERE `email` = "' . contrexx_raw2db($username) . '"
+        ' . $usernameCondition);
     }
 
 
@@ -2472,6 +2715,7 @@ class User extends User_Profile
     public function setUsername($username)
     {
         $this->username = $username;
+        $this->updateLoadedUserData('username', $this->username);
     }
 
 
@@ -2492,6 +2736,9 @@ class User extends User_Profile
             $this->validity = $validity;
             $this->setExpirationDate(($validitySeconds = $validity*60*60*24) ? mktime(23, 59, 59, date('m', time() + $validitySeconds), date('d', time() + $validitySeconds), date('Y', time() + $validitySeconds)) : 0);
         }
+
+        $this->updateLoadedUserData('validity', $this->validity);
+
         return true;
     }
 
@@ -2499,6 +2746,7 @@ class User extends User_Profile
     public function setExpirationDate($expiration)
     {
         $this->expiration = $expiration;
+        $this->updateLoadedUserData('expiration', $this->expiration);
     }
 
 
@@ -2521,33 +2769,44 @@ class User extends User_Profile
         }
         // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         $this->email = $email;
+
+        $this->updateLoadedUserData('email', $this->email);
     }
 
 
     /**
      * Sets password of user
      *
-     * This will set the attribute password of this object to the md5 hash
+     * This will set the attribute password of this object to the hash
      * of $password if $password is a valid password and if it was confirmed
      * by the second parameter $confirmedPassword.
      * @param   string    $password           The new password
      * @param   string    $confirmedPassword  The new password, again
+     * @param   boolean   $reset
+     * @param   boolean   $verify             Whether or not to verify if
+     *                                        $password is a valid password
+     *                                        according to the set password
+     *                                        complexity rules.
      * @return  boolean                       True on success, false otherwise
      * @global  array     $_CORELANG
      */
-    public function setPassword($password, $confirmedPassword=null, $reset=false)
+    public function setPassword($password, $confirmedPassword=null, $reset=false, $verify=true)
     {
         global $_CORELANG, $_CONFIG;
 
         if ((empty($password) && empty($confirmedPassword) && $this->id && !$reset) || isset($_SESSION['user_id'])) {
             return true;
         }
-        if (self::isValidPassword($password)) {
+        if (
+            !$verify ||
+            self::isValidPassword($password)
+        ) {
             if (isset($confirmedPassword) && $password != $confirmedPassword) {
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
-            $this->password = md5($password);
+            $this->password = $this->hashPassword($password);
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2560,18 +2819,19 @@ class User extends User_Profile
     }
 
     /**
-     * Set new password as md5 sum of password
-     * @param   string $hashedPassword The md5 sum of the new password to be set
+     * Set new password as hash of password
+     * @param   string $hashedPassword The hash of the new password to be set
      */
     public function setHashedPassword($hashedPassword) {
         $this->password = $hashedPassword;
+        $this->updateLoadedUserData('password', $this->password);
     }
 
     /**
-     * Returns the md5 sum of the newly set password of the user account if it has been changed.
-     * This method only returns the password (its md5 sum) of the user account in case it has
+     * Returns the hash of the newly set password of the user account if it has been changed.
+     * This method only returns the password (its hash) of the user account in case it has
      * been changed using {@see \User::setPassword()}.
-     * This method's purpose is to have the newly set password (its md5 sum) available in
+     * This method's purpose is to have the newly set password (its hash) available in
      * the model events through it.
      * @return  string  The newly set password of the user account
      */
@@ -2591,6 +2851,7 @@ class User extends User_Profile
     {
         $this->frontend_language = intval($langId);
         $this->validateLanguageId('frontend');
+        $this->updateLoadedUserData('frontend_lang_id', $this->frontend_language);
     }
 
 
@@ -2605,6 +2866,7 @@ class User extends User_Profile
     {
         $this->backend_language = intval($langId);
         $this->validateLanguageId('backend');
+        $this->updateLoadedUserData('backend_lang_id', $this->backend_language);
     }
 
 
@@ -2619,6 +2881,7 @@ class User extends User_Profile
     public function setActiveStatus($status)
     {
         $this->is_active = (bool)$status;
+        $this->updateLoadedUserData('active', $this->is_active);
     }
 
     /**
@@ -2631,6 +2894,7 @@ class User extends User_Profile
      */
     public function setVerification($verified) {
         $this->verified = $verified;
+        $this->updateLoadedUserData('verified', $this->verified);
         return true;
     }
 
@@ -2652,6 +2916,8 @@ class User extends User_Profile
         } else {
             $this->primary_group = 0;
         }
+
+        $this->updateLoadedUserData('primary_group', $this->primary_group);
     }
 
 
@@ -2672,6 +2938,7 @@ class User extends User_Profile
 
         if ($status || !$this->isLastAdmin() || $force) {
             $this->is_admin = (bool)$status;
+            $this->updateLoadedUserData('is_admin', $this->is_admin);
             return true;
         }
         $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_CHANGE_PERM_LAST_ADMIN_USER'], $this->getUsername());
@@ -2715,6 +2982,7 @@ class User extends User_Profile
     {
         $this->email_access = in_array($emailAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $emailAccess : $this->defaultEmailAccessType;
+        $this->updateLoadedUserData('email_access', $this->email_access);
     }
 
 
@@ -2722,6 +2990,7 @@ class User extends User_Profile
     {
         $this->profile_access = in_array($profileAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $profileAccess : $this->defaultProfileAccessTyp;
+        $this->updateLoadedUserData('profile_access', $this->profile_access);
     }
 
 
@@ -2931,6 +3200,34 @@ class User extends User_Profile
     }
 
     /**
+     * Update a specific profile attribute of the user
+     *
+     * @param   string  $attribute  ID of profile attribute to update
+     * @param   string|integer|boolean  $value  Value to set the profile
+     *                                          attribute to
+     */
+    protected function updateLoadedUserData($attribute, $value) {
+        if (!$this->id) {
+            return;
+        }
+
+        if (!isset($this->arrLoadedUsers[$this->id])) {
+            return;
+        }
+
+        $this->arrLoadedUsers[$this->id][$attribute] = $value;
+    }
+
+    /**
+     * Get object data as array
+     *
+     * @param    array   Return data of user object as array
+     */
+    public function toArray() {
+        return $this->arrLoadedUsers[$this->id];
+    }
+
+    /**
      * Tries to form a valid and unique username from the words given
      *
      * Usually, you would use first and last names as parameters.
@@ -3047,16 +3344,19 @@ class User extends User_Profile
             $mix_user_id = array($mix_user_id);
         }
         $count = 0;
-        global $objFWUser;
-        $objUser = $objFWUser->objUser;
+        $objFWUser = \FWUser::getFWUserObject();
         foreach ($mix_user_id as $user_id) {
-            $objUser = $objUser->getUser($user_id);
+            $objUser = $objFWUser->objUser->getUser($user_id);
             if (!$objUser) {
                 Message::warning(sprintf(
                     $_CORELANG['TXT_ACCESS_NO_USER_WITH_ID'], $user_id));
                 continue;
             }
-//$objUser = new User();
+            // do not change the status of the currently signed-in user
+            if ($objUser->getId() == $objFWUser->objUser->getId()) {
+                continue;
+            }
+
             $objUser->setActiveStatus($active);
             if (!$objUser->store()) {
                 Message::warning(sprintf(
@@ -3074,4 +3374,30 @@ class User extends User_Profile
         return;
     }
 
+    /**
+     * Generate hash of password with default hash algorithm
+     *
+     * @param string $password Password to be hashed
+     *
+     * @return string The generated hash of the supplied password
+     * @throws  UserException   In case the password hash generation fails
+     */
+    public function hashPassword($password)
+    {
+        $hash = password_hash($password, $this->defaultHashAlgorithm);
+        if ($hash !== false) {
+            return $hash;
+        }
+
+        throw new UserException('Failed to generate a new password hash');
+    }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
+    }
 }

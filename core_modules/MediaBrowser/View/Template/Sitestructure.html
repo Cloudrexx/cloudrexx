@@ -1,41 +1,40 @@
 <div id="sitestructure" ng-controller="SitestructureCtrl">
-  <div class="fileOptions">
-    <input type="search" class="searchterm"
-           placeholder="{{::'TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'| translate}}"
-           ng-model="searchSites">
-    <span ng-repeat="language in activeLanguages">
-      <button
-        ng-click="setLang(language.lang)"
-        class="btn"
-        ng-class="isActive(language.lang) ? 'btn-primary' : 'btn-default'">
-        {{::language.name}}
-      </button>
-    </span>
-  </div>
-  <div class="tabMediaBrowserContent"  >
-    <div class="sitestructureCtrl">
-      <div  ng-repeat="site in sites| findPage:searchSites:activeLanguage"
-            class="data-row animation"
-            ng-hide="!site.name[activeLanguage]">
-        <div ng-class="{filtered: searchSites.length > 0}"
-             class="col-icon level_{{site.level}}">
-          <i class="icon-fileType icon-fileType{{site.extension}}"></i>
-        </div>
-        <div class="col-name" >
-          <a data-dismiss="modal"
-             data-target=".media-browser-modal"
-             ng-click="clickPage(site)"
-             ng-dblclick="clickPage(site)">
-            {{::site.name[activeLanguage]}}
-          </a>
-        </div>
-      </div>
+    <div class="fileOptions">
+        <input type="search" class="searchterm"
+               placeholder="{{::'TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'| translate}}"
+               ng-model="searchSites">
+        <span ng-repeat="language in activeLanguages">
+            <button ng-click="setLang(language.lang)"
+                  class="btn"
+                  ng-class="isActive(language.lang) ? 'btn-primary' : 'btn-default'">
+                {{::language.name}}
+            </button>
+        </span>
     </div>
-  </div>
-  <div class="tabMediaBrowserFooter">
-    <button type="submit" class="btn btn-primary"
-            ng-click="cancel()">
-      {{:: 'TXT_FILEBROWSER_CANCEL' | translate }}
-    </button>
-  </div>
+    <div class="tabMediaBrowserContent">
+        <div class="sitestructureCtrl">
+            <div ng-repeat="site in sites| findPage:searchSites:activeLanguage"
+                 class="data-row animation"
+                 ng-hide="!site.name[activeLanguage]">
+                <div ng-class="{filtered: searchSites.length > 0}"
+                     class="col-icon level_{{site.level}}">
+                    <i class="icon-fileType icon-fileType{{site.extension}}"></i>
+                </div>
+                <div class="col-name">
+                    <a data-dismiss="modal"
+                       data-target=".media-browser-modal"
+                       ng-click="clickPage(site)"
+                       ng-dblclick="clickPage(site)">
+                        {{site.name[activeLanguage]}}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tabMediaBrowserFooter">
+        <button type="submit" class="btn btn-primary"
+                ng-click="cancel()">
+            {{:: 'TXT_FILEBROWSER_CANCEL' | translate }}
+        </button>
+    </div>
 </div>

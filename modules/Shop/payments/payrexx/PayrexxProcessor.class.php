@@ -29,6 +29,7 @@
  * Payrexx Payment Processor
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Ueli Kramer <ueli.kramer@comvation.com>
+ * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
  * @version     1.0.0
  * @package     cloudrexx
  * @subpackage  module_shop
@@ -38,6 +39,7 @@
  * Payrexx Payment Processor
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Ueli Kramer <ueli.kramer@comvation.com>
+ * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
  * @version     1.0.0
  * @package     cloudrexx
  * @subpackage  module_shop
@@ -74,45 +76,37 @@ class PayrexxProcessor
             return false;
         }
 
-        $order = \Cx\Modules\Shop\Controller\Order::getById($_SESSION['shop']['order_id']);
-
-        $payrexx = new \Payrexx\Payrexx($instanceName, $apiSecret);
-        $invoice = new \Payrexx\Models\Request\Invoice();
-        $invoice->setReferenceId('Shop-' . $order->id());
-        $invoice->setTitle($_CONFIG['coreGlobalPageTitle']);
-        $invoice->setDescription('&nbsp;');
-        // We have to set all known PSPs to support all PSPs.
-        // Known PSP are listed on https://payrexx.readme.io/docs/miscellaneous
-        $invoice->setPsp(array(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,22,23));
-        $invoice->setName('Contrexx Shop Order: #' . $_SESSION['shop']['order_id']);
-        $invoice->setPurpose('Shop Order #' . $_SESSION['shop']['order_id']);
-        $invoice->setAmount(intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)));
-        $invoice->setCurrency(\Cx\Modules\Shop\Controller\Currency::getCodeById($order->currency_id()));
-        $invoice->addField('email', false, $order->billing_email());
-        $invoice->addField('company', false, $order->billing_company());
-        $invoice->addField('forename', false, $order->billing_firstname());
-        $invoice->addField('surname', false, $order->billing_lastname());
-        $invoice->addField('street', false, $order->billing_address());
-        $invoice->addField('postcode', false, $order->billing_zip());
-        $invoice->addField('place', false, $order->billing_city());
-
-        try {
-            /**
-             * @var \Payrexx\Models\Response\Invoice $invoice
-             */
-            $invoice = $payrexx->create($invoice);
-        } catch (\Payrexx\PayrexxException $e) {
-            self::$arrError[] = $e->getMessage();
-            return false;
-        }
-
         $successPage = \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'success');
         $successPageUrl = $successPage->toString();
 
+        $order = \Cx\Modules\Shop\Controller\Order::getById($_SESSION['shop']['order_id']);
+
+        $payrexx = new \Payrexx\Payrexx($instanceName, $apiSecret);
+        $gateway = new \Payrexx\Models\Request\Gateway();
+        $gateway->setReferenceId('Shop-' . $order->id());
+        // Known PSP are listed on https://payrexx.readme.io/docs/miscellaneous
+        // Let Payrexx set the available PSP automatically
+        $gateway->setPsp([]);
+        $gateway->setPreAuthorization(false);
+        $gateway->setSuccessRedirectUrl($successPageUrl);
+        $gateway->setFailedRedirectUrl($successPageUrl);
+        $gateway->setAmount(intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)));
+        $gateway->setCurrency(\Cx\Modules\Shop\Controller\Currency::getCodeById($order->currency_id()));
+        $gateway->addField('email', $order->billing_email());
+        $gateway->addField('company', $order->billing_company());
+        $gateway->addField('forename', $order->billing_firstname());
+        $gateway->addField('surname', $order->billing_lastname());
+        $gateway->addField('street', $order->billing_address());
+        $gateway->addField('postcode', $order->billing_zip());
+        $gateway->addField('place', $order->billing_city());
+        $gateway->addField('country', \Cx\Core\Country\Controller\Country::getAlpha2ById($order->billing_country_id()));
+        $gateway->addField('phone', $order->billing_phone());
+
         try {
-            $link = $invoice->getLink() . '&RETURN_URL=' . base64_encode($successPageUrl);
-        } catch (\Cx\Core\Routing\UrlException $e) {
-            self::$arrError[] = 'Could not find success page for shop module!';
+            $response = $payrexx->create($gateway);
+            $link = $response->getLink();
+        } catch (\Payrexx\PayrexxException $e) {
+            self::$arrError[] = $e->getMessage();
             return false;
         }
 
@@ -158,12 +152,28 @@ EOF;
             return false;
         }
 
-        if ($_POST['transaction']['status'] === 'waiting') {
-            die(); // we don't want the shop to update the status to cancelled or confirmed
-        }
+        /*
+            Payrexx knows the following states
 
+            - Order placed (status: waiting)
+            - Successful payment processed (status: confirmed) --> Payment was successful
+            - Payment aborted by customer (status: cancelled) --> Payment failed
+            - Payment declined (status: declined) --> Payment failed
+            - Technical error (status: error)
+
+            Additional for cloudrexx non-relevant states:
+            - Pre-authorization successful (status: authorized)
+            - Payment (partial-) refunded by merchant (status: refunded / partially-refunded)
+            - Refund pending (status: refund_pending)
+            - Chargeback by card holder (status: chargeback)
+        */
+
+        // Return null in any other case than 'confirmed'.
+        // This shall enure compatability with payrexx as the gateway sends
+        // status notifications of all events including when a card is
+        // declined and more.
         if ($_POST['transaction']['status'] !== 'confirmed') {
-            return false;
+            return null;
         }
 
         $invoiceId = $_POST['transaction']['invoice']['paymentRequestId'];
@@ -181,15 +191,15 @@ EOF;
         }
         $payrexx = new \Payrexx\Payrexx($instanceName, $apiSecret);
 
-        $invoice = new \Payrexx\Models\Request\Invoice();
-        $invoice->setId($invoiceId);
+        $gateway = new \Payrexx\Models\Request\Gateway();
+        $gateway->setId($invoiceId);
         try {
-            $invoice = $payrexx->getOne($invoice);
+            $response = $payrexx->getOne($gateway);
         } catch (\Payrexx\PayrexxException $e) {
             return false;
         }
 
-        return $invoice->getStatus() === $_POST['transaction']['status'];
+        return $response->getStatus() === $_POST['transaction']['status'];
     }
 
 

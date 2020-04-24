@@ -160,6 +160,7 @@ class CrmSettings extends CrmLibrary
             $statusArr     = array();
             $x             = 0;
             foreach ($_POST['form_id'] as $id) {
+                $statusArr[$id]           = array();
                 $statusArr[$id]['id']     = intval($id);
                 $statusArr[$id]['status'] = ($defaultTypeId == $id) ? 1 : 0;
                 $statusArr[$id]['pos']    = intval($_POST['form_pos'][$x]);
@@ -319,7 +320,7 @@ class CrmSettings extends CrmLibrary
         $customerStatus     = isset($_POST['activeStatus']) || !isset ($_POST['customer_type_submit']) ? 1 : 0;
         $hrlyRate           = array();
 
-        if ($_POST['customer_type_submit']) {
+        if (isset($_POST['customer_type_submit'])) {
             $success = true;
 
             $searchingQuery = "SELECT label FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_types`
@@ -823,7 +824,7 @@ class CrmSettings extends CrmLibrary
         ));
         \JS::activate("jquery");
 
-        $msg = base64_decode($_REQUEST['msg']);
+        $msg = isset($_REQUEST['msg']) ? base64_decode($_REQUEST['msg']) : '';
         switch ($msg) {
         case 'taskUpdated':
             $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_TASK_TYPE_UPDATED_SUCCESSFULLY'];
@@ -863,7 +864,7 @@ class CrmSettings extends CrmLibrary
                 $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_PROJECTSTATUS_SORTING_COMPLETE'];
         }
 
-        if ($_POST['saveTaskType']) {
+        if (isset($_POST['saveTaskType'])) {
             $this->saveTaskTypes();
             $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_TASK_TYPE_ADDED_SUCCESSFULLY'];
         }
@@ -916,7 +917,7 @@ class CrmSettings extends CrmLibrary
 
         $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-        if ($_POST['saveTaskType']) {
+        if (isset($_POST['saveTaskType'])) {
             $this->saveTaskTypes($id);
             $msg = "taskUpdated";
             \Cx\Core\Csrf\Controller\Csrf::header("Location:./index.php?cmd=".$this->moduleName."&act=settings&tpl=tasktypes&msg=".base64_encode($msg));
@@ -1356,7 +1357,7 @@ class CrmSettings extends CrmLibrary
             $_REQUEST['active_tab'] = 2;
         }
         $objTemplate = null;
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             $_CORELANG['TXT_CORE_MAILTEMPLATES'],
             \Cx\Core\MailTemplate\Controller\MailTemplate::overview('Crm', 'config',
@@ -1364,7 +1365,7 @@ class CrmSettings extends CrmLibrary
             )->get()
         );
 
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             (empty($_REQUEST['key'])
               ? $_CORELANG['TXT_CORE_MAILTEMPLATE_ADD']
@@ -1372,7 +1373,7 @@ class CrmSettings extends CrmLibrary
             \Cx\Core\MailTemplate\Controller\MailTemplate::edit('Crm')->get()
         );
 
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             $_ARRAYLANG['TXT_CRM_PLACEHOLDERS'],
             $this->getCrmModulePlaceHolders()
@@ -1495,7 +1496,7 @@ class CrmSettings extends CrmLibrary
         $objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_crm_settings_company_size.html');
         $this->_pageTitle = $_ARRAYLANG['TXT_CRM_SETTINGS'];
 
-        if ($_POST['save']) {
+        if (isset($_POST['save'])) {
             //insert
             $query = \SQL::insert('module_' . $this->moduleNameLC . '_company_size', $fields, array('escape' => true));
             $db = $objDatabase->Execute($query);
@@ -1530,7 +1531,7 @@ class CrmSettings extends CrmLibrary
         $this->getCompanySize($id);
         //parse the placeholders
         $this->parseCompanySizePlaceholders();
-        if($_POST['save']) {
+        if (isset($_POST['save'])) {
             if(!empty($id)){
                 //update
                 $query  = \SQL::update('module_'.$this->moduleNameLC.'_company_size', $fields, array('escape' => true)).' WHERE `id` = '.$id;

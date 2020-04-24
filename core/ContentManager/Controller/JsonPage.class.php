@@ -164,7 +164,6 @@ class JsonPage implements JsonAdapter {
             // load the draft revision if one is available and we're not loading historic data:
             else if ($page->getEditingStatus() == 'hasDraft' || $page->getEditingStatus() == 'hasDraftWaiting') {
                 $this->logRepo = $this->em->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
-
                 $availableRevisions = $this->logRepo->getLogEntries($page, true, 2);
                 $this->logRepo->revert($page, $availableRevisions[1]->getVersion());
             }
@@ -236,7 +235,6 @@ class JsonPage implements JsonAdapter {
                 $node = $this->nodeRepo->find($nodeId);
                 $page = $node->translatePage(true, \FWLanguage::getLanguageIdByCode($lang));
                 $page->setNodeIdShadowed($node->getId());
-                $page->setEditingStatus('');
 
                 $newPage = true;
                 $reload  = true;
@@ -512,9 +510,15 @@ class JsonPage implements JsonAdapter {
                     }
                     if (isset($dataPost['inheritSkin']) && $dataPost['inheritSkin'] == 'on'/*theme*/) {
                         $currentPage->setSkin($page->getSkin());
+                        if (!empty($pageArray['useSkinForAllChannels'])) {
+                            $currentPage->setUseSkinForAllChannels(1);
+                        }
                     }
                     if (isset($dataPost['inheritCustomContent']) && $dataPost['inheritCustomContent'] == 'on'/*customContent*/) {
                         $currentPage->setCustomContent($page->getCustomContent());
+                        if (!empty($pageArray['useCustomContentForAllChannels'])) {
+                            $currentPage->setUseCustomContentForAllChannels(1);
+                        }
                     }
                     if (isset($dataPost['inheritCssName']) && $dataPost['inheritCssName'] == 'on'/*cssName*/) {
                         $currentPage->setCssName($page->getCssName());
@@ -672,6 +676,7 @@ class JsonPage implements JsonAdapter {
         register_shutdown_function(array($this, 'multipleSetShutdown'));
 
         $post = $params['post'];
+        $data = array('post' => array());
         $data['post']['lang']   = $post['lang'];
         $data['post']['action'] = $post['action'];
         $recursive = (isset($params['get']['recursive']) && $params['get']['recursive'] == 'true');
@@ -699,49 +704,49 @@ class JsonPage implements JsonAdapter {
                 case 'activate':
                     if ($page->isActive()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'deactivate':
                     if (!$page->isActive()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'show':
                     if ($page->isVisible()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'hide':
                     if (!$page->isVisible()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'protect':
                     if ($page->isFrontendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'unprotect':
                     if (!$page->isFrontendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'lock':
                     if ($page->isBackendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'unlock':
                     if (!$page->isBackendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 default:

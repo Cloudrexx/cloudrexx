@@ -71,6 +71,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $filter['gender'] = 'gender_'.$gender;
         }
 
+        // filter users by group association
+        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_currently_online_member_list');
+        if ($groupFilter) {
+            $filter['group_id'] = $groupFilter;
+        }
+
         $objUser = $objFWUser->objUser->getUsers(
             $filter,
             null,
@@ -83,20 +89,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         if ($objUser) {
             while (!$objUser->EOF) {
-                $this->_objTpl->setVariable(array(
-                    'ACCESS_USER_ID'    => $objUser->getId(),
-                    'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-                    'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
-                ));
-
-                $objUser->objAttribute->first();
-                while (!$objUser->objAttribute->EOF) {
-                    $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
-                    if ($objAttribute->checkReadPermission()) {
-                        $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
-                    }
-                    $objUser->objAttribute->next();
-                }
+                $this->parseBasePlaceholders($objUser);
 
                 $this->_objTpl->parse('access_currently_online_'.(!empty($gender) ? $gender.'_' : '').'members');
 
@@ -126,6 +119,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $filter['gender'] = 'gender_'.$gender;
         }
 
+        // filter users by group association
+        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_last_active_member_list');
+        if ($groupFilter) {
+            $filter['group_id'] = $groupFilter;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $objUser = $objFWUser->objUser->getUsers(
             $filter,
@@ -139,20 +138,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         if ($objUser) {
             while (!$objUser->EOF) {
-                $this->_objTpl->setVariable(array(
-                    'ACCESS_USER_ID'    => $objUser->getId(),
-                    'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-                    'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
-                ));
-
-                $objUser->objAttribute->first();
-                while (!$objUser->objAttribute->EOF) {
-                    $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
-                    if ($objAttribute->checkReadPermission()) {
-                        $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
-                    }
-                    $objUser->objAttribute->next();
-                }
+                $this->parseBasePlaceholders($objUser);
 
                 $this->_objTpl->parse('access_last_active_'.(!empty($gender) ? $gender.'_' : '').'members');
 
@@ -182,6 +168,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $filter['gender'] = 'gender_'.$gender;
         }
 
+        // filter users by group association
+        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_latest_registered_member_list');
+        if ($groupFilter) {
+            $filter['group_id'] = $groupFilter;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $objUser = $objFWUser->objUser->getUsers(
             $filter,
@@ -195,20 +187,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         if ($objUser) {
             while (!$objUser->EOF) {
-                $this->_objTpl->setVariable(array(
-                    'ACCESS_USER_ID'    => $objUser->getId(),
-                    'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-                    'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
-                ));
-
-                $objUser->objAttribute->first();
-                while (!$objUser->objAttribute->EOF) {
-                    $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
-                    if ($objAttribute->checkReadPermission()) {
-                        $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
-                    }
-                    $objUser->objAttribute->next();
-                }
+                $this->parseBasePlaceholders($objUser);
 
                 $this->_objTpl->parse('access_latest_registered_'.(!empty($gender) ? $gender.'_' : '').'members');
 
@@ -242,6 +221,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $filter['gender'] = 'gender_'.$gender;
         }
 
+        // filter users by group association
+        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_birthday_member_list');
+        if ($groupFilter) {
+            $filter['group_id'] = $groupFilter;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $objUser = $objFWUser->objUser->getUsers(
             $filter,
@@ -255,20 +240,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         if ($objUser) {
             while (!$objUser->EOF) {
-                $this->_objTpl->setVariable(array(
-                    'ACCESS_USER_ID'    => $objUser->getId(),
-                    'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-                    'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
-                ));
-
-                $objUser->objAttribute->first();
-                while (!$objUser->objAttribute->EOF) {
-                    $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
-                    if ($objAttribute->checkReadPermission()) {
-                        $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
-                    }
-                    $objUser->objAttribute->next();
-                }
+                $this->parseBasePlaceholders($objUser);
 
                 $this->_objTpl->parse('access_birthday_'.(!empty($gender) ? $gender.'_' : '').'members');
 
@@ -280,10 +252,32 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
     }
 
     /**
+     * Parses ACCESS_USER_ID, -USERNAME and -REGDATE placeholders and the user's attributes
+     * @param \User User object to parse placeholders for
+     */
+    public function parseBasePlaceholders($objUser) {
+        $this->_objTpl->setVariable(array(
+            'ACCESS_USER_ID'    => $objUser->getId(),
+            'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
+            'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
+        ));
+
+        $objUser->objAttribute->first();
+        while (!$objUser->objAttribute->EOF) {
+            $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
+            if ($objAttribute->checkReadPermission()) {
+                $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
+            }
+            $objUser->objAttribute->next();
+        }
+    }
+
+    /**
      * Parse a list (into the loaded template object) of those users having
      * their birthday coming up.
      *
      * @param   string  $gender Optional set to 'female' or 'male' to filter the list by gender
+     * @todo    Implement feature to filter by filter group placeholder (see fetchGroupFilter())
      */
     public function setNextBirthdayUsers($gender = '')
     {
@@ -292,7 +286,8 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         $query = 'SELECT tblU.`id`
             FROM `' . DBPREFIX . 'access_users` AS tblU
             INNER JOIN `' . DBPREFIX . 'access_user_profile` AS tblP ON tblP.`user_id` = tblU.`id`
-            WHERE tblU.`active` = true';
+            WHERE tblU.`active` = true
+              AND tblP.`birthday` != ""';
 
         if (!empty($gender)) {
             $query .= ' AND tblP.`gender` = "gender_' . $gender . '"';
@@ -406,5 +401,23 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         return false;
     }
 
+    /**
+     * Scan the supplied template for group-filter-placeholders and return
+     * the parsed group-IDs.
+     * Scheme of a group-filter-placeholder: ACCESS_FILTER_GROUP_<ID>
+     *
+     * @param   \Cx\Core\Html\Sigma $template   Template to look for group filter placeholders for
+     * @param   string  $blockName  The template block in which to look for the placeholders for
+     * @return  array Array of group-IDs
+     */
+    public static function fetchGroupFilter($template, $blockName) {
+        // fetch all placeholders from current application template
+        $placeholders = $template->getPlaceholderList($blockName);
+
+        // filter out special placeholders that identify a group filter
+        $groupFilterPlaceholderPrefix = 'ACCESS_FILTER_GROUP_';
+        $groupFilterPlaceholders = preg_grep('/^' . $groupFilterPlaceholderPrefix . '/', $placeholders);
+        return preg_filter('/^' . $groupFilterPlaceholderPrefix . '/', '', $groupFilterPlaceholders);
+    }
 }
 

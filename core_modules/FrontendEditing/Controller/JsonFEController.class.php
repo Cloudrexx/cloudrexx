@@ -64,7 +64,7 @@ class JsonFEController extends \Cx\Core\Core\Model\Entity\Controller implements 
     
     public function getAccessableMethods() {
         return array(
-            'getToggleButton' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
+            'getToggleButton' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false),
         );
     }
     
@@ -73,7 +73,6 @@ class JsonFEController extends \Cx\Core\Core\Model\Entity\Controller implements 
     }
     
     public function getToggleButton($params) {
-        $this->getComponent('Session')->getSession();
         if (
             !$this->frontendEditingIsActive(true, false) ||
             !isset($params['get']) ||

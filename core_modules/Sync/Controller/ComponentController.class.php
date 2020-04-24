@@ -70,6 +70,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     protected $spooledPushes = array();
     
     protected $unspooling = false;
+
+    /**
+     * On remote side, this is set to the changeset's foreign host
+     */
+    protected $foreignHost = '';
     
     /**
      * Returns all Controller class names for this component (except this)
@@ -202,6 +207,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             // Most exceptions should be catched inside the API!
             http_response_code(400); // BAD REQUEST
             echo 'Exception of type "' . get_class($e) . '" with message "' . $e->getMessage() . '"';
+            \DBG::log($e->getTraceAsString());
         }
     }
     
@@ -210,6 +216,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         if ($this->unspooling || !isset($this->spooler)) {
             return;
         }
+        $this->unspooling = true;
         $em = $this->cx->getDb()->getEntityManager();
         foreach ($this->spooler->getSpool() as $i=>$change) {
             $change->setHosts($change->getOriginSync()->getRelatedHosts($change->getOriginEntityIndexData()));
@@ -218,7 +225,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $em->persist($change);
         }
-        $this->unspooling = true;
         $em->flush();
         $this->spooler = new \Cx\Core_Modules\Sync\Model\Entity\Spooler();
         $this->unspooling = false;
@@ -262,6 +268,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             throw new \Exception('No such DataSource: ' . $name);
         }
         $entityType = $dataAccess->getDataSource()->getIdentifier();
+        $this->cx->getEvents()->addEventListener('preDistantEntityLoad', $this);
         
         $argumentKeys = array_keys($arguments);
         $metaData = $em->getClassMetadata($entityType);
@@ -278,14 +285,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $this->currentInsertId = $elementId;
     
         $referrerParts = parse_url($_SERVER['HTTP_REFERRER']);
-        $foreignHost = $referrerParts['host'];
+        $this->foreignHost = $referrerParts['host'];
         
         if (!isset($arguments[2])) {
             // API would produce a 404 here
             throw new \BadMethodCallException('No element given');
         }
         
-        $mapping = $this->getIdMapping($entityType, $foreignHost, $elementId);
+        $mapping = $this->getIdMapping($entityType, $this->foreignHost, $elementId);
         
         if (!$mapping) {
             // remote is trying to push changes to an entity that does not yet exist here
@@ -339,17 +346,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
         $primaryKeyColumnNames = array();
         foreach ($primaryKeyNames as $fieldName) {
-            $this->replaceKey($foreignHost, $entityType, $fieldName, $dataArguments, $foreignId);
+            $this->replaceKey($this->foreignHost, $entityType, $fieldName, $dataArguments, $foreignId);
             $fieldMapping = $metaData->getFieldMapping($fieldName);
             $primaryKeyColumnNames[$fieldMapping['columnName']] = $fieldName;
         }
         if ($method != 'delete') {
             $associationMappings = $metaData->getAssociationMappings();
             foreach ($associationMappings as $fieldName => $associationMapping) {
-                if (!isset($associationMapping['targetEntity'])) {
+                if (
+                    !isset($associationMapping['targetEntity']) ||
+                    !isset($associationMapping['joinColumns']) // not set for m-m relations, not a local field, no need to replace key
+                ) {
                     continue;
                 }
-                $replacement = $this->replaceKey($foreignHost, $associationMapping['targetEntity'], $fieldName, $dataArguments);
+                $replacement = $this->replaceKey($this->foreignHost, $associationMapping['targetEntity'], $fieldName, $dataArguments);
                 
                 $joinColumn = current($associationMapping['joinColumns']);
                 if ($replacement && isset($primaryKeyColumnNames[$joinColumn['name']])) {
@@ -382,6 +392,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function onEvent($eventName, array $eventArgs) {
         $em = $this->cx->getDb()->getEntityManager();
+
+        if ($eventName == 'preDistantEntityLoad') {
+            $fieldData = $eventArgs['targetId'];
+            $newId = $this->replaceKey(
+                $this->foreignHost,
+                $eventArgs['targetEntityClassName'],
+                $field,
+                $fieldData,
+                array_values($eventArgs['targetId'])
+            );
+            $eventArgs['targetId']['id'] = $newId;
+            return;
+        }
+
         if (substr($eventName, 6) != \Doctrine\ORM\Events::postFlush) {
             try {
                 $dlea = current($eventArgs);
@@ -522,7 +546,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $i = 0;
         $severity = 'INFO';
         // for as long as there are changes of non-locked hosts
-        $query = $em->createQuery('SELECT h FROM ' . $this->getNamespace() . '\Model\Entity\Host h WHERE h.state = 0');
+        $fiveMinutesAgo = $this->getComponent(
+            'DateTime'
+        )->createDateTimeForDb('5 minutes ago');
+        $query = $em->createQuery('
+            SELECT
+                h
+            FROM
+                ' . $this->getNamespace() . '\Model\Entity\Host h
+            WHERE
+                h.state = 0 OR
+                (
+                    h.state = 1 AND
+                    h.lastUpdate < :fiveMinutesAgo
+                )
+        ')->setParameter(
+            'fiveMinutesAgo',
+            $fiveMinutesAgo->format('Y-m-d H:i:s')
+        );
+        $query->useResultCache(false);
         $nonLockedHosts = $query->getResult();
         $hasNonLockedChanges = false;
         foreach ($nonLockedHosts as $host) {
@@ -547,14 +589,26 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     if (!$host->handleChange($change)) {
                         $severity = 'WARNING';
                         $host->disable();
+                        \DBG::msg(
+                            'SYNC ERROR: Host "' . $host->getHost() .
+                                '" could not handle change #' .
+                                $change->getId() . '. Host disabled.'
+                        );
                         break 2;
                     }
                     $i++;
-                    $em->remove($change);
+                    // remove host change
+                    $change->removeHost($host);
+                    $host->removeChange($change);
+                    if (!$change->getHosts()->count()) {
+                        // if change has no more hosts, remove change
+                        $em->remove($change);
+                    }
                 }
                 $host->removeLock();
             }
             $query = $em->createQuery('SELECT h FROM ' . $this->getNamespace() . '\Model\Entity\Host h WHERE h.state = 0');
+            $query->useResultCache(false);
             $nonLockedHosts = $query->getResult();
             $hasNonLockedChanges = false;
             foreach ($nonLockedHosts as $host) {
@@ -629,7 +683,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * Returns the fields another entity depends on (relations that should be satisfied)
      * @todo: This method should be in DataSource model
      */
-    public function getCascadingFields($entity, $eventType) {
+    public function getCascadingFields($entity, $eventType, $manyToManyOnly = false) {
         $em = $this->cx->getDb()->getEntityManager();
         $entityClassName = get_class($entity);
         $entityMetaData = $em->getClassMetadata($entityClassName);
@@ -648,11 +702,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             ) {
                 continue;
             }
+            if (
+                $manyToManyOnly &&
+                $associationMapping['type'] != \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY
+            ) {
+                continue;
+            }
             $dependingFields[$field] = $associationMapping['targetEntity'];
         }
         return $dependingFields;
     }
     
+    /**
+     * Remote side
+     */
     public function getIdMapping($entityType, $foreignHost = '', $foreignId = '', $localId = '', $allowMultiple = false) {
         $em = $this->cx->getDb()->getEntityManager();
         $qb = $em->createQueryBuilder();
@@ -671,13 +734,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $qb->andWhere($qb->expr()->like('m.localId', $qb->expr()->literal(serialize($localId))));
         }
         $mapping = null;
+        $query = $qb->getQuery();
+        $query->useResultCache(false);
         try {
             if ($allowMultiple) {
-                $mapping = $qb->getQuery()->getResult();
+                $mapping = $query->getResult();
             } else {
-                $mapping = $qb->getQuery()->getSingleResult();
+                $mapping = $query->getSingleResult();
             }
-        } catch (\Doctrine\ORM\NoResultException $e) {}
+        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (\Doctrine\ORM\NonUniqueResultException $e) {
+            \DBG::log($query->getDql());
+            throw $e;
+        }
         return $mapping;
     }
     

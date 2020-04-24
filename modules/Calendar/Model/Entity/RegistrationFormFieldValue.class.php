@@ -60,12 +60,12 @@ class RegistrationFormFieldValue extends \Cx\Model\Base\EntityBase {
     protected $value;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Registration
+     * @var \Cx\Modules\Calendar\Model\Entity\Registration
      */
     protected $registration;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\RegistrationFormField
+     * @var \Cx\Modules\Calendar\Model\Entity\RegistrationFormField
      */
     protected $registrationFormField;
 
@@ -133,7 +133,7 @@ class RegistrationFormFieldValue extends \Cx\Model\Base\EntityBase {
     /**
      * Set registration
      *
-     * @param Cx\Modules\Calendar\Model\Entity\Registration $registration
+     * @param \Cx\Modules\Calendar\Model\Entity\Registration $registration
      */
     public function setRegistration(\Cx\Modules\Calendar\Model\Entity\Registration $registration)
     {
@@ -143,7 +143,7 @@ class RegistrationFormFieldValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get registration
      *
-     * @return Cx\Modules\Calendar\Model\Entity\Registration $registration
+     * @return \Cx\Modules\Calendar\Model\Entity\Registration $registration
      */
     public function getRegistration()
     {
@@ -153,7 +153,7 @@ class RegistrationFormFieldValue extends \Cx\Model\Base\EntityBase {
     /**
      * Set registrationFormField
      *
-     * @param Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
      */
     public function setRegistrationFormField(\Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField)
     {
@@ -163,7 +163,7 @@ class RegistrationFormFieldValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get registrationFormField
      *
-     * @return Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
+     * @return \Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
      */
     public function getRegistrationFormField()
     {

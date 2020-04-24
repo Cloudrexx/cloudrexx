@@ -73,10 +73,10 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupName', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupDescription', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'isActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'homepage', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'user', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId2', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupName', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupDescription', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'isActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'homepage', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'user', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId2', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId', 'toolbar', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupName', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupDescription', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'isActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'homepage', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'user', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId2', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupName', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'groupDescription', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'isActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'homepage', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'user', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId2', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\Group' . "\0" . 'accessId', 'toolbar', 'validators', 'virtual');
     }
 
     /**
@@ -387,6 +387,28 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     /**
      * {@inheritDoc}
      */
+    public function setToolbar($toolbar)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setToolbar', array($toolbar));
+
+        return parent::setToolbar($toolbar);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getToolbar()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getToolbar', array());
+
+        return parent::getToolbar();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -415,6 +437,17 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

@@ -55,6 +55,37 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array('JsonSurvey');
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustResponse(
+        \Cx\Core\Routing\Model\Entity\Response $response
+    ) {
+        $page   = $response->getPage();
+        if (!$page ||
+            $page->getModule() !== $this->getName() ||
+            !in_array(
+                $page->getCmd(),
+                array(
+                    '',
+                    'surveybyId',
+                    'surveypreview',
+                    'questionpreview',
+                    'homesurvey'
+                )
+            )
+        ) {
+            return;
+        }
+
+        $survey = new Survey('');
+        $title  = $survey->getPageTitle();
+        if (!$title) {
+            return;
+        }
+        $page->setTitle($title);
+        $page->setMetatitle($title);
+    }
      /**
      * Load your component.
      *

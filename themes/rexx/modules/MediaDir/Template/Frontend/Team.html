@@ -1,0 +1,60 @@
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery('#mediadir .employee:last').addClass('last');
+    });
+</script>
+{MEDIADIR_JAVASCRIPT}
+<div id="mediadir">
+    <div class="row">
+        <div class="container-fluid">
+            <!-- BEGIN mediadirSearchform -->
+            {MEDIADIR_NORMAL_SEARCH_FORM}
+            <!-- END mediadirSearchform -->
+        </div>
+        <!-- BEGIN mediadirEntryList -->
+        <div class="container-fluid">
+            <div class="employee">
+                <div class="row">
+                    <div class="employee-left col-md-3 col-sm-12 col-xs-12">
+                        <!-- BEGIN mediadir_inputfield_171 -->
+                        <img class="img-responsive" src="{MEDIADIR_INPUTFIELD_VALUE_SRC}" alt="" />
+                        <!-- END mediadir_inputfield_171 -->
+                    </div>
+                    <div class="employee-middle col-md-4 col-sm-12 col-xs-12">
+                        <div class="employee-title">
+                            <!-- BEGIN mediadir_inputfield_167 -->
+                            {MEDIADIR_INPUTFIELD_VALUE}
+                            <!-- END mediadir_inputfield_167 -->
+                            <!-- BEGIN mediadir_inputfield_168 -->
+                            {MEDIADIR_INPUTFIELD_VALUE}
+                            <!-- END mediadir_inputfield_168 -->
+                        </div>
+                        <div class="employee-description">
+                            <!-- BEGIN mediadir_inputfield_172 -->
+                            {TXT_MEDIADIR_INPUTFIELD_NAME}: {MEDIADIR_INPUTFIELD_VALUE}<br />
+                            <!-- END mediadir_inputfield_172 -->
+                            <!-- BEGIN mediadir_inputfield_169 -->
+                            {TXT_MEDIADIR_INPUTFIELD_NAME}: {MEDIADIR_INPUTFIELD_VALUE}
+                            <!-- END mediadir_inputfield_169 -->
+                        </div>
+                    </div>
+                    <div class="employee-right col-md-5 col-sm-12 col-xs-12">
+                        <div class="employee-more">
+                            <!-- BEGIN mediadir_inputfield_170 -->
+                            <strong>{TXT_MEDIADIR_INPUTFIELD_NAME}:</strong><br />
+                            {MEDIADIR_INPUTFIELD_VALUE}
+                            <!-- END mediadir_inputfield_170 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END mediadirEntryList -->
+        <div class="container-fluid">
+            <!-- BEGIN mediadirNoEntriesFound -->
+            {TXT_MEDIADIR_SEARCH_MESSAGE}
+            <!-- END mediadirNoEntriesFound -->
+        </div>
+        {MEDIADIR_PAGING}
+    </div>
+</div>

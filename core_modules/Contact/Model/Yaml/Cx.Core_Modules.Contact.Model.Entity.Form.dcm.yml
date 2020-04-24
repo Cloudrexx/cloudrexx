@@ -7,32 +7,57 @@ Cx\Core_Modules\Contact\Model\Entity\Form:
       type: integer
       generator:
         strategy: AUTO
+      options:
+        unsigned: true
   fields:
     mails:
       type: text
+      length: 65535
     showForm:
       type: boolean
+      options:
+        default: false
     useCaptcha:
       type: boolean
+      options:
+        default: true
       column: use_captcha
     useCustomStyle:
       type: boolean
+      options:
+        default: false
       column: use_custom_style
     saveDataInCrm:
       type: boolean
+      options:
+        default: false
       column: save_data_in_crm
     sendCopy:
       type: boolean
+      options:
+        default: false
       column: send_copy
     useEmailOfSender:
       type: boolean
+      options:
+        default: false
       column: use_email_of_sender
     htmlMail:
       type: boolean
+      options:
+        default: true
       column: html_mail
     sendAttachment:
       type: boolean
+      options:
+        default: false
       column: send_attachment
     crmCustomerGroups:
       type: array
+      nullable: true
       column: crm_customer_groups
+    sendMultipleReply:
+      type: boolean
+      options:
+        default: false
+      column: send_multiple_reply

@@ -175,6 +175,11 @@ class Event extends \Cx\Model\Base\EntityBase {
     protected $invitedCrmGroups;
 
     /**
+     * @var string $excludedCrmGroups
+     */
+    protected $excludedCrmGroups;
+
+    /**
      * @var text $invitedMails
      */
     protected $invitedMails;
@@ -223,6 +228,11 @@ class Event extends \Cx\Model\Base\EntityBase {
      * @var smallint $seriesStatus
      */
     protected $seriesStatus;
+
+    /**
+     * @var integer $independentSeries
+     */
+    protected $independentSeries;
 
     /**
      * @var integer $seriesType
@@ -410,24 +420,24 @@ class Event extends \Cx\Model\Base\EntityBase {
     protected $registrationExternalFullyBooked;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\EventField
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $eventFields;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Invite
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $invite;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Registration
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $registrations;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Category
+     * @var \Doctrine\Common\Collections\Collection
      */
-    protected $category;
+    protected $categories;
 
     /**
      * @var Cx\Modules\Calendar\Model\Entity\RegistrationForm
@@ -438,9 +448,10 @@ class Event extends \Cx\Model\Base\EntityBase {
     {
         $this->eventFields = new \Doctrine\Common\Collections\ArrayCollection();
         $this->registrations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invite = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *
@@ -952,6 +963,26 @@ class Event extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Set excludedCrmGroups
+     *
+     * @param string $excludedCrmGroups
+     */
+    public function setExcludedCrmGroups($excludedCrmGroups)
+    {
+        $this->excludedCrmGroups = $excludedCrmGroups;
+    }
+
+    /**
+     * Get excludedCrmGroups
+     *
+     * @return string $excludedCrmGroups
+     */
+    public function getExcludedCrmGroups()
+    {
+        return $this->excludedCrmGroups;
+    }
+
+    /**
      * Set invitedMails
      *
      * @param text $invitedMails
@@ -1183,6 +1214,26 @@ class Event extends \Cx\Model\Base\EntityBase {
     public function getSeriesStatus()
     {
         return $this->seriesStatus;
+    }
+
+    /**
+     * Set independentSeries
+     *
+     * @param smallint $independentSeries
+     */
+    public function setIndependentSeries($independentSeries)
+    {
+        $this->independentSeries = $independentSeries;
+    }
+
+    /**
+     * Get independentSeries
+     *
+     * @return smallint $independentSeries
+     */
+    public function getIndependentSeries()
+    {
+        return $this->independentSeries;
     }
 
     /**
@@ -1916,6 +1967,16 @@ class Event extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove eventFields
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\EventField $eventFields
+     */
+    public function removeEventField(\Cx\Modules\Calendar\Model\Entity\EventField $eventFields)
+    {
+        $this->eventFields->removeElement($eventFields);
+    }
+
+    /**
      * Set eventFields
      *
      * @param Doctrine\Common\Collections\Collection $eventFields
@@ -1943,6 +2004,16 @@ class Event extends \Cx\Model\Base\EntityBase {
     public function addInvite(\Cx\Modules\Calendar\Model\Entity\Invite $invite)
     {
         $this->invite[] = $invite;
+    }
+
+    /**
+     * Remove invite
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\Invite $invite
+     */
+    public function removeInvite(\Cx\Modules\Calendar\Model\Entity\Invite $invite)
+    {
+        $this->invite->removeElement($invite);
     }
 
     /**
@@ -1997,6 +2068,16 @@ class Event extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove registrations
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\Registration $registrations
+     */
+    public function removeRegistration(\Cx\Modules\Calendar\Model\Entity\Registration $registrations)
+    {
+        $this->registrations->removeElement($registrations);
+    }
+
+    /**
      * Set registrations
      *
      * @param Doctrine\Common\Collections\Collection $registrations
@@ -2017,23 +2098,56 @@ class Event extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set category
-     *
-     * @param Cx\Modules\Calendar\Model\Entity\Category $category
+     * Set categories
+     * @param \Doctrine\Common\Collections\Collection $categories
+     * @author Reto Kohli <reto.kohli@comvation.com>
      */
-    public function setCategory(\Cx\Modules\Calendar\Model\Entity\Category $category)
+    public function setCategories(\Doctrine\Common\Collections\Collection $categories)
     {
-        $this->category = $category;
+        $this->categories = $categories;
     }
 
     /**
-     * Get category
-     *
-     * @return Cx\Modules\Calendar\Model\Entity\Category $category
+     * Get categories
+     * @return \Doctrine\Common\Collections\Collection
+     * @author Reto Kohli <reto.kohli@comvation.com>
      */
-    public function getCategory()
+    public function getCategories()
     {
-        return $this->category;
+        return $this->categories;
+    }
+
+    /**
+     * Add a category
+     * @param Category $category Category to add
+     * @author Michael Ritter <michael.ritter@cloudrexx.com>
+     */
+    public function addCategories($category) {
+        $category->addEvents($this);
+        $this->categories[] = $category;
+    }
+
+    /**
+     * Add categories
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\Category $categories
+     * @return Event
+     */
+    public function addCategory(\Cx\Modules\Calendar\Model\Entity\Category $categories)
+    {
+        $this->categories[] = $categories;
+
+        return $this;
+    }
+
+    /**
+     * Remove categories
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\Category $categories
+     */
+    public function removeCategory(\Cx\Modules\Calendar\Model\Entity\Category $categories)
+    {
+        $this->categories->removeElement($categories);
     }
 
     /**
@@ -2055,4 +2169,5 @@ class Event extends \Cx\Model\Base\EntityBase {
     {
         return $this->registrationForm;
     }
+
 }

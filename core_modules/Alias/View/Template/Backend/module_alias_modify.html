@@ -151,8 +151,9 @@
     var aliasSetUrl = function(data) {
         if (data.type === 'page') {
                 if (data.data[0]) {
-                    url  = data.data[0].node;
-                    path = data.data[0].url;
+                    var locale = data.locale;
+                    var url  = data.data[0].localization[locale].node;
+                    var path = data.data[0].localization[locale].url;
 
                     url = url.replace(cx.variables.get('contrexxPathOffset', 'alias'), '');
                     if (path === '') {
@@ -161,9 +162,8 @@
                     if (path[0] === '/') {
                         path = path.substr(1);
                     }
-                    var lang = cx.variables.get('language', 'contrexx');
                     $J('#alias_target_wrapper').hide();
-                    $J('#alias_target_text').text(cx.variables.get('contrexxBaseUrl', 'alias') + "/" + lang + "/" + path).attr('href', function () {
+                    $J('#alias_target_text').text(cx.variables.get('contrexxBaseUrl', 'alias') + "/" + locale + "/" + path).attr('href', function () {
                         return $J(this).text();
                     });
                     $J('#alias_target_text_wrapper').show();

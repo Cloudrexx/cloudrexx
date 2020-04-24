@@ -96,7 +96,6 @@ $_ARRAYLANG['TXT_COMMENTS'] = "Comentarios";
 $_ARRAYLANG['TXT_ID'] = "ID";
 $_ARRAYLANG['TXT_ADDRESS_CUSTOMER'] = "Direcci&oacute;n del cliente";
 $_ARRAYLANG['TXT_TAC'] = "T&eacute;rminos y condiciones";
-$_ARRAYLANG['TXT_ACCEPT_TAC'] = "Confirmo la correcci&oacute;n de los datos introducidos, conozco los <a href=\"index.php?section=Agb\" target=\"_blank\">t&eacute;rminos y condiciones</a> y los acepto.";
 $_ARRAYLANG['TXT_TOTAL_PRICE'] = "Precio total";
 $_ARRAYLANG['TXT_ORDER_INFOS'] = "Informaci&oacute;n del pedido";
 $_ARRAYLANG['TXT_ORDER_PREPARED'] = "Su pedido ha sido preparado para el pago.";

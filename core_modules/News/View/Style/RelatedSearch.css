@@ -1,0 +1,63 @@
+/* CSS for edit dialog */
+#news-related-news-list ul {
+    margin: 0;
+    padding: 0;
+    float: left;
+    width: 308px;
+}
+#news-related-news-list ul li {
+    list-style-type: none;
+    background: none;
+    border: 1px solid rgb(183, 188, 192);
+    padding: 0 0 0 6px;
+    margin: 5px;
+    margin-left: 0;
+    width: auto;
+    float: left;
+    line-height: 24px;
+}
+#news-related-news-list ul li span.news_list_close {
+    padding: 1px 5px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    margin-left: 5px;
+    background: rgb(183, 188, 192);
+    color: rgb(255, 255, 255);
+    position: relative;
+    float: right;
+}
+#news-related-news-list ul li label {
+    margin: 1px;
+    float: left;
+    width: auto;
+}
+.news-related-search-info {
+    font-style: italic;
+}
+.news-related-search-input.ui-autocomplete-input.loading {
+    background-image: url('../Media/Loading.gif');
+    background-repeat: no-repeat;
+    background-position: 98% center;
+    background-size: 16px;
+}
+
+/* CSS for listing (view) */
+#news-related-news {
+    width: 100%;
+    float: left;
+}
+#news-related-news h3 {
+    border-bottom: 1px solid #E3E4E5;
+    padding-bottom: 5px;
+}
+#news-related-news .rel-news-blocks {
+    width: 100%;
+    float: left;
+    height: auto;
+    border-bottom: 1px solid #E3E4E5;
+    padding-bottom: 12px;
+}
+#news-related-news .rel-news-blocks:last-child {
+    margin: 0;
+    border-bottom: 1px solid #D6D6D6;
+}

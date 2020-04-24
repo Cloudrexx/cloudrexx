@@ -209,6 +209,9 @@ class ContentWorkflow extends \Module {
             } else {
                 $page = $this->pageRepo->findOneById($log['objectId']);
             }
+            if (!$page) {
+                continue;
+            }
             $data[$page->getId()] = array(
                 'action'  => $log['action'],
                 'version' => $log['version'],

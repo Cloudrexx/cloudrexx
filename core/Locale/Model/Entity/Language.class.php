@@ -68,12 +68,12 @@ class Language extends \Cx\Model\Base\EntityBase {
     protected $backend;
 
     /**
-     * @var \Cx\Core\Locale\Model\Entity\Locale
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $localeRelatedBySourceLanguages;
 
     /**
-     * @var \Cx\Core\Locale\Model\Entity\Locale
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $localeRelatedByIso1s;
 
@@ -194,6 +194,29 @@ class Language extends \Cx\Model\Base\EntityBase {
      * Add localeRelatedBySourceLanguages
      *
      * @param \Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages
+     * @return Language
+     */
+    public function addLocaleRelatedBySourceLanguage(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
+    {
+        $this->localeRelatedBySourceLanguages[] = $localeRelatedBySourceLanguages;
+
+        return $this;
+    }
+
+    /**
+     * Remove localeRelatedBySourceLanguages
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages
+     */
+    public function removeLocaleRelatedBySourceLanguage(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
+    {
+        $this->localeRelatedBySourceLanguages->removeElement($localeRelatedBySourceLanguages);
+    }
+
+    /**
+     * Add localeRelatedBySourceLanguages
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages
      */
     public function addLocaleRelatedBySourceLanguages(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
     {
@@ -208,6 +231,29 @@ class Language extends \Cx\Model\Base\EntityBase {
     public function getLocaleRelatedBySourceLanguages()
     {
         return $this->localeRelatedBySourceLanguages;
+    }
+
+    /**
+     * Add localeRelatedByIso1s
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s
+     * @return Language
+     */
+    public function addLocaleRelatedByIso1(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s)
+    {
+        $this->localeRelatedByIso1s[] = $localeRelatedByIso1s;
+
+        return $this;
+    }
+
+    /**
+     * Remove localeRelatedByIso1s
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s
+     */
+    public function removeLocaleRelatedByIso1(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s)
+    {
+        $this->localeRelatedByIso1s->removeElement($localeRelatedByIso1s);
     }
 
     /**

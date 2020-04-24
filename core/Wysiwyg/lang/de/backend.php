@@ -40,7 +40,7 @@ global $_ARRAYLANG;
 
 // Let's start with module info:
 $_ARRAYLANG['TXT_CORE_WYSIWYG'] = 'WYSIWYG';
-$_ARRAYLANG['TXT_CORE_WYSIWYG_DESCRIPTION'] = 'Dieses Modul dient dazu die WYSIWYG-Vorlagen zu verwalten';
+$_ARRAYLANG['TXT_CORE_WYSIWYG_DESCRIPTION'] = 'Diese Anwendung stellt den WYSIWYG-Editor zur Pflege des Inhalts bereit.';
 
 // Here come the ACTs:
 $_ARRAYLANG['TXT_CORE_WYSIWYG_ACT_WYSIWYG_TEMPLATE'] = 'WYSIWYG Vorlagen';
@@ -61,26 +61,36 @@ $_ARRAYLANG['TXT_CORE_WYSIWYG_ACT_FUNCTIONS'] = 'Editorfunktionen';
 $_ARRAYLANG['TXT_CORE_WYSIWYG_ACT_SETTINGS'] = 'Einstellungen';
 $_ARRAYLANG['TXT_CORE_WYSIWYG_SPECIFICSTYLESHEET'] = 'Berücksichtigung von spezifischen CSS';
 $_ARRAYLANG['TXT_CORE_WYSIWYG_REPLACEACTUALCONTENTS'] = 'Aktuellen Inhalt im WYSIWYG ersetzen';
+$_ARRAYLANG['TXT_CORE_WYSIWYG_SORTBEHAVIOUR'] = 'Sortierung der WYSIWYG Vorlagen';
+$_ARRAYLANG['TXT_CORE_WYSIWYG_ALPHABETICAL']  = 'Alphabetisch';
+$_ARRAYLANG['TXT_CORE_WYSIWYG_CUSTOM']        = 'Individuell';
 
 // Functions
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_CONFIGURATOR'] = 'Editorfunktionen';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_FUNC_DESC'] = 'Wählen Sie die Funktionen aus, welche im WYSIWYG-Editor zur Verfügung stehen sollen.';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_FUNC_DESC_INFO_GROUPS'] = 'Der Funktionsumfang des WYSIWYG-Editors kann pro Benutzergruppe (unter %s) weiter eingeschränkt werden.';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_SAVE'] = 'Speichern';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_MODE'] = 'Modus';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_DOCUMENT'] = 'Dokument';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_DOCUMENT_TOOLS'] = 'Dokumenten Werkzeuge';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_DOCUMENT'] = 'Inhalt löschen';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_DOCUMENT_TOOLS'] = 'Vorlagen';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_CLIPBOARD'] = 'Zwischenablage';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_UNDO'] = 'Rückgängig machen';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_FIND'] = 'Suchen';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_UNDO'] = 'Änderungskontrolle';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_FIND'] = 'Suchen & Ersetzen';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_SELECTION'] = 'Auswahl';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_SPELLCHECKER'] = 'Rechtschreibung';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_BASICSTYLES'] = 'Formatierungen';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_SPELLCHECKER'] = 'Rechtschreibkontrolle';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_BASICSTYLES'] = 'Textformatierung';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_CLEANUP'] = 'Formatierungen entfernen';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_LIST'] = 'Aufzählungslisten';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_INDENT'] = 'Einrücken';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_BLOCKS'] = 'Blöcke';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_ALIGN'] = 'Ausrichtung';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_LINKS'] = 'Verlinkungen';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_INSERT'] = 'Einfügen';
-$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_STYLES'] = 'Überschriften';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_INSERT'] = 'Objekte Einfügen';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_STYLES'] = 'Formatierung';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_COLORS'] = 'Farben';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_TOOLS'] = 'Werkzeuge';
+$_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_BIDI'] = 'Textrichtung';
+
+// GUI
+$_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_LABEL'] = 'Bild in modalem Fenster anzeigen (Shadowbox)';
+$_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_SRC'] = 'Bildquelle für die Anzeige in modalem Fenster';

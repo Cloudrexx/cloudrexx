@@ -102,6 +102,9 @@ var setSelectedImage = function(data) {
 function toggleOptions(checkboxId) {
   if (document.getElementById('productOptions'+checkboxId).checked) {
     document.getElementById('subOptionsProductOptions'+checkboxId).style.display = 'block';
+    if (!!!cx.variables.get('activate_product_attribute_children', 'shop')) {
+        return;
+    }
     for (var i = 0; i < document.getElementById('subOptionsProductOptions'+checkboxId).getElementsByTagName('input').length; ++i) {
       objInput = document.getElementById('subOptionsProductOptions'+checkboxId).getElementsByTagName('input')[i];
       if (objInput.getAttribute('type') == "checkbox") {

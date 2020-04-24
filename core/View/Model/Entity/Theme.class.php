@@ -379,7 +379,7 @@ class Theme extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget
             ->getFileSystem();
         $file = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($filePath, $fileSystem);
 
-        return $fileSystem->getFullPath($file);
+        return $fileSystem->getFullPath($file) . $file->getFullName();
     }
 
     /**

@@ -53,6 +53,11 @@ class Response extends \Cx\Lib\Net\Model\Entity\Response {
     protected $page;
 
     /**
+     * @param \Cx\Core\View\Model\Entity\Theme Current theme
+     */
+    protected $theme = null;
+
+    /**
      * Sets the current page for this response
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Page
      */
@@ -66,5 +71,32 @@ class Response extends \Cx\Lib\Net\Model\Entity\Response {
      */
     public function getPage() {
         return $this->page;
+    }
+
+    /**
+     * Sets the current theme
+     * @param \Cx\Core\View\Model\Entity\Theme $theme Current theme
+     */
+    public function setTheme(\Cx\Core\View\Model\Entity\Theme $theme) {
+        $this->theme = $theme;
+    }
+
+    /**
+     * Returns the current theme
+     * @return \Cx\Core\View\Model\Entity\Theme Current theme
+     */
+    public function getTheme() {
+        if ($this->theme) {
+            return $this->theme;
+        }
+        $themesRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
+        $init = \Env::get('init');
+        if (!$init) {
+            return null;
+        }
+        $this->theme = $themesRepository->findById(
+            $init->getCurrentThemeId()
+        );
+        return $this->theme;
     }
 }

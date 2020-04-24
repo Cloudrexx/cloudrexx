@@ -66,7 +66,9 @@ class Uploader extends EntityBase
     /**
      * @var Array
      */
-    protected $options = array();
+    protected $options = array(
+        'pl-Max-File-Size' => '',
+    );
 
     /**
      * @var Cx
@@ -90,7 +92,8 @@ class Uploader extends EntityBase
             'data-pl-upload',
             'data-uploader-id' => $this->id,
             'class' => 'uploader-button button',
-            'uploader-type' => self::UPLOADER_TYPE_MODAL
+            'uploader-type' => self::UPLOADER_TYPE_MODAL,
+            'pl-Max-File-Size' => '',
         );
     }
 
@@ -185,6 +188,17 @@ class Uploader extends EntityBase
      */
     function getXHtml($buttonName = 'Upload')
     {
+        // set system upload file size limit,
+        // if no file size limit has been set
+        if (!$this->getMaxFileSize()) {
+            $uploadFileSizeLimit =
+                \Cx\Core\Setting\Controller\Setting::getValue(
+                    'uploadFileSizeLimit',
+                    'Config'
+                );
+            $this->setMaxFileSize($uploadFileSizeLimit);
+        }
+
         $inline = '';
         if ($this->options['uploader-type'] == self::UPLOADER_TYPE_INLINE){
             $this->addClass('uploader-button-hidden');
@@ -292,12 +306,21 @@ class Uploader extends EntityBase
         $this->options['pl-Max-File-Size'] = $type;
     }
 
+    /**
+     * Get the currently set upload file size limit
+     *
+     * @return  string  Set upload file size limit
+     */
+    public function getMaxFileSize() {
+        return $this->options['pl-Max-File-Size'];
+    }
+
     public static function generateId(){
         $uploaders = $_SESSION['uploader']['handlers'];
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randstring = '';
         for ($i = 0; $i < 10; $i++) {
-            $randstring .= $characters[rand(0, strlen($characters))];
+            $randstring .= $characters[rand(0, strlen($characters) - 1)];
         }
         if (array_key_exists($randstring, $uploaders)){
             return self::generateId();

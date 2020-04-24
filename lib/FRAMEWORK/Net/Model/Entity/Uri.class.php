@@ -250,7 +250,7 @@ class Uri extends \Cx\Model\Base\EntityBase {
      * @return string Path section
      */
     public function getPath() {
-        return implode($this->getPathDelimiter(), $this->path);
+        return $this->getPathDelimiter() . implode($this->getPathDelimiter(), $this->path);
     }
     
     /**
@@ -266,7 +266,7 @@ class Uri extends \Cx\Model\Base\EntityBase {
      * @param string $path New path
      */
     public function setPath($path) {
-        $this->path = explode($this->getPathDelimiter(), $path);
+        $this->path = preg_grep('/^$/', explode($this->getPathDelimiter(), $path), PREG_GREP_INVERT);
     }
     
     /**

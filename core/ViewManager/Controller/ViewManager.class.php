@@ -153,8 +153,6 @@ class ViewManager
         'component.yml',
         'forum.html',
         'podcast.html',
-        'blog.html',
-        'immo.html',
     );
 
     /**
@@ -238,7 +236,7 @@ class ViewManager
 
     function __construct()
     {
-        global  $_ARRAYLANG, $objDatabase;
+        global  $_ARRAYLANG;
 
         $this->cx         = \Cx\Core\Core\Controller\Cx::instanciate();
         $this->fileSystem = $this->cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem();
@@ -268,7 +266,6 @@ class ViewManager
             $this->webPath = $this->webPath . '/';
         }
 
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."skins");
         $this->oldTable = DBPREFIX."themes";
 
         $this->themeRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
@@ -1211,7 +1208,7 @@ CODE;
 
         $themeFolder = $theme->getFoldername();
         $archive     = new \PclZip($this->_archiveTempPath . $themeFolder . '.zip');
-        $themeFiles  = $this->getThemesFiles($theme);
+        $themeFiles  = $this->getThemesFiles($theme, true);
 
         \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath);
         $this->createZipFolder($archive, $themeFiles, '/' . $themeFolder);
@@ -1240,7 +1237,7 @@ CODE;
             }
 
             $localFile  = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($relativePath, $this->fileSystem);
-            $filePath   = $localFile->getFileSystem()->getFullPath($localFile);
+            $filePath   = $localFile->getFileSystem()->getFullPath($localFile) . $localFile->getFullName();
             $removePath = preg_replace('/'. preg_quote($relativePath, '/') .'$/', '', $filePath);
 
             if ($archive->add($filePath, PCLZIP_OPT_REMOVE_PATH, $removePath) == 0) {
@@ -1250,13 +1247,17 @@ CODE;
     }
 
     /**
-     * Get the themes files using viewmanager filesystem
+     * Get the theme's files using viewmanager filesystem
      *
-     * @return  array
+     * This pretents that the folders "modules" and "core_modules" are named
+     * "module" and "core_module" unless $real is set to true.
+     * @param \Cx\Core\View\Model\Entity\Theme $theme Theme to fetch files for
+     * @param boolean $real (optional) If set to true, filesystem names are used
+     * @return array Simple list of files. Folder names are indexes containing an array in the same format.
      */
-    function getThemesFiles(\Cx\Core\View\Model\Entity\Theme $theme) {
+    function getThemesFiles(\Cx\Core\View\Model\Entity\Theme $theme, $real = false) {
         $filesList     = $this->fileSystem->getFileList($theme->getFoldername());
-        $formatedFiles = $this->formatFileList($filesList);
+        $formatedFiles = $this->formatFileList($filesList, $real);
         $this->sortFilesFolders($formatedFiles);
 
         return $formatedFiles;
@@ -1265,11 +1266,13 @@ CODE;
     /**
      * Format the Filesystem files and folders to viewManger format
      *
-     * @param array $filesList
-     *
-     * @return array
+     * This pretents that the folders "modules" and "core_modules" are named
+     * "module" and "core_module" unless $real is set to true.
+     * @param array $filesList List of files as returned by FileSystem::getFileList()
+     * @param boolean $real (optional) If set to true, filesystem names are used
+     * @return array Simple list of files. Folder names are indexes containing an array in the same format.
      */
-    function formatFileList($filesList)
+    function formatFileList($filesList, $real = false)
     {
         $result = array();
 
@@ -1282,21 +1285,10 @@ CODE;
                 unset($subFiles['datainfo']);
 
                 $name = $info['name'];
-                switch (true) {
-                    case $name == ltrim($this->cx->getCoreModuleFolderName() , '/'):
-                        $name = 'core_module';
-                        break;
-                    case $name == ltrim($this->cx->getModuleFolderName(), '/'):
-                        $name = 'module';
-                        break;
-                    case $name == ltrim($this->cx->getCoreFolderName(), '/'):
-                        $name = 'core';
-                        break;
-                    default:
-                        break;
+                if (!$real) {
+                    $name = str_replace('modules', 'module', $info['name']);
                 }
-
-                $result[$name] = $this->formatFileList($subFiles);
+                $result[$name] = $this->formatFileList($subFiles, $real);
             }
         }
 
@@ -1327,7 +1319,6 @@ CODE;
             'TXT_ACTIVE_PRINT_TEMPLATE'    => $_ARRAYLANG['TXT_ACTIVE_PRINT_TEMPLATE'],
             'TXT_SAVE'                     => $_ARRAYLANG['TXT_SAVE'],
             'TXT_THEME_ACTIVATE_INFO'      => $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO'],
-            'TXT_THEME_ACTIVATE_INFO_BODY' => $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO_BODY'],
             'TXT_ACTIVE_MOBILE_TEMPLATE'   => $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'],
             'TXT_ACTIVE_APP_TEMPLATE'      => $_ARRAYLANG['TXT_APP'],
         ));
@@ -1650,7 +1641,7 @@ CODE;
     function getDropdownNotInDb()
     {
         
-        $filesList     = $this->fileSystem->getFileList('/');
+        $filesList     = $this->fileSystem->getFullFileList('/');
 
         ksort($filesList);
         $result = '';
@@ -1698,7 +1689,7 @@ CODE;
         $pageContent = contrexx_input2raw($_POST['content']);
 
         // Change the replacement variables from [[TITLE]] into {TITLE}
-        $pageContent = preg_replace('/\[\[([A-Z0-9_]*?)\]\]/', '{\\1}' ,$pageContent);
+        $pageContent = preg_replace('/\[\[([A-Z0-9_]+)\]\]/', '{\\1}' ,$pageContent);
 
         try {
             if (self::isFileTypeComponent($themesPage)) {
@@ -2076,10 +2067,23 @@ CODE;
         $components = $objSystemComponent->findAll();
         $componentFiles = array();
         foreach ($components as $component) {
-           $componentDirectory = $component->getDirectory() . '/View/Template/Frontend';
-            if (file_exists($componentDirectory)) {
-                foreach (glob("$componentDirectory/*") as $componentFile) {
-                   $componentFiles[$component->getType()][$component->getName()][]= basename($componentFile);
+            foreach (array('Template/Frontend', 'Style') as $offset) {
+                $componentDirectory = $cx->getClassLoader()->getFilePath(
+                    $component->getDirectory(false) . '/View/' . $offset
+                );
+                if (file_exists($componentDirectory)) {
+                    foreach (glob("$componentDirectory/*") as $componentFile) {
+                        if (
+                            substr($componentFile, -3, 3) == 'css' &&
+                            substr($componentFile, -12, 12) != 'Frontend.css'
+                        ) {
+                            continue;
+                        }
+                        if (!isset($componentFiles[$component->getType()])) {
+                            $componentFiles[$component->getType()] = array();
+                        }
+                        $componentFiles[$component->getType()][$component->getName()][]= basename($componentFile);
+                    }
                 }
             }
         }
@@ -2190,7 +2194,10 @@ CODE;
                 if (in_array($fileName, $this->filenames)) {
                     $iconSrc = '../core/ViewManager/View/Media/Config.png';
                 } else {
-                    $iconSrc = \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIconWebPath() . \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIcon($this->fileSystem->getFullPath($localFile)) . '.png';
+                    $iconSrc  = \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIconWebPath(); 
+                    $iconSrc .= \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIcon(
+                        $this->fileSystem->getFullPath($localFile) . $localFile->getFullName()
+                    ) . '.png';
                 }
 
                 $icon    = "<img height='16' width='16' alt='icon' src='" . $iconSrc . "' class='icon'>";
@@ -2229,11 +2236,53 @@ CODE;
         } else {
             \JS::activate('ace');
 
-            $contenthtml = htmlspecialchars(
-                preg_replace('/\{([A-Z0-9_]*?)\}/', '[[\\1]]', $this->fileSystem->readFile($file))
-            );
+            // fetch content from file
+            $content = $this->fileSystem->readFile($file);
+
+            // replace placeholder format
+            $content = preg_replace('/\{([A-Z0-9_]+)\}/', '[[\\1]]', $content);
+
+            // escape special characters
+            $contenthtml = htmlspecialchars($content);
+
+            // check if file contains invalid characters
+            if (
+                strlen($content) &&
+                !strlen($contenthtml)
+            ) {
+                // replace invalid code unit sequences with a Unicode
+                // Replacement Character U+FFFD
+                $contenthtml = htmlspecialchars($content, ENT_SUBSTITUTE);
+
+
+                $invalidFileMessage = sprintf(
+                    $_ARRAYLANG['TXT_VIEWMANAGER_INVALID_FILE_ENCODING_MSG'],
+                    contrexx_raw2xhtml($file)
+                );
+                $confirmFileStorage = $invalidFileMessage . sprintf(
+                    $_ARRAYLANG['TXT_VIEWMANAGER_CONFIRM_INVALID_FILE_ENCODING'],
+                    contrexx_raw2xhtml($file)
+                );
+
+                // add warning box regarding done replacement
+                $objTemplate->setVariable(array(
+                    'VIEWMANAGER_INVALID_FILE_ENCODING' => $invalidFileMessage,
+                    'VIEWMANAGER_STORE_INVALID_ENCODING' => $confirmFileStorage,
+                ));
+                $objTemplate->parse('viewmanager_invalid_encoding');
+
+                \ContrexxJavascript::getInstance()->setVariable(
+                    'fileEncodingIsInvalid', true, 'ViewManager'
+                );
+            } else {
+                $objTemplate->hideBlock('viewmanager_invalid_encoding');
+            }
+
             $objTemplate->setVariable('CONTENT_HTML', $contenthtml);
-            $pathInfo =  pathinfo($this->fileSystem->getFullPath($file), PATHINFO_EXTENSION);
+            $pathInfo = pathinfo(
+                $this->fileSystem->getFullPath($file) . $file->getFullName(),
+                PATHINFO_EXTENSION
+            );
             $mode = 'html';
 
             switch($pathInfo) {
@@ -2373,17 +2422,34 @@ CODE;
             return false;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $componentFilePath = '';
+        $isCustomized = false;
+        $isWebsite = false;
+
+        $offset = 'Template/Frontend';
+        if (substr($path, -3, 3) == 'css') {
+            $offset = 'Style';
+        }
+
         //get the Core Modules File path
         if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_CORE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/Template/Frontend/' . $fileName;
-        }
+            $componentFilePath = \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
 
         //get the Modules File path
-        if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/Template/Frontend/' . $fileName;
+        } elseif (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
+            $componentFilePath = \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
+        } else {
+            return false;
         }
 
-        return false;
+        // check for customized version
+        $customizedComponentFilePath = $cx->getClassLoader()->getFilePath($componentFilePath, $isCustomized, $isWebsite, true);
+        if ($customizedComponentFilePath) {
+            return $customizedComponentFilePath;
+        }
+
+        return $componentFilePath;
     }
 
     /**

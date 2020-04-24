@@ -9,16 +9,25 @@
 /**
  * Position the workbench-warning-bar
  */
-cx.ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     // fetch the current vertical position of the body
-    var toolbarOffset = parseInt(cx.jQuery("body").css("padding-top"));
+    var toolbarOffset = parseInt(
+        window.getComputedStyle(document.querySelector("body")).paddingTop
+    );
     if (!toolbarOffset) {
         toolbarOffset = 0;
     }
 
     // position the body and the workbench-warning-bar
-    cx.jQuery("body").css("padding-top", (parseInt(cx.jQuery("#workbenchWarning").outerHeight()) + toolbarOffset) + "px");
-    cx.jQuery("#workbenchWarning").css({
-        top: toolbarOffset + "px"
-    });
+    const el = document.querySelector("#workbenchWarning");
+    const style = window.getComputedStyle(el);
+    var height = parseInt(style.height);
+    if (style.boxSizing != "border-box") {
+        height += parseInt(style.paddingTop) +
+        parseInt(style.paddingBottom) +
+        parseInt(style.borderBottomWidth) +
+        parseInt(style.borderTopWidth);
+    }
+    document.querySelector("body").style.paddingTop = parseInt(height + toolbarOffset) + "px";
+    el.style.top = toolbarOffset + "px";
 });

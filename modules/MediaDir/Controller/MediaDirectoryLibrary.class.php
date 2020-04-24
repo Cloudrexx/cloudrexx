@@ -68,6 +68,33 @@ class MediaDirectoryLibrary
     public $pageContent;
 
     public $arrFrontendLanguages = array();
+
+    /**
+     * Contains a list of all existing slugs
+     *
+     * Is being used to ensure uniqueness within slugs.
+     *
+     * @var array
+     */
+    protected static $slugs = array();
+
+    /**
+     * Two-dimensional array of activated frontend locales
+     *
+     * Contains array-data of the frontend locales that have
+     * been activated in the settings section.
+     *
+     * @var array
+     */
+    protected static $usedFrontendLocales = array();
+
+    /**
+     * List of the component's configuration
+     *
+     * @var array
+     */
+    protected static $settings = array();
+
     public $arrSettings = array();
     public $arrCommunityGroups = array();
 
@@ -107,6 +134,13 @@ class MediaDirectoryLibrary
     protected static $currentFetchedEntryDataObject = null;
 
     /**
+     * The locale in which the output shall be parsed for
+     *
+     * @var \Cx\Core\Locale\Model\Entity\Locale
+     */
+    protected static $outputLocale;
+
+    /**
      * Constructor
      */
     function __construct($tplPath, $name)
@@ -125,11 +159,30 @@ class MediaDirectoryLibrary
             'MODULE_NAME_LC' => $this->moduleNameLC,
             'CSRF' =>  'csrf='.\Cx\Core\Csrf\Controller\Csrf::code(),
         ));
+
+        $this->getFrontendLanguages();
+
+        // we need to urlencode() the slash '/' character in slugs
+        // three times.
+        //
+        // 1. urlencode() -> ensures the slash does not slice a slug into
+        //                   two slugs
+        // 2. urlencode() -> escapes the escaped slash again to prevent
+        //                   Apache from blocking the request in case the
+        //                   apache directive 'AllowEncodedSlashes' is set
+        //                   to 'Off'
+        // 3. urlencode() -> escapes the double-escaped slashes a thrid time
+        //                   as PHP will receive the double-escaped slash as
+        //                   decoded slash character which would then be
+        //                   wrongly interpreted as a slug separater.
+        //                   Note that the third escaping in done in method
+        //                   {@see MediaDirectoryLibrary::getSlugFromName()}
+        $this->slugConversions['/'] = urlencode(urlencode('/'));
     }
 
     function checkDisplayduration()
     {
-        self::getSettings();
+        $this->getSettings();
 
         if($this->arrSettings['settingsEntryDisplaydurationNotification'] >= 1) {
 
@@ -137,7 +190,7 @@ class MediaDirectoryLibrary
             $objEntries->getEntries(null, null, null, null, null, null, true);
 
             $intDaysbefore = intval($this->arrSettings['settingsEntryDisplaydurationNotification']);
-            $intToday = mktime();
+            $intToday = time();
 
             foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
                 $intWindowEnd =  $arrEntry['entryDurationEnd'];
@@ -180,7 +233,7 @@ class MediaDirectoryLibrary
             $accessId = 0; //used to remember which access id the user needs to have. this is passed to Permission::checkAccess() later.
 
             if(!$intUserIsAdmin) {
-                self::getSettings();
+                $this->getSettings();
 
                 switch($strAction) {
                     case 'add_entry':
@@ -209,7 +262,7 @@ class MediaDirectoryLibrary
                                     $objGroup->next();
                                 }
 
-                                self::getCommunityGroups();
+                                $this->getCommunityGroups();
                                 $strMaxEntries = 0;
                                 $bolFormAllowed = false;
 
@@ -367,7 +420,7 @@ class MediaDirectoryLibrary
         $arrLanguages = array();
         $arrActiveLangs = array();
 
-        self::getSettings();
+        $this->getSettings();
         $arrActiveLangs = explode(",",$this->arrSettings['settingsActiveLanguages']);
 
         foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
@@ -384,8 +437,8 @@ class MediaDirectoryLibrary
             }
         }
 
-        // return $arrLanguages;
         $this->arrFrontendLanguages = $arrLanguages;
+        static::$usedFrontendLocales = $arrLanguages;
     }
 
 
@@ -395,6 +448,7 @@ class MediaDirectoryLibrary
         global $objDatabase;
 
         $this->arrSettings = array();
+        static::$settings = array();
 
         $objSettings = $objDatabase->Execute("SELECT id,name,value FROM ".DBPREFIX."module_".$this->moduleNameLC."_settings ORDER BY name ASC");
         if ($objSettings === false) {
@@ -414,6 +468,8 @@ class MediaDirectoryLibrary
 
         $this->arrSettings['categorySelectorExpSearch'] = $this->getSelectorSearch($this->arrSettings['categorySelectorExpSearch']);
         $this->arrSettings['levelSelectorExpSearch'] = $this->getSelectorSearch($this->arrSettings['levelSelectorExpSearch']);
+
+        static::$settings = $this->arrSettings;
     }
 
 
@@ -548,12 +604,25 @@ class MediaDirectoryLibrary
 
     /**
      * Get SQL statement to fetch the ID of the primary field of a form.
-     * The SQL statement can be used as a sub-query in a query where contrexx_module_mediadir_entry
-     * is used and has been aliased as 'entry'
+     * The SQL statement can be used as a sub-query in a query where
+     * contrexx_module_mediadir_entry is used and has been aliased as 'entry'
      *
-     * @return string
+     * @return string   The SQL statement to be used as sub-query
      */
     public function getQueryToFindPrimaryInputFieldId() 
+    {
+        return $this->getQueryToFindInputFieldIdByContextType('title');
+    }
+
+    /**
+     * Get SQL statement to fetch the ID of the field of a form identified by
+     * its context.
+     * The SQL statement can be used as a sub-query in a query where
+     * contrexx_module_mediadir_entry is used and has been aliased as 'entry'
+     *
+     * @return string   The SQL statement to be used as sub-query
+     */
+    protected function getQueryToFindInputFieldIdByContextType($type)
     {
         $query = "SELECT
                         first_rel_inputfield.`field_id` AS `id`
@@ -570,7 +639,7 @@ class MediaDirectoryLibrary
                     AND
                         (first_rel_inputfield.`form_id` = entry.`form_id`)
                     ORDER BY
-                        FIELD(inputfield.context_type, 'title') DESC,
+                        FIELD(inputfield.context_type, '".$type."') DESC,
                         inputfield.`order` ASC
                     LIMIT 1";
         return $query;
@@ -578,10 +647,11 @@ class MediaDirectoryLibrary
 
 
     function getSelectorJavascript(){
-        global $objInit, $_LANGID;
+        global $objInit;
+        $langId = static::getOutputLocale()->getId();
 
         if($objInit->mode == 'frontend') {
-            self::getSettings();
+            $this->getSettings();
             if($this->arrSettings['settingsAddEntriesOnlyCommunity'] == 1) {
                 $objFWUser      = \FWUser::getFWUserObject();
                 $objUser         = $objFWUser->objUser;
@@ -601,7 +671,7 @@ class MediaDirectoryLibrary
                             $objGroup->next();
                         }
 
-                        self::getCommunityGroups();
+                        $this->getCommunityGroups();
                         $strMaxCategorySelect = 0;
                         $strMaxLevelSelect = 0;
 
@@ -640,7 +710,7 @@ class MediaDirectoryLibrary
         }
 
         //get languages
-        self::getFrontendLanguages();
+        $this->getFrontendLanguages();
         foreach ($this->arrFrontendLanguages as $intKey => $arrLang) {
             $arrActiveLang[$arrLang['id']] = $arrLang['id'];
         }
@@ -709,7 +779,7 @@ function deselectAll(control){
         control.options[i].selected = false;
     }
 }
-var defaultLang = '$_LANGID';
+var defaultLang = '$langId';
 var activeLang = [$arrActiveLang];
 \$J(function(){
     \$J('.mediadirInputfieldDefault').each(function(){
@@ -960,6 +1030,10 @@ EOF;
 
     public function getNameFromSlug($slug) {
         $slugConversions = array_reverse($this->slugConversions, true);
+        // we need to manually decode the encoded slash character,
+        // as we needed to escaped it (see 3rd time encoding in custructor)
+        // to ensure it won't split the slug up into two slugs
+        $slugConversions['/'] = urldecode($slugConversions['/']);
         return  str_replace($slugConversions, array_keys($slugConversions), $slug);
     }
 
@@ -1017,7 +1091,7 @@ EOF;
      */
     public function getAutoSlugPath($arrEntry = null, $categoryId = null, $levelId = null, $useRequestedPageAsFallback = false, $includeDetailApplicationPage = true) {
         $entryId = null;
-        $entryName = null;
+        $entrySlug = null;
         $formId = null;
         $formCmd = null;
         $page = null;
@@ -1026,8 +1100,8 @@ EOF;
             $entryId = $arrEntry['entryId'];
         }
 
-        if (isset($arrEntry['entryFields'][0])) {
-            $entryName = $arrEntry['entryFields'][0];
+        if (isset($arrEntry['slug'])) {
+            $entrySlug = $arrEntry['slug'];
         }
 
         if (isset($arrEntry['entryFormId'])) {
@@ -1095,7 +1169,11 @@ EOF;
 
         // create human readable url if option has been enabled to do so
         if ($this->arrSettings['usePrettyUrls']) {
-            $url->setPath($url->getPath() . $this->getLevelSlugPath($levelId) . $this->getCategorySlugPath($categoryId) . $this->getEntrySlugPath($entryName));
+            $path = $url->getPath() . $this->getLevelSlugPath($levelId) . $this->getCategorySlugPath($categoryId);
+            if (isset($entrySlug)) {
+                $path .= '/' . $entrySlug;
+            }
+            $url->setPath($path);
         } else {
             if ($entryId) {
                 $url->setParam('eid', $entryId);
@@ -1146,15 +1224,17 @@ EOF;
     }
 
     public function getApplicationPageByCategory($categoryId) {
-        // abort in case levels are in use
+        $cmdPrefix = '';
+
+        // in case levels are in use, the cmd of a category is prefixed by a dash
         if ($this->arrSettings['settingsShowLevels']) {
-            return null;
+            $cmdPrefix = '-';
         }
 
         $pageRepo = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager()->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
 
         // fetch category specific application page (i.e. section=MediaDir&cmd=3)
-        $page = $pageRepo->findOneByModuleCmdLang($this->moduleName, $categoryId, FRONTEND_LANG_ID);
+        $page = $pageRepo->findOneByModuleCmdLang($this->moduleName, $cmdPrefix.$categoryId, FRONTEND_LANG_ID);
         if ($page && $page->isActive()) {
             return $page;
         }
@@ -1245,14 +1325,6 @@ EOF;
         }
 
         return '';
-    }
-
-    public function getEntrySlugPath($entryName) {
-        if (!$entryName) {
-            return '';
-        }
-
-        return '/' . $this->getSlugFromName($entryName);
     }
 
     public function getLevelData() {
@@ -1362,6 +1434,8 @@ EOF;
      * - MEDIADIR_CONFIG_FILTER_CATEGORY_<id> => filter by category
      * - MEDIADIR_CONFIG_FILTER_LEVEL_<id> => filter by level
      * - MEDIADIR_CONFIG_FILTER_AUTO => filter by supplied arguments as default
+     * - MEDIADIR_CONFIG_SORT_POPULAR => order entries by popularity
+     * - MEDIADIR_CONFIG_SORT_ALPHABETICAL => order entries alphabetically
      *
      * @param   string  $block Name of the template block to look up for
      *                         functional placeholders
@@ -1388,7 +1462,10 @@ EOF;
      *                           'form' => 3,
      *                           'category' => 4,
      *                           'level' => 5
-     *                      )
+     *                      ),
+     *                      'sort' => array(
+     *                          'alphabetical' => true,
+     *                      ),
      *                  )</pre>
      *                  Note: the sub entries in array 'list' and array 'filter'
      *                  are optional. They will only be set in case the
@@ -1399,11 +1476,22 @@ EOF;
         $config = array(
             'list' => array(),
             'filter' => array(),
+            'sort' => array(),
         );
+
+        // abort in case the template is invalid
+        if (!$template->blockExists($block)) {
+            return $config;
+        }
+
         $placeholderList = $template->getPlaceholderList($block);
         $placeholderListAsString = join("\n", $placeholderList);
-
-        if (preg_match_all('/MEDIADIR_CONFIG_(FILTER|LIST)_(LATEST|LIMIT|OFFSET|FORM|CATEGORY|LEVEL)(?:_([0-9]+))?/', $placeholderListAsString, $match)) {
+        $match = null;
+        if (preg_match_all(
+                '/MEDIADIR_CONFIG_(FILTER|LIST|SORT)_' // $1
+                . '(LATEST|LIMIT|OFFSET|FORM|CATEGORY|LEVEL|ASSOCIATED|POPULAR|ALPHABETICAL)' // $2
+                . '(?:_([0-9]+))?/', // $3
+                $placeholderListAsString, $match)) {
             foreach ($match[2] as $idx => $key) {
                 $configKey = strtolower($match[1][$idx]);
                 $option = strtolower($key);
@@ -1416,7 +1504,9 @@ EOF;
                     // then the option will be set to TRUE
                     $value = true;
                 }
-
+                // $configKey: "filter", or "list"
+                // $option: "latest", "limit", "offset", "form",
+                //      "category", "level", or "associated"
                 $config[$configKey][$option] = $value;
             }
         }
@@ -1444,5 +1534,393 @@ EOF;
         }
 
         return $config;
+    }
+
+    /**
+     * Slugifies the given string and ensures its uniqueness
+     *
+     * @param   int $entryId    The ID of the associated entry
+     * @param   string  $string The string to slugify
+     * @param   int $langId     The ID of the locale the string $string
+     *                          comes from.
+     * @param   array   $titleData  Array of strings to be used in case
+     *                              $string is an empty string.
+     *                              The array uses the IDs of available locales
+     *                              as keys for each string.
+     */
+    protected function slugify($entryId, &$string, $langId, $titleData = array()) {
+        if (empty($string) && isset($titleData[$langId])) {
+            $string = $titleData[$langId];
+        }
+        if (empty($string) && isset($titleData[0])) {
+            $string = $titleData[0];
+        }
+        $string = $this->cx->getComponent('Model')->slugify($string);
+        $this->enforceUniqueSlug($string, $entryId, $langId);
+    }
+
+    /**
+     * Get locale in which output shall be parsed for
+     *
+     * @return \Cx\Core\Locale\Model\Entity\Locale
+     */
+    public static function getOutputLocale() {
+        if (!static::$outputLocale) {
+            static::initOutputLocale();
+        }
+        return static::$outputLocale;
+    }
+
+    /**
+     * Determine the locale in which the output shall be parsed for.
+     *
+     * Backend:
+     *  1. Matching Locale of Backend language
+     *  2. Selected Frontend Locale (of menu / if used by MediaDir)
+     *  3. Default Frontend Locale (if used by MediaDir)
+     *  4. Any Frontend Locale used by MediaDir
+     *
+     * Any other mode:
+     *  Currently requested frontend Locale
+     *
+     * @return \Cx\Core\Locale\Model\Entity\Locale
+     */
+    protected static function initOutputLocale() {
+        $em = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getDb()
+            ->getEntityManager();
+
+        static::$outputLocale = null;
+        $locale = null;
+        $cxMode = \Cx\Core\Core\Controller\Cx::instanciate()->getMode();
+
+        // If we are in backend
+        // do try to find a matching frontend locale
+        if ($cxMode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
+            try {
+                // get ISO-639-1 code of backend language
+                $backend = $em->find(
+                    'Cx\Core\Locale\Model\Entity\Backend',
+                    LANG_ID
+                );
+                $iso1Code = $backend->getIso1()->getId();
+
+                // find matching frontend locale based on ISO-639-1 code of backend
+                // language
+                $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+                $locale = $localeRepo->findOneByCode($iso1Code);
+            } catch (\Exception $e) {}
+        }
+
+        // If we are in frontend (or in any other mode than backend) or if
+        // there does not exist a matching locale for the current backend
+        // language, then load the currently set frontend locale
+        // (either from the request when in frontend mode or by the selected
+        // frontend locale in backend mode)
+        if (!$locale) {
+            // get currently selected frontend locale
+            $locale = $em->find(
+                'Cx\Core\Locale\Model\Entity\Locale',
+                FRONTEND_LANG_ID
+            );
+        }
+
+        // This should not happen as FRONTEND_LANG_ID should have been set
+        // based on an existing locale
+        if (!$locale) {
+            throw new \Exception('Unable to initialize frontend locale');
+        }
+
+        // If we are in backend, we will check if the locale is actually in
+        // use. In all other modes, we won't care about that as the
+        // responsible view methods will take care about that themself.
+        if ($cxMode != \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
+            static::$outputLocale = $locale;
+            return $locale;
+        }
+
+        // If the current locale is not used by MediaDir component,
+        // we will try to find the best match from the available locales.
+        if (
+            !static::$settings['settingsShowEntriesInAllLang'] &&
+            !isset(static::$usedFrontendLocales[$locale->getId()])
+        ) {
+            $locale = null;
+        }
+
+        // If we haven't found a matching locale yet,
+        // we will try to load the frontend's default locale that,
+        // if it is used by the MediaDir component.
+        if (
+            !$locale &&
+            isset(static::$usedFrontendLocales[\FWLanguage::getDefaultLangId()])
+        ) {
+            $locale = $em->find(
+                'Cx\Core\Locale\Model\Entity\Locale',
+                \FWLanguage::getDefaultLangId()
+            );
+        }
+
+        // If we still haven't found a matching locale,
+        // we will simply load the first locale that is used by the MediaDir
+        // component.
+        if (!$locale) {
+            reset(static::$usedFrontendLocales);
+            $locale = $em->find(
+                'Cx\Core\Locale\Model\Entity\Locale',
+                key(static::$usedFrontendLocales)
+            );
+        }
+
+        // Without any locale we have to abort execution
+        if (!$locale) {
+            throw new \Exception('Unable to initialize frontend locale');
+        }
+
+        static::$outputLocale = $locale;
+        return $locale;
+    }
+
+    /**
+     * Get the source locale of a target locale
+     *
+     * The source locale is the fallback locale of a locale (the target locale)
+     * or the system's default locale.
+     *
+     * @param   integer $localeId   The ID of the target locale
+     * @param   array   $usedFrontendLocales List of available locales.
+     *                                       One-dimensional array of locale
+     *                                       IDs.
+     * @return  integer The ID of the source locale
+     */
+    protected static function getSourceLocaleIdForTargetLocale($localeId, $usedFrontendLocales = array()) {
+        if (!$usedFrontendLocales) {
+            $usedFrontendLocales = array_keys(static::$usedFrontendLocales);
+        }
+
+        // fetch fallback locale of target locale
+        $sourceLocaleId = \FWLanguage::getFallbackLanguageIdById($localeId);
+
+        // fetch default locale in case no fallback locale is defined for the
+        // target locale
+        if (!$sourceLocaleId) {
+            $sourceLocaleId = \FWLanguage::getDefaultLangId();
+        }
+
+        // If the source locale is not used by the MediaDir component
+        // then we shall try the default locale (if not tried already)
+        if (
+            !in_array($sourceLocaleId, $usedFrontendLocales) &&
+            $sourceLocaleId != \FWLanguage::getDefaultLangId()
+        ) {
+            $sourceLocaleId = \FWLanguage::getDefaultLangId();
+        }
+
+        // Fallback to any existing locale used by the MediaDir component
+        if (!in_array($sourceLocaleId, $usedFrontendLocales)) {
+            reset($usedFrontendLocales);
+            $sourceLocaleId = current($usedFrontendLocales);
+        }
+
+        return $sourceLocaleId;
+    }
+
+    /**
+     * Enforce uniqueness of a slug
+     *
+     * The supplied $slug will be made unqiue within the sopce of a locale
+     * (identified by the locale's ID through argument $slugLangId).
+     * This is achieved by adding a trailing (unique) integer to the slug
+     * in case its not yet unique.
+     * In case the option settingsShowEntriesInAllLang is set, then the slug
+     * will be made unique over all locales.
+     *
+     * @param  string  $slug    The slug to make unique.
+     * @param  int     $entryId The associated entry of the slug.
+     * @param  int     $slugLangId  The ID of the locale the slug is from.
+     */
+    protected function enforceUniqueSlug(&$slug, $entryId, $slugLangId) {
+        // Check for pretty urls usage.
+        // In case it's not enabled, do simply return
+        // the proposed slug.
+        if (!$this->arrSettings['usePrettyUrls']) {
+            return;
+        }
+
+        // $entryId must always be set. If its not set (which should never
+        // happen), then something unexpected happened.
+        if (!$entryId) {
+            throw new \Exception('$entryId is invalid in ' . __METHOD__);
+        }
+
+        if (empty(static::$slugs)) {
+            $this->loadAllSlugsFromDb();
+        }
+
+        // in case all entries are getting displayed in every locale,
+        // then we have to enforce uniqueness within slugs over all
+        // locales. This is achieved by grouping all slugs by ID 0.
+        // Otherwise (option settingsShowEntriesInAllLang not set) we'll
+        // group the slugs by their locale
+        if ($this->arrSettings['settingsShowEntriesInAllLang']) {
+            $langId = 0;
+        } else {
+            $langId = $slugLangId;
+        }
+
+        // check if the entry owns a slug for the specified locale already.
+        // if so, do remove it from the existing slug list to prevent
+        // collision as duplicate
+        if (
+            isset(static::$slugs[$slugLangId]) &&
+            isset(static::$slugs[$slugLangId][$entryId])
+        ) {
+            // Remove existing slug from the list of all slugs.
+            // Note: we're intentionally looking up the index of the existing
+            // slug to only drop it once from the list of all slugs. This will
+            // ensure that in case (of a bug) an existing slug already exists
+            // twice, it will be fixed (-> made unique) that way.
+            // Otherwise, if we would use array_diff() to filter out the
+            // existing slug, we would not detect any existing duplicates.
+            $idx = array_search(
+                static::$slugs[$slugLangId][$entryId],
+                static::$slugs[$langId][0]
+            );
+            if ($idx !== false) {
+                unset(static::$slugs[$langId][0][$idx]);
+            }
+
+            // reset associated slug on entry
+            unset(static::$slugs[$slugLangId][$entryId]);
+        }
+
+        // In case slugs must be unique over all locales (if option
+        // settingsShowEntriesInAllLang is set), then we must check if the
+        // slug to be set is already in use in any other locale by the
+        // associated entry. If so, we have to unset those from the list of
+        // all slugs to make it possible for an entry to use the same slug in
+        // multiple locales even if option settingsShowEntriesInAllLang is set.
+        if ($this->arrSettings['settingsShowEntriesInAllLang']) {
+            $localeIds = array_keys(static::$slugs);
+            foreach ($localeIds as $localeId) {
+                // skip locale of slug as we did check this already above
+                if ($localeId == $slugLangId) {
+                    continue;
+                }
+
+                // check if the same slug is being used for any other locale,
+                // if so, do remove it from the list of all locales to.
+                if (
+                    isset(static::$slugs[$localeId][$entryId]) &&
+                    static::$slugs[$localeId][$entryId] == $slug
+                ) {
+                    $idx = array_search(
+                        $slug,
+                        static::$slugs[$langId][0]
+                    );
+                    if ($idx !== false) {
+                        unset(static::$slugs[$langId][0][$idx]);
+                    }
+                }
+
+                // note: we're intentionally not unsetting the slug from the
+                // entry's slug list (static::$slugs[$localeId][$entryId]) as
+                // this would break the uniqueness
+            }
+        }
+
+        // assign a random slug in case non has been set yet
+        if ($slug == '') {
+            $slug = base_convert(microtime(), 10, 36);
+        }
+
+        // enforce uniqueness on slug
+        $idx = 1;
+        $oriSlug = $slug;
+        while (
+            isset(static::$slugs[$langId][0]) &&
+            in_array($slug, static::$slugs[$langId][0])
+        ) {
+            // get next slug
+            $slug = $oriSlug . $idx++;
+        }
+
+        // Add slug to the list of all slugs of all entries (optinally grouped
+        // by locale if option settingsShowEntriesInAllLang is not set).
+        // This is done by putting all slugs of all entries in index 0.
+        if (!isset(static::$slugs[$langId])) {
+            static::$slugs[$langId] = array(
+                0 => array(),
+            );
+        }
+        static::$slugs[$langId][0][] = $slug;
+
+        // remember all slugs (grouped by locale) identified by the ID of
+        // its associated entry
+        if (!isset(static::$slugs[$slugLangId])) {
+            static::$slugs[$slugLangId] = array();
+        }
+        static::$slugs[$slugLangId][$entryId] = $slug;
+    }
+
+    /**
+     * Fetch all slugs from the database
+     *
+     * Those will be used to ensure uniqueness within slugs
+     * (@see MediaDirectoryLibrary::enforceUniqueSlug()).
+     */
+    protected function loadAllSlugsFromDb() {
+        static::$slugs = array();
+        $db = $this->cx->getDb()->getAdoDb();
+
+        $query = "SELECT
+                        first_rel_inputfield.`value` AS `slug`,
+                        first_rel_inputfield.`entry_id` AS `entry_id`,
+                        first_rel_inputfield.`lang_id` AS `lang_id`
+                    FROM
+                        ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields AS first_rel_inputfield
+                    INNER JOIN
+                        ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields AS inputfield
+                    ON
+                        first_rel_inputfield.`field_id` = inputfield.`id`
+                    WHERE
+                        inputfield.`context_type` = 'slug'
+                    ";
+        $result = $db->Execute($query);
+        if (
+            !$result ||
+            $result->EOF
+        ) {
+            return;
+        }
+
+        while (!$result->EOF) {
+            // in case all entries are getting displayed in every locale,
+            // then we have to enforce uniqueness within slugs over all
+            // locales. This is achieved by grouping all slugs by ID 0.
+            if ($this->arrSettings['settingsShowEntriesInAllLang']) {
+                $langId = 0;
+            } else {
+                $langId = $result->fields['lang_id'];
+            }
+
+            // Create a list of all slugs of all entries (optinally grouped by
+            // locale if option settingsShowEntriesInAllLang is not set).
+            // This is doen by putting all all slugs of all entries in index 0.
+            if (!isset(static::$slugs[$langId])) {
+                static::$slugs[$langId] = array(
+                    0 => array(),
+                );
+            }
+            static::$slugs[$langId][0][] = $result->fields['slug'];
+
+            // remember all slugs (grouped by locale) identified by the ID of
+            // its associated entry
+            if (!isset(static::$slugs[$result->fields['lang_id']])) {
+                static::$slugs[$result->fields['lang_id']] = array();
+            }
+            static::$slugs[$result->fields['lang_id']][$result->fields['entry_id']] = $result->fields['slug'];
+            $result->MoveNext();
+        }
     }
 }

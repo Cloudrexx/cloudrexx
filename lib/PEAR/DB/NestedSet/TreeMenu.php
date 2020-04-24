@@ -133,7 +133,7 @@ class DB_NestedSet_TreeMenu extends DB_NestedSet_Output {
         // the child nodes are passed by reference during the recursion so that the parent
         // will know when they have been hit.
         reset($params['structure']);
-        while (list($key, $node) = each($params['structure'])) {
+        foreach ($params['structure'] as $key => $node) {
             // see if we've already been here before
             if (isset($node['hit'])) {
                 continue;

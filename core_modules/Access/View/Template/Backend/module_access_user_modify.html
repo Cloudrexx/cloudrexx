@@ -5,7 +5,7 @@
 /* <![CDATA[ */
 $J(document).ready(function() {
     $J('input[name=access_user_password]').keyup(function(){
-        $J('#password-complexity').html(checkComplexity($J('input[name=access_user_password]').val()))
+        $J('#password-complexity').html(checkComplexity($J(this).val()))
     })
     
     $J('input[name="notification_email"]').change(function() {
@@ -151,7 +151,11 @@ $J(document).ready(function() {
 		<tbody style="vertical-align:top; white-space:nowrap;">
 			<tr class="row1">
                 <td width="15%">{TXT_ACCESS_EMAIL}</td>
-                <td width="85%">{ACCESS_USER_EMAIL}</td>
+                <td width="85%">
+                    <input type="text" name="access_user_email" value="" style="display: none" />
+                    {ACCESS_USER_EMAIL}
+                    <input type="text" name="not-an-email" value="" style="display: none" />
+                </td>
             </tr>
             <!-- BEGIN access_user_username_block -->
             <tr class="row2">
@@ -169,6 +173,7 @@ $J(document).ready(function() {
 			<tr class="row1 password-field">
 				<td width="15%">{TXT_ACCESS_PASSWORD}</td>
 				<td width="85%">
+                    <input type="password" name="access_user_password" value="" style="display: none" />
 				    {ACCESS_USER_PASSWORD}&nbsp;
 				    <font color="red">*</font>&nbsp;
                         <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_ACCESS_PASSWORD_INFO}</span>&nbsp;&nbsp;
@@ -326,7 +331,7 @@ $J(document).ready(function() {
                     <input type="checkbox" value="{ACCESS_NEWSLETTER_ID}" {ACCESS_NEWSLETTER_SELECTED} id="access_user_newsletters-{ACCESS_NEWSLETTER_ID}" name="access_user_newsletters[]" />
                 </td>
                 <td>
-                    <label for="access_user_newsletters-{ACCESS_NEWSLETTER_ID}">{ACCESS_NEWSLETTER_NAME}</label>
+                    <label for="access_user_newsletters-{ACCESS_NEWSLETTER_ID}">{ACCESS_NEWSLETTER_NAME} {ACCESS_NEWSLETTER_CONSENT}</label>
                 </td>
             </tr>
             <!-- END access_newsletter_list -->

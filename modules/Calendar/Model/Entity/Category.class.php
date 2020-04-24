@@ -60,12 +60,12 @@ class Category extends \Cx\Model\Base\EntityBase {
     protected $status;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\CategoryName
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $categoryNames;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Event
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $events;
 
@@ -76,7 +76,7 @@ class Category extends \Cx\Model\Base\EntityBase {
         $this->categoryNames = new \Doctrine\Common\Collections\ArrayCollection();
         $this->events = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *
@@ -148,6 +148,16 @@ class Category extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove categoryNames
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\CategoryName $categoryNames
+     */
+    public function removeCategoryName(\Cx\Modules\Calendar\Model\Entity\CategoryName $categoryNames)
+    {
+        $this->categoryNames->removeElement($categoryNames);
+    }
+
+    /**
      * Get getCategoryNameByLangId
      *
      * @param integer $langId lang id
@@ -190,6 +200,16 @@ class Category extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove events
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\Event $events
+     */
+    public function removeEvent(\Cx\Modules\Calendar\Model\Entity\Event $events)
+    {
+        $this->events->removeElement($events);
+    }
+
+    /**
      * Set events
      *
      * @param Doctrine\Common\Collections\Collection $events
@@ -207,5 +227,14 @@ class Category extends \Cx\Model\Base\EntityBase {
     public function getEvents()
     {
         return $this->events;
+    }
+
+    /**
+     * Add an event
+     * @param Event $event Event to add
+     * @author Michael Ritter <michael.ritter@cloudrexx.com>
+     */
+    public function addEvents($event) {
+        $this->events[] = $event;
     }
 }

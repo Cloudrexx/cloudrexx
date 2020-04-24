@@ -551,7 +551,7 @@ class Currency
              WHERE `id`=$currency_id");
         if (!$objResult) return false;
         unset(self::$arrCurrency[$currency_id]);
-        $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."module_shop".MODULE_INDEX."_currencies`");
+
         return true;
     }
 

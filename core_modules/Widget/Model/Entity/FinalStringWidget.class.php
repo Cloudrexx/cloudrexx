@@ -67,7 +67,7 @@ class FinalStringWidget extends Widget {
      * @param string $string String to display
      */
     public function __construct($component, $name, $string) {
-        parent::__construct($component, $name, false);
+        parent::__construct($component, $name);
         $this->string = $string;
     }
 
@@ -88,9 +88,10 @@ class FinalStringWidget extends Widget {
      * @param string $targetComponent Parse target component name
      * @param string $targetEntity Parse target entity name
      * @param string $targetId Parse target entity ID
+     * @param array $params (optional) List of params for widgets of type 'callback'
      * @return string Replacement for widgets without content, NULL otherwise
      */
-    public function internalParse($template, $response, $targetComponent, $targetEntity, $targetId) {
+    public function internalParse($template, $response, $targetComponent, $targetEntity, $targetId, $params = array()) {
         return $this->getString();
     }
 

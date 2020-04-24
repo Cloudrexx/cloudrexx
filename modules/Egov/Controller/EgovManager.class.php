@@ -379,6 +379,14 @@ class EgovManager extends EgovLibrary
             'EGOV_PRODUCT_QUANTITY_LIMIT' => EgovLibrary::GetProduktValue('product_quantity_limit', $product_id),
             // Alternative payment methods, comma separated
             'ALTERNATIVE_NAMES' => EgovLibrary::GetProduktValue('alternative_names', $product_id),
+            'EGOV_PRODUCT_MEDIABROWSER_FILE_BUTTON'       => $this->getMediaBrowserButton(
+                'productFileButton',
+                'mbProductFileCallback'
+            ),
+            'EGOV_PRODUCT_MEDIABROWSER_TARGET_URL_BUTTON' => $this->getMediaBrowserButton(
+                'productTargetUrlButton',
+                'mbProductTargetUrlCallback'
+            ),
         ));
 
         if (EgovLibrary::GetProduktValue('product_per_day', $product_id) == 'yes') {
@@ -1506,7 +1514,10 @@ class EgovManager extends EgovLibrary
 
         $product_id = intval($_REQUEST['id']);
         $datum_db = date('Y-m-d H:i:s');
-        $ip_adress = $_SERVER['REMOTE_ADDR'];
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $ip_adress = $cx->getComponent(
+            'Stats'
+        )->getCounterInstance()->getUniqueUserId();
 
         $arrFields = EgovLibrary::getFormFields($product_id);
         $FormValue = '';

@@ -266,6 +266,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
     /**
      * {@inheritDoc}
      */
+    public function removeCategoryName(\Cx\Modules\Calendar\Model\Entity\CategoryName $categoryNames)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCategoryName', array($categoryNames));
+
+        return parent::removeCategoryName($categoryNames);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getCategoryNameByLangId($langId)
     {
 
@@ -299,6 +310,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
     /**
      * {@inheritDoc}
      */
+    public function removeEvent(\Cx\Modules\Calendar\Model\Entity\Event $events)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeEvent', array($events));
+
+        return parent::removeEvent($events);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setEvents($events)
     {
 
@@ -316,6 +338,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEvents', array());
 
         return parent::getEvents();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addEvents($event)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addEvents', array($event));
+
+        return parent::addEvents($event);
     }
 
     /**
@@ -349,6 +382,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

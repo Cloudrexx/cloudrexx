@@ -55,7 +55,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
 
     function importSQL($tableName, $newKeys, $givenKeys, $importType, $formId, $categoryId=null, $levelId=null)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         $newKeys = explode(";", $newKeys);
         $givenKeys = explode(";", $givenKeys);
@@ -78,16 +78,16 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                 SET
                     `order` = '0',
                     `form_id` = '".$formId."',
-                    `create_date` = '".mktime()."',
-                    `validate_date` = '".mktime()."',
+                    `create_date` = '".time()."',
+                    `validate_date` = '".time()."',
                     `added_by` = '".$intUserId."',
-                    `lang_id` = '".$_LANGID."',
+                    `lang_id` = '" . static::getOutputLocale()->getId() . "',
                     `ready_to_confirm` = '1',
                     `confirmed` =  '1',
                     `active` =  '1',
                     `duration_type` =  '1',
                     `duration_notification` =  '0',
-                    `translation_status` = '".$_LANGID."'
+                    `translation_status` = '" . static::getOutputLocale()->getId() . "'
             ");
 
             $newEntryId = $objDatabase->Insert_ID();
@@ -102,7 +102,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
                         SET
                             `entry_id`='".intval($newEntryId)."',
-                            `lang_id`='".intval($_LANGID)."',
+                            `lang_id`='" . static::getOutputLocale()->getId() . "',
                             `form_id`='".intval($formId)."',
                             `field_id`='".intval($givenFieldId)."',
                             `value`='".$newValue."'
@@ -116,7 +116,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                     ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
                 SET
                     `entry_id`='".intval($newEntryId)."',
-                    `lang_id`='".intval($_LANGID)."',
+                    `lang_id`='" . static::getOutputLocale()->getId() . "',
                     `form_id`='".intval($formId)."',
                     `field_id`='".intval(118)."',
                     `value`='/cms/images/mediadir/images/".$objResultImport->fields['refnr'].".gif'
@@ -216,7 +216,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
 
     function importCSV($objTpl)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         echo  'importCSV';
 

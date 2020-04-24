@@ -57,7 +57,7 @@ class Request {
     /**
      * Resolved url object
      *
-     * @var object
+     * @var \Cx\Core\Routing\Url
      */
     protected $url;
 
@@ -116,7 +116,7 @@ class Request {
     /**
      * Get the resolved url object
      *
-     * @return Object
+     * @return \Cx\Core\Routing\Url
      */
     public function getUrl() {
         return $this->url;
@@ -155,6 +155,22 @@ class Request {
 
         // return data from POST
         return $this->postData[$name];
+    }
+
+    /**
+     * Returns all params
+     * @param boolean $get (optional) Set to false to check POST
+     * @return array Parameters values
+     */
+    public function getParams($get = true)
+    {
+        // return data from GET
+        if ($get) {
+            return $this->getUrl()->getParamArray();
+        }
+
+        // return data from POST
+        return $this->postData;
     }
 
     /**
@@ -266,7 +282,7 @@ class Request {
             || strpos($ua, 'gt-p7100') !== false
             || strpos($ua, 'gt-p1000') !== false
             || strpos($ua, 'at100') !== false
-            || strpos($ua, 'a43') !== false;
+            || (strpos($ua, 'a43') !== false && strpos($ua, 'iphone') === false);
         return $isTablet;
     }
 }

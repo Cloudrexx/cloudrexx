@@ -7,11 +7,11 @@
 function prepareConfiguration(formname) {
   formname = !formname ? '' : formname;
   // Trigger the download of the configuration
-  cx.jQuery('[data-group="edit"]').click();
+  cx.jQuery('[data-group="edit"]')[2].click();
   // get the content of the textarea
   var configuration = cx.jQuery('.configCode').val();
   // go back to the configurator view
-  cx.jQuery('[data-group="config"]').click();
+  cx.jQuery('[data-group="config"]')[1].click();
   var pattern = /config\.removeButtons\s=\s'([a-z0-9,]*)*/i;
   if (pattern.test(configuration)) {
     var removedButtons = pattern.exec(configuration);

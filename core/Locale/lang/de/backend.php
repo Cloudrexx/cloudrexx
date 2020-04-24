@@ -47,10 +47,19 @@ $_ARRAYLANG['TXT_CORE_LOCALE_DESCRIPTION'] = 'Steuert die Sprachversionen anhand
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_DEFAULT'] = 'Website';
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_LOCALE'] = 'Website';
 $_ARRAYLANG['TXT_CORE_LOCALE_ACT_BACKEND'] = 'Administrationsoberfläche';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE'] = 'Sprachplatzhalter';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE_DEFAULT'] = 'Frontend';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACT_LANGUAGEFILE_BACKEND'] = 'Backend';
+
+// Module ACLs:
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_LIST'] = 'Anzeige Website & Administrationsoberfläche';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_MANAGEMENT'] = 'Verwaltung Website & Administrationsoberfläche';
+$_ARRAYLANG['TXT_CORE_LOCALE_ACL_VARS'] = 'Verwaltung der Sprachplatzhalter';
 
 // Module fields
 $_ARRAYLANG['TXT_CORE_LOCALE_LOCALE_NAME'] = 'Sprachversion';
 $_ARRAYLANG['TXT_CORE_LOCALE_BACKEND_NAME'] = 'Sprachen bearbeiten';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NAME'] = 'Sprachplatzhalter bearbeiten';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_ID'] = 'ID';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_ISO1'] = 'Sprache';
 $_ARRAYLANG['TXT_CORE_LOCALE_FIELD_LABEL'] = 'Label';
@@ -84,3 +93,21 @@ $_ARRAYLANG['TXT_NO'] = 'Nein';
 $_ARRAYLANG['TXT_CORE_LOCALE_LABEL_LANG_REMOVAL'] = 'Bitte bestätigen Sie das Entfernen der Sprachdaten!';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANG_REMOVAL_CONTENT'] = 'Sprachbezogene Daten der deaktivieren Sprachen in allen Anwendungen löschen.';
 $_ARRAYLANG['TXT_CORE_LOCALE_SAVE'] = 'Änderungen übernehmen';
+
+// Messages
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_SUCCESSFULLY_UPDATED'] = 'Die Sprachplatzhalter wurden erfolgreich aktualisiert.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOTHING_CHANGED'] = 'Es wurde kein Sprachplatzhalter bearbeitet.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_LANGUAGE_NOT_SET'] = 'Die Sprachdatei kann nicht geladen werden, weil die Quellsprache nicht gesetzt ist.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_EXPORT_FAILED'] = 'Exportieren der angepassten Sprachplatzhalter in die YAML-Datei schlug fehl!';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_IMPORT_FAILED'] = 'Importieren der Sprachplatzhalter aus der YAML-Datei schlug fehl!';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOT_FOUND'] = 'Sprachdatei nicht gefunden.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_SUCCESS'] = 'Standardwert erfolgreich geladen.';
+$_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_ERROR'] = 'Standardwert nicht gefunden.';
+$_ARRAYLANG['TXT_CORE_LOCALE_ADD_NEW_INFORMATION'] = 'Bevor weitere Sprachversionen hinzugefügt werden können, muss die Option %1$s (unter %2$s) zuerst aktiviert werden.';
+
+// Translation view
+$_ARRAYLANG['id'] = 'Platzhalter';
+$_ARRAYLANG['sourceLang'] = 'Ausgangssprache';
+$_ARRAYLANG['destLang'] = 'Zielsprache';
+$_ARRAYLANG['TXT_CORE_LOCALE_RESET'] = 'Zurücksetzen';
+$_ARRAYLANG['TXT_CORE_LOCALE_UNSAVED_CHANGES'] = 'Bitte klicken Sie auf "Änderungen übernehmen"';

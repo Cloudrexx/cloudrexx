@@ -57,7 +57,7 @@ class JsonLocaleController extends \Cx\Core\Core\Model\Entity\Controller impleme
      * @return array List of method names
      */
     public function getAccessableMethods() {
-        return array('getGeneratedLabel');
+        return array('getGeneratedLabel','getPlaceholderDefaultValue');
     }
 
     /**
@@ -94,6 +94,26 @@ class JsonLocaleController extends \Cx\Core\Core\Model\Entity\Controller impleme
         }
         $countryName = \Locale::getDisplayRegion('und_' . $parameters['alpha2'], $parameters['iso1']);
         return $countryName . ' (' . $languageName . ')';
+    }
+
+    /**
+     * Gets the default value of a language placeholder according to the args
+     * @param $arguments The arguments
+     * @return string The default value of the placeholder or empty string
+     */
+    public function getPlaceholderDefaultValue($arguments) {
+        $parameters = $arguments['get'];
+        $languageData = \Env::get('init')->getComponentSpecificLanguageDataByCode(
+            trim($parameters['componentName']),
+            $parameters['frontend'] == 'true' ? true : false,
+            trim($parameters['languageCode']),
+            false
+        );
+        $placeholderName = trim($parameters['placeholderName']);
+        if (isset($languageData[$placeholderName])) {
+            return $languageData[$placeholderName];
+        }
+        return '';
     }
 
 }

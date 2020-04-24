@@ -37,8 +37,6 @@
 
 namespace Cx\Core_Modules\MediaBrowser\Testing\UnitTest;
 
-use Cx\Core\MediaSource\Model\Entity\MediaSource;
-use Cx\Core\MediaSource\Model\Entity\MediaSourceManager;
 use Cx\Core\Test\Model\Entity\ContrexxTestCase;
 
 /**

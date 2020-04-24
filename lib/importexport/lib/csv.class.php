@@ -63,7 +63,7 @@ class CsvLib
             $this->separator = "\t";
         }
 
-        if (strlen($_POST['import_options']) == 1) {
+        if (isset($_POST['import_options']) && strlen($_POST['import_options']) == 1) {
             $this->enclosure = $_POST['import_options_csv_enclosure'];
         }
     }
@@ -120,9 +120,9 @@ class CsvLib
         // try to convert the file to the system charset CONTREXX_CHARSET if required
         if(function_exists("mb_detect_encoding")) {
             $content = file_get_contents($file);
-            $encoding = mb_detect_encoding($content, CONTREXX_CHARSET, true);
+            $encoding = mb_detect_encoding($content);
             if($encoding != CONTREXX_CHARSET) {
-                $content = mb_convert_encoding($content, CONTREXX_CHARSET);
+                $content = utf8_encode($content);
                 file_put_contents($file, $content);
             }
         }

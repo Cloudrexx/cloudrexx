@@ -62,8 +62,16 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
     /**
      * {@inheritDoc}
      */
-    public function getNewVersion($meta, $object) {
+    public function isPostInsertGenerator($meta)
+    {
+        return $meta->idGenerator->isPostInsertGenerator();
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function getNewVersion($meta, $object)
+    {
         $em = $this->getObjectManager();
         $objectMeta = $em->getClassMetadata(get_class($object));
         $identifierField = $this->getSingleIdentifierFieldName($objectMeta);
@@ -76,19 +84,10 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
         $q = $em->createQuery($dql);
         $q->setParameters(array(
             'objectId' => $objectId,
-            'objectClass' => $objectMeta->name
+            'objectClass' => $objectMeta->name,
         ));
         $q->useResultCache(false);
 
         return $q->getSingleScalarResult() + 1;
-
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public function isPostInsertGenerator($meta)
-    {
-        return $meta->idGenerator->isPostInsertGenerator();
     }
 }

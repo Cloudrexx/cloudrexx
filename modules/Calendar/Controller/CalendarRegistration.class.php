@@ -106,22 +106,6 @@ class CalendarRegistration extends CalendarLibrary
     public $type; 
     
     /**
-     * Host name
-     *
-     * @access public
-     * @var string
-     */
-    public $hostName; 
-    
-    /**
-     * User Ip address
-     *
-     * @access public
-     * @var string
-     */
-    public $ipAddress;
-    
-    /**
      * First Export time
      *
      * @access public
@@ -184,7 +168,25 @@ class CalendarRegistration extends CalendarLibrary
      * @var \Cx\Modules\Calendar\Model\Entity\Invite
      */
     protected $invite;
-    
+
+    /**
+     * Registration type normal registration
+     * @var integer
+     */
+    const REGISTRATION_TYPE_REGISTRATION = 1;
+
+    /**
+     * Registration type waiting list
+     * @var integer
+     */
+    const REGISTRATION_TYPE_WAITLIST = 2;
+
+    /**
+     * Registration type cancellation
+     * @var integer
+     */
+    const REGISTRATION_TYPE_CANCELLATION = 0;
+
     /**
      * Constructor for registration class
      * 
@@ -207,7 +209,7 @@ class CalendarRegistration extends CalendarLibrary
      * Returns the form of this registration
      * @return \Cx\Modules\Calendar\Controller\CalendarForm Associated form object
      */
-    protected function getForm() {
+    public function getForm() {
         if ($this->form) {
             return $this->form;
         }
@@ -227,14 +229,12 @@ class CalendarRegistration extends CalendarLibrary
      * @return null
      */
     function get($regId) {
-        global $objDatabase, $_LANGID;    
+        global $objDatabase;    
         
         $query = 'SELECT registration.`id` AS `id`,
                          registration.`event_id` AS `event_id`,
                          registration.`submission_date` AS `submission_date`,
                          registration.`date` AS `date`,
-                         registration.`host_name` AS `host_name`,
-                         registration.`ip_address` AS `ip_address`,
                          registration.`type` AS `type`,
                          registration.`invite_id` AS `invite_id`,
                          registration.`user_id` AS `user_id`,
@@ -255,8 +255,6 @@ class CalendarRegistration extends CalendarLibrary
             $this->userId= intval($objResult->fields['user_id']);        
             $this->langId= intval($objResult->fields['lang_id']);        
             $this->type = intval($objResult->fields['type']);        
-            $this->hostName = htmlentities($objResult->fields['host_name'], ENT_QUOTES, CONTREXX_CHARSET);      
-            $this->ipAddress = htmlentities($objResult->fields['ip_address'], ENT_QUOTES, CONTREXX_CHARSET);        
             $this->firstExport = intval($objResult->fields['first_export']);
             $this->paymentMethod = intval($objResult->fields['payment_method']);
             $this->paid = intval($objResult->fields['paid']);
@@ -284,6 +282,7 @@ class CalendarRegistration extends CalendarLibrary
                 WHERE
                     `field`.`reg_id` = "' . $regId . '" AND
                     `field`.`field_id` IN (' . implode(',', array_column($this->getForm()->inputfields, 'id')) . ')
+                ORDER BY `field`.`field_id` DESC
             ';
             $fieldsQueryResult = $objDatabase->Execute($fieldsQuery);
             if ($fieldsQueryResult === false) {
@@ -292,10 +291,10 @@ class CalendarRegistration extends CalendarLibrary
             while (!$fieldsQueryResult->EOF) {
                 $id = $fieldsQueryResult->fields['field_id'];
                 $this->fields[$id] = array(
-                    'name' => $this->getForm()->inputfields[$id]['name'][$_LANGID],
+                    'name' => $this->getForm()->inputfields[$id]['name'][FRONTEND_LANG_ID],
                     'type' => $this->getForm()->inputfields[$id]['type'],
                     'value' => contrexx_raw2xhtml($fieldsQueryResult->fields['value']),
-                    'default' => $this->getForm()->inputfields[$id]['default_value'][$_LANGID],
+                    'default' => $this->getForm()->inputfields[$id]['default_value'][FRONTEND_LANG_ID],
                 );
                 $fieldsQueryResult->MoveNext();
             }
@@ -311,7 +310,7 @@ class CalendarRegistration extends CalendarLibrary
      */
     function save($data)
     {
-        global $objDatabase, $objInit, $_LANGID;
+        global $objDatabase, $objInit;
         
         /* foreach ($this->getForm()->inputfields as $key => $arrInputfield) {
             if($arrInputfield['type'] == 'selectBillingAddress') { 
@@ -347,11 +346,11 @@ class CalendarRegistration extends CalendarLibrary
             /* } */
         }
         
-        $regId = empty($data['regid']) ? 0 : intval($data['regid']);
-        $eventId = intval($data['id']);
-        $formId = intval($data['form']);
+        $regId     = empty($data['regid']) ? 0 : intval($data['regid']);
+        $eventId   = intval($data['id']);
+        $formId    = intval($data['form']);
         $eventDate = intval($data['date']);
-        $userId = intval($data['userid']);
+        $userId    = intval($data['userid']);
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
 
@@ -360,7 +359,7 @@ class CalendarRegistration extends CalendarLibrary
         ) {
             $eventDate = isset($data['registrationEventDate']) ? contrexx_input2int($data['registrationEventDate']) : $eventDate;
 
-            $endDate   = new \DateTime();
+            $endDate = new \DateTime();
             $endDate->modify('+10 years');
 
             $eventManager = new CalendarEventManager(null, $endDate);
@@ -400,18 +399,16 @@ class CalendarRegistration extends CalendarLibrary
             !empty($objEvent->numSubscriber) &&
             intval($objEvent->getFreePlaces() - $numSeating) < 0
         ) {
-            $type = 2;
+            $type = static::REGISTRATION_TYPE_WAITLIST;
         } elseif (isset($data['registrationType'])) {
             $type = intval($data['registrationType']);
         } else {
-            $type = 1;
+            $type = static::REGISTRATION_TYPE_REGISTRATION;
         }
         $this->saveIn = intval($type);
 
         $paymentMethod = empty($data['paymentMethod']) ? 0 : intval($data['paymentMethod']);
         $paid = empty($data['paid']) ? 0 : intval($data['paid']);
-        $hostName = 0;
-        $ipAddress = 0;
 
         if (!$this->invite) {
             $eventRepo = $this->em->getRepository('Cx\Modules\Calendar\Model\Entity\Event');
@@ -435,11 +432,9 @@ class CalendarRegistration extends CalendarLibrary
         $formData = array(
             'fields' => array(
                 'date'          => $eventDate,
-                'hostName'      => $hostName,
-                'ipAddress'     => $ipAddress,
                 'type'          => $type,
                 'userId'        => $userId,
-                'langId'        => $_LANGID,
+                'langId'        => $this->langId ? $this->langId : FRONTEND_LANG_ID,
                 'paymentMethod' => $paymentMethod,
                 'paid'          => $paid
             ),
@@ -477,12 +472,10 @@ class CalendarRegistration extends CalendarLibrary
                         SET `event_id`         = ' . $eventId . ',
                             `submission_date`  = "' . $submissionDate->format('Y-m-d H:i:s') .'",
                             `date`             = ' . $eventDate . ',
-                            `host_name`        = "' . $hostName . '",
-                            `ip_address`       = "' . $ipAddress . '",
                             `type`             = ' . $type . ',
                             `invite_id`        = ' . $this->invite->getId(). ',
                             `user_id`          = ' . $userId . ',
-                            `lang_id`          = ' . $_LANGID . ',
+                            `lang_id`          = ' . ($this->langId ? $this->langId : FRONTEND_LANG_ID) . ',
                             `export`           = 0,
                             `payment_method`   = ' . $paymentMethod . ',
                             `paid`             = ' . $paid . ' ';
@@ -517,12 +510,10 @@ class CalendarRegistration extends CalendarLibrary
             $query = 'UPDATE `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration`
                          SET `event_id` = '.$eventId.',
                              `date` = '.$eventDate.',
-                             `host_name` = '.$hostName.',
-                             `ip_address` = '.$ipAddress.',
                              `invite_id` = '.$this->invite->getId().',
                              `user_id` = '.$userId.',
                              `type`    = '.$type.',
-                             `lang_id` = '.$_LANGID.',
+                             `lang_id` = ' . ($this->langId ? $this->langId : FRONTEND_LANG_ID) . ',
                              `payment_method` = '.$paymentMethod.',
                              `paid` = '.$paid.'
                        WHERE `id` = '.$regId;
@@ -609,14 +600,23 @@ class CalendarRegistration extends CalendarLibrary
 
         if ($objInit->mode == 'frontend') {
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-            
+
             // send notification mail about successful registration to user
-            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG, $this->id, $objEvent->emailTemplate);
+            $objMailManager->sendMail(
+                $objEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG,
+                $this->id,
+                $objEvent->emailTemplate
+            );
             
             // send notification mail about new registration to admin
-            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG, $this->id);
+            $objMailManager->sendMail(
+                $objEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG,
+                $this->id
+            );
         }
-        
+
         return true;
     }
 
@@ -672,6 +672,10 @@ class CalendarRegistration extends CalendarLibrary
 
         if (!empty($regId)) {
             $registration = $this->getRegistrationEntity($regId);
+            if (!$registration) {
+                return false;
+            }
+
             //Trigger preRemove event for Registration Entity
             $this->triggerEvent(
                 'model/preRemove', $registration,
@@ -747,22 +751,21 @@ class CalendarRegistration extends CalendarLibrary
      */
     function move($regId, $typeId)
     {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
         if (!empty($regId)) {
-            $registration = $this
-                ->em
-                ->getRepository('Cx\Modules\Calendar\Model\Entity\Registration')
-                ->findOneBy(array('id' => $regId, 'langId' => $_LANGID));
-            $registration->setType($typeId);
-            $registration->setVirtual(true);
+            $registration = $this->getRegistrationEntity(
+                $regId,
+                array('type', $typeId)
+            );
             //Trigger preUpdate event for Registration Entity
             $this->triggerEvent(
                 'model/preUpdate', $registration,
                 array(
                     'relations' => array(
                         'oneToMany' => 'getRegistrationFormFieldValues',
-                        'manyToOne' => 'getEvent'
+                        'manyToOne' => 'getEvent',
+                        'oneToOne'  => 'getInvite',
                     ),
                     'joinEntityRelations' => array(
                         'getRegistrationFormFieldValues' => array(
@@ -776,8 +779,7 @@ class CalendarRegistration extends CalendarLibrary
             $query = '
                 UPDATE `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration`
                 SET `type` = '.$typeId.'
-                WHERE `id` = '.$regId.'
-                AND `lang_id` = '.$_LANGID
+                WHERE `id` = '.$regId
             ;
             $objResult = $objDatabase->Execute($query);
 
@@ -801,7 +803,7 @@ class CalendarRegistration extends CalendarLibrary
      */
     function tagExport()
     {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
        $now = time();
 
@@ -901,15 +903,16 @@ class CalendarRegistration extends CalendarLibrary
                 ->getRepository('Cx\Modules\Calendar\Model\Entity\Registration')
                 ->findOneById($id);
         }
+
+        if (!$registration) {
+            return null;
+        }
+
         if ($registration->getInvite()) {
             $registration->getInvite()->setVirtual(true);
             $this->em->detach($registration->getInvite());
         }
         $registration->setVirtual(true);
-
-        if (!$registration) {
-            return null;
-        }
 
         if (!$formDatas) {
             return $registration;

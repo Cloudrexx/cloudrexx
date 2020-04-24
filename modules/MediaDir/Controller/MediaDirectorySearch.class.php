@@ -70,10 +70,10 @@ class MediaDirectorySearch extends MediaDirectoryLibrary
      */
     public function getSearchform($objTpl, $actionUrl = null)
     {
-        global $_ARRAYLANG, $_CORELANG, $objDatabase, $_LANGID;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         if (isset($_GET['term'])) {
-            $strSearchFormTerm = $_GET['term'];
+            $strSearchFormTerm = contrexx_input2xhtml($_GET['term']);
         } else {
             $strSearchFormTerm = '';
         }
@@ -130,7 +130,7 @@ EOF;
 
     function getExpandedInputfields()
     {
-        global $_ARRAYLANG, $objDatabase, $_LANGID;
+        global $_ARRAYLANG, $objDatabase;
 
         $formId = null;
         $strPleaseChoose = $_ARRAYLANG['TXT_MEDIADIR_PLEASE_CHOOSE'];
@@ -152,6 +152,15 @@ EOF;
             } elseif ($arrIds[0] != 'search' && $arrIds[0] != 'alphabetical'){
                 $objForms = new MediaDirectoryForm(null, $this->moduleName);
                 foreach ($objForms->arrForms as $id => $arrForm) {
+                    // note: in a previous version of Cloudrexx, there was no check
+                    // if the form was active or not. this caused unexpected
+                    // behavior
+                    if (
+                        !$this->arrSettings['legacyBehavior'] &&
+                        !$arrForm['formActive']
+                    ) {
+                        continue;
+                    }
                     if (!empty($arrForm['formCmd']) && ($arrForm['formCmd'] == $_GET['cmd'])) {
                         $formId = intval($id);
                         $formDefinition = $objForms->arrForms[$formId];
@@ -254,7 +263,7 @@ EOF;
 
     function searchEntries($arrData)
     {
-        global $_ARRAYLANG, $_CORELANG, $objDatabase, $_LANGID, $objInit;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase, $objInit;
 
         $arrSelect = array();
         $arrWhere = array();
@@ -272,6 +281,15 @@ EOF;
         if (isset($_GET['cmd']) && $_GET['cmd'] != 'search') {
             $objForms = new MediaDirectoryForm(null, $this->moduleName);
             foreach ($objForms->arrForms as $intFormId => $arrForm) {
+                // note: in a previous version of Cloudrexx, there was no check
+                // if the form was active or not. this caused unexpected
+                // behavior
+                if (
+                    !$this->arrSettings['legacyBehavior'] &&
+                    !$arrForm['formActive']
+                ) {
+                    continue;
+                }
                 if (!empty($arrForm['formCmd']) && ($arrForm['formCmd'] == $_GET['cmd'])) {
                     $intCmdFormId = intval($intFormId);
                 }
@@ -321,7 +339,7 @@ EOF;
         $arrSelect[]    = 'entry.id AS `entry_id`';
 
         if (!empty($arrData['term'])) {
-            $strTerm        = contrexx_addslashes(trim($arrData['term']));
+            $strTerm        = contrexx_raw2db(trim($arrData['term']));
             $arrSelect[]    = 'MATCH (rel_inputfield.`value`) AGAINST ("%'.$strTerm.'%")  AS score';
             $arrJoins[]     = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_inputfields AS inputfield ON rel_inputfield.`field_id` = inputfield.`id`';
             $strReplace     = '%" AND rel_inputfield.`value` LIKE "%';
@@ -381,39 +399,61 @@ EOF;
                 }
 
                 $intInputfieldType = $objInputfields->arrInputfields[$intInputfieldId]['type'];
+                $inputfieldContextType = $objInputfields->arrInputfields[$intInputfieldId]['context_type'];
                 $strExpTerm = is_array($strExpTerm) ? contrexx_input2db(array_map('trim', $strExpTerm)) : contrexx_input2db(trim($strExpTerm));
                 $strTableName = 'rel_inputfield_'.intval($intInputfieldId);
                 $arrJoins[]  = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS '.$strTableName.' ON '.$strTableName.'.`entry_id` = entry.id';
 
-                if ($intInputfieldType == '11') { // 11 = classification
-                    switch ($this->arrSettings['settingsClassificationSearch']) {
-                        case 1:
-                            $strSearchOperator = '>=';
-                            break;
-                        case 2:
-                            $strSearchOperator = '<=';
-                            break;
-                        case 3:
-                            $strSearchOperator = '=';
-                            break;
-                    }
+                switch ($inputfieldContextType) {
+                    case 'zip':
+                        $whereExp = $strTableName.'.`value` REGEXP "(^|[^a-z0-9])'.$strExpTerm.'([^a-z0-9]|$)"';
+                        $arrWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$whereExp.')';
+                        continue;
 
-                    $whereExp = $strTableName.'.`value` '.$strSearchOperator.' "'.$strExpTerm.'"';
-                } elseif ($intInputfieldType == '3' || $intInputfieldType == '25') { // 3 = dropdown, 25 = country
-                    $whereExp = $strTableName.'.`value` = "'.$strExpTerm.'"';
-                } elseif ($intInputfieldType == '5') { // 5 = checkbox
-                    $checkboxSearch = array();
-                    foreach ($strExpTerm as $value) {
-                        $checkboxSearch[] = ' FIND_IN_SET("'. $value .'",' . $strTableName . '.`value`) <> 0';
-                    }
-                    $whereExp = '('. implode(' AND ', $checkboxSearch) .')';
-                } elseif ($intInputfieldType == '31') {
-                    // Range Slider
-                    $intMin = (int)$strExpTerm[0];
-                    $intMax = (int)$strExpTerm[1];
-                    $whereExp = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$strTableName.'.`value` BETWEEN '.$intMin.' AND '.$intMax.')';
-                } else {
-                    $whereExp = $strTableName.'.`value` LIKE "%'.$strExpTerm.'%"';
+                        break;
+
+                    default:
+                        break;
+                }
+                switch ($intInputfieldType) {
+                    case '11': // 11 = classification
+                        switch ($this->arrSettings['settingsClassificationSearch']) {
+                            case 1:
+                                $strSearchOperator = '>=';
+                                break;
+                            case 2:
+                                $strSearchOperator = '<=';
+                                break;
+                            case 3:
+                                $strSearchOperator = '=';
+                                break;
+                        }
+
+                        $whereExp = $strTableName.'.`value` '.$strSearchOperator.' "'.$strExpTerm.'"';
+                        break;
+
+                    case '3': // 3 = dropdown
+                    case '25': // 25 = country
+                        $whereExp = $strTableName.'.`value` = "'.$strExpTerm.'"';
+                        break;
+
+                    case '5': // 5 = checkbox
+                        $checkboxSearch = array();
+                        foreach ($strExpTerm as $value) {
+                            $checkboxSearch[] = ' FIND_IN_SET("'. $value .'",' . $strTableName . '.`value`) <> 0';
+                        }
+                        $whereExp = '('. implode(' AND ', $checkboxSearch) .')';
+                        break;
+
+                    case '31': // Range Slider
+                        $intMin = (int)$strExpTerm[0];
+                        $intMax = (int)$strExpTerm[1];
+                        $whereExp = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$strTableName.'.`value` BETWEEN '.$intMin.' AND '.$intMax.')';
+                    break;
+
+                    default:
+                        $whereExp = $strTableName.'.`value` LIKE "%'.$strExpTerm.'%"';
+                        break;
                 }
                 $arrWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$whereExp.')';
             }

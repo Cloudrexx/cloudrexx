@@ -28,10 +28,12 @@ Cx\Core_Modules\Sync\Model\Entity\Sync:
     changes:
       targetEntity: Cx\Core_Modules\Sync\Model\Entity\Change
       mappedBy: sync
+    originChanges:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Change
+      mappedBy: originSync
   manyToOne: # owning side
     dataAccess:
       targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
-      inversedBy: syncs
       joinColumn:
         name: data_access_id
         referencedColumnName: id

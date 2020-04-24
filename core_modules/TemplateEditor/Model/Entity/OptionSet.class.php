@@ -308,7 +308,7 @@ class OptionSet extends \Cx\Model\Base\EntityBase implements YamlSerializable
         $data = $this->data;
         foreach ($data['options'] as &$emptyOption) {
             if ($presetOption = $preset->getOption($emptyOption['name'])) {
-                if (!is_array($emptyOption['specific'])) {
+                if (!isset($emptyOption['specific']) || !is_array($emptyOption['specific'])) {
                     $emptyOption['specific'] = array();
                 }
                 $emptyOption['specific'] = array_merge(

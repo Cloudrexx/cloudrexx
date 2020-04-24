@@ -207,26 +207,25 @@ function updateContentSite()
   }
 }
 
-function newsGetFileBrowser(elInsertBox, sType)
+function mbProductFileCallback(data)
 {
-  newsElInsertBox = elInsertBox;
-  newsElType = sType;
-  openWindow('index.php?cmd=FileBrowser&{CSRF_PARAM}&standalone=true','','width=800,height=600,resizable=yes,status=no,scrollbars=yes');
+  if (data.type !== 'file' || (typeof data.data[0] === 'undefined')) {
+    return;
+  }
+
+  var url = data.data[0].datainfo.filepath;
+  cx.jQuery('#productFile').val(url);
 }
 
-function openWindow(theURL,winName,features){
-  galleryPopup = window.open(theURL,"gallery",features);
-  galleryPopup.focus();
-}
-
-function SetUrl(url, width, height, alt) {
-  switch (newsElType) {
-  case 'image':
-    document.getElementById(newsElInsertBox).value = url;
-    break
-  case 'link':
-    newsInsertLink(document.getElementById(newsElInsertBox), '<a href="'+url+'">'+newsElLinkText+'<\/a>');
-    break;
+function mbProductTargetUrlCallback(data)
+{
+  if (data.type === 'file' && (typeof data.data[0] !== 'undefined')) {
+    var url = data.data[0].datainfo.filepath;
+    cx.jQuery('#productFormTargetUrl').val(url);
+  }
+  if (data.type === 'page') {
+    var url = data.data[0].node;
+    cx.jQuery('#productFormTargetUrl').val(url);
   }
 }
 
@@ -470,7 +469,7 @@ cx.jQuery(function(){
                 </label>
                 <div id="productFileLayer">{TXT_EGOV_PRODUCT_SELECT_FILE}
                   &nbsp;<input style="width: 450px;" type="text" name="productFile" id="productFile" value="{PRODUCT_FORM_FILE}" />
-                  &nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('productFile', 'image')" />
+                  &nbsp; {EGOV_PRODUCT_MEDIABROWSER_FILE_BUTTON}
                 </div>
             </div>
             <input type="radio" name="productAutoStatus" value="1"
@@ -493,7 +492,8 @@ cx.jQuery(function(){
         </tr>
         <tr class="row1" style="height:20px;">
           <td width="20%">{TXT_EGOV_TARGET_URL}</td>
-          <td width="80%"><input style="width: 580px;" type="text" name="productFormTargetUrl" id="productFormTargetUrl" value="{PRODUCT_FORM_TARGET_URL}" />&nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('productFormTargetUrl', 'image')" /><td>
+          <td width="80%"><input style="width: 580px;" type="text" name="productFormTargetUrl" id="productFormTargetUrl" value="{PRODUCT_FORM_TARGET_URL}" />
+            &nbsp; {EGOV_PRODUCT_MEDIABROWSER_TARGET_URL_BUTTON}
         </tr>
         <tr class="row2" style="height:20px;">
           <td>{TXT_STATE}</td>

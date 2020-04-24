@@ -6,6 +6,9 @@ Cx\Modules\Calendar\Model\Entity\EventField:
       columns: [ title ]
     contrexx_module_calendar_event_id_ibfk:
       columns: [ event_id ]
+    eventIndex:
+      columns: [ title, teaser, description ]
+      flags: [ fulltext ]
   fields:
     eventId:
       id: true
@@ -35,12 +38,12 @@ Cx\Modules\Calendar\Model\Entity\EventField:
     placeCity:
       type: string
       length: 255
-      nullable: true
+      nullable: false
       column: place_city
     placeCountry:
       type: string
       length: 255
-      nullable: true
+      nullable: false
       column: place_country
     orgName:
       type: string

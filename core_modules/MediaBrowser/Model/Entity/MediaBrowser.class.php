@@ -61,7 +61,7 @@ class MediaBrowser extends EntityBase
         'mediatypes',
         'multipleselect',
         'modalopened',
-        'modalClosed'
+        'modalclosed'
     ];
 
     /**
@@ -111,6 +111,13 @@ class MediaBrowser extends EntityBase
             $this->callingSystemComponentController = $this->getComponent($matches[1]);
         }
 
+        // sets js variable for current component
+        \ContrexxJavascript::getInstance()->setVariable(
+            'component',
+            $this->callingSystemComponentController->getSystemComponent()->getName(),
+            'mediabrowser'
+        );
+
         $this->entity = $entity;
 
         $this->getComponentController()->addMediaBrowser($this);
@@ -153,7 +160,7 @@ class MediaBrowser extends EntityBase
      */
     function setCallback($callback)
     {
-        $this->options['data-cx-Mb-Cb-Js-Modalclosed'] = $callback;
+        $this->options['data-cx-Mb-Modalclosed'] = $callback;
     }
 
     /**
@@ -168,8 +175,8 @@ class MediaBrowser extends EntityBase
             if (is_int($key)) {
                 $optionsString .= $value . ' ';
             } else {
-                if (in_array($key, self::$optionValues)){
-                    $key = 'data-cx-Mb-'.$key;
+                if (in_array($key, self::$optionValues)) {
+                    $key = 'data-cx-Mb-' . $key;
                 }
                 $optionsString .= $key . '="' . $value . '" ';
             }
@@ -190,7 +197,7 @@ class MediaBrowser extends EntityBase
         $button->loadTemplateFile($this->cx->getCodeBaseCoreModulePath() . '/MediaBrowser/View/Template/MediaBrowserButton.html');
         $button->setVariable(array(
             'MEDIABROWSER_BUTTON_NAME' => $buttonName,
-            'MEDIABROWSER_BUTTON_OPTIONS' =>  $this->getOptionsString()
+            'MEDIABROWSER_BUTTON_OPTIONS' => $this->getOptionsString()
         ));
         return $button->get();
     }
@@ -207,9 +214,8 @@ class MediaBrowser extends EntityBase
         return $this;
     }
 
-
     protected function addOption($optionName, $value) {
-        $option  = $this->getOption($optionName);
+        $option = $this->getOption($optionName);
         $optionValues = explode(' ', $option);
         if (!in_array($value, $optionValues)) {
             $optionValues[] = $value;

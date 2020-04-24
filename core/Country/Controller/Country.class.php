@@ -89,6 +89,9 @@ class Country
      */
     static function getPage()
     {
+        // TODO: reimplement
+        return;
+
         global $objTemplate, $_CORELANG;
 
 //DBG::activate(DBG_PHP|DBG_ADODB|DBG_LOG_FIREPHP);
@@ -919,10 +922,14 @@ class Country
 
     /**
      * Sets up the Country settings page
+     * @todo reimplement
      * @return  string          The page content
      */
     static function settings()
     {
+        // TODO: reimplement
+        return;
+
         global $_CORELANG;
 
         $objTemplateCountry = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseCorePath() . '/Country/View/Template/Generic');

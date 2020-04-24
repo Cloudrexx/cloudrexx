@@ -1,0 +1,68 @@
+<form method="get" id="vg-{VG_ID}-searchForm" data-vg-id="{VG_ID}"></form>
+<!-- BEGIN search -->
+<div id="vg-{VG_ID}-filterSearch">
+    <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
+        <tbody>
+            <tr>
+                <th colspan="2" valign="top">{TXT_SEARCH}</th>
+            </tr>
+            <tr class="row1">
+                <td>
+                    <input type="text" name="term" placeholder="{TXT_CORE_SEARCH_TERM}" class="vg-encode" form="vg-{VG_ID}-searchForm">
+                    <input type="<!-- BEGIN submitSearch -->submit<!-- END submitSearch --><!-- BEGIN buttonSearch -->button<!-- END buttonSearch -->" value="{TXT_SEARCH}" class="vg-searchSubmit" form="vg-{VG_ID}-searchForm">
+                    <!-- BEGIN showExtendedSearch -->
+                    <a href="#" onclick="cx.jQuery('#vg-{VG_ID}-extendedSearch').toggle(500); return false;">
+                        {TXT_EXP_SEARCH}
+                    </a>
+                    <!-- END showExtendedSearch -->
+                </td>
+            </tr>
+        </tbody>
+    </table> 
+</div>
+<!-- END search -->
+<!-- BEGIN filter -->
+<div id="vg-{VG_ID}-extendedSearch"<!-- BEGIN hideFilter --> style="display:none;"<!-- END hideFilter -->>
+    <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
+        <tbody>
+            <tr>
+                <th colspan="2" valign="top">{TXT_EXP_SEARCH}</th>
+            </tr>
+            <!-- BEGIN filter-field -->
+            <tr class="row1">
+                <td>
+                    <label for="{FIELD_ID}">{FIELD_TITLE}</label>
+                </td>
+                <td>
+                    {FIELD_FILTER_OPTIONS}
+                </td>
+            </tr>
+            <!-- END filter-field -->
+            <tr class="row1">
+                <td colspan="2">
+                    <input type="submit" value="{TXT_SEARCH}" class="vg-searchSubmit" form="vg-{VG_ID}-searchForm">
+                </td>
+            </tr>
+        </tbody>
+    </table> 
+</div>
+<!-- END filter -->
+<!-- BEGIN filter-alphabetical -->
+<div id="vg-{VG_ID}-alphabeticalSearch">
+    <ul class="vg-alphabeticalSearch">
+        <!-- BEGIN letter -->
+        <li <!-- BEGIN selected -->class="selected"<!-- END selected -->>
+            <a href="{ALPHABETICAL_URL}">{LETTER}</a>
+        </li>
+        <!-- END letter -->
+    </ul>
+</div>
+<!-- END filter-alphabetical -->
+<!-- BEGIN no-entries -->
+<p class="vg-noresult">{TXT_NO_RESULT}</p>
+<!-- END no-entries -->
+<!-- BEGIN table -->
+{TABLE}<br />
+{PAGING}
+<!-- END table -->
+{ADD_BUTTON}

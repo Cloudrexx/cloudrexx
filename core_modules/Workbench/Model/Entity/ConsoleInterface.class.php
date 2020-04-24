@@ -273,4 +273,22 @@ Available subcommands:' . "\r\n";
         }
         echo $output;
     }
+
+    /**
+     * Opens a diff view for the user to diff $content1 and $content2
+     * @param string $content1 Content to diff with $content2
+     * @param string $content2 Content to diff with $content1
+     * @param string $tool (optional) Hint which tool to use
+     */
+    public function diff($content1, $content2, $tool = '') {
+        $file1 = tmpfile();
+        $file2 = tmpfile();
+        fwrite($file1, $content1);
+        fwrite($file2, $content2);
+        $filename1 = stream_get_meta_data($file1)['uri'];
+        $filename2 = stream_get_meta_data($file2)['uri'];
+        passthru('diff -sy ' . $filename1 . ' ' . $filename2);
+        fclose($file1);
+        fclose($file2);
+    }
 }

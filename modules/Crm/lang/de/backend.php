@@ -500,7 +500,8 @@ $_ARRAYLANG['TXT_CRM_CREATE_ACCOUNT_USER_TIP']      = "Diese Option erstellt zum
 $_ARRAYLANG['TXT_CRM_ADD_NEW_ACCOUNT']              = "Neuer Kontakt anlegen";
 $_ARRAYLANG['TXT_CRM_DATASOURCE']                   = "Datenquelle";
 $_ARRAYLANG['TXT_CRM_SOCIAL_NETWORK']               = "Soziales Netzwerk";
-$_ARRAYLANG['TXT_CRM_GENDER']                       = "Anrede";
+$_ARRAYLANG['TXT_CRM_GENDER']                       = "Geschlecht";
+$_ARRAYLANG['TXT_CRM_SALUTATION']                   = "Anrede";
 $_ARRAYLANG['TXT_CRM_NOT_SPECIFIED']                = "Nicht festgelegt";
 $_ARRAYLANG['TXT_CRM_GENDER_MALE']                  = "Männlich";
 $_ARRAYLANG['TXT_CRM_GENDER_FEMALE']                = "Weiblich";
@@ -627,3 +628,11 @@ $_ARRAYLANG['TXT_CRM_EMAIL_DELIVERY'] = 'E-Mail Zustellung';
 $_ARRAYLANG['TXT_CRM_FILTER_STATUS'] = 'Statusfilter';
 $_ARRAYLANG['TXT_CRM_TASK_STATUS_OPEN'] = 'Offen';
 $_ARRAYLANG['TXT_CRM_TASK_STATUS_COMPLETED'] = 'Erledigt';
+
+// Settings
+$_ARRAYLANG['TXT_ENTER_SORTING']    = 'Geben Sie einen Sortierwert ein';
+$_ARRAYLANG['TXT_SORTING_NUMERIC']  = 'Sortierwert sollte numerisch sein [0-9]';
+$_ARRAYLANG['TXT_ENTRIES_MARKED']   = 'Aufwärtspfeil';
+
+// Settings interface import success message
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS'] = 'Datensätze wurden erfolgreich importiert.';

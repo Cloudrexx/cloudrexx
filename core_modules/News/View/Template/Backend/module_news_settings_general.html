@@ -19,7 +19,7 @@ function updateLangName(input)
 }
 function swapBlock( div,status ) {
     if(status == 1){
-        document.getElementById( div ).style.display ='block';
+        document.getElementById( div ).style.display ='';
     }else{
         document.getElementById( div ).style.display ='none';
     }
@@ -212,8 +212,8 @@ function preSubmitCheck(){
             <br />
         </td>
     </tr>
-    <tr class="row1">
-        <td width="15%" nowrap="nowrap">{TXT_USE_TAGS}</td>
+    <tr class="row2">
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_USE_TAGS}</td>
         <td width="85%" nowrap="nowrap">
             <input type="checkbox" name="newsUseTags" id="newsUseTags" {NEWS_USE_TAGS_CHECKED} value="1" />
             <label for="newsUseTags">{TXT_NEWS_ACTIVE}</label>
@@ -221,7 +221,7 @@ function preSubmitCheck(){
         </td>
     </tr>
     <tr class="row1">
-        <td width="15%" nowrap="nowrap">{TXT_USE_RELATED_NEWS}</td>
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_SETTINGS_USE_RELATED_NEWS}</td>
         <td width="85%" nowrap="nowrap">
             <input type="checkbox" name="useRelatedNews" id="newsUseTags" {NEWS_USE_RELATED_NEWS_CHECKED} value="1" />
             <label for="newsUseTags">{TXT_NEWS_ACTIVE}</label>
@@ -229,17 +229,25 @@ function preSubmitCheck(){
         </td>
     </tr>
     <tr class="row2">
-        <td width="15%" nowrap="nowrap">{TXT_USE_TYPES}</td>
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_USE_PREVIOUS_NEXT_LINK}</td>
+        <td width="85%" nowrap="nowrap">
+            <input type="checkbox" name="newsUsePreviousNextLink" id="newsUsePreviousNextLink" {NEWS_USE_PREVIOUS_NEXT_LINK_CHECKED} value="1" />
+            <label for="newsUsePreviousNextLink">{TXT_NEWS_ACTIVE}</label>
+            <br />
+        </td>
+    </tr>
+    <tr class="row1">
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_SETTINGS_USE_TYPES}</td>
         <td width="85%" nowrap="nowrap">
             <input type="checkbox" name="newsUseTypes" id="newsUseTypes" {NEWS_USE_TYPES_CHECKED} value="1" />
             <label for="newsUseTypes">{TXT_NEWS_ACTIVE}</label>
             <br />
         </td>
     </tr>
-    <tr class="row1">
+    <tr class="row2">
       <td nowrap="nowrap" style="vertical-align:top;">{TXT_NEWS_PROTECTION}</td>
       <td nowrap="nowrap">
-        <input type="checkbox" name="newsMessageProtection" id="newsMessageProtection" {NEWS_MESSAGE_PROTECTION_CHECKED} value="1" onclick="swapBlock('newsMessageProtectionRestrictedConfig',this.checked)" />
+        <input type="checkbox" name="newsMessageProtection" id="newsMessageProtection" {NEWS_MESSAGE_PROTECTION_CHECKED} value="1" onclick="swapBlock('newsMessageProtectionRestrictedConfig',this.checked);swapBlock('newsMessageProtectionRedirect',this.checked);" />
         <label for="newsMessageProtection">{TXT_NEWS_ACTIVE}</label>
 
         <div id="newsMessageProtectionRestrictedConfig" style="display:{NEWS_MESSAGE_PROTECTION_RESTRICTED_DISPLAY};">
@@ -249,8 +257,17 @@ function preSubmitCheck(){
         </div>
       </td>
     </tr>
-    <tr class="row2">
-        <td style="vertical-align: top;">{TXT_NEWS_COMMENTS}</td>
+    <tr class="row1" id="newsMessageProtectionRedirect" style="display:{NEWS_MESSAGE_PROTECTION_RESTRICTED_DISPLAY};">
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_SETTINGS_LOGIN_REDIRECT}</td>
+        <td width="85%" nowrap="nowrap">
+            <input type="checkbox" name="newsLoginRedirect" id="newsLoginRedirect" {NEWS_LOGIN_REDIRECT} value="1" />
+            <label for="newsLoginRedirect">{TXT_NEWS_ACTIVE}</label>
+            <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWS_SETTINGS_LOGIN_REDIRECT_HELP}</span>
+            <br />
+        </td>
+    </tr>
+    <tr class="row1">
+        <td style="vertical-align: top;">{TXT_NEWS_SETTINGS_USE_COMMENTS}</td>
         <td>
             <input type="checkbox" name="newsCommentsAllow" id="newsCommentsAllow" value="1" {NEWS_SETTINGS_COMMENTS_STATUS_CHECKED} onclick="swapBlock('news_comments_configuration',this.checked);" />
             <label for="newsCommentsAllow">{TXT_NEWS_ACTIVE}</label>
@@ -283,6 +300,14 @@ function preSubmitCheck(){
                 <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWS_SETTINGS_RECENT_MESSAGES_LIMIT_HELP}</span>
 
             </div>
+        </td>
+    </tr>
+    <tr class="row2">
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_SETTINGS_USE_THUMBNAILS}</td>
+        <td width="85%" nowrap="nowrap">
+            <input type="checkbox" name="newsUseThumbnails" id="newsUseThumbnails" {NEWS_USE_THUMBNAILS} value="1" />
+            <label for="newsUseThumbnails">{TXT_NEWS_ACTIVE}</label>
+            <br />
         </td>
     </tr>
     <tr class="row1">

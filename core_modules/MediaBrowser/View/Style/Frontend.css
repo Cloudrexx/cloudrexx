@@ -1,556 +1,556 @@
 .media-browser-modal-window, .media-browser-modal-window *, .uploader-modal, .uploader-modal * {
-  font-family: Arial, sans-serif
+    font-family: Arial, sans-serif
 }
 
 .media-browser-modal-window .icon-refresh:before, .media-browser-modal-window .icon-upload:before {
-  content: '';
-  display: none
+    content: '';
+    display: none
 }
 
 .media-browser-modal-window .modal-header .close, .uploader-modal .modal-header .close {
-  float: right;
-  height: 58px;
-  left: auto;
-  letter-spacing: normal;
-  line-height: 32px;
-  margin: -15px -15px 0 0;
-  max-height: none;
-  max-width: none;
-  min-height: 0;
-  min-width: 0;
-  opacity: 1;
-  padding: 13px 21px;
-  text-align: center;
-  text-decoration: none;
-  text-indent: 0;
-  text-shadow: none;
-  text-transform: none;
-  top: auto;
-  width: 61px;
-  word-break: normal;
-  word-spacing: 0;
-  z-index: auto;
-  zoom: 1
+    float: right;
+    height: 58px;
+    left: auto;
+    letter-spacing: normal;
+    line-height: 32px;
+    margin: -15px -15px 0 0;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    min-width: 0;
+    opacity: 1;
+    padding: 13px 21px;
+    text-align: center;
+    text-decoration: none;
+    text-indent: 0;
+    text-shadow: none;
+    text-transform: none;
+    top: auto;
+    width: 61px;
+    word-break: normal;
+    word-spacing: 0;
+    z-index: auto;
+    zoom: 1
 }
 
 .media-browser-modal-window .mediaBrowserNavigation > ul li a, .uploader-modal .mediaBrowserNavigation > ul li a {
-  cursor: pointer;
-  line-height: normal;
-  float: none;
-  font-weight: 400;
-  text-align: left;
-  display: block;
-  width: 100%;
-  margin: 0;
+    cursor: pointer;
+    line-height: normal;
+    float: none;
+    font-weight: 400;
+    text-align: left;
+    display: block;
+    width: 100%;
+    margin: 0;
 }
 
 .media-browser-modal-window span.fileActions-text, .uploader-modal span.fileActions-text {
-  font-size: 12px;
-  vertical-align: top;
-  display: inline-block
+    font-size: 12px;
+    vertical-align: top;
+    display: inline-block
 }
 
 .media-browser-modal-window table.adminlist, .uploader-modal table.adminlist {
-  bottom: 1px;
-  clear: both;
-  border-spacing: 0;
-  border-collapse: collapse;
-  background: #fff
+    bottom: 1px;
+    clear: both;
+    border-spacing: 0;
+    border-collapse: collapse;
+    background: #fff
 }
 
 .media-browser-modal-window table.adminlist th, .uploader-modal table.adminlist th {
-  background: #0071bc;
-  height: 28px;
-  line-height: 28px;
-  margin: 0;
-  padding: 0 10px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  text-transform: none
+    background: #0071bc;
+    height: 28px;
+    line-height: 28px;
+    margin: 0;
+    padding: 0 10px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: none
 }
 
 .media-browser-modal-window table.adminlist th a, .uploader-modal table.adminlist th a {
-  color: #fff
+    color: #fff
 }
 
 .media-browser-modal-window table.adminlist th a:active, .media-browser-modal-window table.adminlist th a:focus, .media-browser-modal-window table.adminlist th a:hover, .uploader-modal table.adminlist th a:active, .uploader-modal table.adminlist th a:focus, .uploader-modal table.adminlist th a:hover {
-  color: #ececec
+    color: #ececec
 }
 
 .media-browser-modal-window table.adminlist tr.row0, .media-browser-modal-window table.adminlist tr.row1, .media-browser-modal-window table.adminlist tr.row2, .uploader-modal table.adminlist tr.row0, .uploader-modal table.adminlist tr.row1, .uploader-modal table.adminlist tr.row2 {
-  background: #fff
+    background: #fff
 }
 
 .media-browser-modal-window table.adminlist tr.row0:hover, .media-browser-modal-window table.adminlist tr.row1:hover, .media-browser-modal-window table.adminlist tr.row2:hover, .uploader-modal table.adminlist tr.row0:hover, .uploader-modal table.adminlist tr.row1:hover, .uploader-modal table.adminlist tr.row2:hover {
-  background: #ffffd6
+    background: #ffffd6
 }
 
 .media-browser-modal-window table.adminlist tr.row3, .uploader-modal table.adminlist tr.row3 {
-  background: #f5f5f5;
-  font-weight: 700
+    background: #f5f5f5;
+    font-weight: 700
 }
 
 .media-browser-modal-window table.adminlist tr.highlighted, .media-browser-modal-window table.adminlist tr.highlighted:hover, .uploader-modal table.adminlist tr.highlighted, .uploader-modal table.adminlist tr.highlighted:hover {
-  background: #ffe7e7
+    background: #ffe7e7
 }
 
 .media-browser-modal-window table.adminlist tr.highlightedGreen, .uploader-modal table.adminlist tr.highlightedGreen {
-  background: #d8ffca
+    background: #d8ffca
 }
 
 .media-browser-modal-window table.adminlist tr.rowWarn, .media-browser-modal-window table.adminlist tr.rowwarn, .uploader-modal table.adminlist tr.rowWarn, .uploader-modal table.adminlist tr.rowwarn {
-  background: #ffe7e7 !important
+    background: #ffe7e7 !important
 }
 
 .media-browser-modal-window table.adminlist tr.rowInactive, .media-browser-modal-window table.adminlist tr.rowinactive, .uploader-modal table.adminlist tr.rowInactive, .uploader-modal table.adminlist tr.rowinactive {
-  background: #edefef !important
+    background: #edefef !important
 }
 
 .media-browser-modal-window table.adminlist tr.active, .uploader-modal table.adminlist tr.active {
-  background: #ffffd6
+    background: #ffffd6
 }
 
 .media-browser-modal-window table.adminlist td, .uploader-modal table.adminlist td {
-  height: 22px;
-  line-height: 22px;
-  padding: 3px;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: #e5e5e5 1px solid
+    height: 22px;
+    line-height: 22px;
+    padding: 3px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: #e5e5e5 1px solid
 }
 
 .media-browser-modal-window table.adminlist td a:active, .media-browser-modal-window table.adminlist td a:focus, .media-browser-modal-window table.adminlist td a:hover, .uploader-modal table.adminlist td a:active, .uploader-modal table.adminlist td a:focus, .uploader-modal table.adminlist td a:hover {
-  color: #0b4c7a
+    color: #0b4c7a
 }
 
 .media-browser-modal-window table.adminlist td.options, .uploader-modal table.adminlist td.options {
-  font-size: 10px;
-  background: #fff
+    font-size: 10px;
+    background: #fff
 }
 
 .media-browser-modal-window table.adminlist td.col3, .uploader-modal table.adminlist td.col3 {
-  font-weight: 700
+    font-weight: 700
 }
 
 .media-browser-modal-window table.adminlist td.number, .uploader-modal table.adminlist td.number {
-  text-align: right
+    text-align: right
 }
 
 .media-browser-modal-window table.title, .uploader-modal table.title {
-  border-bottom: #009 1px solid;
-  background: #fff
+    border-bottom: #009 1px solid;
+    background: #fff
 }
 
 .media-browser-modal-window table.subnavbar, .uploader-modal table.subnavbar {
-  border-bottom: #009 0 solid;
-  background: #dde4ff
+    border-bottom: #009 0 solid;
+    background: #dde4ff
 }
 
 .media-browser-modal-window table.reset, .media-browser-modal-window table.reset td, .media-browser-modal-window table.reset th, .media-browser-modal-window table.reset tr, .uploader-modal table.reset, .uploader-modal table.reset td, .uploader-modal table.reset th, .uploader-modal table.reset tr {
-  width: auto;
-  height: auto;
-  float: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  font-size: 100%;
-  vertical-align: baseline;
-  background: 0 0;
-  border-collapse: collapse;
-  border-spacing: 0
+    width: auto;
+    height: auto;
+    float: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: 0 0;
+    border-collapse: collapse;
+    border-spacing: 0
 }
 
 .media-browser-modal-window table.reset td, .uploader-modal table.reset td {
-  padding: 0 10px 0 0
+    padding: 0 10px 0 0
 }
 
 .media-browser-modal-window table tr.reset:hover, .uploader-modal table tr.reset:hover {
-  background: 0 0 !important
+    background: 0 0 !important
 }
 
 .media-browser-modal-window table tr.reset td, .uploader-modal table tr.reset td {
-  padding: 0;
-  border: 0
+    padding: 0;
+    border: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group:after, .media-browser-modal-window .btn-toolbar:after, .media-browser-modal-window .clearfix:after, .media-browser-modal-window .modal-footer:after, .uploader-modal .btn-group-vertical > .btn-group:after, .uploader-modal .btn-toolbar:after, .uploader-modal .clearfix:after, .uploader-modal .modal-footer:after {
-  clear: both
+    clear: both
 }
 
 .media-browser-modal-window, .uploader-modal {
-  font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
-  margin: 0
+    font-family: sans-serif;
+    -ms-text-size-adjust: 100%;
+    margin: 0
 }
 
 .media-browser-modal-window article, .media-browser-modal-window aside, .media-browser-modal-window details, .media-browser-modal-window figcaption, .media-browser-modal-window figure, .media-browser-modal-window footer, .media-browser-modal-window header, .media-browser-modal-window hgroup, .media-browser-modal-window main, .media-browser-modal-window menu, .media-browser-modal-window nav, .media-browser-modal-window section, .media-browser-modal-window summary, .uploader-modal article, .uploader-modal aside, .uploader-modal details, .uploader-modal figcaption, .uploader-modal figure, .uploader-modal footer, .uploader-modal header, .uploader-modal hgroup, .uploader-modal main, .uploader-modal menu, .uploader-modal nav, .uploader-modal section, .uploader-modal summary {
-  display: block
+    display: block
 }
 
 .media-browser-modal-window audio, .media-browser-modal-window canvas, .media-browser-modal-window progress, .media-browser-modal-window video, .uploader-modal audio, .uploader-modal canvas, .uploader-modal progress, .uploader-modal video {
-  display: inline-block;
-  vertical-align: baseline
+    display: inline-block;
+    vertical-align: baseline
 }
 
 .media-browser-modal-window audio:not([controls]), .uploader-modal audio:not([controls]) {
-  display: none;
-  height: 0
+    display: none;
+    height: 0
 }
 
 .media-browser-modal-window [hidden], .media-browser-modal-window template, .uploader-modal [hidden], .uploader-modal template {
-  display: none
+    display: none
 }
 
 .media-browser-modal-window a, .uploader-modal a {
-  background-color: transparent
+    background-color: transparent
 }
 
 .media-browser-modal-window a:active, .media-browser-modal-window a:hover, .uploader-modal a:active, .uploader-modal a:hover {
-  outline: 0
+    outline: 0
 }
 
 .media-browser-modal-window abbr[title], .uploader-modal abbr[title] {
-  border-bottom: 1px dotted
+    border-bottom: 1px dotted
 }
 
 .media-browser-modal-window b, .media-browser-modal-window strong, .uploader-modal b, .uploader-modal strong {
-  font-weight: 700
+    font-weight: 700
 }
 
 .media-browser-modal-window dfn, .uploader-modal dfn {
-  font-style: italic
+    font-style: italic
 }
 
 .media-browser-modal-window h1, .uploader-modal h1 {
-  font-size: 2em;
-  margin: .67em 0
+    font-size: 2em;
+    margin: .67em 0
 }
 
 .media-browser-modal-window mark, .uploader-modal mark {
-  background: #ff0;
-  color: #000
+    background: #ff0;
+    color: #000
 }
 
 .media-browser-modal-window small, .uploader-modal small {
-  font-size: 80%
+    font-size: 80%
 }
 
 .media-browser-modal-window sub, .media-browser-modal-window sup, .uploader-modal sub, .uploader-modal sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline
 }
 
 .media-browser-modal-window sup, .uploader-modal sup {
-  top: -.5em
+    top: -.5em
 }
 
 .media-browser-modal-window sub, .uploader-modal sub {
-  bottom: -.25em
+    bottom: -.25em
 }
 
 .media-browser-modal-window img, .uploader-modal img {
-  border: 0;
-  vertical-align: middle
+    border: 0;
+    vertical-align: middle
 }
 
 .media-browser-modal-window svg:not(:root), .uploader-modal svg:not(:root) {
-  overflow: hidden
+    overflow: hidden
 }
 
 .media-browser-modal-window hr, .uploader-modal hr {
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box;
-  height: 0
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0
 }
 
 .media-browser-modal-window pre, .uploader-modal pre {
-  overflow: auto
+    overflow: auto
 }
 
 .media-browser-modal-window code, .media-browser-modal-window kbd, .media-browser-modal-window pre, .media-browser-modal-window samp, .uploader-modal code, .uploader-modal kbd, .uploader-modal pre, .uploader-modal samp {
-  font-family: monospace, monospace;
-  font-size: 1em
+    font-family: monospace, monospace;
+    font-size: 1em
 }
 
 .media-browser-modal-window button, .media-browser-modal-window input, .media-browser-modal-window optgroup, .media-browser-modal-window select, .media-browser-modal-window textarea, .uploader-modal button, .uploader-modal input, .uploader-modal optgroup, .uploader-modal select, .uploader-modal textarea {
-  color: inherit;
-  font: inherit;
-  margin: 0
+    color: inherit;
+    font: inherit;
+    margin: 0
 }
 
 .media-browser-modal-window button, .uploader-modal button {
-  overflow: visible
+    overflow: visible
 }
 
 .media-browser-modal-window button, .media-browser-modal-window select, .uploader-modal button, .uploader-modal select {
-  text-transform: none
+    text-transform: none
 }
 
 .media-browser-modal-window button, .media-browser-modal-window html input[type=button], .media-browser-modal-window input[type=reset], .media-browser-modal-window input[type=submit], .uploader-modal button, .uploader-modal html input[type=button], .uploader-modal input[type=reset], .uploader-modal input[type=submit] {
-  cursor: pointer
+    cursor: pointer
 }
 
 .media-browser-modal-window button[disabled], .media-browser-modal-window html input[disabled], .uploader-modal button[disabled], .uploader-modal html input[disabled] {
-  cursor: default
+    cursor: default
 }
 
 .media-browser-modal-window button::-moz-focus-inner, .media-browser-modal-window input::-moz-focus-inner, .uploader-modal button::-moz-focus-inner, .uploader-modal input::-moz-focus-inner {
-  border: 0;
-  padding: 0
+    border: 0;
+    padding: 0
 }
 
 .media-browser-modal-window input[type=checkbox], .media-browser-modal-window input[type=radio], .uploader-modal input[type=checkbox], .uploader-modal input[type=radio] {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  padding: 0
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0
 }
 
 .media-browser-modal-window input[type=search], .uploader-modal input[type=search] {
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box
 }
 
 .media-browser-modal-window fieldset, .uploader-modal fieldset {
-  border: 1px solid silver;
-  margin: 0 2px;
-  padding: .35em .625em .75em
+    border: 1px solid silver;
+    margin: 0 2px;
+    padding: .35em .625em .75em
 }
 
 .media-browser-modal-window legend, .uploader-modal legend {
-  border: 0;
-  padding: 0
+    border: 0;
+    padding: 0
 }
 
 .media-browser-modal-window textarea, .uploader-modal textarea {
-  overflow: auto
+    overflow: auto
 }
 
 .media-browser-modal-window optgroup, .uploader-modal optgroup {
-  font-weight: 700
+    font-weight: 700
 }
 
 .media-browser-modal-window td, .media-browser-modal-window th, .uploader-modal td, .uploader-modal th {
-  padding: 0
+    padding: 0
 }
 
 .media-browser-modal-window *, .media-browser-modal-window :after, .media-browser-modal-window :before, .uploader-modal *, .uploader-modal :after, .uploader-modal :before {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box
 }
 
 .media-browser-modal-window html, .uploader-modal html {
-  font-size: 10px
+    font-size: 10px
 }
 
 .media-browser-modal-window body, .uploader-modal body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #333;
-  background-color: #fff
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff
 }
 
 .media-browser-modal-window button, .media-browser-modal-window input, .media-browser-modal-window select, .media-browser-modal-window textarea, .uploader-modal button, .uploader-modal input, .uploader-modal select, .uploader-modal textarea {
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit
 }
 
 .media-browser-modal-window a, .uploader-modal a {
-  color: #337ab7;
-  text-decoration: none
+    color: #337ab7;
+    text-decoration: none
 }
 
 .media-browser-modal-window a:focus, .media-browser-modal-window a:hover, .uploader-modal a:focus, .uploader-modal a:hover {
-  color: #23527c;
-  text-decoration: underline
+    color: #23527c;
+    text-decoration: underline
 }
 
 .media-browser-modal-window a:focus, .uploader-modal a:focus {
-  outline: dotted thin;
-  outline-offset: -2px
+    outline: dotted thin;
+    outline-offset: -2px
 }
 
 .media-browser-modal-window figure, .uploader-modal figure {
-  margin: 0
+    margin: 0
 }
 
 .modal.media-browser-modal-window, .modal.uploader-modal {
-  display: none;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1050;
-  outline: 0
+    display: none;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    outline: 0
 }
 
 .media-browser-modal-window .modal.fade.uploader-modal.modal-dialog, .uploader-modal .modal.fade.uploader-modal.modal-dialog {
-  -ms-transform: translate(0, -25%);
-  -webkit-transform: translate(0, -25%);
-  transform: translate(0, -25%);
-  -webkit-transition: -webkit-transform .3s ease-out;
-  transition: transform .3s ease-out
+    -ms-transform: translate(0, -25%);
+    -webkit-transform: translate(0, -25%);
+    transform: translate(0, -25%);
+    -webkit-transition: -webkit-transform .3s ease-out;
+    transition: transform .3s ease-out
 }
 
 .media-browser-modal-window .modal.in.uploader-modal.modal-dialog, .uploader-modal .modal.in.uploader-modal.modal-dialog {
-  -ms-transform: translate(0, 0);
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0)
+    -ms-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0)
 }
 
 .modal-open .modal.media-browser-modal-window, .modal-open .modal.uploader-modal {
-  overflow-x: hidden;
-  overflow-y: auto;
-  margin: 0;
-  width: 100%
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0;
+    width: 100%
 }
 
 .media-browser-modal-window.modal .modal-dialog, .uploader-modal.modal .modal-dialog {
-  position: relative;
-  width: auto;
-  margin: 10px
+    position: relative;
+    width: auto;
+    margin: 10px
 }
 
 .media-browser-modal-window .modal-header, .uploader-modal .modal-header {
-  border-bottom: 1px solid #e5e5e5
+    border-bottom: 1px solid #e5e5e5
 }
 
 .media-browser-modal-window .modal-scrollbar-measure, .uploader-modal .modal-scrollbar-measure {
-  position: absolute;
-  top: -9999px;
-  width: 50px;
-  height: 50px;
-  overflow: scroll
+    position: absolute;
+    top: -9999px;
+    width: 50px;
+    height: 50px;
+    overflow: scroll
 }
 
 @media (min-width: 768px) {
-  .media-browser-modal-window.modal .modal-dialog, .uploader-modal.modal .modal-dialog {
-    width: 600px;
-    margin: 30px auto
-  }
+    .media-browser-modal-window.modal .modal-dialog, .uploader-modal.modal .modal-dialog {
+        width: 600px;
+        margin: 30px auto
+    }
 
-  .media-browser-modal-window .modal-content, .uploader-modal .modal-content {
-    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, .5)
-  }
+    .media-browser-modal-window .modal-content, .uploader-modal .modal-content {
+        -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .5)
+    }
 
-  .media-browser-modal-window .modal-sm, .uploader-modal .modal-sm {
-    width: 300px
-  }
+    .media-browser-modal-window .modal-sm, .uploader-modal .modal-sm {
+        width: 300px
+    }
 }
 
 @media (min-width: 992px) {
-  .media-browser-modal-window.modal .modal-lg, .uploader-modal.modal .modal-lg {
-    width: 900px
-  }
+    .media-browser-modal-window.modal .modal-lg, .uploader-modal.modal .modal-lg {
+        width: 900px
+    }
 }
 
 .media-browser-modal-window .clearfix:after, .media-browser-modal-window .clearfix:before, .media-browser-modal-window .modal-footer:after, .media-browser-modal-window .modal-footer:before, .uploader-modal .clearfix:after, .uploader-modal .clearfix:before, .uploader-modal .modal-footer:after, .uploader-modal .modal-footer:before {
-  content: " ";
-  display: table
+    content: " ";
+    display: table
 }
 
 .uploader-modal .modal-body {
-  max-height: none
+    max-height: none
 }
 
 .media-browser-modal-window .img-responsive, .uploader-modal .img-responsive {
-  display: block;
-  max-width: 100%;
-  height: auto
+    display: block;
+    max-width: 100%;
+    height: auto
 }
 
 .media-browser-modal-window .img-rounded, .uploader-modal .img-rounded {
-  border-radius: 6px
+    border-radius: 6px
 }
 
 .media-browser-modal-window .img-thumbnail, .uploader-modal .img-thumbnail {
-  padding: 4px;
-  line-height: 1.42857143;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  -webkit-transition: all .2s ease-in-out;
-  transition: all .2s ease-in-out;
-  display: inline-block;
-  max-width: 100%;
-  height: auto
+    padding: 4px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    display: inline-block;
+    max-width: 100%;
+    height: auto
 }
 
 .media-browser-modal-window .img-circle, .uploader-modal .img-circle {
-  border-radius: 50%
+    border-radius: 50%
 }
 
 .media-browser-modal-window hr, .uploader-modal hr {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border: 0;
-  border-top: 1px solid #eee
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid #eee
 }
 
 .media-browser-modal-window .sr-only, .uploader-modal .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  border: 0
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0
 }
 
 .media-browser-modal-window .sr-only-focusable:active, .media-browser-modal-window .sr-only-focusable:focus, .uploader-modal .sr-only-focusable:active, .uploader-modal .sr-only-focusable:focus {
-  position: static;
-  width: auto;
-  height: auto;
-  margin: 0;
-  overflow: visible
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible
 }
 
 .media-browser-modal-window [role=button], .uploader-modal [role=button] {
-  cursor: pointer
+    cursor: pointer
 }
 
 .media-browser-modal-window table, .uploader-modal table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  background-color: transparent
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: transparent
 }
 
 .media-browser-modal-window.uploader-modal {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  color: #777;
-  text-align: left
+    padding-top: 8px;
+    padding-bottom: 8px;
+    color: #777;
+    text-align: left
 }
 
 .media-browser-modal-window th, .uploader-modal th {
-  text-align: left
+    text-align: left
 }
 
 .media-browser-modal-window .table, .uploader-modal .table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 20px
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px
 }
 
 .media-browser-modal-window .table > tbody > tr > td, .media-browser-modal-window .table > tbody > tr > th, .media-browser-modal-window .table > tfoot > tr > td, .media-browser-modal-window .table > tfoot > tr > th, .media-browser-modal-window .table > thead > tr > td, .media-browser-modal-window .table > thead > tr > th, .uploader-modal .table > tbody > tr > td, .uploader-modal .table > tbody > tr > th, .uploader-modal .table > tfoot > tr > td, .uploader-modal .table > tfoot > tr > th, .uploader-modal .table > thead > tr > td, .uploader-modal .table > thead > tr > th {
-  padding: 8px;
-  line-height: 1.42857143;
-  vertical-align: top;
-  border-top: 1px solid #ddd
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd
 }
 
 .media-browser-modal-window .table > thead > tr > th, .uploader-modal .table > thead > tr > th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #ddd
+    vertical-align: bottom;
+    border-bottom: 2px solid #ddd
 }
 
 /* TODO: These should be improved (read: simplified and *fixed*) */
@@ -566,831 +566,831 @@
 .uploader-modal .table > colgroup + thead > tr:first-child > th,
 .uploader-modal .table > thead:first-child > tr:first-child > td,
 .uploader-modal .table > thead:first-child > tr:first-child > th {
-  border-top: 0
+    border-top: 0
 }
 
 .media-browser-modal-window .table > tbody + tbody, .uploader-modal .table > tbody + tbody {
-  border-top: 2px solid #ddd
+    border-top: 2px solid #ddd
 }
 
 .media-browser-modal-window .table .table, .uploader-modal .table .table {
-  background-color: #fff
+    background-color: #fff
 }
 
 .media-browser-modal-window .table-condensed > tbody > tr > td, .media-browser-modal-window .table-condensed > tbody > tr > th, .media-browser-modal-window .table-condensed > tfoot > tr > td, .media-browser-modal-window .table-condensed > tfoot > tr > th, .media-browser-modal-window .table-condensed > thead > tr > td, .media-browser-modal-window .table-condensed > thead > tr > th, .uploader-modal .table-condensed > tbody > tr > td, .uploader-modal .table-condensed > tbody > tr > th, .uploader-modal .table-condensed > tfoot > tr > td, .uploader-modal .table-condensed > tfoot > tr > th, .uploader-modal .table-condensed > thead > tr > td, .uploader-modal .table-condensed > thead > tr > th {
-  padding: 5px
+    padding: 5px
 }
 
 .media-browser-modal-window .table-bordered, .media-browser-modal-window .table-bordered > tbody > tr > td, .media-browser-modal-window .table-bordered > tbody > tr > th, .media-browser-modal-window .table-bordered > tfoot > tr > td, .media-browser-modal-window .table-bordered > tfoot > tr > th, .media-browser-modal-window .table-bordered > thead > tr > td, .media-browser-modal-window .table-bordered > thead > tr > th, .uploader-modal .table-bordered, .uploader-modal .table-bordered > tbody > tr > td, .uploader-modal .table-bordered > tbody > tr > th, .uploader-modal .table-bordered > tfoot > tr > td, .uploader-modal .table-bordered > tfoot > tr > th, .uploader-modal .table-bordered > thead > tr > td, .uploader-modal .table-bordered > thead > tr > th {
-  border: 1px solid #ddd
+    border: 1px solid #ddd
 }
 
 .media-browser-modal-window .table-bordered > thead > tr > td, .media-browser-modal-window .table-bordered > thead > tr > th, .uploader-modal .table-bordered > thead > tr > td, .uploader-modal .table-bordered > thead > tr > th {
-  border-bottom-width: 2px
+    border-bottom-width: 2px
 }
 
 .media-browser-modal-window .table-striped > tbody > tr:nth-of-type(odd), .uploader-modal .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #f9f9f9
+    background-color: #f9f9f9
 }
 
 .media-browser-modal-window .table-hover > tbody > tr:hover, .media-browser-modal-window .table > tbody > tr.active > td, .media-browser-modal-window .table > tbody > tr.active > th, .media-browser-modal-window .table > tbody > tr > td.active, .media-browser-modal-window .table > tbody > tr > th.active, .media-browser-modal-window .table > tfoot > tr.active > td, .media-browser-modal-window .table > tfoot > tr.active > th, .media-browser-modal-window .table > tfoot > tr > td.active, .media-browser-modal-window .table > tfoot > tr > th.active, .media-browser-modal-window .table > thead > tr.active > td, .media-browser-modal-window .table > thead > tr.active > th, .media-browser-modal-window .table > thead > tr > td.active, .media-browser-modal-window .table > thead > tr > th.active, .uploader-modal .table-hover > tbody > tr:hover, .uploader-modal .table > tbody > tr.active > td, .uploader-modal .table > tbody > tr.active > th, .uploader-modal .table > tbody > tr > td.active, .uploader-modal .table > tbody > tr > th.active, .uploader-modal .table > tfoot > tr.active > td, .uploader-modal .table > tfoot > tr.active > th, .uploader-modal .table > tfoot > tr > td.active, .uploader-modal .table > tfoot > tr > th.active, .uploader-modal .table > thead > tr.active > td, .uploader-modal .table > thead > tr.active > th, .uploader-modal .table > thead > tr > td.active, .uploader-modal .table > thead > tr > th.active {
-  background-color: #f5f5f5
+    background-color: #f5f5f5
 }
 
 .media-browser-modal-window table col[class*=col-], .uploader-modal table col[class*=col-] {
-  position: static;
-  float: none;
-  display: table-column
+    position: static;
+    float: none;
+    display: table-column
 }
 
 .media-browser-modal-window table td[class*=col-], .media-browser-modal-window table th[class*=col-], .uploader-modal table td[class*=col-], .uploader-modal table th[class*=col-] {
-  position: static;
-  float: none;
-  display: table-cell
+    position: static;
+    float: none;
+    display: table-cell
 }
 
 .media-browser-modal-window .btn-group > .btn-group, .media-browser-modal-window .btn-toolbar .btn, .media-browser-modal-window .btn-toolbar .btn-group, .media-browser-modal-window .btn-toolbar .input-group, .uploader-modal .btn-group > .btn-group, .uploader-modal .btn-toolbar .btn, .uploader-modal .btn-toolbar .btn-group, .uploader-modal .btn-toolbar .input-group {
-  float: left
+    float: left
 }
 
 .media-browser-modal-window .table-hover > tbody > tr.active:hover > td, .media-browser-modal-window .table-hover > tbody > tr.active:hover > th, .media-browser-modal-window .table-hover > tbody > tr:hover > .active, .media-browser-modal-window .table-hover > tbody > tr > td.active:hover, .media-browser-modal-window .table-hover > tbody > tr > th.active:hover, .uploader-modal .table-hover > tbody > tr.active:hover > td, .uploader-modal .table-hover > tbody > tr.active:hover > th, .uploader-modal .table-hover > tbody > tr:hover > .active, .uploader-modal .table-hover > tbody > tr > td.active:hover, .uploader-modal .table-hover > tbody > tr > th.active:hover {
-  background-color: #e8e8e8
+    background-color: #e8e8e8
 }
 
 .media-browser-modal-window .table > tbody > tr.success > td, .media-browser-modal-window .table > tbody > tr.success > th, .media-browser-modal-window .table > tbody > tr > td.success, .media-browser-modal-window .table > tbody > tr > th.success, .media-browser-modal-window .table > tfoot > tr.success > td, .media-browser-modal-window .table > tfoot > tr.success > th, .media-browser-modal-window .table > tfoot > tr > td.success, .media-browser-modal-window .table > tfoot > tr > th.success, .media-browser-modal-window .table > thead > tr.success > td, .media-browser-modal-window .table > thead > tr.success > th, .media-browser-modal-window .table > thead > tr > td.success, .media-browser-modal-window .table > thead > tr > th.success, .uploader-modal .table > tbody > tr.success > td, .uploader-modal .table > tbody > tr.success > th, .uploader-modal .table > tbody > tr > td.success, .uploader-modal .table > tbody > tr > th.success, .uploader-modal .table > tfoot > tr.success > td, .uploader-modal .table > tfoot > tr.success > th, .uploader-modal .table > tfoot > tr > td.success, .uploader-modal .table > tfoot > tr > th.success, .uploader-modal .table > thead > tr.success > td, .uploader-modal .table > thead > tr.success > th, .uploader-modal .table > thead > tr > td.success, .uploader-modal .table > thead > tr > th.success {
-  background-color: #dff0d8
+    background-color: #dff0d8
 }
 
 .media-browser-modal-window .table-hover > tbody > tr.success:hover > td, .media-browser-modal-window .table-hover > tbody > tr.success:hover > th, .media-browser-modal-window .table-hover > tbody > tr:hover > .success, .media-browser-modal-window .table-hover > tbody > tr > td.success:hover, .media-browser-modal-window .table-hover > tbody > tr > th.success:hover, .uploader-modal .table-hover > tbody > tr.success:hover > td, .uploader-modal .table-hover > tbody > tr.success:hover > th, .uploader-modal .table-hover > tbody > tr:hover > .success, .uploader-modal .table-hover > tbody > tr > td.success:hover, .uploader-modal .table-hover > tbody > tr > th.success:hover {
-  background-color: #d0e9c6
+    background-color: #d0e9c6
 }
 
 .media-browser-modal-window .table > tbody > tr.info > td, .media-browser-modal-window .table > tbody > tr.info > th, .media-browser-modal-window .table > tbody > tr > td.info, .media-browser-modal-window .table > tbody > tr > th.info, .media-browser-modal-window .table > tfoot > tr.info > td, .media-browser-modal-window .table > tfoot > tr.info > th, .media-browser-modal-window .table > tfoot > tr > td.info, .media-browser-modal-window .table > tfoot > tr > th.info, .media-browser-modal-window .table > thead > tr.info > td, .media-browser-modal-window .table > thead > tr.info > th, .media-browser-modal-window .table > thead > tr > td.info, .media-browser-modal-window .table > thead > tr > th.info, .uploader-modal .table > tbody > tr.info > td, .uploader-modal .table > tbody > tr.info > th, .uploader-modal .table > tbody > tr > td.info, .uploader-modal .table > tbody > tr > th.info, .uploader-modal .table > tfoot > tr.info > td, .uploader-modal .table > tfoot > tr.info > th, .uploader-modal .table > tfoot > tr > td.info, .uploader-modal .table > tfoot > tr > th.info, .uploader-modal .table > thead > tr.info > td, .uploader-modal .table > thead > tr.info > th, .uploader-modal .table > thead > tr > td.info, .uploader-modal .table > thead > tr > th.info {
-  background-color: #d9edf7
+    background-color: #d9edf7
 }
 
 .media-browser-modal-window .table-hover > tbody > tr.info:hover > td, .media-browser-modal-window .table-hover > tbody > tr.info:hover > th, .media-browser-modal-window .table-hover > tbody > tr:hover > .info, .media-browser-modal-window .table-hover > tbody > tr > td.info:hover, .media-browser-modal-window .table-hover > tbody > tr > th.info:hover, .uploader-modal .table-hover > tbody > tr.info:hover > td, .uploader-modal .table-hover > tbody > tr.info:hover > th, .uploader-modal .table-hover > tbody > tr:hover > .info, .uploader-modal .table-hover > tbody > tr > td.info:hover, .uploader-modal .table-hover > tbody > tr > th.info:hover {
-  background-color: #c4e3f3
+    background-color: #c4e3f3
 }
 
 .media-browser-modal-window .table > tbody > tr.warning > td, .media-browser-modal-window .table > tbody > tr.warning > th, .media-browser-modal-window .table > tbody > tr > td.warning, .media-browser-modal-window .table > tbody > tr > th.warning, .media-browser-modal-window .table > tfoot > tr.warning > td, .media-browser-modal-window .table > tfoot > tr.warning > th, .media-browser-modal-window .table > tfoot > tr > td.warning, .media-browser-modal-window .table > tfoot > tr > th.warning, .media-browser-modal-window .table > thead > tr.warning > td, .media-browser-modal-window .table > thead > tr.warning > th, .media-browser-modal-window .table > thead > tr > td.warning, .media-browser-modal-window .table > thead > tr > th.warning, .uploader-modal .table > tbody > tr.warning > td, .uploader-modal .table > tbody > tr.warning > th, .uploader-modal .table > tbody > tr > td.warning, .uploader-modal .table > tbody > tr > th.warning, .uploader-modal .table > tfoot > tr.warning > td, .uploader-modal .table > tfoot > tr.warning > th, .uploader-modal .table > tfoot > tr > td.warning, .uploader-modal .table > tfoot > tr > th.warning, .uploader-modal .table > thead > tr.warning > td, .uploader-modal .table > thead > tr.warning > th, .uploader-modal .table > thead > tr > td.warning, .uploader-modal .table > thead > tr > th.warning {
-  background-color: #fcf8e3
+    background-color: #fcf8e3
 }
 
 .media-browser-modal-window .table-hover > tbody > tr.warning:hover > td, .media-browser-modal-window .table-hover > tbody > tr.warning:hover > th, .media-browser-modal-window .table-hover > tbody > tr:hover > .warning, .media-browser-modal-window .table-hover > tbody > tr > td.warning:hover, .media-browser-modal-window .table-hover > tbody > tr > th.warning:hover, .uploader-modal .table-hover > tbody > tr.warning:hover > td, .uploader-modal .table-hover > tbody > tr.warning:hover > th, .uploader-modal .table-hover > tbody > tr:hover > .warning, .uploader-modal .table-hover > tbody > tr > td.warning:hover, .uploader-modal .table-hover > tbody > tr > th.warning:hover {
-  background-color: #faf2cc
+    background-color: #faf2cc
 }
 
 .media-browser-modal-window .table > tbody > tr.danger > td, .media-browser-modal-window .table > tbody > tr.danger > th, .media-browser-modal-window .table > tbody > tr > td.danger, .media-browser-modal-window .table > tbody > tr > th.danger, .media-browser-modal-window .table > tfoot > tr.danger > td, .media-browser-modal-window .table > tfoot > tr.danger > th, .media-browser-modal-window .table > tfoot > tr > td.danger, .media-browser-modal-window .table > tfoot > tr > th.danger, .media-browser-modal-window .table > thead > tr.danger > td, .media-browser-modal-window .table > thead > tr.danger > th, .media-browser-modal-window .table > thead > tr > td.danger, .media-browser-modal-window .table > thead > tr > th.danger, .uploader-modal .table > tbody > tr.danger > td, .uploader-modal .table > tbody > tr.danger > th, .uploader-modal .table > tbody > tr > td.danger, .uploader-modal .table > tbody > tr > th.danger, .uploader-modal .table > tfoot > tr.danger > td, .uploader-modal .table > tfoot > tr.danger > th, .uploader-modal .table > tfoot > tr > td.danger, .uploader-modal .table > tfoot > tr > th.danger, .uploader-modal .table > thead > tr.danger > td, .uploader-modal .table > thead > tr.danger > th, .uploader-modal .table > thead > tr > td.danger, .uploader-modal .table > thead > tr > th.danger {
-  background-color: #f2dede
+    background-color: #f2dede
 }
 
 .media-browser-modal-window .table-hover > tbody > tr.danger:hover > td, .media-browser-modal-window .table-hover > tbody > tr.danger:hover > th, .media-browser-modal-window .table-hover > tbody > tr:hover > .danger, .media-browser-modal-window .table-hover > tbody > tr > td.danger:hover, .media-browser-modal-window .table-hover > tbody > tr > th.danger:hover, .uploader-modal .table-hover > tbody > tr.danger:hover > td, .uploader-modal .table-hover > tbody > tr.danger:hover > th, .uploader-modal .table-hover > tbody > tr:hover > .danger, .uploader-modal .table-hover > tbody > tr > td.danger:hover, .uploader-modal .table-hover > tbody > tr > th.danger:hover {
-  background-color: #ebcccc
+    background-color: #ebcccc
 }
 
 .media-browser-modal-window .table-responsive, .uploader-modal .table-responsive {
-  overflow-x: auto;
-  min-height: .01%
+    overflow-x: auto;
+    min-height: .01%
 }
 
 @media screen and (max-width: 767px) {
-  .media-browser-modal-window .table-responsive, .uploader-modal .table-responsive {
-    width: 100%;
-    margin-bottom: 15px;
-    overflow-y: hidden;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-    border: 1px solid #ddd
-  }
+    .media-browser-modal-window .table-responsive, .uploader-modal .table-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-y: hidden;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        border: 1px solid #ddd
+    }
 
-  .media-browser-modal-window .table-responsive > .table, .uploader-modal .table-responsive > .table {
-    margin-bottom: 0
-  }
+    .media-browser-modal-window .table-responsive > .table, .uploader-modal .table-responsive > .table {
+        margin-bottom: 0
+    }
 
-  .media-browser-modal-window .table-responsive > .table > tbody > tr > td, .media-browser-modal-window .table-responsive > .table > tbody > tr > th, .media-browser-modal-window .table-responsive > .table > tfoot > tr > td, .media-browser-modal-window .table-responsive > .table > tfoot > tr > th, .media-browser-modal-window .table-responsive > .table > thead > tr > td, .media-browser-modal-window .table-responsive > .table > thead > tr > th, .uploader-modal .table-responsive > .table > tbody > tr > td, .uploader-modal .table-responsive > .table > tbody > tr > th, .uploader-modal .table-responsive > .table > tfoot > tr > td, .uploader-modal .table-responsive > .table > tfoot > tr > th, .uploader-modal .table-responsive > .table > thead > tr > td, .uploader-modal .table-responsive > .table > thead > tr > th {
-    white-space: nowrap
-  }
+    .media-browser-modal-window .table-responsive > .table > tbody > tr > td, .media-browser-modal-window .table-responsive > .table > tbody > tr > th, .media-browser-modal-window .table-responsive > .table > tfoot > tr > td, .media-browser-modal-window .table-responsive > .table > tfoot > tr > th, .media-browser-modal-window .table-responsive > .table > thead > tr > td, .media-browser-modal-window .table-responsive > .table > thead > tr > th, .uploader-modal .table-responsive > .table > tbody > tr > td, .uploader-modal .table-responsive > .table > tbody > tr > th, .uploader-modal .table-responsive > .table > tfoot > tr > td, .uploader-modal .table-responsive > .table > tfoot > tr > th, .uploader-modal .table-responsive > .table > thead > tr > td, .uploader-modal .table-responsive > .table > thead > tr > th {
+        white-space: nowrap
+    }
 
-  .media-browser-modal-window .table-responsive > .table-bordered, .uploader-modal .table-responsive > .table-bordered {
-    border: 0
-  }
+    .media-browser-modal-window .table-responsive > .table-bordered, .uploader-modal .table-responsive > .table-bordered {
+        border: 0
+    }
 
-  .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > th:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > th:first-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > th:first-child {
-    border-left: 0
-  }
+    .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > th:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > th:first-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > td:first-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > th:first-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > td:first-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > th:first-child {
+        border-left: 0
+    }
 
-  .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > th:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > th:last-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > th:last-child {
-    border-right: 0
-  }
+    .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr > th:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr > th:last-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > td:last-child, .media-browser-modal-window .table-responsive > .table-bordered > thead > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > tbody > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > tfoot > tr > th:last-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > td:last-child, .uploader-modal .table-responsive > .table-bordered > thead > tr > th:last-child {
+        border-right: 0
+    }
 
-  .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr:last-child > td, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr:last-child > th, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr:last-child > td, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr:last-child > th, .uploader-modal .table-responsive > .table-bordered > tbody > tr:last-child > td, .uploader-modal .table-responsive > .table-bordered > tbody > tr:last-child > th, .uploader-modal .table-responsive > .table-bordered > tfoot > tr:last-child > td, .uploader-modal .table-responsive > .table-bordered > tfoot > tr:last-child > th {
-    border-bottom: 0
-  }
+    .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr:last-child > td, .media-browser-modal-window .table-responsive > .table-bordered > tbody > tr:last-child > th, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr:last-child > td, .media-browser-modal-window .table-responsive > .table-bordered > tfoot > tr:last-child > th, .uploader-modal .table-responsive > .table-bordered > tbody > tr:last-child > td, .uploader-modal .table-responsive > .table-bordered > tbody > tr:last-child > th, .uploader-modal .table-responsive > .table-bordered > tfoot > tr:last-child > td, .uploader-modal .table-responsive > .table-bordered > tfoot > tr:last-child > th {
+        border-bottom: 0
+    }
 }
 
 #content .media-browser-modal-window .btn, #content .uploader-modal .btn, .media-browser-modal-window .btn, .uploader-modal .btn {
-  display: inline-block;
-  margin-bottom: 0;
-  font-weight: 400;
-  text-align: center;
-  vertical-align: middle;
-  -ms-touch-action: manipulation;
-  touch-action: manipulation;
-  cursor: pointer;
-  background-image: none;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  border-radius: 4px;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-select: none;
-  user-select: none
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none
 }
 
 .media-browser-modal-window .btn.active.focus, .media-browser-modal-window .btn.active:focus, .media-browser-modal-window .btn.focus, .media-browser-modal-window .btn:active.focus, .media-browser-modal-window .btn:active:focus, .media-browser-modal-window .btn:focus, .uploader-modal .btn.active.focus, .uploader-modal .btn.active:focus, .uploader-modal .btn.focus, .uploader-modal .btn:active.focus, .uploader-modal .btn:active:focus, .uploader-modal .btn:focus {
-  outline: dotted thin;
-  outline-offset: -2px
+    outline: dotted thin;
+    outline-offset: -2px
 }
 
 .media-browser-modal-window .btn.focus, .media-browser-modal-window .btn:focus, .media-browser-modal-window .btn:hover, .uploader-modal .btn.focus, .uploader-modal .btn:focus, .uploader-modal .btn:hover {
-  color: #333;
-  text-decoration: none
+    color: #333;
+    text-decoration: none
 }
 
 .media-browser-modal-window .btn.active, .media-browser-modal-window .btn:active, .uploader-modal .btn.active, .uploader-modal .btn:active {
-  outline: 0;
-  background-image: none;
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
+    outline: 0;
+    background-image: none;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
 }
 
 .media-browser-modal-window .btn.disabled, .media-browser-modal-window .btn[disabled], .media-browser-modal-window fieldset[disabled] .btn, .uploader-modal .btn.disabled, .uploader-modal .btn[disabled], .uploader-modal fieldset[disabled] .btn {
-  cursor: not-allowed;
-  opacity: .65;
-  filter: alpha(opacity=65);
-  -webkit-box-shadow: none;
-  box-shadow: none
+    cursor: not-allowed;
+    opacity: .65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none
 }
 
 .media-browser-modal-window a.btn.disabled, .media-browser-modal-window fieldset[disabled] a.btn, .uploader-modal a.btn.disabled, .uploader-modal fieldset[disabled] a.btn {
-  pointer-events: none
+    pointer-events: none
 }
 
 #content .media-browser-modal-window .btn-default, #content .uploader-modal .btn-default, .media-browser-modal-window .btn-default, .uploader-modal .btn-default {
-  color: #333;
-  background-color: #fff;
-  border-color: #ccc
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc
 }
 
 .media-browser-modal-window .btn-default.focus, .media-browser-modal-window .btn-default:focus, .uploader-modal .btn-default.focus, .uploader-modal .btn-default:focus {
-  color: #333;
-  background-color: #e6e6e6;
-  border-color: #8c8c8c
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #8c8c8c
 }
 
 .media-browser-modal-window .btn-default.active, .media-browser-modal-window .btn-default:active, .media-browser-modal-window .btn-default:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-default, .uploader-modal .btn-default.active, .uploader-modal .btn-default:active, .uploader-modal .btn-default:hover, .uploader-modal .open > .dropdown-toggle.btn-default {
-  color: #333;
-  background-color: #e6e6e6;
-  border-color: #adadad
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad
 }
 
 .media-browser-modal-window .btn-default.active.focus, .media-browser-modal-window .btn-default.active:focus, .media-browser-modal-window .btn-default.active:hover, .media-browser-modal-window .btn-default:active.focus, .media-browser-modal-window .btn-default:active:focus, .media-browser-modal-window .btn-default:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-default.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-default:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-default:hover, .uploader-modal .btn-default.active.focus, .uploader-modal .btn-default.active:focus, .uploader-modal .btn-default.active:hover, .uploader-modal .btn-default:active.focus, .uploader-modal .btn-default:active:focus, .uploader-modal .btn-default:active:hover, .uploader-modal .open > .dropdown-toggle.btn-default.focus, .uploader-modal .open > .dropdown-toggle.btn-default:focus, .uploader-modal .open > .dropdown-toggle.btn-default:hover {
-  color: #333;
-  background-color: #d4d4d4;
-  border-color: #8c8c8c
+    color: #333;
+    background-color: #d4d4d4;
+    border-color: #8c8c8c
 }
 
 .media-browser-modal-window .btn-default.active, .media-browser-modal-window .btn-default:active, .media-browser-modal-window .open > .dropdown-toggle.btn-default, .uploader-modal .btn-default.active, .uploader-modal .btn-default:active, .uploader-modal .open > .dropdown-toggle.btn-default {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-default.disabled, .media-browser-modal-window .btn-default.disabled.active, .media-browser-modal-window .btn-default.disabled.focus, .media-browser-modal-window .btn-default.disabled:active, .media-browser-modal-window .btn-default.disabled:focus, .media-browser-modal-window .btn-default.disabled:hover, .media-browser-modal-window .btn-default[disabled], .media-browser-modal-window .btn-default[disabled].active, .media-browser-modal-window .btn-default[disabled].focus, .media-browser-modal-window .btn-default[disabled]:active, .media-browser-modal-window .btn-default[disabled]:focus, .media-browser-modal-window .btn-default[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-default, .media-browser-modal-window fieldset[disabled] .btn-default.active, .media-browser-modal-window fieldset[disabled] .btn-default.focus, .media-browser-modal-window fieldset[disabled] .btn-default:active, .media-browser-modal-window fieldset[disabled] .btn-default:focus, .media-browser-modal-window fieldset[disabled] .btn-default:hover, .uploader-modal .btn-default.disabled, .uploader-modal .btn-default.disabled.active, .uploader-modal .btn-default.disabled.focus, .uploader-modal .btn-default.disabled:active, .uploader-modal .btn-default.disabled:focus, .uploader-modal .btn-default.disabled:hover, .uploader-modal .btn-default[disabled], .uploader-modal .btn-default[disabled].active, .uploader-modal .btn-default[disabled].focus, .uploader-modal .btn-default[disabled]:active, .uploader-modal .btn-default[disabled]:focus, .uploader-modal .btn-default[disabled]:hover, .uploader-modal fieldset[disabled] .btn-default, .uploader-modal fieldset[disabled] .btn-default.active, .uploader-modal fieldset[disabled] .btn-default.focus, .uploader-modal fieldset[disabled] .btn-default:active, .uploader-modal fieldset[disabled] .btn-default:focus, .uploader-modal fieldset[disabled] .btn-default:hover {
-  background-color: #fff;
-  border-color: #ccc
+    background-color: #fff;
+    border-color: #ccc
 }
 
 .media-browser-modal-window .btn-default .badge, .uploader-modal .btn-default .badge {
-  color: #fff;
-  background-color: #333
+    color: #fff;
+    background-color: #333
 }
 
 #content .media-browser-modal-window .btn-primary, #content .uploader-modal .btn-primary, .media-browser-modal-window .btn-primary, .uploader-modal .btn-primary {
-  color: #fff;
-  background-color: #337ab7;
-  border-color: #2e6da4
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4
 }
 
 .media-browser-modal-window .btn-primary.focus, .media-browser-modal-window .btn-primary:focus, .uploader-modal .btn-primary.focus, .uploader-modal .btn-primary:focus {
-  color: #fff;
-  background-color: #286090;
-  border-color: #122b40
+    color: #fff;
+    background-color: #286090;
+    border-color: #122b40
 }
 
 .media-browser-modal-window .btn-primary.active, .media-browser-modal-window .btn-primary:active, .media-browser-modal-window .btn-primary:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-primary, .uploader-modal .btn-primary.active, .uploader-modal .btn-primary:active, .uploader-modal .btn-primary:hover, .uploader-modal .open > .dropdown-toggle.btn-primary {
-  color: #fff;
-  background-color: #286090;
-  border-color: #204d74
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74
 }
 
 .media-browser-modal-window .btn-primary.active.focus, .media-browser-modal-window .btn-primary.active:focus, .media-browser-modal-window .btn-primary.active:hover, .media-browser-modal-window .btn-primary:active.focus, .media-browser-modal-window .btn-primary:active:focus, .media-browser-modal-window .btn-primary:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-primary.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-primary:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-primary:hover, .uploader-modal .btn-primary.active.focus, .uploader-modal .btn-primary.active:focus, .uploader-modal .btn-primary.active:hover, .uploader-modal .btn-primary:active.focus, .uploader-modal .btn-primary:active:focus, .uploader-modal .btn-primary:active:hover, .uploader-modal .open > .dropdown-toggle.btn-primary.focus, .uploader-modal .open > .dropdown-toggle.btn-primary:focus, .uploader-modal .open > .dropdown-toggle.btn-primary:hover {
-  color: #fff;
-  background-color: #204d74;
-  border-color: #122b40
+    color: #fff;
+    background-color: #204d74;
+    border-color: #122b40
 }
 
 .media-browser-modal-window .btn-primary.active, .media-browser-modal-window .btn-primary:active, .media-browser-modal-window .open > .dropdown-toggle.btn-primary, .uploader-modal .btn-primary.active, .uploader-modal .btn-primary:active, .uploader-modal .open > .dropdown-toggle.btn-primary {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-primary.disabled, .media-browser-modal-window .btn-primary.disabled.active, .media-browser-modal-window .btn-primary.disabled.focus, .media-browser-modal-window .btn-primary.disabled:active, .media-browser-modal-window .btn-primary.disabled:focus, .media-browser-modal-window .btn-primary.disabled:hover, .media-browser-modal-window .btn-primary[disabled], .media-browser-modal-window .btn-primary[disabled].active, .media-browser-modal-window .btn-primary[disabled].focus, .media-browser-modal-window .btn-primary[disabled]:active, .media-browser-modal-window .btn-primary[disabled]:focus, .media-browser-modal-window .btn-primary[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-primary, .media-browser-modal-window fieldset[disabled] .btn-primary.active, .media-browser-modal-window fieldset[disabled] .btn-primary.focus, .media-browser-modal-window fieldset[disabled] .btn-primary:active, .media-browser-modal-window fieldset[disabled] .btn-primary:focus, .media-browser-modal-window fieldset[disabled] .btn-primary:hover, .uploader-modal .btn-primary.disabled, .uploader-modal .btn-primary.disabled.active, .uploader-modal .btn-primary.disabled.focus, .uploader-modal .btn-primary.disabled:active, .uploader-modal .btn-primary.disabled:focus, .uploader-modal .btn-primary.disabled:hover, .uploader-modal .btn-primary[disabled], .uploader-modal .btn-primary[disabled].active, .uploader-modal .btn-primary[disabled].focus, .uploader-modal .btn-primary[disabled]:active, .uploader-modal .btn-primary[disabled]:focus, .uploader-modal .btn-primary[disabled]:hover, .uploader-modal fieldset[disabled] .btn-primary, .uploader-modal fieldset[disabled] .btn-primary.active, .uploader-modal fieldset[disabled] .btn-primary.focus, .uploader-modal fieldset[disabled] .btn-primary:active, .uploader-modal fieldset[disabled] .btn-primary:focus, .uploader-modal fieldset[disabled] .btn-primary:hover {
-  background-color: #337ab7;
-  border-color: #2e6da4
+    background-color: #337ab7;
+    border-color: #2e6da4
 }
 
 .media-browser-modal-window .btn-primary .badge, .uploader-modal .btn-primary .badge {
-  color: #337ab7;
-  background-color: #fff
+    color: #337ab7;
+    background-color: #fff
 }
 
 #content .media-browser-modal-window .btn-success, #content .uploader-modal .btn-success, .media-browser-modal-window .btn-success, .uploader-modal .btn-success {
-  color: #fff;
-  background-color: #5cb85c;
-  border-color: #4cae4c
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c
 }
 
 .media-browser-modal-window .btn-success.focus, .media-browser-modal-window .btn-success:focus, .uploader-modal .btn-success.focus, .uploader-modal .btn-success:focus {
-  color: #fff;
-  background-color: #449d44;
-  border-color: #255625
+    color: #fff;
+    background-color: #449d44;
+    border-color: #255625
 }
 
 .media-browser-modal-window .btn-success.active, .media-browser-modal-window .btn-success:active, .media-browser-modal-window .btn-success:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-success, .uploader-modal .btn-success.active, .uploader-modal .btn-success:active, .uploader-modal .btn-success:hover, .uploader-modal .open > .dropdown-toggle.btn-success {
-  color: #fff;
-  background-color: #449d44;
-  border-color: #398439
+    color: #fff;
+    background-color: #449d44;
+    border-color: #398439
 }
 
 .media-browser-modal-window .btn-success.active.focus, .media-browser-modal-window .btn-success.active:focus, .media-browser-modal-window .btn-success.active:hover, .media-browser-modal-window .btn-success:active.focus, .media-browser-modal-window .btn-success:active:focus, .media-browser-modal-window .btn-success:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-success.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-success:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-success:hover, .uploader-modal .btn-success.active.focus, .uploader-modal .btn-success.active:focus, .uploader-modal .btn-success.active:hover, .uploader-modal .btn-success:active.focus, .uploader-modal .btn-success:active:focus, .uploader-modal .btn-success:active:hover, .uploader-modal .open > .dropdown-toggle.btn-success.focus, .uploader-modal .open > .dropdown-toggle.btn-success:focus, .uploader-modal .open > .dropdown-toggle.btn-success:hover {
-  color: #fff;
-  background-color: #398439;
-  border-color: #255625
+    color: #fff;
+    background-color: #398439;
+    border-color: #255625
 }
 
 .media-browser-modal-window .btn-success.active, .media-browser-modal-window .btn-success:active, .media-browser-modal-window .open > .dropdown-toggle.btn-success, .uploader-modal .btn-success.active, .uploader-modal .btn-success:active, .uploader-modal .open > .dropdown-toggle.btn-success {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-success.disabled, .media-browser-modal-window .btn-success.disabled.active, .media-browser-modal-window .btn-success.disabled.focus, .media-browser-modal-window .btn-success.disabled:active, .media-browser-modal-window .btn-success.disabled:focus, .media-browser-modal-window .btn-success.disabled:hover, .media-browser-modal-window .btn-success[disabled], .media-browser-modal-window .btn-success[disabled].active, .media-browser-modal-window .btn-success[disabled].focus, .media-browser-modal-window .btn-success[disabled]:active, .media-browser-modal-window .btn-success[disabled]:focus, .media-browser-modal-window .btn-success[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-success, .media-browser-modal-window fieldset[disabled] .btn-success.active, .media-browser-modal-window fieldset[disabled] .btn-success.focus, .media-browser-modal-window fieldset[disabled] .btn-success:active, .media-browser-modal-window fieldset[disabled] .btn-success:focus, .media-browser-modal-window fieldset[disabled] .btn-success:hover, .uploader-modal .btn-success.disabled, .uploader-modal .btn-success.disabled.active, .uploader-modal .btn-success.disabled.focus, .uploader-modal .btn-success.disabled:active, .uploader-modal .btn-success.disabled:focus, .uploader-modal .btn-success.disabled:hover, .uploader-modal .btn-success[disabled], .uploader-modal .btn-success[disabled].active, .uploader-modal .btn-success[disabled].focus, .uploader-modal .btn-success[disabled]:active, .uploader-modal .btn-success[disabled]:focus, .uploader-modal .btn-success[disabled]:hover, .uploader-modal fieldset[disabled] .btn-success, .uploader-modal fieldset[disabled] .btn-success.active, .uploader-modal fieldset[disabled] .btn-success.focus, .uploader-modal fieldset[disabled] .btn-success:active, .uploader-modal fieldset[disabled] .btn-success:focus, .uploader-modal fieldset[disabled] .btn-success:hover {
-  background-color: #5cb85c;
-  border-color: #4cae4c
+    background-color: #5cb85c;
+    border-color: #4cae4c
 }
 
 .media-browser-modal-window .btn-success .badge, .uploader-modal .btn-success .badge {
-  color: #5cb85c;
-  background-color: #fff
+    color: #5cb85c;
+    background-color: #fff
 }
 
 .media-browser-modal-window .btn-info, .uploader-modal .btn-info {
-  color: #fff;
-  background-color: #5bc0de;
-  border-color: #46b8da
+    color: #fff;
+    background-color: #5bc0de;
+    border-color: #46b8da
 }
 
 .media-browser-modal-window .btn-info.focus, .media-browser-modal-window .btn-info:focus, .uploader-modal .btn-info.focus, .uploader-modal .btn-info:focus {
-  color: #fff;
-  background-color: #31b0d5;
-  border-color: #1b6d85
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #1b6d85
 }
 
 .media-browser-modal-window .btn-info.active, .media-browser-modal-window .btn-info:active, .media-browser-modal-window .btn-info:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-info, .uploader-modal .btn-info.active, .uploader-modal .btn-info:active, .uploader-modal .btn-info:hover, .uploader-modal .open > .dropdown-toggle.btn-info {
-  color: #fff;
-  background-color: #31b0d5;
-  border-color: #269abc
+    color: #fff;
+    background-color: #31b0d5;
+    border-color: #269abc
 }
 
 .media-browser-modal-window .btn-info.active.focus, .media-browser-modal-window .btn-info.active:focus, .media-browser-modal-window .btn-info.active:hover, .media-browser-modal-window .btn-info:active.focus, .media-browser-modal-window .btn-info:active:focus, .media-browser-modal-window .btn-info:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-info.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-info:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-info:hover, .uploader-modal .btn-info.active.focus, .uploader-modal .btn-info.active:focus, .uploader-modal .btn-info.active:hover, .uploader-modal .btn-info:active.focus, .uploader-modal .btn-info:active:focus, .uploader-modal .btn-info:active:hover, .uploader-modal .open > .dropdown-toggle.btn-info.focus, .uploader-modal .open > .dropdown-toggle.btn-info:focus, .uploader-modal .open > .dropdown-toggle.btn-info:hover {
-  color: #fff;
-  background-color: #269abc;
-  border-color: #1b6d85
+    color: #fff;
+    background-color: #269abc;
+    border-color: #1b6d85
 }
 
 .media-browser-modal-window .btn-info.active, .media-browser-modal-window .btn-info:active, .media-browser-modal-window .open > .dropdown-toggle.btn-info, .uploader-modal .btn-info.active, .uploader-modal .btn-info:active, .uploader-modal .open > .dropdown-toggle.btn-info {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-info.disabled, .media-browser-modal-window .btn-info.disabled.active, .media-browser-modal-window .btn-info.disabled.focus, .media-browser-modal-window .btn-info.disabled:active, .media-browser-modal-window .btn-info.disabled:focus, .media-browser-modal-window .btn-info.disabled:hover, .media-browser-modal-window .btn-info[disabled], .media-browser-modal-window .btn-info[disabled].active, .media-browser-modal-window .btn-info[disabled].focus, .media-browser-modal-window .btn-info[disabled]:active, .media-browser-modal-window .btn-info[disabled]:focus, .media-browser-modal-window .btn-info[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-info, .media-browser-modal-window fieldset[disabled] .btn-info.active, .media-browser-modal-window fieldset[disabled] .btn-info.focus, .media-browser-modal-window fieldset[disabled] .btn-info:active, .media-browser-modal-window fieldset[disabled] .btn-info:focus, .media-browser-modal-window fieldset[disabled] .btn-info:hover, .uploader-modal .btn-info.disabled, .uploader-modal .btn-info.disabled.active, .uploader-modal .btn-info.disabled.focus, .uploader-modal .btn-info.disabled:active, .uploader-modal .btn-info.disabled:focus, .uploader-modal .btn-info.disabled:hover, .uploader-modal .btn-info[disabled], .uploader-modal .btn-info[disabled].active, .uploader-modal .btn-info[disabled].focus, .uploader-modal .btn-info[disabled]:active, .uploader-modal .btn-info[disabled]:focus, .uploader-modal .btn-info[disabled]:hover, .uploader-modal fieldset[disabled] .btn-info, .uploader-modal fieldset[disabled] .btn-info.active, .uploader-modal fieldset[disabled] .btn-info.focus, .uploader-modal fieldset[disabled] .btn-info:active, .uploader-modal fieldset[disabled] .btn-info:focus, .uploader-modal fieldset[disabled] .btn-info:hover {
-  background-color: #5bc0de;
-  border-color: #46b8da
+    background-color: #5bc0de;
+    border-color: #46b8da
 }
 
 .media-browser-modal-window .btn-info .badge, .uploader-modal .btn-info .badge {
-  color: #5bc0de;
-  background-color: #fff
+    color: #5bc0de;
+    background-color: #fff
 }
 
 .media-browser-modal-window .btn-warning, .uploader-modal .btn-warning {
-  color: #fff;
-  background-color: #f0ad4e;
-  border-color: #eea236
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236
 }
 
 .media-browser-modal-window .btn-warning.focus, .media-browser-modal-window .btn-warning:focus, .uploader-modal .btn-warning.focus, .uploader-modal .btn-warning:focus {
-  color: #fff;
-  background-color: #ec971f;
-  border-color: #985f0d
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #985f0d
 }
 
 .media-browser-modal-window .btn-warning.active, .media-browser-modal-window .btn-warning:active, .media-browser-modal-window .btn-warning:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-warning, .uploader-modal .btn-warning.active, .uploader-modal .btn-warning:active, .uploader-modal .btn-warning:hover, .uploader-modal .open > .dropdown-toggle.btn-warning {
-  color: #fff;
-  background-color: #ec971f;
-  border-color: #d58512
+    color: #fff;
+    background-color: #ec971f;
+    border-color: #d58512
 }
 
 .media-browser-modal-window .btn-warning.active.focus, .media-browser-modal-window .btn-warning.active:focus, .media-browser-modal-window .btn-warning.active:hover, .media-browser-modal-window .btn-warning:active.focus, .media-browser-modal-window .btn-warning:active:focus, .media-browser-modal-window .btn-warning:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-warning.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-warning:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-warning:hover, .uploader-modal .btn-warning.active.focus, .uploader-modal .btn-warning.active:focus, .uploader-modal .btn-warning.active:hover, .uploader-modal .btn-warning:active.focus, .uploader-modal .btn-warning:active:focus, .uploader-modal .btn-warning:active:hover, .uploader-modal .open > .dropdown-toggle.btn-warning.focus, .uploader-modal .open > .dropdown-toggle.btn-warning:focus, .uploader-modal .open > .dropdown-toggle.btn-warning:hover {
-  color: #fff;
-  background-color: #d58512;
-  border-color: #985f0d
+    color: #fff;
+    background-color: #d58512;
+    border-color: #985f0d
 }
 
 .media-browser-modal-window .btn-warning.active, .media-browser-modal-window .btn-warning:active, .media-browser-modal-window .open > .dropdown-toggle.btn-warning, .uploader-modal .btn-warning.active, .uploader-modal .btn-warning:active, .uploader-modal .open > .dropdown-toggle.btn-warning {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-warning.disabled, .media-browser-modal-window .btn-warning.disabled.active, .media-browser-modal-window .btn-warning.disabled.focus, .media-browser-modal-window .btn-warning.disabled:active, .media-browser-modal-window .btn-warning.disabled:focus, .media-browser-modal-window .btn-warning.disabled:hover, .media-browser-modal-window .btn-warning[disabled], .media-browser-modal-window .btn-warning[disabled].active, .media-browser-modal-window .btn-warning[disabled].focus, .media-browser-modal-window .btn-warning[disabled]:active, .media-browser-modal-window .btn-warning[disabled]:focus, .media-browser-modal-window .btn-warning[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-warning, .media-browser-modal-window fieldset[disabled] .btn-warning.active, .media-browser-modal-window fieldset[disabled] .btn-warning.focus, .media-browser-modal-window fieldset[disabled] .btn-warning:active, .media-browser-modal-window fieldset[disabled] .btn-warning:focus, .media-browser-modal-window fieldset[disabled] .btn-warning:hover, .uploader-modal .btn-warning.disabled, .uploader-modal .btn-warning.disabled.active, .uploader-modal .btn-warning.disabled.focus, .uploader-modal .btn-warning.disabled:active, .uploader-modal .btn-warning.disabled:focus, .uploader-modal .btn-warning.disabled:hover, .uploader-modal .btn-warning[disabled], .uploader-modal .btn-warning[disabled].active, .uploader-modal .btn-warning[disabled].focus, .uploader-modal .btn-warning[disabled]:active, .uploader-modal .btn-warning[disabled]:focus, .uploader-modal .btn-warning[disabled]:hover, .uploader-modal fieldset[disabled] .btn-warning, .uploader-modal fieldset[disabled] .btn-warning.active, .uploader-modal fieldset[disabled] .btn-warning.focus, .uploader-modal fieldset[disabled] .btn-warning:active, .uploader-modal fieldset[disabled] .btn-warning:focus, .uploader-modal fieldset[disabled] .btn-warning:hover {
-  background-color: #f0ad4e;
-  border-color: #eea236
+    background-color: #f0ad4e;
+    border-color: #eea236
 }
 
 .media-browser-modal-window .btn-warning .badge, .uploader-modal .btn-warning .badge {
-  color: #f0ad4e;
-  background-color: #fff
+    color: #f0ad4e;
+    background-color: #fff
 }
 
 .media-browser-modal-window .btn-danger, .uploader-modal .btn-danger {
-  color: #fff;
-  background-color: #d9534f;
-  border-color: #d43f3a
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a
 }
 
 .media-browser-modal-window .btn-danger.focus, .media-browser-modal-window .btn-danger:focus, .uploader-modal .btn-danger.focus, .uploader-modal .btn-danger:focus {
-  color: #fff;
-  background-color: #c9302c;
-  border-color: #761c19
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #761c19
 }
 
 .media-browser-modal-window .btn-danger.active, .media-browser-modal-window .btn-danger:active, .media-browser-modal-window .btn-danger:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-danger, .uploader-modal .btn-danger.active, .uploader-modal .btn-danger:active, .uploader-modal .btn-danger:hover, .uploader-modal .open > .dropdown-toggle.btn-danger {
-  color: #fff;
-  background-color: #c9302c;
-  border-color: #ac2925
+    color: #fff;
+    background-color: #c9302c;
+    border-color: #ac2925
 }
 
 .media-browser-modal-window .btn-danger.active.focus, .media-browser-modal-window .btn-danger.active:focus, .media-browser-modal-window .btn-danger.active:hover, .media-browser-modal-window .btn-danger:active.focus, .media-browser-modal-window .btn-danger:active:focus, .media-browser-modal-window .btn-danger:active:hover, .media-browser-modal-window .open > .dropdown-toggle.btn-danger.focus, .media-browser-modal-window .open > .dropdown-toggle.btn-danger:focus, .media-browser-modal-window .open > .dropdown-toggle.btn-danger:hover, .uploader-modal .btn-danger.active.focus, .uploader-modal .btn-danger.active:focus, .uploader-modal .btn-danger.active:hover, .uploader-modal .btn-danger:active.focus, .uploader-modal .btn-danger:active:focus, .uploader-modal .btn-danger:active:hover, .uploader-modal .open > .dropdown-toggle.btn-danger.focus, .uploader-modal .open > .dropdown-toggle.btn-danger:focus, .uploader-modal .open > .dropdown-toggle.btn-danger:hover {
-  color: #fff;
-  background-color: #ac2925;
-  border-color: #761c19
+    color: #fff;
+    background-color: #ac2925;
+    border-color: #761c19
 }
 
 .media-browser-modal-window .btn-danger.active, .media-browser-modal-window .btn-danger:active, .media-browser-modal-window .open > .dropdown-toggle.btn-danger, .uploader-modal .btn-danger.active, .uploader-modal .btn-danger:active, .uploader-modal .open > .dropdown-toggle.btn-danger {
-  background-image: none
+    background-image: none
 }
 
 .media-browser-modal-window .btn-danger.disabled, .media-browser-modal-window .btn-danger.disabled.active, .media-browser-modal-window .btn-danger.disabled.focus, .media-browser-modal-window .btn-danger.disabled:active, .media-browser-modal-window .btn-danger.disabled:focus, .media-browser-modal-window .btn-danger.disabled:hover, .media-browser-modal-window .btn-danger[disabled], .media-browser-modal-window .btn-danger[disabled].active, .media-browser-modal-window .btn-danger[disabled].focus, .media-browser-modal-window .btn-danger[disabled]:active, .media-browser-modal-window .btn-danger[disabled]:focus, .media-browser-modal-window .btn-danger[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-danger, .media-browser-modal-window fieldset[disabled] .btn-danger.active, .media-browser-modal-window fieldset[disabled] .btn-danger.focus, .media-browser-modal-window fieldset[disabled] .btn-danger:active, .media-browser-modal-window fieldset[disabled] .btn-danger:focus, .media-browser-modal-window fieldset[disabled] .btn-danger:hover, .uploader-modal .btn-danger.disabled, .uploader-modal .btn-danger.disabled.active, .uploader-modal .btn-danger.disabled.focus, .uploader-modal .btn-danger.disabled:active, .uploader-modal .btn-danger.disabled:focus, .uploader-modal .btn-danger.disabled:hover, .uploader-modal .btn-danger[disabled], .uploader-modal .btn-danger[disabled].active, .uploader-modal .btn-danger[disabled].focus, .uploader-modal .btn-danger[disabled]:active, .uploader-modal .btn-danger[disabled]:focus, .uploader-modal .btn-danger[disabled]:hover, .uploader-modal fieldset[disabled] .btn-danger, .uploader-modal fieldset[disabled] .btn-danger.active, .uploader-modal fieldset[disabled] .btn-danger.focus, .uploader-modal fieldset[disabled] .btn-danger:active, .uploader-modal fieldset[disabled] .btn-danger:focus, .uploader-modal fieldset[disabled] .btn-danger:hover {
-  background-color: #d9534f;
-  border-color: #d43f3a
+    background-color: #d9534f;
+    border-color: #d43f3a
 }
 
 .media-browser-modal-window .btn-danger .badge, .uploader-modal .btn-danger .badge {
-  color: #d9534f;
-  background-color: #fff
+    color: #d9534f;
+    background-color: #fff
 }
 
 .media-browser-modal-window .btn-link, .uploader-modal .btn-link {
-  color: #337ab7;
-  font-weight: 400;
-  border-radius: 0
+    color: #337ab7;
+    font-weight: 400;
+    border-radius: 0
 }
 
 .media-browser-modal-window .btn-link, .media-browser-modal-window .btn-link.active, .media-browser-modal-window .btn-link:active, .media-browser-modal-window .btn-link[disabled], .media-browser-modal-window fieldset[disabled] .btn-link, .uploader-modal .btn-link, .uploader-modal .btn-link.active, .uploader-modal .btn-link:active, .uploader-modal .btn-link[disabled], .uploader-modal fieldset[disabled] .btn-link {
-  background-color: transparent;
-  -webkit-box-shadow: none;
-  box-shadow: none
+    background-color: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none
 }
 
 .media-browser-modal-window .btn-link, .media-browser-modal-window .btn-link:active, .media-browser-modal-window .btn-link:focus, .media-browser-modal-window .btn-link:hover, .uploader-modal .btn-link, .uploader-modal .btn-link:active, .uploader-modal .btn-link:focus, .uploader-modal .btn-link:hover {
-  border-color: transparent
+    border-color: transparent
 }
 
 .media-browser-modal-window .btn-link:focus, .media-browser-modal-window .btn-link:hover, .uploader-modal .btn-link:focus, .uploader-modal .btn-link:hover {
-  color: #23527c;
-  text-decoration: underline;
-  background-color: transparent
+    color: #23527c;
+    text-decoration: underline;
+    background-color: transparent
 }
 
 .media-browser-modal-window .btn-link[disabled]:focus, .media-browser-modal-window .btn-link[disabled]:hover, .media-browser-modal-window fieldset[disabled] .btn-link:focus, .media-browser-modal-window fieldset[disabled] .btn-link:hover, .uploader-modal .btn-link[disabled]:focus, .uploader-modal .btn-link[disabled]:hover, .uploader-modal fieldset[disabled] .btn-link:focus, .uploader-modal fieldset[disabled] .btn-link:hover {
-  color: #777;
-  text-decoration: none
+    color: #777;
+    text-decoration: none
 }
 
 .media-browser-modal-window .btn-group-lg > .btn, .media-browser-modal-window .btn-lg, .uploader-modal .btn-group-lg > .btn, .uploader-modal .btn-lg {
-  padding: 10px 16px;
-  font-size: 18px;
-  line-height: 1.3333333;
-  border-radius: 6px
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.3333333;
+    border-radius: 6px
 }
 
 .media-browser-modal-window .btn-group-sm > .btn, .media-browser-modal-window .btn-sm, .uploader-modal .btn-group-sm > .btn, .uploader-modal .btn-sm {
-  padding: 5px 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px
 }
 
 .media-browser-modal-window .btn-group-xs > .btn, .media-browser-modal-window .btn-xs, .uploader-modal .btn-group-xs > .btn, .uploader-modal .btn-xs {
-  padding: 1px 5px;
-  font-size: 12px;
-  line-height: 1.5;
-  border-radius: 3px
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn:not(:first-child):not(:last-child), .media-browser-modal-window .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn, .media-browser-modal-window .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle), .uploader-modal .btn-group-vertical > .btn:not(:first-child):not(:last-child), .uploader-modal .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn, .uploader-modal .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
-  border-radius: 0
+    border-radius: 0
 }
 
 .media-browser-modal-window .btn-block, .uploader-modal .btn-block {
-  display: block;
-  width: 100%
+    display: block;
+    width: 100%
 }
 
 .media-browser-modal-window .btn-block + .btn-block, .uploader-modal .btn-block + .btn-block {
-  margin-top: 5px
+    margin-top: 5px
 }
 
 .media-browser-modal-window input[type=button].btn-block, .media-browser-modal-window input[type=reset].btn-block, .media-browser-modal-window input[type=submit].btn-block, .uploader-modal input[type=button].btn-block, .uploader-modal input[type=reset].btn-block, .uploader-modal input[type=submit].btn-block {
-  width: 100%
+    width: 100%
 }
 
 .media-browser-modal-window .btn-group, .media-browser-modal-window .btn-group-vertical, .uploader-modal .btn-group, .uploader-modal .btn-group-vertical {
-  position: relative;
-  display: inline-block;
-  vertical-align: middle
+    position: relative;
+    display: inline-block;
+    vertical-align: middle
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn, .media-browser-modal-window .btn-group > .btn, .uploader-modal .btn-group-vertical > .btn, .uploader-modal .btn-group > .btn {
-  position: relative;
-  float: left
+    position: relative;
+    float: left
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn.active, .media-browser-modal-window .btn-group-vertical > .btn:active, .media-browser-modal-window .btn-group-vertical > .btn:focus, .media-browser-modal-window .btn-group-vertical > .btn:hover, .media-browser-modal-window .btn-group > .btn.active, .media-browser-modal-window .btn-group > .btn:active, .media-browser-modal-window .btn-group > .btn:focus, .media-browser-modal-window .btn-group > .btn:hover, .uploader-modal .btn-group-vertical > .btn.active, .uploader-modal .btn-group-vertical > .btn:active, .uploader-modal .btn-group-vertical > .btn:focus, .uploader-modal .btn-group-vertical > .btn:hover, .uploader-modal .btn-group > .btn.active, .uploader-modal .btn-group > .btn:active, .uploader-modal .btn-group > .btn:focus, .uploader-modal .btn-group > .btn:hover {
-  z-index: 2
+    z-index: 2
 }
 
 .media-browser-modal-window .btn-group .btn + .btn, .media-browser-modal-window .btn-group .btn + .btn-group, .media-browser-modal-window .btn-group .btn-group + .btn, .media-browser-modal-window .btn-group .btn-group + .btn-group, .uploader-modal .btn-group .btn + .btn, .uploader-modal .btn-group .btn + .btn-group, .uploader-modal .btn-group .btn-group + .btn, .uploader-modal .btn-group .btn-group + .btn-group {
-  margin-left: -1px
+    margin-left: -1px
 }
 
 .media-browser-modal-window .btn-toolbar, .uploader-modal .btn-toolbar {
-  margin-left: -5px
+    margin-left: -5px
 }
 
 .media-browser-modal-window .btn-toolbar > .btn, .media-browser-modal-window .btn-toolbar > .btn-group, .media-browser-modal-window .btn-toolbar > .input-group, .uploader-modal .btn-toolbar > .btn, .uploader-modal .btn-toolbar > .btn-group, .uploader-modal .btn-toolbar > .input-group {
-  margin-left: 5px
+    margin-left: 5px
 }
 
 .media-browser-modal-window .btn .caret, .media-browser-modal-window .btn-group > .btn:first-child, .uploader-modal .btn .caret, .uploader-modal .btn-group > .btn:first-child {
-  margin-left: 0
+    margin-left: 0
 }
 
 .media-browser-modal-window .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle), .uploader-modal .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0
 }
 
 .media-browser-modal-window .btn-group > .btn:last-child:not(:first-child), .media-browser-modal-window .btn-group > .dropdown-toggle:not(:first-child), .uploader-modal .btn-group > .btn:last-child:not(:first-child), .uploader-modal .btn-group > .dropdown-toggle:not(:first-child) {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child, .media-browser-modal-window .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .uploader-modal .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child, .uploader-modal .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0
 }
 
 .media-browser-modal-window .btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child, .uploader-modal .btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group .dropdown-toggle:active, .media-browser-modal-window .btn-group.open .dropdown-toggle, .uploader-modal .btn-group .dropdown-toggle:active, .uploader-modal .btn-group.open .dropdown-toggle {
-  outline: 0
+    outline: 0
 }
 
 .media-browser-modal-window .btn-group > .btn + .dropdown-toggle, .uploader-modal .btn-group > .btn + .dropdown-toggle {
-  padding-left: 8px;
-  padding-right: 8px
+    padding-left: 8px;
+    padding-right: 8px
 }
 
 .media-browser-modal-window .btn-group > .btn-lg + .dropdown-toggle, .uploader-modal .btn-group > .btn-lg + .dropdown-toggle {
-  padding-left: 12px;
-  padding-right: 12px
+    padding-left: 12px;
+    padding-right: 12px
 }
 
 .media-browser-modal-window .btn-group.open .dropdown-toggle, .uploader-modal .btn-group.open .dropdown-toggle {
-  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
 }
 
 .media-browser-modal-window .btn-group.open .dropdown-toggle.btn-link, .uploader-modal .btn-group.open .dropdown-toggle.btn-link {
-  -webkit-box-shadow: none;
-  box-shadow: none
+    -webkit-box-shadow: none;
+    box-shadow: none
 }
 
 .media-browser-modal-window .btn-lg .caret, .uploader-modal .btn-lg .caret {
-  border-width: 5px 5px 0
+    border-width: 5px 5px 0
 }
 
 .media-browser-modal-window .dropup .btn-lg .caret, .uploader-modal .dropup .btn-lg .caret {
-  border-width: 0 5px 5px
+    border-width: 0 5px 5px
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn, .media-browser-modal-window .btn-group-vertical > .btn-group, .media-browser-modal-window .btn-group-vertical > .btn-group > .btn, .uploader-modal .btn-group-vertical > .btn, .uploader-modal .btn-group-vertical > .btn-group, .uploader-modal .btn-group-vertical > .btn-group > .btn {
-  display: block;
-  float: none;
-  width: 100%;
-  max-width: 100%
+    display: block;
+    float: none;
+    width: 100%;
+    max-width: 100%
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group > .btn, .uploader-modal .btn-group-vertical > .btn-group > .btn {
-  float: none
+    float: none
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn + .btn, .media-browser-modal-window .btn-group-vertical > .btn + .btn-group, .media-browser-modal-window .btn-group-vertical > .btn-group + .btn, .media-browser-modal-window .btn-group-vertical > .btn-group + .btn-group, .uploader-modal .btn-group-vertical > .btn + .btn, .uploader-modal .btn-group-vertical > .btn + .btn-group, .uploader-modal .btn-group-vertical > .btn-group + .btn, .uploader-modal .btn-group-vertical > .btn-group + .btn-group {
-  margin-top: -1px;
-  margin-left: 0
+    margin-top: -1px;
+    margin-left: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn:first-child:not(:last-child), .uploader-modal .btn-group-vertical > .btn:first-child:not(:last-child) {
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn:last-child:not(:first-child), .uploader-modal .btn-group-vertical > .btn:last-child:not(:first-child) {
-  border-bottom-left-radius: 4px;
-  border-top-right-radius: 0;
-  border-top-left-radius: 0
+    border-bottom-left-radius: 4px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn, .uploader-modal .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
-  border-radius: 0
+    border-radius: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child, .media-browser-modal-window .btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .uploader-modal .btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child, .uploader-modal .btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child, .uploader-modal .btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {
-  border-top-right-radius: 0;
-  border-top-left-radius: 0
+    border-top-right-radius: 0;
+    border-top-left-radius: 0
 }
 
 .media-browser-modal-window .btn-group-justified, .uploader-modal .btn-group-justified {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate
 }
 
 .media-browser-modal-window .btn-group-justified > .btn, .media-browser-modal-window .btn-group-justified > .btn-group, .uploader-modal .btn-group-justified > .btn, .uploader-modal .btn-group-justified > .btn-group {
-  float: none;
-  display: table-cell;
-  width: 1%
+    float: none;
+    display: table-cell;
+    width: 1%
 }
 
 .media-browser-modal-window .btn-group-justified > .btn-group .btn, .uploader-modal .btn-group-justified > .btn-group .btn {
-  width: 100%
+    width: 100%
 }
 
 .media-browser-modal-window .btn-group-justified > .btn-group .dropdown-menu, .uploader-modal .btn-group-justified > .btn-group .dropdown-menu {
-  left: auto
+    left: auto
 }
 
 .media-browser-modal-window [data-toggle=buttons] > .btn input[type=checkbox], .media-browser-modal-window [data-toggle=buttons] > .btn input[type=radio], .media-browser-modal-window [data-toggle=buttons] > .btn-group > .btn input[type=checkbox], .media-browser-modal-window [data-toggle=buttons] > .btn-group > .btn input[type=radio], .uploader-modal [data-toggle=buttons] > .btn input[type=checkbox], .uploader-modal [data-toggle=buttons] > .btn input[type=radio], .uploader-modal [data-toggle=buttons] > .btn-group > .btn input[type=checkbox], .uploader-modal [data-toggle=buttons] > .btn-group > .btn input[type=radio] {
-  position: absolute;
-  pointer-events: none
+    position: absolute;
+    pointer-events: none
 }
 
 .media-browser-modal-window .btn-group-vertical > .btn-group:after, .media-browser-modal-window .btn-group-vertical > .btn-group:before, .media-browser-modal-window .btn-toolbar:after, .media-browser-modal-window .btn-toolbar:before, .media-browser-modal-window .clearfix:after, .media-browser-modal-window .clearfix:before, .uploader-modal .btn-group-vertical > .btn-group:after, .uploader-modal .btn-group-vertical > .btn-group:before, .uploader-modal .btn-toolbar:after, .uploader-modal .btn-toolbar:before, .uploader-modal .clearfix:after, .uploader-modal .clearfix:before {
-  content: " ";
-  display: table
+    content: " ";
+    display: table
 }
 
 .media-browser-modal-window .center-block, .uploader-modal .center-block {
-  display: block;
-  margin-left: auto;
-  margin-right: auto
+    display: block;
+    margin-left: auto;
+    margin-right: auto
 }
 
 .media-browser-modal-window .pull-right, .uploader-modal .pull-right {
-  float: right !important
+    float: right !important
 }
 
 .media-browser-modal-window .pull-left, .uploader-modal .pull-left {
-  float: left !important
+    float: left !important
 }
 
 .media-browser-modal-window .hide, .uploader-modal .hide {
-  display: none !important
+    display: none !important
 }
 
 .media-browser-modal-window .show, .uploader-modal .show {
-  display: block !important
+    display: block !important
 }
 
 .media-browser-modal-window .invisible, .uploader-modal .invisible {
-  visibility: hidden
+    visibility: hidden
 }
 
 .media-browser-modal-window .text-hide, .uploader-modal .text-hide {
-  font: 0/0 a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0
 }
 
 .media-browser-modal-window .hidden, .uploader-modal .hidden {
-  display: none !important
+    display: none !important
 }
 
 .media-browser-modal-window .affix, .uploader-modal .affix {
-  position: fixed
+    position: fixed
 }
 
 .media-browser-modal-window .btn, .media-browser-modal-window button.btn, .uploader-modal .btn, body #content .uploader-modal .btn {
-  border-radius: 0;
-  background-image: none;
-  text-shadow: none;
-  font-size: 14px;
-  border: 1px solid #adadad !important
+    border-radius: 0;
+    background-image: none;
+    text-shadow: none;
+    font-size: 14px;
+    border: 1px solid #adadad !important
 }
 
 .fade.uploader-modal {
-  opacity: 0;
-  -webkit-transition: opacity .15s linear;
-  transition: opacity .15s linear
+    opacity: 0;
+    -webkit-transition: opacity .15s linear;
+    transition: opacity .15s linear
 }
 
 .fade.in.uploader-modal {
-  opacity: 1
+    opacity: 1
 }
 
 .media-browser-modal-window .modal-open, .uploader-modal .modal-open {
-  overflow: hidden
+    overflow: hidden
 }
 
 .modal.uploader-modal {
-  display: none;
-  overflow: auto;
-  overflow-y: scroll;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1050;
-  outline: 0;
-  font-size: 14px
+    display: none;
+    overflow: auto;
+    overflow-y: scroll;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    outline: 0;
+    font-size: 14px
 }
 
 .modal.in.uploader-modal .modal-dialog {
-  -ms-transform: translate(0, 0);
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0)
+    -ms-transform: translate(0, 0);
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0)
 }
 
 .media-browser-modal-window .modal-dialog, .uploader-modal .modal-dialog {
-  position: relative;
-  width: auto
+    position: relative;
+    width: auto
 }
 
 .uploader-modal {
-  background: 0 0;
-  border-radius: 0
+    background: 0 0;
+    border-radius: 0
 }
 
 .media-browser-modal-window .modal-content, .uploader-modal .modal-content {
-  position: relative;
-  background-color: #fff;
-  border: 1px solid #999;
-  border: none;
-  -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
-  box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
-  -webkit-background-clip: padding-box;
-  background-clip: padding-box;
-  outline: 0;
-  border-radius: 0;
-  overflow: auto
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #999;
+    border: none;
+    -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    outline: 0;
+    border-radius: 0;
+    overflow: auto
 }
 
 .media-browser-modal-window .modal-backdrop, .uploader-modal .modal-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1040;
-  background-color: #000
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    background-color: #000
 }
 
 .modal-backdrop.fade.uploader-modal {
-  opacity: 0;
-  filter: alpha(opacity=0)
+    opacity: 0;
+    filter: alpha(opacity=0)
 }
 
 .modal-backdrop.in.uploader-modal {
-  opacity: .5;
-  filter: alpha(opacity=50)
+    opacity: .5;
+    filter: alpha(opacity=50)
 }
 
 .media-browser-modal-window .modal-header, .uploader-modal .modal-header {
-  padding: 15px;
-  min-height: 16.43px
+    padding: 15px;
+    min-height: 16.43px
 }
 
 .media-browser-modal-window .modal-title, .uploader-modal .modal-title {
-  margin: 0;
-  line-height: 1.42857143;
-  padding: 0
+    margin: 0;
+    line-height: 1.42857143;
+    padding: 0
 }
 
 .media-browser-modal-window .modal-body, .uploader-modal .modal-body {
-  position: relative;
-  padding: 20px
+    position: relative;
+    padding: 20px
 }
 
 .media-browser-modal-window .modal-footer, .uploader-modal .modal-footer {
-  margin-top: 15px;
-  padding: 19px 20px 20px;
-  text-align: right;
-  border-top: 1px solid #e5e5e5
+    margin-top: 15px;
+    padding: 19px 20px 20px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5
 }
 
 .media-browser-modal-window .modal-footer .btn + .btn, .uploader-modal .modal-footer .btn + .btn {
-  margin-left: 5px;
-  margin-bottom: 0
+    margin-left: 5px;
+    margin-bottom: 0
 }
 
 .media-browser-modal-window .modal-footer .btn-group .btn + .btn, .uploader-modal .modal-footer .btn-group .btn + .btn {
-  margin-left: -1px
+    margin-left: -1px
 }
 
 .media-browser-modal-window .modal-footer .btn-block + .btn-block, .uploader-modal .modal-footer .btn-block + .btn-block {
-  margin-left: 0
+    margin-left: 0
 }
 
 .uploader-modal .modal-dialog {
-  margin-top: 120px
+    margin-top: 120px
 }
 
 @media (min-width: 768px) {
-  .media-browser-modal-window .modal-dialog, .uploader-modal .modal-dialog {
-    width: 600px;
-    margin: 120px auto
-  }
+    .media-browser-modal-window .modal-dialog, .uploader-modal .modal-dialog {
+        width: 600px;
+        margin: 120px auto
+    }
 
-  .media-browser-modal-window .modal-content, .uploader-modal .modal-content {
-    -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
-    box-shadow: 0 5px 30px rgba(0, 0, 0, .5)
-  }
+    .media-browser-modal-window .modal-content, .uploader-modal .modal-content {
+        -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, .5);
+        box-shadow: 0 5px 30px rgba(0, 0, 0, .5)
+    }
 
-  .media-browser-modal-window .modal-sm, .uploader-modal .modal-sm {
-    width: 300px
-  }
+    .media-browser-modal-window .modal-sm, .uploader-modal .modal-sm {
+        width: 300px
+    }
 }
 
 @media (min-width: 992px) {
-  .media-browser-modal-window .modal-lg, .uploader-modal .modal-lg {
-    width: 900px
-  }
+    .media-browser-modal-window .modal-lg, .uploader-modal .modal-lg {
+        width: 900px
+    }
 }
 
 .media-browser-modal-window .modal-header .close, .uploader-modal .modal-header .close {
-  margin-top: 7px
+    margin-top: 7px
 }
 
 .media-browser-modal-window .modal.uploader-modal.close, .uploader-modal .modal.uploader-modal.close {
-  float: right;
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: .2;
-  filter: alpha(opacity=20)
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .2;
+    filter: alpha(opacity=20)
 }
 
 .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul li a,
@@ -1398,529 +1398,530 @@
 .uploader-modal
 .tabMediaBrowserBreadcrumbs > ul li a,
 .uploader-modal input.searchterm {
-  float: none;
-  font-family: Arial, sans-serif;
-  -webkit-font-kerning: auto;
-  -moz-font-kerning: auto;
-  font-kerning: auto;
-  font-stretch: normal;
-  font-style: normal;
-  font-variant: normal;
-  -webkit-font-variant-ligatures: normal;
-  -moz-font-variant-ligatures: normal;
-  font-variant-ligatures: normal;
-  left: auto;
-  letter-spacing: normal;
-  max-height: none;
-  max-width: none;
-  min-height: 0;
-  position: static;
-  table-layout: auto;
-  text-anchor: start;
-  text-decoration: none;
-  text-indent: 0;
-  text-shadow: none;
-  text-transform: none;
-  -ms-touch-action: auto;
-  touch-action: auto;
-  border-collapse: separate;
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  bottom: auto;
-  clear: none
+    float: none;
+    font-family: Arial, sans-serif;
+    -webkit-font-kerning: auto;
+    -moz-font-kerning: auto;
+    font-kerning: auto;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    -webkit-font-variant-ligatures: normal;
+    -moz-font-variant-ligatures: normal;
+    font-variant-ligatures: normal;
+    left: auto;
+    letter-spacing: normal;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    position: static;
+    table-layout: auto;
+    text-anchor: start;
+    text-decoration: none;
+    text-indent: 0;
+    text-shadow: none;
+    text-transform: none;
+    -ms-touch-action: auto;
+    touch-action: auto;
+    border-collapse: separate;
+    border-image-outset: 0;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    bottom: auto;
+    clear: none
 }
 
 .media-browser-modal-window .close:hover, .media-browser-modal-window .modal.uploader-modal.close:focus, .uploader-modal .close:hover, .uploader-modal .modal.uploader-modal.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-  opacity: .5;
-  filter: alpha(opacity=50)
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: .5;
+    filter: alpha(opacity=50)
 }
 
 .media-browser-modal-window .modal.uploader-modalbutton.close, .uploader-modal .modal.uploader-modalbutton.close {
-  padding: 0;
-  cursor: pointer;
-  background: 0 0;
-  border: 0
+    padding: 0;
+    cursor: pointer;
+    background: 0 0;
+    border: 0
 }
 
 #content .media-browser-modal-window.modal .modal-header button.close[type=button], #content .uploader-modal.modal .modal-header button.close[type=button], .media-browser-modal-window.modal .modal-header button.close[type=button], .uploader-modal.modal .modal-header button.close[type=button] {
-  border: none;
-  border-radius: 0;
-  text-shadow: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  color: #fff;
-  opacity: 1;
-  font-size: 32px;
-  margin-top: -15px;
-  padding: 13px 21px;
-  right: 0;
-  margin-right: -15px;
-  -webkit-transition: .2s background;
-  transition: .2s background;
-  -webkit-filter: none;
-  filter: none;
-  background: 0 0;
-  font-weight: 700
+    border: none;
+    border-radius: 0;
+    text-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: #fff;
+    opacity: 1;
+    font-size: 32px;
+    margin-top: -15px;
+    padding: 13px 21px;
+    right: 0;
+    margin-right: -15px;
+    -webkit-transition: .2s background;
+    transition: .2s background;
+    -webkit-filter: none;
+    filter: none;
+    background: 0 0;
+    font-weight: 700
 }
 
 #content .media-browser-modal-window.modal .modal-header button.close[type=button]:hover, #content .uploader-modal.modal .modal-header button.close[type=button]:hover, .media-browser-modal-window.modal .modal-header button.close[type=button]:hover, .uploader-modal.modal .modal-header button.close[type=button]:hover {
-  background-color: #0071bc;
-  -webkit-filter: none;
-  filter: none
+    background-color: #0071bc;
+    -webkit-filter: none;
+    filter: none
 }
 
 .media-browser-modal-window .modal-title, .uploader-modal .modal-title {
-  font-size: 20px;
-  font-weight: 400
+    font-size: 20px;
+    font-weight: 400
 }
 
 .media-browser-modal-window .modal-header, .uploader-modal .modal-header {
-  background-color: #0a85c8;
-  color: #fff
+    background-color: #0a85c8;
+    color: #fff
 }
 
 #content .media-browser-modal-window .btn-small, #content .uploader-modal .btn-small, .media-browser-modal-window .btn-small, .uploader-modal .btn-small {
-  padding: 0 5px;
-  font-size: 12px
+    padding: 0 5px;
+    font-size: 12px
 }
 
 .media-browser-modal-window input.searchterm,
 .uploader-modal input.searchterm {
-  border-radius: 0;
-  border: 1px solid #ccc;
-  -webkit-box-shadow: rgba(0, 0, 0, .0745098) 0 1px 1px 0 inset;
-  box-shadow: rgba(0, 0, 0, .0745098) 0 1px 1px 0 inset;
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box;
-  color: #555;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  cursor: auto;
-  direction: ltr;
-  display: inline-block;
-  fill: #000;
-  -webkit-filter: none;
-  filter: none;
-  font-size: 14px;
-  font-weight: 400;
-  height: 16px;
-  -webkit-box-pack: start;
-  -webkit-justify-content: start;
-  -ms-flex-pack: start;
-  justify-content: start;
-  line-height: normal;
-  list-style: disc;
-  margin: 20px 0 0;
-  min-width: 0;
-  opacity: 1;
-  overflow-y: visible;
-  padding: 6px 12px;
-  right: auto;
-  text-align: start;
-  text-rendering: auto;
-  top: auto;
-  -webkit-transform: none;
-  -ms-transform: none;
-  transform: none;
-  -webkit-transform-style: flat;
-  transform-style: flat;
-  -webkit-transition-delay: 0s, 0s;
-  transition-delay: 0s, 0s;
-  -webkit-transition-duration: .15s, .15s;
-  transition-duration: .15s, .15s;
-  -webkit-transition-property: border-color, -webkit-box-shadow;
-  transition-property: border-color, box-shadow;
-  -webkit-transition-timing-function: ease-in-out, ease-in-out;
-  transition-timing-function: ease-in-out, ease-in-out;
-  vertical-align: baseline;
-  visibility: visible;
-  white-space: normal;
-  width: 169px;
-  word-break: normal;
-  word-spacing: 0;
-  z-index: auto;
-  zoom: 1
+    border-radius: 0;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: rgba(0, 0, 0, .0745098) 0 1px 1px 0 inset;
+    box-shadow: rgba(0, 0, 0, .0745098) 0 1px 1px 0 inset;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+    color: #555;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    cursor: auto;
+    direction: ltr;
+    display: inline-block;
+    fill: #000;
+    -webkit-filter: none;
+    filter: none;
+    font-size: 14px;
+    font-weight: 400;
+    height: 16px;
+    -webkit-box-pack: start;
+    -webkit-justify-content: start;
+    -ms-flex-pack: start;
+    justify-content: start;
+    line-height: normal;
+    list-style: disc;
+    margin: 20px 0 0;
+    min-width: 0;
+    opacity: 1;
+    overflow-y: visible;
+    padding: 6px 12px;
+    right: auto;
+    text-align: start;
+    text-rendering: auto;
+    top: auto;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    -webkit-transform-style: flat;
+    transform-style: flat;
+    -webkit-transition-delay: 0s, 0s;
+    transition-delay: 0s, 0s;
+    -webkit-transition-duration: .15s, .15s;
+    transition-duration: .15s, .15s;
+    -webkit-transition-property: border-color, -webkit-box-shadow;
+    transition-property: border-color, box-shadow;
+    -webkit-transition-timing-function: ease-in-out, ease-in-out;
+    transition-timing-function: ease-in-out, ease-in-out;
+    vertical-align: baseline;
+    visibility: visible;
+    white-space: normal;
+    width: 169px;
+    word-break: normal;
+    word-spacing: 0;
+    z-index: auto;
+    zoom: 1
 }
 
 .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul, .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul li a, .uploader-modal .tabMediaBrowserBreadcrumbs > ul, .uploader-modal .tabMediaBrowserBreadcrumbs > ul li a {
-  vertical-align: baseline;
-  word-break: normal;
-  cursor: auto;
-  resize: none;
-  right: auto;
-  -webkit-transition-delay: 0s;
-  transition-delay: 0s;
-  -webkit-transition-duration: 0s;
-  transition-duration: 0s;
-  -webkit-transition-property: all;
-  transition-property: all;
-  -webkit-transition-timing-function: ease;
-  transition-timing-function: ease;
-  visibility: visible;
-  white-space: normal;
-  list-style: none
+    vertical-align: baseline;
+    word-break: normal;
+    cursor: auto;
+    resize: none;
+    right: auto;
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
+    -webkit-transition-property: all;
+    transition-property: all;
+    -webkit-transition-timing-function: ease;
+    transition-timing-function: ease;
+    visibility: visible;
+    white-space: normal;
+    list-style: none
 }
 
 .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul li a, .uploader-modal .tabMediaBrowserBreadcrumbs > ul li a {
-  -webkit-animation-play-state: running;
-  animation-play-state: running;
-  -webkit-animation-timing-function: ease;
-  animation-timing-function: ease;
-  -webkit-backface-visibility: visible;
-  backface-visibility: visible;
-  background-blend-mode: normal;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  color: #7c7c7c;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  direction: ltr;
-  display: inline;
-  fill: #000;
-  -webkit-filter: none;
-  filter: none;
-  font-size: 12px;
-  font-weight: 700;
-  height: auto;
-  -webkit-box-pack: start;
-  -webkit-justify-content: start;
-  -ms-flex-pack: start;
-  justify-content: start;
-  line-height: 8px;
-  min-width: 0;
-  -o-object-position: 50% 50%;
-  object-position: 50% 50%;
-  opacity: 1;
-  outline-offset: 0;
-  overflow-wrap: normal;
-  overflow-y: visible;
-  -webkit-perspective: none;
-  perspective: none;
-  -webkit-perspective-origin: 0 0;
-  perspective-origin: 0 0;
-  pointer-events: auto;
-  text-align: left;
-  text-rendering: auto;
-  top: auto;
-  -webkit-transform: none;
-  -ms-transform: none;
-  transform: none;
-  -webkit-transform-style: flat;
-  transform-style: flat;
-  width: auto;
-  word-wrap: normal;
-  background: 0 0;
-  border-color: #7c7c7c;
-  border-radius: 0;
-  border-style: none;
-  border-width: 0;
-  margin: 0;
-  outline: #7c7c7c 0;
-  padding: 0
+    -webkit-animation-play-state: running;
+    animation-play-state: running;
+    -webkit-animation-timing-function: ease;
+    animation-timing-function: ease;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    background-blend-mode: normal;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #7c7c7c;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    direction: ltr;
+    display: inline;
+    fill: #000;
+    -webkit-filter: none;
+    filter: none;
+    font-size: 12px;
+    font-weight: 700;
+    height: auto;
+    -webkit-box-pack: start;
+    -webkit-justify-content: start;
+    -ms-flex-pack: start;
+    justify-content: start;
+    line-height: 8px;
+    min-width: 0;
+    -o-object-position: 50% 50%;
+    object-position: 50% 50%;
+    opacity: 1;
+    outline-offset: 0;
+    overflow-wrap: normal;
+    overflow-y: visible;
+    -webkit-perspective: none;
+    perspective: none;
+    -webkit-perspective-origin: 0 0;
+    perspective-origin: 0 0;
+    pointer-events: auto;
+    text-align: left;
+    text-rendering: auto;
+    top: auto;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    -webkit-transform-style: flat;
+    transform-style: flat;
+    width: auto;
+    word-wrap: normal;
+    background: 0 0;
+    border-color: #7c7c7c;
+    border-radius: 0;
+    border-style: none;
+    border-width: 0;
+    margin: 0;
+    outline: #7c7c7c 0;
+    padding: 0
 }
 
 .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul, .uploader-modal .tabMediaBrowserBreadcrumbs > ul {
-  color: #444;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  display: block;
-  fill: #000;
-  height: 7px;
-  -webkit-box-pack: start;
-  -webkit-justify-content: start;
-  -ms-flex-pack: start;
-  justify-content: start;
-  text-align: start;
-  -webkit-transform-style: flat;
-  transform-style: flat;
-  width: 719px;
-  word-spacing: 0;
-  z-index: auto;
-  zoom: 1;
-  background: 0 0;
-  margin: 12px 0;
-  outline: #444 0;
-  padding: 0 0 0 24px
+    color: #444;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    display: block;
+    fill: #000;
+    height: 7px;
+    -webkit-box-pack: start;
+    -webkit-justify-content: start;
+    -ms-flex-pack: start;
+    justify-content: start;
+    text-align: start;
+    -webkit-transform-style: flat;
+    transform-style: flat;
+    width: 719px;
+    word-spacing: 0;
+    z-index: auto;
+    zoom: 1;
+    background: 0 0;
+    margin: 12px 0;
+    outline: #444 0;
+    padding: 0 0 0 24px
 }
 
 .media-browser-modal-window #FileSearchIsRegexLabel, .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul, .uploader-modal #FileSearchIsRegexLabel, .uploader-modal .tabMediaBrowserBreadcrumbs > ul {
-  -webkit-filter: none;
-  filter: none;
-  -webkit-font-kerning: auto;
-  -moz-font-kerning: auto;
-  font-kerning: auto;
-  -webkit-font-variant-ligatures: normal;
-  -moz-font-variant-ligatures: normal;
-  font-variant-ligatures: normal;
-  outline-offset: 0;
-  -webkit-perspective: none;
-  perspective: none;
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: 0 none #444;
-  border-right: 0 none #444;
-  border-left: 0 none #444;
-  animation-play-state: running;
-  -webkit-animation-timing-function: ease;
-  animation-timing-function: ease;
-  -webkit-backface-visibility: visible;
-  backface-visibility: visible;
-  background-blend-mode: normal;
-  bottom: auto;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  clear: none
+    -webkit-filter: none;
+    filter: none;
+    -webkit-font-kerning: auto;
+    -moz-font-kerning: auto;
+    font-kerning: auto;
+    -webkit-font-variant-ligatures: normal;
+    -moz-font-variant-ligatures: normal;
+    font-variant-ligatures: normal;
+    outline-offset: 0;
+    -webkit-perspective: none;
+    perspective: none;
+    border-image-outset: 0;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 0 none #444;
+    border-right: 0 none #444;
+    border-left: 0 none #444;
+    animation-play-state: running;
+    -webkit-animation-timing-function: ease;
+    animation-timing-function: ease;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    background-blend-mode: normal;
+    bottom: auto;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    clear: none
 }
 
 .media-browser-modal-window #FileSearchIsRegexLabel, .media-browser-modal-window .fileActions > ul li a, .media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul, .media-browser-modal-window input#FileSearchIsRegex, .uploader-modal #FileSearchIsRegexLabel, .uploader-modal .fileActions > ul li a, .uploader-modal .tabMediaBrowserBreadcrumbs > ul, .uploader-modal input#FileSearchIsRegex {
-  table-layout: auto;
-  text-anchor: start;
-  text-decoration: none;
-  text-indent: 0;
-  text-shadow: none;
-  text-transform: none;
-  top: auto;
-  pointer-events: auto;
-  position: static;
-  max-height: none;
-  max-width: none;
-  min-height: 0;
-  min-width: 0;
-  opacity: 1;
-  overflow-wrap: normal;
-  overflow-x: visible;
-  overflow-y: visible;
-  direction: ltr;
-  float: none;
-  font-family: Arial, sans-serif;
-  font-size: 12px;
-  font-stretch: normal;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: 400;
-  left: auto;
-  letter-spacing: normal;
-  line-height: normal;
-  -webkit-animation-play-state: running
+    table-layout: auto;
+    text-anchor: start;
+    text-decoration: none;
+    text-indent: 0;
+    text-shadow: none;
+    text-transform: none;
+    top: auto;
+    pointer-events: auto;
+    position: static;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    min-width: 0;
+    opacity: 1;
+    overflow-wrap: normal;
+    overflow-x: visible;
+    overflow-y: visible;
+    direction: ltr;
+    float: none;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-stretch: normal;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    left: auto;
+    letter-spacing: normal;
+    line-height: normal;
+    -webkit-animation-play-state: running
 }
 
 .media-browser-modal-window #FileSearchIsRegexLabel, .media-browser-modal-window input#FileSearchIsRegex, .uploader-modal #FileSearchIsRegexLabel, .uploader-modal input#FileSearchIsRegex {
-  -webkit-transition-delay: 0s;
-  transition-delay: 0s;
-  -webkit-transition-duration: 0s;
-  transition-duration: 0s;
-  -webkit-transition-property: all;
-  transition-property: all;
-  -webkit-transition-timing-function: ease;
-  transition-timing-function: ease;
-  visibility: visible;
-  white-space: normal;
-  padding: 0;
-  display: inline-block;
-  text-align: start;
-  list-style: disc
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
+    -webkit-transition-property: all;
+    transition-property: all;
+    -webkit-transition-timing-function: ease;
+    transition-timing-function: ease;
+    visibility: visible;
+    white-space: normal;
+    padding: 0;
+    display: inline-block;
+    text-align: start;
+    list-style: disc
 }
 
 .media-browser-modal-window #FileSearchIsRegexLabel, .uploader-modal #FileSearchIsRegexLabel {
-  color: #444;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  cursor: default;
-  fill: #000;
-  height: 16px;
-  -webkit-box-pack: start;
-  -webkit-justify-content: start;
-  -ms-flex-pack: start;
-  justify-content: start;
-  -webkit-transform-style: flat;
-  transform-style: flat;
-  vertical-align: top;
-  background: 0 0;
-  margin: 29px 0 0 6px
+    color: #444;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    cursor: default;
+    fill: #000;
+    height: 16px;
+    -webkit-box-pack: start;
+    -webkit-justify-content: start;
+    -ms-flex-pack: start;
+    justify-content: start;
+    -webkit-transform-style: flat;
+    transform-style: flat;
+    vertical-align: top;
+    background: 0 0;
+    margin: 29px 0 0 6px
 }
 
 .media-browser-modal-window input#FileSearchIsRegex, .uploader-modal input#FileSearchIsRegex {
-  border-image-outset: 0;
-  border-image-repeat: stretch;
-  border-image-slice: 100%;
-  border-image-source: none;
-  border-image-width: 1;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-top: 0 none #444;
-  border-right: 0 none #444;
-  border-left: 0 none #444;
-  color: #444;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  cursor: auto;
-  fill: #000;
-  height: 13px;
-  vertical-align: baseline;
-  width: 13px;
-  word-break: normal;
-  word-spacing: 0;
-  word-wrap: normal;
-  z-index: auto;
-  zoom: 1;
-  background: 0 0;
-  margin: 0;
-  outline: #444 0
+    border-image-outset: 0;
+    border-image-repeat: stretch;
+    border-image-slice: 100%;
+    border-image-source: none;
+    border-image-width: 1;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 0 none #444;
+    border-right: 0 none #444;
+    border-left: 0 none #444;
+    color: #444;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    cursor: auto;
+    fill: #000;
+    height: 13px;
+    vertical-align: baseline;
+    width: 13px;
+    word-break: normal;
+    word-spacing: 0;
+    word-wrap: normal;
+    z-index: auto;
+    zoom: 1;
+    background: 0 0;
+    margin: 0;
+    outline: #444 0
 }
 
 .media-browser-modal-window .fileActions > ul li a, .media-browser-modal-window input#FileSearchIsRegex, .uploader-modal .fileActions > ul li a, .uploader-modal input#FileSearchIsRegex {
-  resize: none;
-  right: auto;
-  outline-offset: 0;
-  -webkit-filter: none;
-  filter: none;
-  -webkit-font-kerning: auto;
-  -moz-font-kerning: auto;
-  font-kerning: auto;
-  -webkit-font-variant-ligatures: normal;
-  -moz-font-variant-ligatures: normal;
-  font-variant-ligatures: normal;
-  animation-play-state: running;
-  -webkit-animation-timing-function: ease;
-  animation-timing-function: ease;
-  -webkit-backface-visibility: visible;
-  backface-visibility: visible;
-  background-blend-mode: normal;
-  bottom: auto;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  clear: none
+    resize: none;
+    right: auto;
+    outline-offset: 0;
+    -webkit-filter: none;
+    filter: none;
+    -webkit-font-kerning: auto;
+    -moz-font-kerning: auto;
+    font-kerning: auto;
+    -webkit-font-variant-ligatures: normal;
+    -moz-font-variant-ligatures: normal;
+    font-variant-ligatures: normal;
+    animation-play-state: running;
+    -webkit-animation-timing-function: ease;
+    animation-timing-function: ease;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    background-blend-mode: normal;
+    bottom: auto;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    clear: none
 }
 
 .media-browser-modal-window .fileActions > ul li a, .uploader-modal .fileActions > ul li a {
-  color: #444;
-  color-interpolation: sRGB;
-  color-interpolation-filters: linearRGB;
-  color-rendering: auto;
-  cursor: pointer;
-  display: inline;
-  fill: #000;
-  height: auto;
-  -webkit-box-pack: start;
-  -webkit-justify-content: start;
-  -ms-flex-pack: start;
-  justify-content: start;
-  outline: 0;
-  text-align: left;
-  vertical-align: baseline;
-  visibility: visible;
-  white-space: normal;
-  width: auto;
-  word-break: normal;
-  word-spacing: 0;
-  z-index: auto;
-  zoom: 1;
-  background: 0 0;
-  list-style: none;
-  margin: 0;
-  padding: 0
+    color: #444;
+    color-interpolation: sRGB;
+    color-interpolation-filters: linearRGB;
+    color-rendering: auto;
+    cursor: pointer;
+    display: inline;
+    fill: #000;
+    height: auto;
+    -webkit-box-pack: start;
+    -webkit-justify-content: start;
+    -ms-flex-pack: start;
+    justify-content: start;
+    outline: 0;
+    text-align: left;
+    vertical-align: baseline;
+    visibility: visible;
+    white-space: normal;
+    width: auto;
+    word-break: normal;
+    word-spacing: 0;
+    z-index: auto;
+    zoom: 1;
+    background: 0 0;
+    list-style: none;
+    margin: 0;
+    padding: 0
 }
 
 .media-browser-modal-window a,
 .media-browser-modal-window a:hover,
-.media-browser-modal-window a:focus  {
-  -webkit-transition: none;
-  transition: none
+.media-browser-modal-window a:focus {
+    -webkit-transition: none;
+    transition: none
 }
 
 .media-browser-modal-window .mediaBrowserNavigation li {
-  margin: 0;
-  display: block;
-  float: none;
+    margin: 0;
+    display: block;
+    float: none;
 }
 
 .media-browser-modal-window .fileActions ul {
-  margin-top: 12px
+    margin-top: 12px
 }
 
 .media-browser-modal-window .filelist td {
-  font-size: 14px
+    font-size: 14px
 }
 
 .media-browser-modal-window a, .media-browser-modal-window tr.data-row.files td.col_2 a {
-  cursor: pointer
+    cursor: pointer
 }
 
-.uploader-modal~.modal-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1040;
-  background-color: #000;
+.uploader-modal ~ .modal-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1040;
+    background-color: #000;
 }
 
-.uploader-modal .fade, .uploader-modal~.fade {
-  opacity: 0;
-  -webkit-transition: opacity .15s linear;
-  -o-transition: opacity .15s linear;
-  transition: opacity .15s linear;
+.uploader-modal .fade, .uploader-modal ~ .fade {
+    opacity: 0;
+    -webkit-transition: opacity .15s linear;
+    -o-transition: opacity .15s linear;
+    transition: opacity .15s linear;
 }
 
-.uploader-modal .fade.in , .uploader-modal~.fade.in {
-  opacity: 1;
+.uploader-modal .fade.in, .uploader-modal ~ .fade.in {
+    opacity: 1;
 }
 
-.uploader-modal~.modal-backdrop.in {
-  opacity: .5;
-  filter: alpha(opacity=50);
+.uploader-modal ~ .modal-backdrop.in {
+    opacity: .5;
+    filter: alpha(opacity=50);
 }
 
 .uploader-modal.modal.fade .modal-dialog {
-  -webkit-transform: translate3d(0, -25%, 0);
-  transform: translate3d(0, -25%, 0);
-  -webkit-transition: -webkit-transform 0.3s ease-out;
-  -moz-transition: -moz-transform 0.3s ease-out;
-  -o-transition: -o-transform 0.3s ease-out;
-  transition: transform 0.3s ease-out;
+    -webkit-transform: translate3d(0, -25%, 0);
+    transform: translate3d(0, -25%, 0);
+    -webkit-transition: -webkit-transform 0.3s ease-out;
+    -moz-transition: -moz-transform 0.3s ease-out;
+    -o-transition: -o-transform 0.3s ease-out;
+    transition: transform 0.3s ease-out;
 }
+
 .uploader-modal.modal.in .modal-dialog {
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
 .media-browser-modal-window .uploadlist .fileName {
-  overflow: hidden;
-  word-wrap: break-word;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
 .media-browser-modal-window .filelist .fileName {
-  overflow: hidden;
-  word-wrap: break-word;
-  width: 500px;
-  white-space: pre;
+    overflow: hidden;
+    word-wrap: break-word;
+    width: 500px;
+    white-space: pre;
 }
 
 .uploader-modal .fileInfos {
-  max-width: 340px;
-  overflow: hidden;
-  word-wrap: break-word;
+    max-width: 340px;
+    overflow: hidden;
+    word-wrap: break-word;
 }

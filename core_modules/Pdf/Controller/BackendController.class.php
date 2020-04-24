@@ -66,7 +66,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd)
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
     {
         global $_ARRAYLANG, $objInit;
 
@@ -110,14 +110,15 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     }
 
     /**
-     * This method defines the option to generate the backend view (list and form)
+     * This function returns the ViewGeneration options for a given entityClass
      *
-     * @global array $_ARRAYLANG Language data
-     * @param string $entityClassName contains the FQCN from entity
-     * @return array array containing the options
+     * @access protected
+     * @global $_ARRAYLANG
+     * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used for better partition
+     * @return array with options
      */
-    protected function getViewGeneratorOptions($entityClassName)
-    {
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts    = explode('\\', $entityClassName);
@@ -126,6 +127,18 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             $this->getType() . '_' . $this->getName() .
             '_ACT_' . $classIdentifier
         );
+
+        // list of mPdf placemarkers
+        // see https://mpdf.github.io/what-else-can-i-do/replaceable-aliases.html
+        $mPdfPlacemarkers = array(
+            'nb',
+            'nbpg',
+            'PAGENO',
+            'DATE\s.+',
+            'colsum(?:\s\d+)?',
+            'iteration\s[a-z0-9]+',
+        );
+        $mPdfPlacemarkersRegexp = '(' . join('|', $mPdfPlacemarkers) . ')';
 
         return array(
             'header'     => $_ARRAYLANG[$placeholderPrefix],
@@ -193,10 +206,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         $length,
                         $value,
                         $options
-                    ) {
+                    ) use ($mPdfPlacemarkersRegexp) {
+                        // escape mPdf placemarkers
+                        $regexp = '/\{' . $mPdfPlacemarkersRegexp . '\}/';
+                        $value = preg_replace($regexp, '[[\1]]', $value);
                         $editor = new \Cx\Core\Wysiwyg\Wysiwyg(
                             $name,
-                            $value,
+                            contrexx_raw2xhtml($value),
                             'full'
                         );
                         $span   = new \Cx\Core\Html\Model\Entity\HtmlElement(
@@ -206,6 +222,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             new \Cx\Core\Html\Model\Entity\TextElement($editor)
                         );
                         return $span;
+                    },
+                    'storecallback' => function($value) use ($mPdfPlacemarkersRegexp) {
+                        // unescape mPdf placemarkers
+                        $regexp = '/\[\[' . $mPdfPlacemarkersRegexp . '\]\]/';
+                        return preg_replace($regexp, '{\1}', $value);
                     }
                 ),
             ),

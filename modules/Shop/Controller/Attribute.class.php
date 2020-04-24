@@ -117,8 +117,8 @@ class Attribute
 // TODO: Disabled FTTB.  Feature for 3.1.0
 // TODO: Include upload path with corresponding backend setting
 // TODO: Set form type for multipart
-//        self::TYPE_UPLOAD_OPTIONAL => 'TYPE_UPLOAD_OPTIONAL',
-//        self::TYPE_UPLOAD_MANDATORY => 'TYPE_UPLOAD_MANDATORY',
+        self::TYPE_UPLOAD_OPTIONAL => 'TYPE_UPLOAD_OPTIONAL',
+        self::TYPE_UPLOAD_MANDATORY => 'TYPE_UPLOAD_MANDATORY',
         self::TYPE_TEXTAREA_OPTIONAL => 'TYPE_TEXTAREA_OPTIONAL',
         self::TYPE_TEXTAREA_MANDATORY => 'TYPE_TEXTAREA_MANDATORY',
         self::TYPE_EMAIL_OPTIONAL => 'TYPE_EMAIL_OPTIONAL',
@@ -460,9 +460,7 @@ class Attribute
              WHERE `id`=$this->id";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_attribute");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_option");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_rel_product_attribute");
+
         return true;
     }
 
@@ -805,9 +803,9 @@ class Attribute
                 return '.+';
 // TODO: Improve the regex for file names
             case self::TYPE_UPLOAD_OPTIONAL:
-                return '.*';
+                return '(^$|^.+\..+$)';
             case self::TYPE_UPLOAD_MANDATORY:
-                return '.+';
+                return '^.+\..+$';
             case self::TYPE_EMAIL_OPTIONAL:
                 return '(^$|^'.\FWValidator::REGEX_EMAIL.'$)';
             case self::TYPE_EMAIL_MANDATORY:

@@ -13,8 +13,8 @@ Cx\Core\View\Model\Entity\Frontend:
       nullable: true
       unsigned: true
     channel:
-      type: string
-      nullable: true
+      type: enum
+      values: ['default','mobile','print','pdf','app']
   manyToOne:
     localeRelatedByIso1s:
       targetEntity: Cx\Core\Locale\Model\Entity\Locale

@@ -1,5 +1,5 @@
 <!-- START module_knowledge_categories_overview -->
-<script type="text/javascript" src="../modules/Knowledge/View/Script/functions.js" ></script>
+<script type="text/javascript" src="/modules/Knowledge/View/Script/functions.js" ></script>
 
 
 <script type="text/javascript">
@@ -65,10 +65,10 @@ var switchActive = function(id, obj, action)
             if (statusMsg(transport.responseText)) {
                 var img = obj.getElementsByTagName("img")[0];
                 if (action == 0) {
-                    img.src = "../core/Core/View/Media/icons/led_red.gif";
+                    img.src = "/core/Core/View/Media/icons/led_red.gif";
                     obj.onclick = function() { switchActive(id, obj, 1); }
                 } else {
-                    img.src = "../core/Core/View/Media/icons/led_green.gif";
+                    img.src = "/core/Core/View/Media/icons/led_green.gif";
                     obj.onclick = function() { switchActive(id, obj, 0); }
                 }
                 new Effect.Highlight('category_'+id);
@@ -118,8 +118,8 @@ var catTree = {
         // div is the last available div element now
         div.cleanWhitespace();
         div.firstChild.show();
-        obj.select('.openClosePicture')[0].src = "../core/Core/View/Media/icons/minuslink.gif";
-        obj.nextSibling.src = "../modules/Knowledge/View/Media/folder-open.small.png";
+        obj.select('.openClosePicture')[0].src = "/core/Core/View/Media/icons/minuslink.gif";
+        obj.nextSibling.src = "/modules/Knowledge/View/Media/folder-open.small.png";
         obj.onclick = function() { catTree.closePart(obj); }
         setRows();
     },
@@ -138,8 +138,8 @@ var catTree = {
         // div is the last available div element now
         div.cleanWhitespace();
         div.firstChild.hide();
-        obj.select('.openClosePicture')[0].src = "../core/Core/View/Media/icons/pluslink.gif";
-        obj.nextSibling.src = "../modules/Knowledge/View/Media/folder.small.png";
+        obj.select('.openClosePicture')[0].src = "/core/Core/View/Media/icons/pluslink.gif";
+        obj.nextSibling.src = "/modules/Knowledge/View/Media/folder.small.png";
         obj.onclick = function() { catTree.openPart(obj); }
         setRows();
     },
@@ -250,24 +250,24 @@ var updateSort = function(id)
                         <table style="width: 100%;">
                             <tr>
                                 <td style="width: 75px;   cursor: move;" class="drag_handle_{SORTABLE_ID}" onmousedown="lastDragged = {CATEGORY_ID}; handlerEvent();">
-                                    <img src="../modules/Knowledge/View/Media/sort.gif" style="boder: none;" />
+                                    <img src="/modules/Knowledge/View/Media/sort.gif" style="boder: none;" />
                                 </td>
                                 <td style="width: 50px;">
                                     <!--<input type="checkbox" name="selectedEntriesId[]" value="category_{CATEGORY_ID}" />-->
                                     <a href="javascript: void(0);" onclick="switchActive({CATEGORY_ID}, this, {CATEGORY_ACTIVE_STATE})">
-                                        <img src="../core/Core/View/Media/icons/led_{CATEGORY_ACTIVE_LED}.gif"  alt="switch active state" style="border: none;" />
+                                        <img src="/core/Core/View/Media/icons/led_{CATEGORY_ACTIVE_LED}.gif"  alt="switch active state" style="border: none;" />
                                     </a>
                                 </td>
                                 <td style="padding-left: {CATEGORY_INDENT}px;">
                                     <!-- BEGIN arrow -->
-                                    <img src="../core/Core/View/Media/icons/sub_arrow.gif" class="sub_arrow" />
+                                    <img src="/core/Core/View/Media/icons/sub_arrow.gif" class="sub_arrow" />
                                     <!-- END arrow -->
 
                                     <a href="javascript: void(0);" onclick="catTree.openPart(this);" style="visibility: {CATEGORY_PLUS_VISIBLITY};">
-                                        <img alt="" class="openClosePicture" src="../core/Core/View/Media/icons/pluslink.gif" style="border: none;" />
+                                        <img alt="" class="openClosePicture" src="/core/Core/View/Media/icons/pluslink.gif" style="border: none;" />
                                     </a>
 
-                                    <img src="../modules/Knowledge/View/Media/folder.small.png" style="margin-right:8px;" id="folder_{CATEGORY_ID}" />
+                                    <img src="/modules/Knowledge/View/Media/folder.small.png" style="margin-right:8px;" id="folder_{CATEGORY_ID}" />
 
                                     <a href="?cmd=Knowledge{MODULE_INDEX}&amp;act=categories&amp;tpl=edit&amp;id={CATEGORY_ID}">{CATEGORY_SUBJECT}</a>
                                 </td>
@@ -275,9 +275,9 @@ var updateSort = function(id)
                                     {ENTRIES_AMOUNT}
                                 </td>
                                 <td style="width: 40px;">
-                                    <a href="?cmd=Knowledge{MODULE_INDEX}&amp;act=categories&amp;tpl=edit&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
+                                    <a href="?cmd=Knowledge{MODULE_INDEX}&amp;act=categories&amp;tpl=edit&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="/core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
                 					<a href="javascript:deleteCategory({CATEGORY_ID}, {ENTRIES_AMOUNT});" target="_self" title="{TXT_DELETE_CATEGORY}">
-                					   <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
+                					   <img src="/core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
                 				    </a>
                                 </td>
                             </tr>

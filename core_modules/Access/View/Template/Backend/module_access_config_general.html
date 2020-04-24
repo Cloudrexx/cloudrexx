@@ -253,6 +253,17 @@ cx.ready(function() {
                 </div>
             </td>
         </tr>
+        <tr class="row2">
+          <td>{TXT_ACCESS_RANDOM_USERS}</td>
+          <td>
+            <input type="checkbox" name="access_blocks_random_access_users" id="access_blocks_random_access_users" value="1" onchange="document.getElementById('access_blocks_random_access_users_box').style.display = this.checked ? '' : 'none'" {ACCESS_BLOCKS_RANDOM_ACCESS_USERS} /> <label for="access_blocks_random_access_users">{TXT_ACCESS_ACTIVATE_BLOCK_FUNCTION}</label>
+            <div style="display:{ACCESS_BLOCKS_RANDOM_ACCESS_USERS_DISPLAY}; padding:12px 0px 0px 23px;" id="access_blocks_random_access_users_box">
+              <div style="margin-bottom:7px;">
+                {TXT_ACCESS_MAX_USER_COUNT}: <input type="text" name="access_blocks_random_access_users_count" value="{ACCESS_BLOCKS_RANDOM_ACCESS_USERS_USER_COUNT}" style="width:30px; text-align:right;" />
+              </div>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>

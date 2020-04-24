@@ -72,13 +72,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Note that we only do the check as long as there's no
         // cmd given; this is so we can reload the main screen if
         // the check has failed somehow.
-        // fileBrowser is an exception, as it eats CSRF codes like
-        // candy. We're doing \Cx\Core\Csrf\Controller\Csrf::check_code() in the relevant
-        // parts in the module instead.
         // The CSRF code needn't to be checked in the login module
         // because the user isn't logged in at this point.
-        // TODO: Why is upload excluded? The CSRF check doesn't take place in the upload module!
-        if (!empty($plainCmd) && !empty($cmd) and !in_array($plainCmd, array('FileBrowser', 'Upload', 'Login', 'Home'))) {
+        if (!empty($plainCmd) && !empty($cmd) and !in_array($plainCmd, array('Login', 'Home'))) {
             // Since language initialization in in the same hook as this
             // and we cannot define the order of module-processing,
             // we need to check if language is already initialized:

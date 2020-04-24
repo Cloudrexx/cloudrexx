@@ -61,17 +61,9 @@ class DirHomeContent extends DirectoryLibrary
     private $arrRows = array();
     private $arrRowsIndex = array();
 
-    public $categories = array();
-    public $levels = array();
-
-    public $count = array();
-    public $numLevels = array();
-    public $numCategories = array();
-
     public $navtree;
     public $navtreeLevels = array();
     public $navtreeCategories = array();
-
 
     /**
      * Constructor PHP5
@@ -106,9 +98,8 @@ class DirHomeContent extends DirectoryLibrary
 
         $this->_objTemplate->setTemplate($this->_pageContent,true,true);
 
-        $this->count = '';
-        $this->numLevels ='';
-        $this->numCategories = '';
+        $this->numLevels = array();
+        $this->numCategories = array();
 
         if(isset($_GET['lid'])){
             $lId = intval($_GET['lid']);
@@ -145,7 +136,7 @@ class DirHomeContent extends DirectoryLibrary
 
         //select View
         if ($this->settings['indexview']['value'] == 1) {
-            $this->arrRows ='';
+            $this->arrRows = array();
             sort($this->arrRowsIndex);
 
             $i = 0;

@@ -2,37 +2,37 @@
 <script type="text/javascript">
     //adds the datetimepicker to the date fields
     cx.jQuery(document).ready(function () {
-        toggleBlock($J('#enableRelatedNews'), $J('#live-search-news-block'), true);
-        toggleBlock($J('#enableTags'), $J('#{NEWS_TAG_ID}'));
+        toggleBlock(cx.jQuery('#newsEnableRelatedNews'), cx.jQuery('#news-related-search-container'), true);
+        toggleBlock(cx.jQuery('#enableTags'), cx.jQuery('#{NEWS_TAG_ID}'));
 
-        $J('#enableRelatedNews').click(function () {
-            toggleBlock($J('#enableRelatedNews'), $J('#live-search-news-block'));
+        cx.jQuery('#newsEnableRelatedNews').click(function () {
+            toggleBlock(cx.jQuery('#newsEnableRelatedNews'), cx.jQuery('#news-related-search-container'));
         });
-        $J('#enableTags').click(function () {
-            toggleBlock($J('#enableTags'), $J('#{NEWS_TAG_ID}'));
+        cx.jQuery('#enableTags').click(function () {
+            toggleBlock(cx.jQuery('#enableTags'), cx.jQuery('#{NEWS_TAG_ID}'));
         });
-       $J('#news_category').chosen();
+        cx.jQuery('#news_category').chosen();
     });
     cx.ready(function() {
         var dpOptions = {
             onSelect: function(dateText, inst) {
                 // adjust start or end date to avoid an invalid date range
-                var startDate = $J('input[name=startDate]').datepicker('getDate');
-                var endDate = $J('input[name=endDate]').datepicker('getDate');
+                var startDate = cx.jQuery('input[name=startDate]').datepicker('getDate');
+                var endDate = cx.jQuery('input[name=endDate]').datepicker('getDate');
 
                 if ((startDate != null) && (endDate != null) && (startDate > endDate)) {
-                    if ($J(this).attr('name') == 'startDate') {
-                        $J('input[name=endDate]').datepicker('setDate', dateText);
+                    if (cx.jQuery(this).attr('name') == 'startDate') {
+                        cx.jQuery('input[name=endDate]').datepicker('setDate', dateText);
                     } else {
-                        $J('input[name=startDate]').datepicker('setDate', dateText);
+                        cx.jQuery('input[name=startDate]').datepicker('setDate', dateText);
                     }
                 }
             }
         };
 
-        $J('input[name=newsDate]').datetimepicker();
-        $J('input[name=startDate]').datetimepicker(dpOptions);
-        $J('input[name=endDate]').datetimepicker(dpOptions);
+        cx.jQuery('input[name=newsDate]').datetimepicker();
+        cx.jQuery('input[name=startDate]').datetimepicker(dpOptions);
+        cx.jQuery('input[name=endDate]').datetimepicker(dpOptions);
     }, true);
 
     function toggleBlock(elementId, toggleId, hide) {
@@ -88,13 +88,13 @@
         var options = {};
         switch (sType) {
             case 'image':
-                options = {cxMbViews: 'filebrowser', cxMbStartview: 'MediaBrowserList'};
+                options = {cxMbViews: 'filebrowser', cxMbStartview: 'filebrowser'};
                 break;
             case 'mixed':
                 options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestructure'};
                 break;
             case 'link':
-                options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'MediaBrowserList'};
+                options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'filebrowser'};
                 break;
         }
         cx.variables.get('jquery','mediabrowser')('#newsMediaBrowser').trigger('click', options);
@@ -160,11 +160,11 @@
             if (newsScheduled.checked == false) {
                 startDate.disabled = true;
                 endDate.disabled = true;
-                $J("#newsDate").css('display','none');
+                cx.jQuery("#newsDate").css('display','none');
             } else {
                 startDate.disabled = false;
                 endDate.disabled = false;
-                $J("#newsDate").css('display','block');
+                cx.jQuery("#newsDate").css('display','block');
             }
         }
     }
@@ -320,25 +320,25 @@
 
     function switchTabVisibility(strTabId) {
         selectedLang = strTabId.split('_')[strTabId.split('_').length - 1];
-        if ($J('#'+strTabId).parent().css('display') == 'none') {
-            $J('#'+strTabId).parent().css('display','inline');
+        if (cx.jQuery('#'+strTabId).parent().css('display') == 'none') {
+            cx.jQuery('#'+strTabId).parent().css('display','inline');
             //newsSwitchLang(selectedLang);
         } else {
-            if ($J('#news_lang_tab_'+selectedLang).hasClass('active')) {
+            if (cx.jQuery('#news_lang_tab_'+selectedLang).hasClass('active')) {
                 var activeLang = [];
-                $J('.langCheckboxes:checked').each(function(i){
-                    activeLang[i] = $J(this).attr('id');
+                cx.jQuery('.langCheckboxes:checked').each(function(i){
+                    activeLang[i] = cx.jQuery(this).attr('id');
                 });
                 activeLangId = activeLang[0].split('_')[activeLang[0].split('_').length - 1];
                 newsSwitchLang(activeLangId);
             }
-            $J('#'+strTabId).parent().css('display','none');
+            cx.jQuery('#'+strTabId).parent().css('display','none');
         }
     }
 
     function countActiveLanguages() {
         var activeLanguages = 0;
-        activeLanguages = $J("input[name*=newsManagerLanguages]:checked").length;
+        activeLanguages = cx.jQuery("input[name*=newsManagerLanguages]:checked").length;
         return activeLanguages;
     }
 
@@ -391,20 +391,20 @@
                     </select>
                 </td>
             </tr>
-            <!-- BEGIN newsTagsBlock -->
+            <!-- BEGIN news_tags_container -->
             <tr class="row1">
                 <td nowrap="nowrap"><label for="news_tags">{TXT_NEWS_TAGS}</label></td>
                 <td>
                     <input type="checkbox" name="enableTags" id="enableTags" value="1" {NEWS_TAGS_ENABLED_CHECKED}>
                     <label for="enableTags">{TXT_NEWS_TAGS_ENABLE}</label>
                     <ul id="{NEWS_TAG_ID}" style="display: none">
-                        <!-- BEGIN newsTags -->
+                        <!-- BEGIN news_tags -->
                         <li>{NEWS_TAGS}</li>
-                        <!-- END newsTags -->
+                        <!-- END news_tags -->
                     </ul>
                 </td>
             </tr>
-            <!-- END newsTagsBlock -->
+            <!-- END news_tags_container -->
             {NEWS_TYPE_MENU}
             <tr class="row1">
                 <td nowrap="nowrap">{TXT_NEWS_MESSAGE_TYPE}</td>
@@ -541,59 +541,60 @@
                 <td colspan="2">{TXT_EXTERNAL_SOURCE}</td>
             </tr>
             <tr class="row1">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_external_source">{TXT_EXTERNAL_SOURCE}</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_external_source">{TXT_NEWS_SOURCE}</label></td>
                 <td><input type="text" name="newsSource" id="news_external_source" style="width: 400px;" value="{NEWS_SOURCE}" maxlength="250" /></td>
             </tr>
             <tr class="row2">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_1">{TXT_LINK} #1</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_1">{TXT_NEWS_LINK1}</label></td>
                 <td><input type="text" name="newsUrl1" id="news_link_1" style="width: 400px;" value="{NEWS_URL1}" maxlength="250" /></td>
             </tr>
             <tr class="row1">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_2">{TXT_LINK} #2</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_2">{TXT_NEWS_LINK2}</label></td>
                 <td><input type="text" name="newsUrl2" id="news_link_2" style="width: 400px;" value="{NEWS_URL2}" maxlength="250" /></td>
             </tr>
         </table>
         <br />
-        <!-- BEGIN relatedNewsBlock -->
-        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist live-search-news">
+        <!-- BEGIN news_related_news_container -->
+        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist news-related-search">
             <tr class="row3">
                 <td colspan="2">
                     {TXT_NEWS_RELATED_NEWS}
-                    <input type="checkbox" name="enableRelatedNews" id="enableRelatedNews" value="1" {NEWS_RELATED_NEWS_ENABLED_CHECKED}>
+                    <input type="checkbox" name="newsEnableRelatedNews" id="newsEnableRelatedNews" value="1" {NEWS_RELATED_NEWS_ENABLED_CHECKED}>
                 </td>
             </tr>
         </table>
-        <div id='live-search-news-block'>
-            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist live-search-news">
+        <div id='news-related-search-container'>
+            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist news-related-search">
                 <tr class="row1">
                     <td width="12%" height="20">
                         <label>{TXT_NEWS_INCLUDE_NEWS}</label>
                     </td>
                     <td>
-                        <label class=live-search-user-info>{TXT_NEWS_SEARCH_INFO}</label><br>
-                        <input class="live-search-news-input" style="width: 300px;" placeholder="{TXT_NEWS_SEARCH_PLACEHOLDER}" />
+                        <label class="news-related-search-info">{TXT_NEWS_SEARCH_INFO}</label><br>
+                        <input class="news-related-search-input" style="width: 300px;" placeholder="{TXT_NEWS_SEARCH_PLACEHOLDER}" />
                         &nbsp;
                         <span class="tooltip-trigger icon-info"></span>
-                        <span class="tooltip-message">{TXT_INCLUDE_RELATED_NEWS_DESC}</span></td>
+                        <span class="tooltip-message">{TXT_NEWS_INCLUDE_RELATED_NEWS_DESC}</span></td>
                     </td>
                 </tr>
-                <tr class="row2" id='related-news-list' style="display:none;">
+                <tr class="row2" id='news-related-news-list' style="display:none;">
                     <td>&nbsp;</td>
                     <td>
                         <ul>
-                            <!-- BEGIN related_news -->
+                            <!-- BEGIN news_related_news -->
                             <li>
                                 <label>{NEWS_RELATED_NEWS_TITLE_SHORT}</label>
                                 <span class="news_list_close">X</span>
-                                <input type=hidden class="relationNewsId" name="relatedNews[]" value='{NEWS_RELATED_NEWS_ID}'>
+                                <input type="hidden" class="relationNewsId" name="newsRelatedNews[]" value='{NEWS_RELATED_NEWS_ID}'>
                             </li>
-                            <!-- END related_news -->
+                            <!-- END news_related_news -->
                         </ul>
                     </td>
                 </tr>
             </table>
-    </div>
-        <!-- END relatedNewsBlock -->
+        </div>
+        <br />
+        <!-- END news_related_news_container -->
     </div>
     <!-- end news2 div -->
     <!-- start news3 div -->

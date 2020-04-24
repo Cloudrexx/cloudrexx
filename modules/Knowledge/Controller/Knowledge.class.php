@@ -374,6 +374,17 @@ class Knowledge extends KnowledgeLibrary
     }
 
     /**
+     * Get the page title
+     *
+     * @return string
+     */
+    public function getPageTitle()
+    {
+        $this->article();
+        return $this->pageTitle;
+    }
+
+    /**
      * Show the tags of an article
      *
      * @param array $tags

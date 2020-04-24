@@ -59,6 +59,13 @@ class DomainRepositoryException extends \Exception {};
  * @subpackage  core_model
  */
 class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
+
+    /**
+     * The domain (in the repository) that represents the server's hostname
+     * @var \Cx\Core\Net\Model\Entity\Domain    Server's hostname domain
+     */
+    protected $hostnameDomain = null;
+
     /**
      * Constructor to initialize the YamlRepository with source
      * file config/DomainRepository.yml.
@@ -66,28 +73,32 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
     public function __construct() {
         parent::__construct(\Env::get('cx')->getWebsiteConfigPath() . '/DomainRepository.yml');
 
-        //Initialize the Hostname Domain
+        // fetch hostname domain from repository
         $hostName = $this->findOneBy(array('name' => $_SERVER['SERVER_NAME']));
+
+        // add virtual domain representing the hostname if it doesn't
+        // exist in the repository
         if (!$hostName) {
+            // create new domain of server's hostname
             $hostName = new \Cx\Core\Net\Model\Entity\Domain($_SERVER['SERVER_NAME']);
+
+            // make hostname domain virtual to ensure it won't get stored
+            // in the repository
             $hostName->setVirtual(true);
+
             //attach the hostname domain entity to repository
             $this->add($hostName);
+
+            // set ID to 0 to make it having the same ID constantly
+            // note: this is required as the YamlRepository can't properly
+            // handle virtual entiries. As a result, if we would not overwrite
+            // the ID to 0, the YamlRepository would constantly increment the
+            // auto-increment ID of the repository.
+            $hostName->setId(0);
         }
 
-        // Since YamlRepo handles virtual entities wrong, we can not change the
-        // ID of an existing entry (see
-        // http://bugs.cloudrexx.com/cloudrexx/ticket/2762 and
-        // http://bugs.cloudrexx.com/cloudrexx/ticket/2763).
-        // This else statement can be removed as soon as YamlRepository can
-        // handle ID changes of virtual entities.
-        else {
-            throw new \Exception('Duplicate entry for this domain, see http://bugs.cloudrexx.com/cloudrexx/ticket/2763');
-        }
-
-        $hostName->setVirtual(true);
-        // set ID to 0 to make it having the same ID constantly
-        $hostName->setId(0);
+        // remember server's hostname domain
+        $this->hostnameDomain = $hostName;
     }
 
     public function getMainDomain() {
@@ -99,5 +110,14 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
 
         $objDomain = $this->findBy(array('name' => $_SERVER['SERVER_NAME']));
         return $objDomain[0];
+    }
+
+    /**
+     * Get the server's hostname domain
+     *
+     * @return \Cx\Core\Net\Model\Entity\Domain The server's hostname domain
+     */
+    public function getHostDomain() {
+        return $this->hostnameDomain;
     }
 }

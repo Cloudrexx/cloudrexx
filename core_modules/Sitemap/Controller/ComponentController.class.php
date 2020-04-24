@@ -60,8 +60,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objSitemap = new \Cx\Core_Modules\Sitemap\Controller\Sitemap(\Env::get('cx')->getPage()->getContent(), \Env::get('cx')->getLicense());
-                $pageTitle = \Env::get('cx')->getPage()->getTitle();
-                \Env::get('cx')->getPage()->setContent($objSitemap->getSitemapContent());
+                $page->setContent($objSitemap->getSitemapContent());
                 break;
 
             default:

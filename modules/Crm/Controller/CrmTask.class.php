@@ -459,12 +459,12 @@ class CrmTask extends CrmLibrary
         }
         $objtpl->setVariable(array(
                 'CRM_LOGGED_USER_ID'    => $objFWUser->objUser->getId(),
-                'CRM_TASK_AUTOID'       => contrexx_raw2xhtml($taskAutoId),
+                'CRM_TASK_AUTOID'       => !empty($taskAutoId) ? contrexx_raw2xhtml($taskAutoId) : '',
                 'CRM_TASK_ID'           => (int) $id,
                 'CRM_TASKTITLE'         => contrexx_raw2xhtml($title),
                 'CRM_DUE_DATE'          => contrexx_raw2xhtml($duedate),
                 'CRM_CUSTOMER_ID'       => intval($customer),
-                'CRM_CUSTOMER_NAME'     => contrexx_raw2xhtml($customerName),
+                'CRM_CUSTOMER_NAME'     => !empty($customerName) ? contrexx_raw2xhtml($customerName) : '',
                 'CRM_TASK_DESC'         => new \Cx\Core\Wysiwyg\Wysiwyg('description', contrexx_raw2xhtml($description)),
                 'CRM_BACK_LINK'         => base64_decode($redirect),
 

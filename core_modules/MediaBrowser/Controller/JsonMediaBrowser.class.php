@@ -41,7 +41,6 @@ use Cx\Core\Core\Model\Entity\SystemComponent;
 use Cx\Core\Core\Model\Entity\SystemComponentController;
 use Cx\Core\Json\JsonAdapter;
 use Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowserPageTree;
-use Cx\Core\MediaSource\Model\Entity\ThumbnailGenerator;
 
 /**
  * JSON Adapter for Uploader
@@ -89,8 +88,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         return array(
             'getFiles', 'getSites', 'getSources', 'createThumbnails',
             'createDir', 'renameFile', 'removeFile',
-            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
-            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false)
+            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false),
+            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false)
         );
     }
 
@@ -141,13 +140,30 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
      * @return array
      */
     public function getFiles($params) {
-        $filePath  = (strlen($params['get']['path']) > 0)
-            ? $params['get']['path'] : '/';
-        $mediaType = (strlen($params['get']['mediatype']) > 0)
-            ? $params['get']['mediatype'] : 'files';
+        $filePath = '/';
+        if (
+            isset($params['get']['path']) &&
+            strlen($params['get']['path']) > 0
+        ) {
+            $filePath = $params['get']['path'];
+        }
+        $mediaType = 'files';
+        if (
+            isset($params['get']['mediatype']) &&
+            strlen($params['get']['mediatype']) > 0
+        ) {
+            $mediaType = $params['get']['mediatype'];
+        }
+        $recursive = false;
+        if (
+            isset($params['get']['recursive']) &&
+            strlen($params['get']['recursive']) > 0
+        ) {
+            $recursive = $params['get']['recursive'];
+        }
 
         $mediaTypes = $this->cx->getMediaSourceManager()->getMediaTypes();
-        return $mediaTypes[$mediaType]->getFileSystem()->getFileList($filePath);
+        return $mediaTypes[$mediaType]->getFileSystem()->getFileList($filePath, $recursive);
     }
 
     /**
@@ -187,8 +203,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
      */
     public function createDir($params) {
         $pathArray                 = explode('/', $params['get']['path']);
-        // Shift off the first element of the array to get the media type.
-        $mediaType = array_shift($pathArray);
+        $mediaType = (strlen($params['get']['mediatype']) > 0)
+            ? $params['get']['mediatype'] : 'files';
         $strPath = '/' . utf8_decode(join('/', $pathArray));
         $dir        = utf8_decode($params['post']['dir']) . '/';
         $this->setMessage(
@@ -205,6 +221,7 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         \Env::get('init')->loadLanguageData('MediaBrowser');
 
         $path       = !empty($params['get']['path']) ? contrexx_input2raw(utf8_decode($params['get']['path'])) : null;
+        $mediaType = !empty($params['get']['mediatype']) ? $params['get']['mediatype'] : 'files';
         $oldName    = !empty($params['post']['oldName']) ? contrexx_input2raw(utf8_decode($params['post']['oldName'])) : null;
         $newName    = !empty($params['post']['newName']) ? contrexx_input2raw(utf8_decode($params['post']['newName'])) : null;
 
@@ -213,8 +230,6 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         }
 
         $pathArray = explode('/', $path);
-        // Shift off the first element of the array to get the media type.
-        $mediaType  = array_shift($pathArray);
         $strPath    = '/' . join('/', $pathArray);
 
         $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
@@ -235,12 +250,11 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
     public function removeFile($params) {
         \Env::get('init')->loadLanguageData('MediaBrowser');
         $path     = !empty($params['get']['path']) ? contrexx_input2raw(utf8_decode($params['get']['path'])) : null;
+        $mediaType = !empty($params['get']['mediatype']) ? $params['get']['mediatype'] : 'files';
         $filename = !empty($params['post']['file']['datainfo']['name']) ? contrexx_input2raw(utf8_decode($params['post']['file']['datainfo']['name'])) : null;
 
         if ($filename && $path) {
             $pathArray = explode('/', $path);
-            // Shift off the first element of the array to get the media type.
-            $mediaType  = array_shift($pathArray);
             $strPath    = '/' . join('/', $pathArray);
 
             $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
@@ -346,5 +360,4 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
     public function setMessage($message) {
         $this->message = $message;
     }
-
 }

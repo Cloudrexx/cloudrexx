@@ -59,6 +59,18 @@ class Sigma extends \Cx\Core\Html\Sigma
     }
 
     /**
+     * This sets other default values than in the parent class which ensure
+     * that unparsed placeholders are not dropped
+     */
+    function loadTemplateFile($filename, $removeUnknownVariables = false, $removeEmptyBlocks = false) {
+        return parent::loadTemplateFile(
+            $filename,
+            $removeUnknownVariables,
+            $removeEmptyBlocks
+        );
+    }
+
+    /**
      * This is exactly the same as in the parent class except for the processing
      * of the inner blocks. This re-adds not yet parsed blocks. Changes are
      * marked with "BEGIN CHANGES ... END CHANGES"

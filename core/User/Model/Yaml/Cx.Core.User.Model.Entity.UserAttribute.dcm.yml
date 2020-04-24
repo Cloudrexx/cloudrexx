@@ -5,30 +5,45 @@ Cx\Core\User\Model\Entity\UserAttribute:
     id:
       id: true
       type: integer
-      length: 10
       unsigned: true
       generator:
         strategy: AUTO
     type:
-      type: string
-      nullable: false
+      type: enum
+      values: ['text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history']
+      options:
+        default: "text"
     mandatory:
-      type: string
-      nullable: false
+      type: enum
+      values: ['0','1']
+      options:
+        default: "0"
     sortType:
-      type: string
-      nullable: false
+      type: enum
+      values: ['asc','desc','custom']
       column: sort_type
+      options:
+        default: "asc"
     orderId:
       type: integer
-      length: 10
       nullable: false
       unsigned: true
       column: order_id
+      options:
+        default: 0
     accessSpecial:
-      type: string
-      nullable: false
+      type: enum
+      values: ['','menu_select_higher','menu_select_lower']
       column: access_special
+      options:
+        default: ""
+# Temporarily adds these fields so they don't get dropped
+    accessId:
+      type: integer
+      column: access_id
+    readAccessId:
+      type: integer
+      column: read_access_id
   oneToMany:
     parent:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
@@ -36,6 +51,9 @@ Cx\Core\User\Model\Entity\UserAttribute:
     userAttributeName:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
       mappedBy: userAttribute
+#    userAttributeValue:
+#      targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
+#      mappedBy: attribute
   manyToOne:
     children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
@@ -43,29 +61,17 @@ Cx\Core\User\Model\Entity\UserAttribute:
       joinColumns:
         parent_id:
           referencedColumnName: id
-    accessId:
-      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-      inversedBy: contrexxAccessUserAttribute
-      joinColumns:
-        access_id:
-          referencedColumnName: id
-    readAccessId:
-      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-      inversedBy: contrexxAccessUserAttributeRead
-      joinColumns:
-        read_access_id:
-          referencedColumnName: id
-  manyToMany:
-    userProfile:
-      targetEntity: Cx\Core\User\Model\Entity\UserProfile
-      inversedBy: userAttribute
-      joinTable:
-        name: access_user_attribute_value
-        joinColumns:
-          attribute_id:
-            referencedColumnName: id
-            nullable: false
-        inverseJoinColumns:
-          user_id:
-            referencedColumnName: user_id
-            nullable: false
+#    accessId:
+#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
+#      inversedBy: contrexxAccessUserAttribute
+#      joinColumns:
+#        access_id:
+#          referencedColumnName: id
+#          nullable: false
+#    readAccessId:
+#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
+#      inversedBy: contrexxAccessUserAttributeRead
+#      joinColumns:
+#        read_access_id:
+#          referencedColumnName: id
+#          nullable: false

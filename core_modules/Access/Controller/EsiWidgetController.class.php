@@ -55,6 +55,13 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
      */
     public function parseWidget($name, $template, $response, $params)
     {
+        global $_CORELANG;
+
+        if ($name == 'ACCESS_USER_COUNT') {
+            $template->setVariable($name, \FWUser::getUserCount());
+            return;
+        }
+
         $template->setVariable(
             \Env::get('init')->getComponentSpecificLanguageData(
                 'Access',
@@ -62,16 +69,14 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                 $params['locale']->getId()
             )
         );
-        $template->setVariable(
-            \Env::get('init')->getComponentSpecificLanguageData(
-                'Core',
-                true,
-                $params['locale']->getId()
-            )
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core',
+            true,
+            $params['locale']->getId()
         );
+        $template->setVariable($_CORELANG);
 
         if (preg_match('/^access_logged_(in|out)\d{0,2}/', $name)) {
-            $this->getComponent('Session')->getSession();
             \FWUser::parseLoggedInOutBlocks($template);
             return;
         }
@@ -208,8 +213,7 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             } else {
                 $template->hideBlock($name);
             }
-            $dateTime = new \DateTime();
-            $dateTime->setTime(23, 59, 59);
+            $dateTime = new \DateTime('tomorrow');
             $response->setExpirationDate($dateTime);
         }
 
@@ -234,6 +238,9 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                 if ($template->blockExists('access_next_birthday_members')) {
                     $objAccessBlocks->setNextBirthdayUsers();
                 }
+
+                $dateTime = new \DateTime('tomorrow');
+                $response->setExpirationDate($dateTime);
             } else {
                 $template->hideBlock($name);
             }

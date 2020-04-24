@@ -99,8 +99,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         global $moduleStyleFile, $objTemplate, $_CORELANG, $subMenuTitle;
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $contactObj = new \Cx\Core_Modules\Contact\Controller\Contact(\Env::get('cx')->getPage()->getContent());
-                \Env::get('cx')->getPage()->setContent($contactObj->getContactPage());
+                $contact = new \Cx\Core_Modules\Contact\Controller\Contact();
+                $contact->getContactPage($this->cx->getPage());
                 $moduleStyleFile = $this->cx->getCodeBaseOffsetPath() . self::getPathForType($this->getType()) . '/' . $this->getName() . '/View/Style/frontend_style.css';
                 break;
 
@@ -120,6 +120,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
+     * Called for additional, component specific resolving
+     * 
+     * If /en/Path/to/Page is the path to a page for this component
+     * a request like /en/Path/to/Page/with/some/parameters will
+     * give an array like array('with', 'some', 'parameters') for $parts
+     * 
+     * This may be used to redirect to another page
+     * @param array $parts List of additional path parts
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
+     */
+    public function resolve($parts, $page) {
+        $params = $this->cx->getRequest()->getUrl()->getParamArray();
+        unset($params['section']);
+        unset($params['cmd']);
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $params);
+        header('Link: <' . $canonicalUrl->toString() . '>; rel="canonical"');
+    }
+
+    /**
      * Do something with a Response object
      * You may do page alterations here (like changing the metatitle)
      * You may do response alterations here (like set headers)
@@ -129,10 +148,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
      */
     public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {
-        $params = $response->getRequest()->getUrl()->getParamArray();
+        // in case of an ESI request, the request URL will be set through Referer-header
+        $headers = $response->getRequest()->getHeaders();
+        if (isset($headers['Referer'])) {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($headers['Referer']);
+        } else {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($response->getRequest()->getUrl()->toString());
+        }
+
+        $page   = $response->getPage();
+        $params = $refUrl->getParamArray();
         unset($params['section']);
         unset($params['cmd']);
-        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($response->getPage(), $params);
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $params);
         $response->setHeader(
             'Link',
             '<' . $canonicalUrl->toString() . '>; rel="canonical"'

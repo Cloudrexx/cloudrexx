@@ -58,7 +58,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Backend template for this page
      * @param array $cmd Supplied CMD
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         $em = $this->cx->getDb()->getEntityManager();
         $logRepo = $em->getRepository('Cx\Core_Modules\SysLog\Model\Entity\Log');
 
@@ -80,9 +80,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @access protected
      * @global $_ARRAYLANG
      * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used for better partition
      * @return array with options
      */
-    protected function getViewGeneratorOptions($entityClassName) {
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts = explode('\\', $entityClassName);

@@ -65,8 +65,9 @@ class SocialLogin
      */
     public function loginWithProvider($provider)
     {
-        if (!self::$providers[$provider]->isActive()
-            || !isset(self::$providers[$provider])
+        if (
+            !isset(self::$providers[$provider]) ||
+            !self::$providers[$provider]->isActive()
         ) {
             return null;
         }

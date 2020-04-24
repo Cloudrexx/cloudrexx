@@ -112,10 +112,64 @@ class Changeset extends \Cx\Model\Base\EntityBase
         if ($eventType == 'delete') {
             return;
         }
-        foreach ($this->getComponentController()->getCascadingFields($entity, $eventType) as $field=>$fieldType) {
+        foreach (
+            $this->getComponentController()->getCascadingFields(
+                $entity,
+                $eventType
+            ) as $field=>$fieldType
+        ) {
             // recurse
             //echo 'Calculating cascades for ' . $entityClassName . '.' . $field . '<br />';
-            $this->calculateRelations($field, $fieldType, $entity, $em, $eventType, 'put', $sync, $changeCondition, $originEntityIndexData, $originalSync);
+            $this->calculateRelations(
+                $field,
+                $fieldType,
+                $entity,
+                $em,
+                $eventType,
+                'put',
+                $sync,
+                $changeCondition,
+                $originEntityIndexData,
+                $originalSync
+            );
+        }
+
+        // foreach cascading n:n relation
+        foreach (
+            $this->getComponentController()->getCascadingFields(
+                $entity,
+                $eventType,
+                true
+            ) as $field => $fieldType
+        ) {
+            // get IDs of all related entities
+            $fieldGetMethodName = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
+            $foreignEntities = $entity->$fieldGetMethodName();
+            if (get_class($foreignEntities) != 'Doctrine\ORM\PersistentCollection') {
+                $foreignEntities = array($foreignEntities);
+            }
+            $foreignIds = array();
+            foreach ($foreignEntities as $foreignEntity) {
+                $foreignIds[] = implode(
+                    '/',
+                    $this->getComponentController()->getEntityIndexData(
+                        $foreignEntity
+                    )
+                );
+            }
+
+            // sync related entries in intermediary table
+            $this->spool[] = new Change(
+                $sync,
+                $eventType,
+                $changeCondition,
+                $entityIndexData,
+                $originalSync,
+                $originEntityIndexData,
+                array(
+                    $field => implode(',', $foreignIds),
+                )
+            );
         }
         
         //$this->simplify();
@@ -149,7 +203,10 @@ class Changeset extends \Cx\Model\Base\EntityBase
                 'identifier' => $fieldType,
             ));
             
-            $foreignSync = $foreignDataSource->getDataAccesses()->first()->getSyncs()->first();
+            $foreignDataAccess = $foreignDataSource->getDataAccesses()->first();
+            $foreignSync = current($syncRepo->findBy(array(
+                'dataAccess' => $foreignDataAccess,
+            )));
             $foreignSync->setVirtual(true); // does not seem to work anymore!
             $foreignSync->setTempActive(true); // that's why we introduced "tempActive"
             

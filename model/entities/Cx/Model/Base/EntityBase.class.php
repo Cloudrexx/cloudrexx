@@ -86,7 +86,7 @@ class EntityBase {
      * )
      * @var array
      */
-    protected $validators = null;
+    protected $validators = array();
 
     /**
      * Defines if an entity is virtual and therefore not persistable.
@@ -94,6 +94,12 @@ class EntityBase {
      * @var boolean
      */
     protected $virtual = false;
+
+    /**
+     * Counts the nesting level of __call()
+     * @var int
+     */
+    protected static $nestingCount = 0;
 
     /**
      * This is an ugly solution to allow $this->cx to be available in all entity classes
@@ -147,41 +153,76 @@ class EntityBase {
     }
 
     /**
+     * Set $this->validators
+     *
+     * Validators can be found in lib/FRAMEWORK/Validator.class.php
+     * These will be executed if validate() is called
+     */
+    public function initializeValidators() { }
+
+    /**
      * @throws ValidationException
      * @prePersist
      */
     public function validate() {
-        if(!$this->validators)
+        $this->initializeValidators();
+
+        if (!count($this->validators)) {
             return;
+        }
 
         $errors = array();
-        foreach($this->validators as $field => $validator) {
+        foreach ($this->validators as $field => $validator) {
             $methodName = 'get'.ucfirst($field);
             $val = $this->$methodName();
-            if($val) {
-                if(!$validator->isValid($val)) {
-                     $errors[$field] = $validator->getMessages();
-                }
+            if (!$validator->isValid($val)) {
+                 $errors[$field] = $validator->getMessages();
             }
         }
-        if(count($errors) > 0)
+        if (count($errors) > 0) {
             throw new ValidationException($errors);
+        }
     }
 
     /**
      * Route methods like getName(), getType(), getDirectory(), etc.
      * @param string $methodName Name of method to call
      * @param array $arguments List of arguments for the method to call
+     * @throws \Exception If __call() nesting level reaches 20
      * @return mixed Return value of the method to call
      */
     public function __call($methodName, $arguments) {
-        return call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        if (static::$nestingCount >= 20) {
+            throw new \Exception('Stopped nesting at method ' . $methodName . '()');
+        }
+        static::$nestingCount++;
+        $res = call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        static::$nestingCount--;
+        return $res;
     }
 
-    public function __toString() {
+    /**
+     * Returns this entity's key
+     *
+     * If this entity has a composite key, the fields are separated by $separator.
+     * @param string $separator (optional) Separator for composite key fields, default "/"
+     * @return string Entity key as string
+     */
+    public final function getKeyAsString($separator = '/') {
         $em = $this->cx->getDb()->getEntityManager();
         $cmf = $em->getMetadataFactory();
         $meta = $cmf->getMetadataFor(get_class($this));
-        return (string) implode('/', $meta->getIdentifierValues($this));
+        return (string) implode($separator, $meta->getIdentifierValues($this));
+    }
+
+    /**
+     * Returns this entity's identifying value
+     *
+     * By default this returns the same as getKeyAsString(), but this method
+     * might get overridden by subclasses.
+     * @return string Identifying value for this entity
+     */
+    public function __toString() {
+        return $this->getKeyAsString();
     }
 }

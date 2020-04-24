@@ -157,11 +157,11 @@ class PresetFileStorage implements Storable
      */
     public function getPresetList($path)
     {
-        return array_filter(
-            array_filter(glob($path . '/options/presets/*'), 'is_file'),
-            function (&$name) {
-                return $name = pathinfo($name, PATHINFO_FILENAME);
-            }
+        return array_map(
+            function ($name) {
+                return pathinfo($name, PATHINFO_FILENAME);
+            },
+            array_filter(glob($path . '/options/presets/*'), 'is_file')
         );
     }
 

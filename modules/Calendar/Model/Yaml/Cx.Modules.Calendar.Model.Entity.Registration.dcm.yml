@@ -13,17 +13,11 @@ Cx\Modules\Calendar\Model\Entity\Registration:
     date:
       type: integer
     submissionDate:
-      type: datetime
-      nullable: true
+      type: timestamp
+      nullable: false
       column: submission_date
-    hostName:
-      type: string
-      length: 255
-      column: host_name
-    ipAddress:
-      type: string
-      length: 15
-      column: ip_address
+      options:
+        default: "0000-00-00 00:00:00"
     type:
       type: integer
     userId:
@@ -57,4 +51,5 @@ Cx\Modules\Calendar\Model\Entity\Registration:
       inversedBy: registrations
       joinColumn:
         name: event_id
+        nullable: false
         referencedColumnName: id

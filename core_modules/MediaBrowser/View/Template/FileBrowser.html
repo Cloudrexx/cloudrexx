@@ -1,128 +1,129 @@
-<div id="filebrowser" ng-controller="MediaBrowserListCtrl">
-  <div class="tabMediaBrowserBreadcrumbs">
-    <ul>
-      <li ng-repeat="pathpart in path">
-        <a ng-click="clickPath($index)" href="#">
-          {{pathpart.name}}
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div class="fileOptions">
-    <input type="search" class="searchterm"
-           placeholder="{{::'TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'| translate}}"
-           ng-model="searchConfig.string">
-    <label for="FileSearchIsRegex" id="FileSearchIsRegexLabel"
-           data-tooltip-placement="bottom" data-tooltip="{{
-             'TXT_FILEBROWSER_EXTENDED_FILE_SEARCH_EXPLANATION' | translate }}">
-      <input type="checkbox" id="FileSearchIsRegex"
-             ng-model="searchConfig.isRegex"/>
-      {{:: 'TXT_FILEBROWSER_EXTENDED_FILE_SEARCH' | translate }}
-    </label>
-    <div class="fileActions">
-      <ul>
-        <li>
-          <a ng-click="createFolder()">
-            <i class="icon-addfolder"></i>
-            <span class="fileActions-text">
-              {{:: 'TXT_FILEBROWSER_CREATE_DIRECTORY' | translate }}
-            </span>
-          </a>
-        </li>
-        <li>
-          <a ng-click="updateSource()"><i class="icon-refresh"></i>
-            <span class="fileActions-text">
-              {{:: 'TXT_FILEBROWSER_RELOAD' | translate }}
-            </span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  <div class="tabMediaBrowserContent contentWithOptions">
-    <div class="mediaBrowserListCtrl">
-      <div class="loadingPlatform" ng-hide="sources && files">
-        <i class="icon-loading"></i>
-        <div class="loadingText1">Loading</div>
-      </div>
-      <table class="adminlist filelist" ng-show="sources && files">
-        <tbody>
-          <tr>
-            <th colspan="2"><a href="" ng-click="changeSorting('name')">
-                {{:: 'TXT_FILEBROWSER_FILE_NAME' | translate }}</a></th>
-            <th class="text-right">
-              <a href="" ng-click="changeSorting('cleansize')">
-                {{:: 'TXT_FILEBROWSER_FILE_SIZE' | translate }}
-              </a>
-            </th>
-            <th class="text-right">
-              {{:: 'TXT_FILEBROWSER_FILE_ACTIONS' | translate }}
-            </th>
-          </tr>
-          <tr ng-hide="path.length == 1">
-            <td width="2%">&#8624;</td>
-            <td>
-              <a ng-click="shrinkPath(1)">
-                {{:: 'TXT_FILEBROWSER_DIRECTORY_UP' | translate }}
-              </a>
-            </td>
-            <td class="text-right"></td>
-            <td class="text-right"></td>
-          </tr>
-          <tr ng-repeat="file in files| orderAndSearchFiles: sorting: reverse: searchConfig.string: searchConfig.isRegex"
-              ng-class="{active: true === file.datainfo.active}"
-              ng-if="file.datainfo"
-              class="data-row files animation">
-            <td width="2%" class="col_1">
-              <i class="icon-fileType icon-fileType{{file.datainfo.extension}}"></i>
-            </td>
-            <td width="50%" class="col_2">
-              <a sglclick="clickFile(file, false)"
-                 ng-dblclick="clickFile(file, true)"
-                 data-preview-image="{{file.datainfo.preview}}"
-                 data-has-preview-image="{{file.datainfo.hasPreview}}">
-                <div class="fileName">{{file.datainfo.name}}</div>
-              </a>
-            </td>
-            <td class="fileSize col_4" width="18%">
-              <span ng-hide="file.datainfo.extension == 'Dir'">
-                {{file.datainfo.size}}
-              </span>
-            </td>
-            <td class="actions col_3" width="5%">
-              <div ng-hide="file.datainfo.readonly">
-                <a ng-click="renameFile(file)" class="renameFile">
+<div id="filebrowser" ng-controller="FilebrowserCtrl">
+    <div class="tabMediaBrowserBreadcrumbs">
+        <ul>
+            <li ng-repeat="pathpart in path">
+                <a ng-click="clickPath($index)" href="#">
+                    {{pathpart.name}}
                 </a>
-                <a ng-click="removeFile(file)" class="removeFile">
-                </a>
-              </div>
-            </td>
-          </tr>
-          <tr ng-show="((length(files) == 1 && files.datainfo) || length(files) == 0) && sources">
-            <td width="2%"></td>
-            <td>
-              {{:: 'TXT_FILEBROWSER_NO_FILES_IN_DIRECTORY' | translate }}
-            </td>
-            <td class="text-right"></td>
-            <td class="text-right"></td>
-          </tr>
-        </tbody>
-      </table>
+            </li>
+        </ul>
     </div>
-  </div>
-  <div class="tabMediaBrowserFooter">
-    <button type="submit" class="btn btn-primary"
-            ng-click="go('UploaderCtrl')">
-      {{:: 'TXT_FILEBROWSER_UPLOAD_FILE' | translate }}
-    </button>
-    <button type="submit" class="btn btn-primary"
-            ng-disabled="noFileSelected"
-            ng-click="choosePictures()">
-      {{:: 'TXT_FILEBROWSER_CHOOSE_FILE' | translate }}
-    </button>
-    <button type="submit" class="btn btn-primary"
-            ng-click="cancel()">
-      {{:: 'TXT_FILEBROWSER_CANCEL' | translate }}
-    </button>
-  </div>
+    <div class="fileOptions">
+        <input type="search" class="searchterm"
+               placeholder="{{::'TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'| translate}}"
+               ng-model="searchConfig.string"
+               ng-change="updateSourceSearch()">
+        <label for="FileSearchIsRegex" id="FileSearchIsRegexLabel"
+               data-tooltip-placement="bottom"
+               data-tooltip="{{'TXT_FILEBROWSER_EXTENDED_FILE_SEARCH_EXPLANATION' | translate }}">
+            <input type="checkbox" id="FileSearchIsRegex"
+                   ng-model="searchConfig.isRegex"/>
+            {{:: 'TXT_FILEBROWSER_EXTENDED_FILE_SEARCH' | translate }}
+        </label>
+        <div class="fileActions">
+            <ul>
+                <li>
+                    <a ng-click="createFolder()">
+                        <i class="icon-addfolder"></i>
+                        <span class="fileActions-text">
+                            {{:: 'TXT_FILEBROWSER_CREATE_DIRECTORY' | translate }}
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a ng-click="updateSource(false, false)"><i class="icon-refresh"></i>
+                        <span class="fileActions-text">
+                            {{:: 'TXT_FILEBROWSER_RELOAD' | translate }}
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="tabMediaBrowserContent contentWithOptions">
+        <div class="FilebrowserCtrl">
+            <div class="loadingPlatform" ng-show="loadingScreen.get()">
+                <i class="icon-loading"></i>
+                <div class="loadingText1">Loading</div>
+            </div>
+            <table class="adminlist filelist" ng-show="!loadingScreen.get()">
+                <tbody>
+                <tr>
+                    <th colspan="2"><a href="" ng-click="changeSorting('name')">
+                        {{:: 'TXT_FILEBROWSER_FILE_NAME' | translate }}</a></th>
+                    <th class="text-right">
+                        <a href="" ng-click="changeSorting('cleansize')">
+                            {{:: 'TXT_FILEBROWSER_FILE_SIZE' | translate }}
+                        </a>
+                    </th>
+                    <th class="text-right">
+                        {{:: 'TXT_FILEBROWSER_FILE_ACTIONS' | translate }}
+                    </th>
+                </tr>
+                <tr ng-hide="path.length == 1">
+                    <td width="2%">&#8624;</td>
+                    <td>
+                        <a ng-click="shrinkPath(1)">
+                            {{:: 'TXT_FILEBROWSER_DIRECTORY_UP' | translate }}
+                        </a>
+                    </td>
+                    <td class="text-right"></td>
+                    <td class="text-right"></td>
+                </tr>
+                <tr ng-repeat="file in files| orderAndSearchFiles: sorting: reverse: searchConfig.string: searchConfig.isRegex"
+                    ng-class="{active: true === file.datainfo.active}"
+                    ng-if="file.datainfo"
+                    class="data-row files animation">
+                    <td width="2%" class="col_1">
+                        <i class="icon-fileType icon-fileType{{file.datainfo.extension}}"></i>
+                    </td>
+                    <td width="50%" class="col_2">
+                        <a sglclick="clickFile(file, false)"
+                           ng-dblclick="clickFile(file, true)"
+                           data-preview-image="{{file.datainfo.preview}}"
+                           data-has-preview-image="{{file.datainfo.hasPreview}}">
+                            <div class="fileName">{{file.datainfo.name}}</div>
+                        </a>
+                    </td>
+                    <td class="fileSize col_4" width="18%">
+                        <span ng-hide="file.datainfo.extension == 'Dir'">
+                            {{file.datainfo.size}}
+                        </span>
+                    </td>
+                    <td class="actions col_3" width="5%">
+                        <div ng-hide="file.datainfo.readonly">
+                            <a ng-click="renameFile(file)" class="renameFile">
+                            </a>
+                            <a ng-click="removeFile(file)" class="removeFile">
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-show="((length(files) == 1 && files.datainfo) || length(files) == 0) && sources">
+                    <td width="2%"></td>
+                    <td>
+                        {{:: 'TXT_FILEBROWSER_NO_FILES_IN_DIRECTORY' | translate }}
+                    </td>
+                    <td class="text-right"></td>
+                    <td class="text-right"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tabMediaBrowserFooter">
+        <button type="submit" class="btn btn-primary"
+                ng-click="go('UploaderCtrl')">
+            {{:: 'TXT_FILEBROWSER_UPLOAD_FILE' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary"
+                ng-disabled="noFileSelected"
+                ng-click="choosePictures()">
+            {{:: 'TXT_FILEBROWSER_CHOOSE_FILE' | translate }}
+        </button>
+        <button type="submit" class="btn btn-primary"
+                ng-click="cancel()">
+            {{:: 'TXT_FILEBROWSER_CANCEL' | translate }}
+        </button>
+    </div>
 </div>
