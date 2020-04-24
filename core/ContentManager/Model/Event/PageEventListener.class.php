@@ -190,9 +190,6 @@ class PageEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
         global $_CORELANG;
 
         if ($page instanceof Page) {
-            if ($page->isVirtual()) {
-                throw new PageEventListenerException('Tried to persist Page "'.$page->getTitle().'" with id "'.$page->getId().'". This Page is virtual and cannot be stored in the DB.');
-            }
             if ($page->getModule() == 'Home'
                     && $page->getCmd() == ''
                     && $page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION
