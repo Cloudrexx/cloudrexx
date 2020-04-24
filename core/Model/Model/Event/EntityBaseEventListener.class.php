@@ -106,6 +106,29 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
     }
 
     /**
+     * Finds an entity by its key as produced by EntityBase::getKeyAsString()
+     *
+     * @todo This should be moved to a common superclass of all repository classes
+     * @param string $entityClass Fully qualified entity class name
+     * @param string $key Identifier values separated by $separator
+     * @param string $separator (optional) Separator for $key, default "/"
+     */
+    protected function findByKey($em, $entityClass, $key, $separator = '/') {
+        $repo = $em->getRepository($entityClass);
+        $metaData = $em->getClassMetadata($entityClass);
+        $keyParts = explode($separator, $key);
+        $identifierFields = $metaData->getIdentifierFieldNames();
+        if (count($keyParts) != count($identifierFields)) {
+            throw new \Exception('Could not findByKey(): key part count does not match');
+        }
+        $condition = array();
+        foreach ($identifierFields as $identifierField) {
+            $condition[$identifierField] = array_shift($keyParts);
+        }
+        return $repo->findOneBy($condition);
+    }
+
+    /**
      * Merges virtual entity that were detached during checkEntities()
      * @param \Cx\Core\Model\Controller\EntityManager EntityManager
      */
