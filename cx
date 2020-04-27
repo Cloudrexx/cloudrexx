@@ -3,16 +3,107 @@
 #!/bin/bash
 # vim: syn=sh
 
+# detect OS of host system
+function get_host_os_type {
+    case "$(uname -s)" in
+        Linux*)
+            echo "Linux"
+            ;;
+
+        Darwin*)
+            echo "Darwin"
+            ;;
+
+        CYGWIN*)
+            echo "Cygwin"
+            ;;
+
+        MINGW*)
+            echo "MinGw"
+            ;;
+
+        *)
+            echo "UNKNOWN"
+    esac
+}
+
+# detect host OS
+HOST_OS=$(get_host_os_type)
+
+# whether docker runs as nativ app or is virtualized with virtualbox
+NATIVE_DOCKER=true
+
+# perform host OS specific initialization
+case "$HOST_OS" in
+    Darwin)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -f '%g' /var/run/docker.sock)
+        # check if 'Docker Desktop on Mac' or 'Docker Toolbox' is installed
+        if [[ -z "$(docker info --format '{{.OperatingSystem}}' | grep 'Docker Desktop')" ]]; then
+            # 'Docker Toolbox' is installed
+            # this means that docker is installed through a virutal machine
+            NATIVE_DOCKER=false
+        fi
+        ;;
+
+    Linux)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -c '%g' /var/run/docker.sock)
+        ;;
+
+    *)
+        echo "Your system ($HOST_OS) is not supported. Abort..."
+        exit 1
+        ;;
+esac
+
 # Wrapper for bash 3
-if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
-    command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
+if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
+    # will be used to mount the global cx into the wrapper container
+    GLOBAL_CX_MOUNT=""
+
+    # check if we're using the global cx (instead of a local one)
+    PATH_OF_CALLING_CX="$(dirname $(realpath $0))"
+    if [[ "$PATH_OF_CALLING_CX" != "$(pwd)" ]]; then
+        # we're using the global cx
+        if [[ ! $NATIVE_DOCKER ]]; then
+            echo "The usage of a global cx is not supported on your system."
+            exit 1
+        fi
+
+        # install copy of global cx in temp
+        TEMPCX=$(basename $0)
+        TMPFILE=$(mktemp -q /tmp/${TEMPCX}.XXXXXX)
+        TMPNAME=$(basename $TMPFILE)
+        if [ $? -ne 0 ]; then
+            echo "$0: Can't create temp file, exiting..."
+            exit 1
+        fi
+        cp $0 $TMPFILE
+        chmod +x $TMPFILE
+
+        # run cx in wrapper container from its /tmp directory
+        CX_PATH="/tmp/cx"
+        GLOBAL_CX_MOUNT="-v $TMPFILE:$CX_PATH"
+    else
+        # path to local cx
+        CX_PATH="./cx"
+    fi
+
+    command="cd /root && $CX_PATH --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
         command="cd /root && bash"
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock $GLOBAL_CX_MOUNT cloudrexx/ubuntu bash -c "$command"
+
+    # remove temp copy of cx
+    if [[ -n "$GLOBAL_CX_MOUNT" ]]; then
+        rm $TMPFILE
+    fi
+
     exit 0
 fi
 
@@ -805,7 +896,7 @@ function cmd_env {
                     echo "phpMyAdmin is available at http://${CONFIG["hostname"]}:8234/"
                     echo "MailHog is available at http://${CONFIG["hostname"]}:8025/"
                 fi
-                if ! which cx > /dev/null; then
+                if ! is_wrapper && ! which cx > /dev/null; then
                     echo ""
                     echo "cx could not be found in your path. Run the following command to add it:"
                     echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
@@ -1513,6 +1604,9 @@ function set_config_array {
         FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
         FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
     fi
+    # drop any non-parsed blocks & placeholders
+    FILE_CONTENTS=$(drop_all_blocks_form_template "$FILE_CONTENTS")
+    FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<[a-z0-9_-]+>())" "")
     # save docker-compose.yml
     echo "$FILE_CONTENTS" > docker-compose.yml
     
@@ -1754,6 +1848,31 @@ function regex_replace_all {
     echo "$HAYSTACK"
 }
 
+# Drop all blocks from a template
+#
+# A block has the following notation: <name>...</name>
+function drop_all_blocks_form_template {
+    local TEMPLATE="$1"
+    local REGEX="(<[a-z0-9_-]+>)[^<]*(</[a-z0-9_-]+>)"
+    # check if template still contains any blocks
+    while [[ "$TEMPLATE" =~ $REGEX ]]; do
+        # verify that the opening and closing tags of the block do match
+        OPENING_TAG="${BASH_REMATCH[1]//[<>]/}"
+        CLOSING_TAG="${BASH_REMATCH[2]//[<\/>]/}"
+        if [[ "$OPENING_TAG" == "$CLOSING_TAG" ]]; then
+            # drop the whole block
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/}"
+        else
+            # opening tag does not match -> this indicated that the opening
+            # tag is not a block-tag, but a placeholder instead.
+            # so let's just remove that placeholder then
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/"${BASH_REMATCH[2]}"}"
+        fi
+    done
+
+    echo "$TEMPLATE"
+}
+
 # Usage: if runs_as_proxy; then
 function runs_as_proxy {
     if [[ "$PROXY_HOST_DIR" != "" ]]; then
@@ -1821,7 +1940,7 @@ do
 done
 if ! $found; then
     # command is init
-    if [[ "$1" == "env" ]] && [[ "$2" == "init" ]]; then
+    if [[ "${COMMANDS[0]}" == "env" ]] && [[ "${COMMANDS[1]}" == "init" ]]; then
         # download cx and call init
         wget "$DOWNLOAD_URL" || curl -O "$DOWNLOAD_URL"
         chmod +x cx
@@ -1829,7 +1948,7 @@ if ! $found; then
         exit
 
     # command is envs
-    elif [[ "$1" == "envs" ]]; then
+    elif [[ "${COMMANDS[0]}" == "envs" ]]; then
         if is_wrapper; then
             echo "envs command is not available through wrapper!"
             exit 1
@@ -1837,7 +1956,7 @@ if ! $found; then
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         exit
-    elif [[ "$1" == "help" && ( "$2" == "" || "$2" == "envs" || ( "$2" == "env" && "$3" == "init" ) ) ]]; then
+    elif [[ "${COMMANDS[0]}" == "help" && ( "${COMMANDS[1]}" == "" || "${COMMANDS[1]}" == "envs" || ( "${COMMANDS[1]}" == "env" && "${COMMANDS[2]}" == "init" ) ) ]]; then
         shift
         cmd_help "$@"
         exit
@@ -1969,6 +2088,7 @@ if "%*" == "env shell --wrapper" (
 )
 
 REM Pass everything through our wrapper
+REM TODO add support for global cx
 docker run --rm -ti --name clx-win-wrapper -v "%cd%/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "cd /root && ./cx --proxy-host-dir='%string%' %*"
 goto :EOF
 
