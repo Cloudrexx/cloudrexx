@@ -1778,6 +1778,12 @@ namespace Cx\Core\Core\Controller {
                 $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : '';
                 $plainCmd = $cmd;
             }
+
+            $this->resolvedPage->setType(
+                \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION
+            );
+            $this->resolvedPage->setModule($cmd);
+            $this->resolvedPage->setCmd($act);
         }
 
         /**
