@@ -144,12 +144,65 @@ class BackendTable extends HTML_Table {
 
             $formGenerator = new \Cx\Core\Html\Controller\FormGenerator($attrs, '', $entityClass, '', $options, 0, null, $this->viewGenerator, true);
 
+            $col = 0;
+            $headerRowIdx = 0;
+            $headerRowCellType = 'th';
+            if ($this->hasMasterTableHeader) {
+                $headerRowCellType = 'td';
+                $headerRowIdx++;
+            }
+            if (isset($options['multiActions'])) {
+                $this->setCellContents($headerRowIdx, $col, '<input class="multi-action-checkbox-all" type="checkbox" />', $headerRowType, '0', false);
+                $col++;
+            }
+            if (
+                isset($options['functions']['sortBy']) &&
+                isset($options['functions']['sortBy']['field'])
+            ) {
+                $orderFieldName = current(array_keys($options['functions']['sortBy']['field']));
+                $orderParam = \Cx\Core\Html\Controller\ViewGenerator::getParam(
+                    $this->viewGenerator->getViewId(),
+                    $_GET['order']
+                );
+                if (empty($orderParam)) {
+                    $orderParam = $options['functions']['order'];
+                }
+                $dragDropEnabled = (
+                    count($orderParam) == 1 &&
+                    current(array_keys($orderParam)) == $orderFieldName
+                );
+                $orderFieldOrder = 'ASC';
+                if ($options['functions']['sortBy']['field'][$orderFieldName] == SORT_DESC) {
+                   $orderFieldOrder = 'DESC';
+                }
+                $orderUrl = $this->viewGenerator->getSortUrl(
+                    array($orderFieldName => $orderFieldOrder)
+                );
+                $img = '&uarr;';
+                if ($orderFieldOrder == 'ASC') {
+                    $img = '&darr;';
+                }
+                $this->setCellContents($headerRowIdx, $col, '<a class="drag-drop-header" href="' . $orderUrl . '">' . $img . '</a>', $headerRowType, '0', false);
+                $col++;
+            }
+
             foreach ($attrs as $rowname=>$rows) {
                 $col = 0;
                 $virtual = $rows['virtual'];
                 unset($rows['virtual']);
                 if (isset($options['multiActions'])) {
                     $this->setCellContents($row, $col, '<input class="multi-action-checkbox" name="select-' . $rowname . '" value="' . $rowname . '" type="checkbox" />', 'TD', '0', false);
+                    $col++;
+                }
+                if (
+                    isset($options['functions']['sortBy']) &&
+                    isset($options['functions']['sortBy']['field'])
+                ) {
+                    $dragDropHandle = '';
+                    if ($dragDropEnabled) {
+                        $dragDropHandle = '<i class="drag-drop-handle"><img src="/core/ContentManager/View/Media/Move.png" /></i>';
+                    }
+                    $this->setCellContents($row, $col, $dragDropHandle, 'TD', '0', false);
                     $col++;
                 }
                 foreach ($rows as $header=>$data) {
@@ -191,27 +244,39 @@ class BackendTable extends HTML_Table {
                             $options['functions']['sorting'] &&
                             $sorting !== false
                         ) {
-                            $order = '';
+                            $order = 'ASC';
                             $img = '&uarr;&darr;';
-                            $sortParamName = !empty($sortBy) ? $entity . 'Order' : 'order';
-                            if (isset($_GET[$sortParamName])) {
-                                $supOrder = explode('/', $_GET[$sortParamName]);
-                                if (current($supOrder) == $origHeader) {
-                                    $order = '/DESC';
+                            $orderParam = \Cx\Core\Html\Controller\ViewGenerator::getParam(
+                                $this->viewGenerator->getViewId(),
+                                $_GET['order']
+                            );
+                            if (
+                                !count($orderParam) &&
+                                count($options['functions']['order'])
+                            ) {
+                                $orderParam = array_map(
+                                    function($order) {
+                                        if (is_string($order)) {
+                                            return $order;
+                                        }
+                                        return ($order == SORT_DESC ? 'DESC' : 'ASC');
+                                    },
+                                    $options['functions']['order']
+                                );
+                            }
+                            if (count($orderParam) && isset($orderParam[$origHeader])) {
+                                $img = '&uarr;';
+                                if ($orderParam[$origHeader] == 'ASC') {
+                                    $order = 'DESC';
                                     $img = '&darr;';
-                                    if (count($supOrder) > 1 && $supOrder[1] == 'DESC') {
-                                        $order = '';
-                                        $img = '&uarr;';
-                                    }
                                 }
                             }
-                            $header = '<a href="' .  \Env::get('cx')->getRequest()->getUrl() . '&' . $sortParamName . '=' . $origHeader . $order . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
+                            $orderUrl = $this->viewGenerator->getSortUrl(
+                                array($origHeader => $order)
+                            );
+                            $header = '<a href="' . $orderUrl . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
                         }
-                        if ($this->hasMasterTableHeader) {
-                            $this->setCellContents(1, $col, $header, 'td', 0);
-                        } else {
-                            $this->setCellContents(0, $col, $header, 'th', 0);
-                        }
+                        $this->setCellContents($headerRowIdx, $col, $header, $headerRowCellType, 0);
                     }
                     if (
                         isset($options['fields']) &&
@@ -353,11 +418,7 @@ class BackendTable extends HTML_Table {
                         if (isset($_ARRAYLANG['TXT_FUNCTIONS'])) {
                             $header = $_ARRAYLANG['TXT_FUNCTIONS'];
                         }
-                        if ($this->hasMasterTableHeader) {
-                            $this->setCellContents(1, $col, $header, 'td', 0, true);
-                        } else {
-                            $this->setCellContents(0, $col, $header, 'th', 0, true);
-                        }
+                        $this->setCellContents($headerRowIdx, $col, $header, $headerRowCellType, 0, true);
                     }
 
                     $this->updateColAttributes($col, array('style' => 'text-align:right;'));
@@ -370,7 +431,7 @@ class BackendTable extends HTML_Table {
                 $row++;
             }
             // adjust colspan of master-table-header-row
-            $this->altRowAttributes(1 + $this->hasMasterTableHeader, array('class' => 'row1'), array('class' => 'row2'), true);
+            $this->altRowAttributes($headerRowIdx, array('class' => 'row1'), array('class' => 'row2'), true);
             if ($this->hasMasterTableHeader) {
                 // now that the number of displayed columns is known:
                 $headerColspan = $col;
@@ -379,6 +440,10 @@ class BackendTable extends HTML_Table {
                     isset($options['functions']) &&
                     isset($options['functions']['export']) &&
                     is_array($options['functions']['export'])
+                ) || (
+                    isset($options['functions']) &&
+                    isset($options['functions']['add']) &&
+                    $options['functions']['add']
                 );
                 // we need to add one if there's an additional functions row
                 $headerColspan += (int) $this->hasRowFunctions(
@@ -404,9 +469,6 @@ class BackendTable extends HTML_Table {
             if (isset($options['multiActions'])) {
                 $multiActionsCode = '
                     <img src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/arrow.gif" width="38" height="22" alt="^" title="^">
-                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', true);return false;">' . $_ARRAYLANG['TXT_SELECT_ALL'] . '</a> /
-                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', false);return false;">' . $_ARRAYLANG['TXT_DESELECT_ALL'] . '</a>
-                    <img alt="-" title="-" src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/strike.gif">
                 ';
                 $multiActions = array(''=>$_ARRAYLANG['TXT_SUBMIT_SELECT']);
                 foreach ($options['multiActions'] as $actionName=>$actionProperties) {
@@ -454,7 +516,7 @@ class BackendTable extends HTML_Table {
             }
             // adds custom attributes to row
             if (isset($options['rowAttributes'])) {
-                $row = 1 + $this->hasMasterTableHeader;
+                $row = $headerRowIdx;
                 $callback = $options['rowAttributes'];
                 foreach ($attrs as $rowname=>$rows) {
                     $originalAttributes = $this->getRowAttributes($row);
@@ -723,6 +785,7 @@ class BackendTable extends HTML_Table {
      * @return string HTML
      */
     protected function getOverallFunctionsCode($functions, $renderObject) {
+        $overallFunctionsCode = '';
         if (
             isset($functions['export']) &&
             is_array($functions['export']) &&
@@ -760,9 +823,33 @@ class BackendTable extends HTML_Table {
                 'export',
                 array('type' => $renderObject->getDataType())
             );
-            return (string) $exportFunc;
+            $overallFunctionsCode .= (string) $exportFunc;
         }
-        return '';
+        if (
+            isset($functions['vg_increment_number']) &&
+            isset($functions['add']) &&
+            $functions['add'] &&
+            $renderObject instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet
+        ) {
+            $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+                'Core',
+                false
+            );
+            $addFunc = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+            $addIcon = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+            $addIcon->setAttribute('src', '/core/Html/View/Media/Add.png');
+            $addFunc->addChild($addIcon);
+            $vgId = $functions['vg_increment_number'];
+            $addFunc->setAttributes(array(
+                'href' => (string) \Cx\Core\Html\Controller\ViewGenerator::getVgAddUrl(
+                    $vgId
+                ),
+                'title' => $_CORELANG['TXT_ADD'],
+            ));
+            $addFunc->addClass('vg-add');
+            $overallFunctionsCode .= (string) $addFunc;
+        }
+        return $overallFunctionsCode;
     }
 
     /**

@@ -78,7 +78,9 @@ class Sandbox {
                     }
                 );
                 try {
-                    $table = new \BackendTable($lister->getData());
+                    $table = new \BackendTable($lister->getData(
+                        \Cx\Core\Core\Controller\Cx::instanciate()->getRequest()->getParams()
+                    ));
                     $this->result = $table->toHtml().$lister;
                 } catch (\Exception $e) {
                     $this->result = 'Could not execute query (' . $e->getMessage() . ')!';
