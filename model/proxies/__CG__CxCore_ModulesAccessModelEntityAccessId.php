@@ -409,6 +409,17 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 

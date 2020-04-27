@@ -100,6 +100,7 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
      * @param array $options Options to set
      */
     protected function initializeOptions($options) {
+        // this prevents usages in preInit from using options
         if (!defined('ASCMS_DATE_FORMAT_DATETIME')) {
             $this->options = $options;
             return;
@@ -110,6 +111,7 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
             'dateFormatTimestamp' => ASCMS_DATE_FORMAT_DATETIME,
             'dateFormatDate' => ASCMS_DATE_FORMAT_DATE,
             'dateFormatTime' => ASCMS_DATE_FORMAT_TIME,
+            'suppressFallback' => false,
         );
         foreach ($defaults as $optionName=>$defaultValue) {
             if (!isset($options[$optionName])) {
@@ -218,10 +220,16 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
                 $identifiers = implode('/', $identifiers);
             }
             $key = $identifiers;
+
             foreach ($entityClassMetadata->getColumnNames() as $column) {
                 $field = $entityClassMetadata->getFieldName($column);
                 $value = $entityClassMetadata->getFieldValue($object, $field);
                 $fieldDefinition = $entityClassMetadata->getFieldMapping($field);
+
+                // automatic fallback
+                if (!$this->options['suppressFallback']) {
+                    $value = $object->getTranslatedFieldValue($field);
+                }
                 if ($value instanceof \DateTime) {
                     // Unknown types fall through!
                     if (isset($this->options['dateFormat' . ucfirst($fieldDefinition['type'])])) {
