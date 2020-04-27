@@ -467,6 +467,7 @@ class SystemComponentController extends Controller {
      * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
      * resolve() HOOK.
      *
+     * @todo This is currently only available in "frontend" mode.
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
      */
     public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {}
