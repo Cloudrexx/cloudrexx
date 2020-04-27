@@ -170,7 +170,8 @@ class ComponentController extends SystemComponentController
                     'element' => 'button.save',
                     'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_SAVE'],
                 )
-            )
+            ),
+            'TemplateEditor'
         );
     }
 }
