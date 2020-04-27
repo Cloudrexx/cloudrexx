@@ -107,6 +107,7 @@ cx.ready(function() {
 
     jQuery('table.sortable tbody').sortable({
         axis: "y",
+        handle: ".drag-drop-handle",
         items: "> tr.row1,> tr.row2 ",
         start: function (event, ui) {
             jQuery(ui.item).data('pIndex', ui.item.index());
@@ -232,6 +233,16 @@ cx.ready(function() {
                 }
             }
         );
+    });
+
+    // make multi action checkboxes behave as they should:
+    cx.jQuery(".multi-action-checkbox").change(function() {
+        var boxCount = cx.jQuery(".multi-action-checkbox").length;
+        var tickedBoxCount = cx.jQuery(".multi-action-checkbox:checked").length;
+        cx.jQuery(".multi-action-checkbox-all").prop("checked", boxCount == tickedBoxCount);
+    });
+    cx.jQuery(".multi-action-checkbox-all").change(function() {
+        cx.jQuery(".multi-action-checkbox").prop("checked", cx.jQuery(this).prop("checked"));
     });
 });
 
