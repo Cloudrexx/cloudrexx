@@ -2026,8 +2026,19 @@ class ViewGenerator {
             return;
         }
 
-        $actionUrl = clone $this->cx->getRequest()->getUrl();
+        $pos = $this->getVgParam($_GET['pos']);
+        $dataSize = $this->listingController->getDataSize() - 1;
+        if ($pos >= $dataSize) {
+            // self-healing: recalculate last page
+            $pageSize = \Cx\Core\Setting\Controller\Setting::getValue(
+                'corePagingLimit',
+                'Config'
+            );
+            $pos = (ceil($dataSize / $pageSize) - 1) * $pageSize;
+        }
+        $actionUrl = $this->getPagingUrl($pos);
         $actionUrl->setParam('deleteid', null);
+        $actionUrl->setParam('vg_increment_number', null);
         \Cx\Core\Csrf\Controller\Csrf::redirect($actionUrl);
     }
 
