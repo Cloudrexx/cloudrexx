@@ -465,7 +465,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2U).",
+     *     description="Set this to true if the user should be able to communicate with other users when using the component U2U messaging (U2U).",
      *     title="User to user active",
      *     default="false",
      * )
