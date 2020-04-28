@@ -567,11 +567,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     ASCMS_DATE_FORMAT_DATE,
                     strtotime($objOrder->getDateTime()->format('d.m.y'))
                 ),
-            'ORDER_TIME' =>
-                date(
-                    ASCMS_DATE_FORMAT_TIME,
-                    strtotime($objOrder->getDateTime()->format('d.m.y'))
-                ),
+            'ORDER_TIME' => $objOrder->getDateTime()->format(ASCMS_DATE_FORMAT_TIME),
             'ORDER_STATUS_ID' => $status,
             'ORDER_STATUS' => $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_'.$status],
             'MODIFIED' =>
