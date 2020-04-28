@@ -786,6 +786,9 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     }
                     $arrProduct['COUPON_DATA'][] = array(
                         'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
+                        'COUPON_VALUE' => $item->getDiscountCoupon()->getDiscountAmount(),
+                        'COUPON_START_DATE' => date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getStartTime()),
+                        'COUPON_END_DATE' => $validTo,
                     );
                 }
             }
