@@ -124,6 +124,11 @@ class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     protected $parentCategory;
 
     /**
+     * @{inheritdoc}
+     */
+    protected $stringRepresentationFields = array('name');
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -426,13 +431,15 @@ class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     }
 
     /**
-     * Get Name
-     *
-     * @return string
+     * @{inheritdoc}
      */
-    public function __toString()
-    {
-        return $this->getName();
+    protected function getStringRepresentationFormat() {
+        $pad = '';
+        $current = $this;
+        while ($current = $current->getParentCategory()) {
+            $pad .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+        }
+        return $pad . '%s';
     }
 
     /**
