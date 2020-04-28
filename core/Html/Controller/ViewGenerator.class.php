@@ -868,7 +868,10 @@ class ViewGenerator {
         //If 'sorting' is applied and sorting field is not equal to
         //'sortBy' => 'field' then disable the row sorting.
         $orderParam = $this->getVgParam($_GET['order']);
-        if (!isset($orderParam[$sortField])) {
+        if (empty($orderParam)) {
+            $orderParam = $this->options['functions']['order'];
+        }
+        if (count($orderParam) != 1 || current(array_keys($orderParam)) != $sortField) {
             return;
         }
 
