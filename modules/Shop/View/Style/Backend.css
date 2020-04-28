@@ -509,12 +509,6 @@ table.adminlist td.discountgroup-name {
 #group-0-uri .controls .tooltip-trigger {
     display: inline-block;
 }
-
-table.adminlist.sortable[data-entity="Product"] tr.row3 td:first-child,
-table.adminlist.sortable[data-entity="Product"] tr.row2 td:first-child,
-table.adminlist.sortable[data-entity="Product"] tr.row1 td:first-child {
-    padding-left: 40px;
-}
 /** MediaBrowser Fix **/
 #content input {
     height: auto;
