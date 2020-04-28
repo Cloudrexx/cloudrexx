@@ -71,6 +71,9 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
         $options['functions']['sortBy'] = array(
             'field' => array('ord' => SORT_ASC)
         );
+        $options['functions']['order'] = array(
+            'ord' => SORT_ASC,
+        );
 
         $options['functions']['status'] = array(
             'field' => 'active'
