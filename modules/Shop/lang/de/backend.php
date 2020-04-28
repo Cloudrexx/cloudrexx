@@ -171,6 +171,9 @@ $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
 
 $_ARRAYLANG['fee']  = 'Gebühr';
+$_ARRAYLANG['type']  = 'Gebührenart';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_FIX'] = 'CHF';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_PERCENT'] = 'Prozent';
 $_ARRAYLANG['freeFrom']  = 'Gebührenfrei ab';
 $_ARRAYLANG['paymentProcessor']  = 'Dienst';
 $_ARRAYLANG['zones']  = 'Zone';

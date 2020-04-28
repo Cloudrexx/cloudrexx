@@ -80,6 +80,7 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             'overview' => array(
                 'name',
                 'fee',
+                'type',
                 'freeFrom',
                 'paymentProcessor',
                 'zones',
@@ -88,6 +89,7 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             'form' => array(
                 'name',
                 'fee',
+                'type',
                 'freeFrom',
                 'paymentProcessor',
                 'zones',
@@ -121,6 +123,13 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             ),
             'fee' => array(
                 'editable' => true,
+            ),
+            'type' => array(
+                'editable' => true,
+                'validValues' => array(
+                    'fix' => $_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_FIX'],
+                    'percent' => $_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_PERCENT'],
+                ),
             ),
             'freeFrom' => array(
                 'editable' => true,

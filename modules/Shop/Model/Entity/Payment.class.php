@@ -74,6 +74,11 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     protected $freeFrom = '0.00';
 
     /**
+     * @var string
+     */
+    protected $type = 'fix';
+
+    /**
      * @var integer
      */
     protected $ord;
@@ -200,6 +205,26 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     public function getFreeFrom()
     {
         return $this->freeFrom;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string 
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**

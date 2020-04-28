@@ -83,6 +83,9 @@ $_ARRAYLANG['unit'] = 'Unit';
 $_ARRAYLANG['discountgroupCountRates'] = 'Minimum quantity';
 
 $_ARRAYLANG['fee']  = 'Fee';
+$_ARRAYLANG['type']  = 'Fee type';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_FIX'] = 'CHF';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_PERCENT'] = 'Percent';
 $_ARRAYLANG['freeFrom']  = 'Free of charge from';
 $_ARRAYLANG['paymentProcessor']  = 'Payment provider';
 $_ARRAYLANG['zones']  = 'Zone';
