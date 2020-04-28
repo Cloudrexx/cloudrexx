@@ -88,6 +88,8 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
      */
     public function getViewGeneratorOptions($options)
     {
+        global $_ARRAYLANG;
+
         $options['functions']['sortBy'] = array(
             'field' => array('ord' => SORT_ASC)
         );
@@ -97,6 +99,7 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
         $options['functions']['status'] = array(
             'field' => 'active'
         );
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_CURRENCY'];
         $options['order']['overview'] = array(
             'id',
             'code',

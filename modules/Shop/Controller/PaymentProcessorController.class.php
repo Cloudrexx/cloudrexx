@@ -79,6 +79,8 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
             'field' => 'status'
         );
 
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENTPROCESSOR'];
+
         $options['fields'] = array(
             'id' => array(
                 'showOverview' => false,

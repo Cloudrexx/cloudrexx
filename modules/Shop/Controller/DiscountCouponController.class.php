@@ -88,6 +88,8 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'payment',
         );
 
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'];
+
         $defaultCurrency = $this->cx->getDb()->getEntityManager()->getRepository(
             '\Cx\Modules\Shop\Model\Entity\Currency'
         )->getDefaultCurrency();
