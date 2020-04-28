@@ -1762,7 +1762,7 @@ if ($test === NULL) {
      */
     function delete_categories($category_id=0)
     {
-        global $_ARRAYLANG;
+        global $objDatabase, $_ARRAYLANG;
 
         $arrCategoryId = array();
         $deleted = false;
@@ -1786,6 +1786,8 @@ if ($test === NULL) {
         // so subcategories are removed first
         $arrCategoryId = array_reverse($arrCategoryId);
 //DBG::log("delete_categories($category_id): Got ".var_export($arrCategoryId, true));
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
         foreach ($arrCategoryId as $category_id) {
             // Check whether this category has subcategories
             $arrChildId =
@@ -1797,6 +1799,36 @@ if ($test === NULL) {
                     "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
                 continue;
             }
+            // Get Products in this category
+            $qb = $em->createQueryBuilder();
+            $qb->select('p.id');
+            $qb->from('Cx\Modules\Shop\Model\Entity\Product', 'p');
+            $qb->join('p.categories', 'c');
+            $qb->where($qb->expr()->eq('c.id', ':catId'));
+            $qb->setParameter('catId', $category_id);
+            $productIds = $qb->getQuery()->getScalarResult();
+            // Delete the products in the category
+            foreach ($productIds as &$productId) {
+                $productId = $productId['id'];
+                // delete products of category in case the user requested
+                // to do so
+                if ($deleteProducts) {
+                    // Check whether there are orders with this Product ID
+                    $query = '
+                        SELECT 1
+                          FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_order_items
+                         WHERE product_id=' . contrexx_raw2db($productId);
+                    $objResult = $objDatabase->Execute($query);
+                    if (!$objResult || $objResult->RecordCount()) {
+                        \Message::error(
+                            $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
+                            "&nbsp;(".
+                            sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
+                                $category_id).")");
+                        continue 2;
+                    }
+                }
+            }
             // Delete the Category now
             $result = ShopCategories::deleteById($category_id);
             if ($result === null) {
@@ -1806,6 +1838,18 @@ if ($test === NULL) {
                 return self::error_database();
             }
             $deleted = true;
+            if ($deleteProducts && count($productIds)) {
+                $qb = $em->createQueryBuilder();
+                $qb->delete('Cx\Modules\Shop\Model\Entity\Product', 'p');
+                $qb->where($qb->expr()->in('p.id', ':productIds'));
+                $qb->setParameter('productIds', $productIds);
+                $result = $qb->getQuery()->getResult();
+                if (!$result) {
+                    \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
+                        "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
+                    continue;
+                }
+            }
         }
         if (!$deleted) {
             return null;

@@ -460,9 +460,13 @@ class ShopCategories
      */
     static function deleteById($id, $flagDeleteImages=false)
     {
-        $objCategory = ShopCategory::getById($id);
-        if ($objCategory === null) return null;
-        return $objCategory->delete($flagDeleteImages);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $catRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Category');
+        $category = $catRepo->find($id);
+        $em->remove($category);
+        $em->flush();
+        return true;
     }
 
 
