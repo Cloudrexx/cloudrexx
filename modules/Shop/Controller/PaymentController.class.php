@@ -138,9 +138,20 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
                 'editable' => true,
             ),
             'zones' => array(
-                'editable' => true,
-                'showDetail' => false,
-                'showOverview' => false,
+                'table' => array(
+                    'parse' => array(
+                        'adapter' => 'Payment',
+                        'method' => 'getZoneDropdown',
+                    ),
+                ),
+                'formfield' => array(
+                    'adapter' => 'Payment',
+                    'method' => 'getZoneDropdown',
+                ),
+                'storecallback' => array(
+                    'adapter' => 'Payment',
+                    'method' => 'storeZone',
+                ),
             ),
         );
 
