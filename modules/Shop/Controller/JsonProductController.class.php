@@ -740,7 +740,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
             )->findAll();
 
         foreach ($categories as $category) {
-            $validValues[$category->getId()] = $category->getName();
+            $validValues[$category->getId()] = (string) $category;
         }
 
         $categoryFilter = new \Cx\Core\Html\Model\Entity\DataElement(
