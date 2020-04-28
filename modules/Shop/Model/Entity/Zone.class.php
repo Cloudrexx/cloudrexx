@@ -82,6 +82,16 @@ class Zone extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Tran
     protected $shippers;
 
     /**
+     * @{inheritdoc}
+     */
+    protected $stringRepresentationFields = array('name');
+
+    /**
+     * @{inheritdoc}
+     */
+    protected $stringRepresentationFormat = '%s';
+
+    /**
      * Constructor
      */
     public function __construct()
