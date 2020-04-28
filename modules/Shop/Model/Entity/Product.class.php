@@ -83,7 +83,7 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var boolean
      */
-    protected $stockVisible = true;
+    protected $stockVisible = false;
 
     /**
      * @var string
@@ -93,7 +93,7 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var boolean
      */
-    protected $discountActive;
+    protected $discountActive = false;
 
     /**
      * @var boolean

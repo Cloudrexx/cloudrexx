@@ -54,7 +54,7 @@ Cx\Modules\Shop\Model\Entity\Product:
       type: boolean
       options:
         unsigned: true
-        default: 1
+        default: 0
       column: stock_visible
     discountprice:
       type: decimal
