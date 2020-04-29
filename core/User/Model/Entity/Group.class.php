@@ -56,42 +56,45 @@ class Group extends \Cx\Model\Base\EntityBase {
     const TYPE_BACKEND = 'backend';
 
     /**
-     * @var integer $id
+     * @var integer Id of the group
      */
     protected $id;
 
     /**
-     * @var string $name
+     * @var string Name of the group
      */
     protected $name = '';
 
     /**
-     * @var string $description
+     * @var string A description for the use of the group
      */
     protected $description = '';
 
     /**
-     * @var boolean $active
+     * @var boolean If group is active
      */
     protected $active = 1;
 
     /**
-     * @var string $type
+     * @var string Defines where the group can act
+     *     possibilities: frontend, backend
      */
     protected $type = self::TYPE_FRONTEND;
 
     /**
-     * @var string $homepage
+     * @var string The page on which the users of this group should land after
+     *     the user has logged in
      */
     protected $homepage = '';
 
     /**
-     * @var integer $toolbar
+     * @var integer Toolbar Profile ID which contains the permissions of the
+     *     WYSIWYG editor
      */
     protected $toolbar = 0;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $users
+     * @var \Doctrine\Common\Collections\Collection assigned users
      */
     protected $users;
 
@@ -106,7 +109,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupId
      *
-     * @return integer $id
+     * @return integer Id of the group
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getId()
      */
@@ -118,7 +121,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer $id group id
+     * @return integer Id of the group
      */
     public function getId()
     {
@@ -150,7 +153,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupName
      *
-     * @return string $name
+     * @return string Name of the group
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getName()
      */
@@ -162,7 +165,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string $name group name
+     * @return string Name of the group
      */
     public function getName()
     {
@@ -194,7 +197,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupDescription
      *
-     * @return string $description
+     * @return string Description of the group
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getDescription()
      */
@@ -206,7 +209,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get description
      *
-     * @return string $description group description
+     * @return string Description of the group
      */
     public function getDescription()
     {
@@ -284,7 +287,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return string $type
+     * @return string where the group can act
      */
     public function getType()
     {
@@ -304,7 +307,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get homepage
      *
-     * @return string $homepage
+     * @return string node of the content page where the user is redirected to
      */
     public function getHomepage()
     {
@@ -324,7 +327,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get toolbar
      *
-     * @return integer $toolbar
+     * @return integer get toolbar profile id
      */
     public function getToolbar()
     {
@@ -354,7 +357,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection $user
+     * @return \Doctrine\Common\Collections\Collection assigned users
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getUsers()
      */
@@ -366,7 +369,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection $users
+     * @return \Doctrine\Common\Collections\Collection assigned users
      */
     public function getUsers()
     {

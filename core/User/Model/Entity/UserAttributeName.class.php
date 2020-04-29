@@ -45,34 +45,34 @@ namespace Cx\Core\User\Model\Entity;
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $id
+     * @var integer ID of the user attribute name
      */
     protected $id;
 
     /**
-     * @var integer $langId
+     * @var integer ID of the assigned locale
      */
     protected $langId = 0;
 
     /**
-     * @var integer $order
+     * @var integer order
      */
     protected $order = 0;
 
     /**
-     * @var string $name
+     * @var string name of the user attribute
      */
     protected $name = '';
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
+     * @var \Cx\Core\User\Model\Entity\UserAttribute related user attribute
      */
     protected $userAttribute;
 
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer id of the user attribute name
      */
     public function getId()
     {
@@ -92,7 +92,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get langId
      *
-     * @return integer $langId
+     * @return integer lang id
      */
     public function getLangId()
     {
@@ -112,7 +112,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string $name
+     * @return string name of the user attribute
      */
     public function getName()
     {
@@ -132,7 +132,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get order
      *
-     * @return string $order
+     * @return string order
      */
     public function getOrder()
     {
@@ -152,7 +152,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttribute
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
+     * @return \Cx\Core\User\Model\Entity\UserAttribute related user attribute
      */
     public function getUserAttribute()
     {

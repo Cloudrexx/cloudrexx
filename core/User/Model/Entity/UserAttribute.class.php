@@ -36,7 +36,7 @@
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Attributes that contain informations about the users.
+ * Attributes that contain information about the users.
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
@@ -136,72 +136,87 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     const ACCESS_SPECIAL_MENU_HIGHER = 'menu_select_higher';
 
     /**
-     * @var integer $id
+     * @var integer ID of the user attribute
      */
     protected $id;
 
     /**
-     * @var string $type
+     * @var string The type of the attribute
+     *     possibilities: text, textarea, mail, uri, date, image, checkbox,
+     *         menu, menu_option, group, frame, history
      */
     protected $type = self::TYPE_TEXT;
 
     /**
-     * @var boolean $mandatory
+     * @var boolean If the attribute is mandatory
      */
     protected $mandatory = false;
 
     /**
-     * @var string $sortType
+     * @var string How the child attributes should be sorted
+     *     possibilities: asc, desc, custom
      */
     protected $sortType = self::SORT_TYPE_ASC;
 
     /**
-     * @var integer $orderId
+     * @var integer the order the attributes get listed
      */
     protected $orderId = 0;
 
     /**
-     * @var string $accessSpecial
+     * @var string Set a special privilege for users that do not have editing
+     *     rights from assigned group
+     *     possibilities: menu_select_higher, menu_select_lower
      */
     protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
     /**
-     * @var integer $accessId
+     * @var integer Permissions are handled using access IDs. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $accessId;
 
     /**
-     * @var integer $readAccessId
+     * @var integer Unique identifier for reading access. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $readAccessId;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @var \Cx\Core\User\Model\Entity\UserAttribute The associated parent
+     *     attribute
      */
     protected $parent;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $userAttributeNames
+     * @var \Doctrine\Common\Collections\Collection Collection of names
+     *     associated to this user attribute
      */
     protected $userAttributeNames;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $userAttributeValues
+     * @var \Doctrine\Common\Collections\Collection Collection of values
+     *     associated to this user attribute
      */
     protected $userAttributeValues;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $children
+     * @var \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     protected $children;
 
     /**
-     * @var boolean $default
+     * @var boolean If attribute is a default system attribute
      */
     protected $default;
 
     /**
-     * @var array[] $arrTypes
+     * @var array[] Default configuration of the default attributes
      */
     protected $arrTypes = array(
         'text' => array(
@@ -340,7 +355,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer ID of the user attribute
      */
     public function getId()
     {
@@ -360,7 +375,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return string $type
+     * @return string The type of the attribute
      */
     public function getType()
     {
@@ -380,7 +395,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return boolean $mandatory
+     * @return boolean If the attribute is mandatory
      */
     public function getMandatory()
     {
@@ -420,7 +435,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer $orderId
+     * @return integer order ID
      */
     public function getOrderId()
     {
@@ -440,7 +455,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return string $accessSpecial
+     * @return string special access privilege
      */
     public function getAccessSpecial()
     {
@@ -460,7 +475,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessId
      *
-     * @return integer $accessId
+     * @return integer accessIDs to manage permissions
      */
     public function getAccessId()
     {
@@ -480,7 +495,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get readAccessId
      *
-     * @return integer $readAccessId
+     * @return integer unique identifier for reading access
      */
     public function getReadAccessId()
     {
@@ -502,7 +517,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean $default
+     * @return boolean if attribute is a default system attribute
      */
     public function getDefault()
     {
@@ -515,7 +530,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean $default
+     * @return boolean if attribute is a default system attribute
      */
     public function isDefault()
     {
@@ -545,7 +560,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection $child
+     * @return \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     public function getChildren()
     {
@@ -575,7 +591,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeName
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeNames
+     * @return \Doctrine\Common\Collections\Collection Collection of names
+     *     associated to this user attribute
      */
     public function getUserAttributeNames()
     {
@@ -605,7 +622,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValues
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeValues
+     * @return \Doctrine\Common\Collections\Collection Collection of values
+     *     associated to this user attribute
      */
     public function getUserAttributeValues()
     {
@@ -625,7 +643,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @return \Cx\Core\User\Model\Entity\UserAttribute the associated parent
+     *     attribute
      */
     public function getParent()
     {
