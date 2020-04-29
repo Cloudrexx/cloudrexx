@@ -165,6 +165,7 @@ Cx\Core\User\Model\Entity\User:
     userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: user
+      cascade: ['remove', 'persist']
   lifecycleCallbacks:
     prePersist: [ validate ]
     preUpdate: [ validate ]

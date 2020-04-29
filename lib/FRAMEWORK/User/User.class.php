@@ -614,11 +614,6 @@ class User extends User_Profile
                     return false;
                 }
 
-                // Remove all groups from user
-                foreach ($user->getGroups() as $group) {
-                    $user->removeGroup($group);
-                }
-
                 $objDatabase->startTrans();
                 if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_network` WHERE `user_id` = ' . $this->id) !== false) {
                     $objDatabase->completeTrans();
@@ -628,10 +623,6 @@ class User extends User_Profile
                 }
 
                 try {
-                    // Remove all user attribute values
-                    foreach ($user->getUserAttributeValues() as $value) {
-                        $em->remove($value);
-                    }
                     $em->remove($user);
                     $em->flush();
 
@@ -1695,10 +1686,6 @@ class User extends User_Profile
         $userIds = array();
         foreach ($users as $user) {
             $userIds[] = $user->getId();
-            // Remove all user attribute values
-            foreach ($user->getUserAttributeValues() as $value) {
-                $em->remove($value);
-            }
             $em->remove($user);
         }
 
