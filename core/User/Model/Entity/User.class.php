@@ -281,8 +281,8 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $expiration = 0;
 
     /**
-     * @var integer How long the account is available. For example unlimited (0)
-     *     or only one day.
+     * @var integer How long the account is available in days. For example
+     *     unlimited (0) or fifteen days (15) only .
      */
     protected $validity = 0;
 
