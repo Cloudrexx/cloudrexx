@@ -213,7 +213,12 @@ class DoctrineRepository extends DataSource {
                 $qb->setFirstResult($offset);
             }
         }
-        $result = $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+        $query->setHint(
+            \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+        );
+        $result = $query->getResult();
 
         // $fieldList
         $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
