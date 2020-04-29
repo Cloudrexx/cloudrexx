@@ -320,7 +320,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $classIdentifier = end($classNameParts);
 
         $sortBy = array('field' => ['order' => SORT_ASC]);
-        $order  = array();
+        $order  = array('order' => SORT_ASC);
         \Cx\Core\Setting\Controller\Setting::init('Wysiwyg', 'config', 'Yaml');
         if (\Cx\Core\Setting\Controller\Setting::getValue('sortBehaviour') === 'alphabetical') {
             $sortBy = array();
