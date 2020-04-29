@@ -1408,7 +1408,9 @@ class User extends User_Profile
 
 
         if (!empty($this->password)) {
-            $user->setPassword($this->password);
+            $user->setPassword(
+                new \Cx\Core\Model\Model\Entity\Password($this->password)
+            );
         }
 
         if (!empty($this->auth_token)) {
@@ -2141,20 +2143,8 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $user = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\User'
-            )->find($this->id);
-            $this->password = $password;
-
-            if (!$user) {
-                return false;
-            }
-
-            if (!empty($password)) {
-                $user->setPassword($password);
-            }
-            $this->updateLoadedUserData('password', $user->getPassword());
+            $this->password = \Cx\Core\Model\Model\Entity\Password::createFromPlaintext($password);;
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
