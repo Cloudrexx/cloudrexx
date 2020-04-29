@@ -2158,13 +2158,15 @@ class User extends User_Profile
             $user = $cx->getDb()->getEntityManager()->getRepository(
                 'Cx\Core\User\Model\Entity\User'
             )->find($this->id);
+            $this->password = $password;
 
             if (!$user) {
                 return false;
             }
 
-            $user->setPassword($password);
-            $this->password = $password;
+            if (!empty($password)) {
+                $user->setPassword($password);
+            }
             $this->updateLoadedUserData('password', $user->getPassword());
             return true;
         }
