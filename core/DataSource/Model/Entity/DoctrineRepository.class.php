@@ -199,9 +199,34 @@ class DoctrineRepository extends DataSource {
 
         // $filter
         $i = 1;
+        $classMetadata = $em->getClassMetadata($this->getIdentifier());
+        $associationMappings = $classMetadata->getAssociationMappings();
         foreach ($criteria as $field=>$filterExpr) {
             foreach ($filterExpr as $operation=>$value) {
-                $qb->andWhere($qb->expr()->$operation('x.' . $field, '?' . $i));
+                $table = 'x.';
+
+                // This allows filters on ManyToMany on the first level
+                // TODO: Expand to make it work on all levels
+                if (
+                    $associationMappings[$field]['type'] == \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY &&
+                    isset($mappingTable['x.' . $field . '.'])
+                ) {
+                    $table = $mappingTable['x.' . $field . '.'];
+                    $targetEntity = $associationMappings[$field]['targetEntity'];
+                    $distantClassMetadata = $em->getClassMetadata($targetEntity);
+                    if ($associationMappings[$field]['isOwningSide']) {
+                        $field = current($associationMappings[$field]['relationToTargetKeyColumns']);
+                    } else {
+                        $field = current(
+                            $distantClassMetadata->getAssociationMappings()[
+                                $associationMappings[$field]['mappedBy']
+                            ]['relationToSourceKeyColumns']
+                        );
+                    }
+                    $field = $distantClassMetadata->fieldNames[$field];
+                }
+
+                $qb->andWhere($qb->expr()->$operation($table . $field, '?' . $i));
                 $qb->setParameter($i, $value);
                 $i++;
             }
