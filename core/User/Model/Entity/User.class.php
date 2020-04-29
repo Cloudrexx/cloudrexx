@@ -337,7 +337,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $verified = true;
 
     /**
-     * @var integer primary group of the user
+     * @var integer Primary group of the user
      */
     protected $primaryGroup = 0;
 
@@ -452,7 +452,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get username
      *
-     * @return string username of the user
+     * @return string Username of the user
      */
     public function getUsername()
     {
@@ -472,7 +472,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get password
      *
-     * @return string password of the users
+     * @return string Password of the users
      */
     public function getPassword()
     {
@@ -492,7 +492,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authToken
      *
-     * @return string auth token of the user
+     * @return string Auth token of the user
      */
     public function getAuthToken()
     {
@@ -512,7 +512,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authTokenTimeout
      *
-     * @return integer timeout of the auth token
+     * @return integer Timeout of the auth token
      */
     public function getAuthTokenTimeout()
     {
@@ -786,7 +786,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get primaryGroup
      *
-     * @return integer primary group of the user
+     * @return integer Primary group of the user
      */
     public function getPrimaryGroup()
     {

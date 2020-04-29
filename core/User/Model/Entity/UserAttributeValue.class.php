@@ -51,17 +51,17 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     protected $history = 0;
 
     /**
-     * @var string the value of the related Attribute for the related User
+     * @var string The value of the related Attribute for the related User
      */
     protected $value;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\User related user
+     * @var \Cx\Core\User\Model\Entity\User Related user
      */
     protected $user;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute related user attribute
+     * @var \Cx\Core\User\Model\Entity\UserAttribute Related user attribute
      */
     protected $userAttribute;
 
@@ -78,7 +78,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get history
      *
-     * @return integer history number
+     * @return integer History number
      */
     public function getHistory()
     {
@@ -98,7 +98,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get value
      *
-     * @return string the value of the related Attribute for the related User
+     * @return string The value of the related Attribute for the related User
      */
     public function getValue()
     {
@@ -118,7 +118,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Cx\Core\User\Model\Entity\User related user
+     * @return \Cx\Core\User\Model\Entity\User Related user
      */
     public function getUser()
     {
@@ -138,7 +138,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttribute
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute related user attribute
+     * @return \Cx\Core\User\Model\Entity\UserAttribute Related user attribute
      */
     public function getUserAttribute()
     {

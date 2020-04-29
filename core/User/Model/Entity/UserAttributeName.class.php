@@ -72,7 +72,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer id of the user attribute name
+     * @return integer Id of the user attribute name
      */
     public function getId()
     {
@@ -92,7 +92,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get langId
      *
-     * @return integer lang id
+     * @return integer Lang id
      */
     public function getLangId()
     {
@@ -112,7 +112,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string name of the user attribute
+     * @return string Name of the user attribute
      */
     public function getName()
     {
@@ -132,7 +132,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get order
      *
-     * @return string order
+     * @return string Order
      */
     public function getOrder()
     {
@@ -152,7 +152,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttribute
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute related user attribute
+     * @return \Cx\Core\User\Model\Entity\UserAttribute Related user attribute
      */
     public function getUserAttribute()
     {

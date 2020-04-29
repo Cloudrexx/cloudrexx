@@ -159,7 +159,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $sortType = self::SORT_TYPE_ASC;
 
     /**
-     * @var integer the order the attributes get listed
+     * @var integer The order the attributes get listed
      */
     protected $orderId = 0;
 
@@ -415,7 +415,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return string $sortType
+     * @return string How the child attributes should be sorted
      */
     public function getSortType()
     {
@@ -435,7 +435,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer order ID
+     * @return integer Order ID
      */
     public function getOrderId()
     {
@@ -455,7 +455,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return string special access privilege
+     * @return string Special access privilege
      */
     public function getAccessSpecial()
     {
@@ -475,7 +475,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessId
      *
-     * @return integer accessIDs to manage permissions
+     * @return integer AccessIDs to manage permissions
      */
     public function getAccessId()
     {
@@ -495,7 +495,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get readAccessId
      *
-     * @return integer unique identifier for reading access
+     * @return integer Unique identifier for reading access
      */
     public function getReadAccessId()
     {
@@ -643,7 +643,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute the associated parent
+     * @return \Cx\Core\User\Model\Entity\UserAttribute The associated parent
      *     attribute
      */
     public function getParent()

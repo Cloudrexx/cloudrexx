@@ -94,7 +94,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $toolbar = 0;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection assigned users
+     * @var \Doctrine\Common\Collections\Collection Assigned users
      */
     protected $users;
 
@@ -241,7 +241,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get isActive
      *
-     * @return boolean $active
+     * @return boolean Whether group is active
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
@@ -287,7 +287,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return string where the group can act
+     * @return string Where the group can act
      */
     public function getType()
     {
@@ -307,7 +307,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get homepage
      *
-     * @return string node of the content page where the user is redirected to
+     * @return string Node of the content page where the user is redirected to
      */
     public function getHomepage()
     {
@@ -327,7 +327,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get toolbar
      *
-     * @return integer get toolbar profile id
+     * @return integer Get toolbar profile id
      */
     public function getToolbar()
     {
@@ -357,7 +357,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection assigned users
+     * @return \Doctrine\Common\Collections\Collection Assigned users
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getUsers()
      */
@@ -369,7 +369,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection assigned users
+     * @return \Doctrine\Common\Collections\Collection Assigned users
      */
     public function getUsers()
     {
