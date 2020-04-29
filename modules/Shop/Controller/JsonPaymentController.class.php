@@ -120,17 +120,24 @@ class JsonPaymentController
         } else if (isset($params['id'])) {
             $paymentId = $params['id'];
             $inputName = 'zones';
+
+        // new
         } else {
-            throw new \Exception('Could not extract Payment ID from params');
+            $paymentId = null;
+            $inputName = 'zones';
         }
 
         $em = $this->cx->getDb()->getEntityManager();
         $zoneRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Zone');
         $paymentRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Payment');
 
-        $payment = $paymentRepo->find($paymentId);
-        $selectedZone = $payment->getZones()->first();
-        $selectedZoneId = $selectedZone->getId();
+        if ($paymentId) {
+            $payment = $paymentRepo->find($paymentId);
+            $selectedZone = $payment->getZones()->first();
+            $selectedZoneId = $selectedZone->getId();
+        } else {
+            $selectedZoneId = 0;
+        }
 
         $zones = array();
         foreach ($zoneRepo->findAll() as $zone) {
