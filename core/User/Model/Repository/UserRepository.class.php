@@ -208,7 +208,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string                     $operation operation to use
      * @return \Doctrine\ORM\Query\Expr\Comparison
      */
-    protected function addExpression(&$qb, $field, $value, $operation = 'eq')
+    protected function addExpression($qb, $field, $value, $operation = 'eq')
     {
         $valueName = preg_replace('/\./', '', 'value' . $field);
         $supportedOperations = array('eq', 'like', 'in');
