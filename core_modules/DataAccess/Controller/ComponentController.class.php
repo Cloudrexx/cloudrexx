@@ -896,7 +896,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (!empty($arguments[2])) {
+            if (isset($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
                 $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {

@@ -59,7 +59,11 @@ class DoctrineRepository extends DataSource {
      */
     public function listFields() {
         $em = $this->cx->getDb()->getEntityManager();
-        return $em->getClassMetadata($this->getIdentifier())->getFieldNames();
+        $classMetadata = $em->getClassMetadata($this->getIdentifier());
+        return array_merge(
+            array_keys($classMetadata->getAssociationMappings()),
+            $classMetadata->getFieldNames()
+        );
     }
 
     /**
