@@ -1186,7 +1186,8 @@ body #content input[type=reset],
 body #navigation_wrapper input[type=reset],
 body #content input[type=submit],
 body #navigation_wrapper input[type=submit],
-body #content a.button {
+body #content a.button,
+body a.introjs-button {
     background: #dadada url(../Media/button_bg.png) repeat-x scroll left top;
     border: 1px solid #BBBBBB;
     color: #444444;
@@ -1204,6 +1205,20 @@ body #content a.button {
 *+html body #navigation_wrapper input[type=submit] {/* For IE7 */
     overflow: visible;
     filter: chroma(color=#000000);
+}
+
+body #content input[type=button][disabled=disabled],
+body #content button[disabled=disabled]:not(.ace_searchbtn),
+body #navigation_wrapper input[type=button][disabled=disabled],
+body #content input[type=reset][disabled=disabled],
+body #navigation_wrapper input[type=reset][disabled=disabled],
+body #content input[type=submit][disabled=disabled],
+body #navigation_wrapper input[type=submit][disabled=disabled],
+body #content a.button.disabled,
+body a.introjs-button.introjs-disabled {
+    color: #9a9a9a !important;
+    border-color: #d4d4d4 !important;
+    cursor: default;
 }
 
 #content #access select,
