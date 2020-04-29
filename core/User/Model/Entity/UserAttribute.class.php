@@ -148,7 +148,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $type = self::TYPE_TEXT;
 
     /**
-     * @var boolean If the attribute is mandatory
+     * @var boolean Whether the attribute is mandatory
      */
     protected $mandatory = false;
 
@@ -211,7 +211,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $children;
 
     /**
-     * @var boolean If attribute is a default system attribute
+     * @var boolean Whether the attribute is a default system attribute
      */
     protected $default;
 
@@ -395,7 +395,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return boolean If the attribute is mandatory
+     * @return boolean Whether the attribute is mandatory
      */
     public function getMandatory()
     {
@@ -517,7 +517,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean if attribute is a default system attribute
+     * @return boolean Whether attribute is a default system attribute
      */
     public function getDefault()
     {
@@ -530,7 +530,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean if attribute is a default system attribute
+     * @return boolean Whether attribute is a default system attribute
      */
     public function isDefault()
     {

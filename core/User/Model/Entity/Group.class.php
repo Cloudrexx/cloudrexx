@@ -71,7 +71,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $description = '';
 
     /**
-     * @var boolean If group is active
+     * @var boolean Whether group is active
      */
     protected $active = 1;
 
@@ -229,7 +229,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set if group is active
+     * Set whether group is active
      *
      * @param boolean $active
      */
@@ -251,11 +251,11 @@ class Group extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * If group is active
+     * Whether group is active
      *
      * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
-     * @return boolean $active if group is active
+     * @return boolean $active Whether group is active
      */
     public function getActive()
     {
@@ -263,11 +263,11 @@ class Group extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * If group is active.
+     * Whether group is active.
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return boolean $active if group is active
+     * @return boolean $active Whether group is active
      */
     public function isActive()
     {

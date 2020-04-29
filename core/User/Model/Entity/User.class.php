@@ -242,7 +242,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $id;
 
     /**
-     * @var boolean If a user has superuser rights. A superuser has permission
+     * @var boolean Whether a user has superuser rights. A superuser has permission
      *     to read and write in all components as well as changing settings in
      *     the administration
      */
@@ -327,12 +327,12 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $backendLangId = 0;
 
     /**
-     * @var boolean If the user account is active
+     * @var boolean Whether the user account is active
      */
     protected $active = false;
 
     /**
-     * @var boolean If the user is verified
+     * @var boolean Whether the user is verified
      */
     protected $verified = true;
 
@@ -358,8 +358,8 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $restoreKeyTime = 0;
 
     /**
-     * @var boolean If user is able to communicate with other users when using
-     *     the module U2U
+     * @var boolean Whether user is able to communicate with other users when
+     *     using the module U2U
      */
     protected $u2uActive = false;
 
@@ -420,7 +420,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isSuperUser, but this method is necessary for doctrine mapping
      *
-     * @return boolean If user has superuser rights
+     * @return boolean Whether user has superuser rights
      */
     public function getSuperUser()
     {
@@ -432,7 +432,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getSuperUser, but this method name is more intuitive
      *
-     * @return boolean If user has superuser rights
+     * @return boolean Whether user has superuser rights
      */
     public function isSuperUser()
     {
@@ -612,7 +612,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastAuthStatus
      *
-     * @return integer If the user has successfully logged in
+     * @return integer Whether the user has successfully logged in
      */
     public function getLastAuthStatus()
     {
@@ -734,7 +734,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method is necessary for doctrine mapping
      *
-     * @return boolean If the user account is active
+     * @return boolean Whether the user account is active
      */
     public function getActive()
     {
@@ -746,7 +746,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer If the user account is active
+     * @return integer Whether the user account is active
      */
     public function isActive()
     {
@@ -766,7 +766,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get verified
      *
-     * @return boolean If the user is verified
+     * @return boolean Whether the user is verified
      */
     public function getVerified()
     {
@@ -868,8 +868,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get u2uActive
      *
-     * @return boolean If user is able to communicate with other users when using
-     *     the module U2U
+     * @return boolean Whether user is able to communicate with other users when
+     *     using the module U2U
      */
     public function getU2uActive()
     {
@@ -967,7 +967,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Check if the user is backend group
      *
-     * @return boolean is user of a backend group
+     * @return boolean Whether user of a backend group
      */
     public function isBackendGroupUser()
     {
