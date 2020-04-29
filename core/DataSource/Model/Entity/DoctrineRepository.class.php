@@ -463,7 +463,10 @@ class DoctrineRepository extends DataSource {
                 // prepare data
                 $foreignEntityIndexes = explode(',', $data[$field]);
                 $targetRepo = $em->getRepository($associationMapping['targetEntity']);
-                $primaryKeys = $entityClassMetadata->getIdentifierFieldNames();
+                $foreignEntityClassMetadata = $em->getClassMetadata(
+                    $associationMapping['targetEntity']
+                );
+                $primaryKeys = $foreignEntityClassMetadata->getIdentifierFieldNames();
                 $addMethod = 'add'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 $getMethod = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 // foreach distant entity
