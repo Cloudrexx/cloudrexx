@@ -2023,16 +2023,20 @@ class User extends User_Profile
      */
     public static function registerFailedLogin($username)
     {
-        $column = 'email';
-        $arrUserSettings = \User_Setting::getSettings();
-        if ($arrUserSettings['use_usernames']['status']) {
-            $column = 'username';
-        }
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $user = $userRepo->findOneBy(array($column => $username));
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->where($qb->expr()->eq('u.email', ':email'))
+            ->setParameter('email', $username);
+
+        $arrUserSettings = \User_Setting::getSettings();
+        if ($arrUserSettings['use_usernames']['status']) {
+            $qb->orWhere($qb->expr()->eq('u.username', ':username'))
+                ->setParameter('username', $username);
+        }
+
+        $user = $qb->getQuery()->getOneOrNullResult();
 
         if (empty($user)) {
             return false;
