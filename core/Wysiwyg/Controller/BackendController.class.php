@@ -345,6 +345,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'paging'    => true,
                 'filtering' => false,
                 'sortBy'    => $sortBy,
+                'status' => array('field' => 'active'),
             ),
             'fields' => array(
                 'id' => array(
@@ -368,16 +369,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_STATE'],
                     'formtext' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ACTIVE'],
                     'sorting' => false,
-                    'table' => array(
-                        'parse' => function($data, $rows) {
-                            $img = 'led_red.gif';
-                            if ($data) {
-                                $img = 'led_green.gif';
-                            }
-                            $data = '<img src="core/Core/View/Media/icons/'.$img.'" />';
-                            return $data;
-                        },
-                    ),
                 ),
                 'imagePath' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_IMAGE_PATH'],
