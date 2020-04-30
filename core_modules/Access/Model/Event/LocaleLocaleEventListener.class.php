@@ -39,6 +39,50 @@ namespace Cx\Core_Modules\Access\Model\Event;
 class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener {
 
     /**
+     * Fills the locale specific user attribute names for the new locale
+     * with attribute values of the the default locale or lang placeholders
+     * when adding a new Cx\Core\Locale\Model\Entity\Locale
+     *
+     * @param $eventArgs
+     */
+    public function postPersist($eventArgs) {
+        global $_CORELANG;
+
+        // get persisted locale
+        $persistedLocale = $eventArgs->getEntity();
+        $source = $persistedLocale->getSourceLanguage()->getIso1();
+
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageDataByCode(
+            'Core', true, $source
+        );
+
+        $em = $this->cx->getDb()->getEntityManager();
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $attributes = $attributeRepo->findAll();
+
+        foreach ($attributes as $attribute) {
+            if ($attribute->isDefault()) {
+                if (!$attribute->arrDefaultAttributeTemplates[$attribute->getContext()]) {
+                    continue;
+                }
+
+                $template = $attribute->arrDefaultAttributeTemplates[
+                $attribute->getContext()
+                ];
+                $name = $_CORELANG[$template['desc']];
+            } else {
+                $name = $attribute->getName();
+            }
+
+            $attribute->setTranslatableLocale($persistedLocale->getIso1()->getIso1());
+            $em->refresh($attribute);
+            $attribute->setName($name);
+            $em->persist($attribute);
+            $em->flush();
+        }
+    }
+
+    /**
      * Deletes the locale specific user attribute names
      * when deleting a Cx\Core\Locale\Model\Entity\Locale
      *

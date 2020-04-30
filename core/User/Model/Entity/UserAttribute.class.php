@@ -342,7 +342,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @var array[] default attribute configuration
      */
-    protected $arrDefaultAttributeTemplates = array(
+    public $arrDefaultAttributeTemplates = array(
         'picture' => array(
             'type'         => 'image',
             'multiline'    => false,
