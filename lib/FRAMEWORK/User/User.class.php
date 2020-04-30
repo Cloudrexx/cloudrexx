@@ -2026,10 +2026,10 @@ class User extends User_Profile
      */
     public static function registerFailedLogin($username)
     {
-        $column = 'email';
+        $usernameCondition = '';
         $arrUserSettings = \User_Setting::getSettings();
         if ($arrUserSettings['use_usernames']['status']) {
-            $column = 'username';
+            $usernameCondition = ' OR `username` = "' . contrexx_raw2db($username) . '"';
         }
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();

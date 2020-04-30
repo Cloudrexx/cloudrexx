@@ -59,7 +59,11 @@ class DoctrineRepository extends DataSource {
      */
     public function listFields() {
         $em = $this->cx->getDb()->getEntityManager();
-        return $em->getClassMetadata($this->getIdentifier())->getFieldNames();
+        $classMetadata = $em->getClassMetadata($this->getIdentifier());
+        return array_merge(
+            array_keys($classMetadata->getAssociationMappings()),
+            $classMetadata->getFieldNames()
+        );
     }
 
     /**
@@ -195,9 +199,34 @@ class DoctrineRepository extends DataSource {
 
         // $filter
         $i = 1;
+        $classMetadata = $em->getClassMetadata($this->getIdentifier());
+        $associationMappings = $classMetadata->getAssociationMappings();
         foreach ($criteria as $field=>$filterExpr) {
             foreach ($filterExpr as $operation=>$value) {
-                $qb->andWhere($qb->expr()->$operation('x.' . $field, '?' . $i));
+                $table = 'x.';
+
+                // This allows filters on ManyToMany on the first level
+                // TODO: Expand to make it work on all levels
+                if (
+                    $associationMappings[$field]['type'] == \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY &&
+                    isset($mappingTable['x.' . $field . '.'])
+                ) {
+                    $table = $mappingTable['x.' . $field . '.'];
+                    $targetEntity = $associationMappings[$field]['targetEntity'];
+                    $distantClassMetadata = $em->getClassMetadata($targetEntity);
+                    if ($associationMappings[$field]['isOwningSide']) {
+                        $field = current($associationMappings[$field]['relationToTargetKeyColumns']);
+                    } else {
+                        $field = current(
+                            $distantClassMetadata->getAssociationMappings()[
+                                $associationMappings[$field]['mappedBy']
+                            ]['relationToSourceKeyColumns']
+                        );
+                    }
+                    $field = $distantClassMetadata->fieldNames[$field];
+                }
+
+                $qb->andWhere($qb->expr()->$operation($table . $field, '?' . $i));
                 $qb->setParameter($i, $value);
                 $i++;
             }
@@ -213,7 +242,12 @@ class DoctrineRepository extends DataSource {
                 $qb->setFirstResult($offset);
             }
         }
-        $result = $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+        $query->setHint(
+            \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+            'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+        );
+        $result = $query->getResult();
 
         // $fieldList
         $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
@@ -228,8 +262,9 @@ class DoctrineRepository extends DataSource {
                 'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
             )
         );
+
         if (count($fieldList)) {
-            $dataFlipped = $dataSet->flip()->toArray();
+            $dataFlipped = $dataSet->flip()->toArray(false);
             foreach ($dataFlipped as $key=>$value) {
                 if (!in_array($key, $fieldList)) {
                     unset($dataFlipped[$key]);
@@ -241,7 +276,7 @@ class DoctrineRepository extends DataSource {
             $dataSet = $dataSetFlipped->flip();
         }
 
-        return $dataSet->toArray();
+        return $dataSet->toArray(false);
     }
 
     /**
@@ -267,7 +302,10 @@ class DoctrineRepository extends DataSource {
         $metaData = $em->getClassMetadata($entityClass);
         // foreach relation
         foreach ($metaData->associationMappings as $relationField => $associationMapping) {
-            if (in_array($associationMapping['targetEntity'], $exclusionList)) {
+            if (
+                in_array($associationMapping['targetEntity'], $exclusionList) &&
+                $associationMapping['targetEntity'] != $entityClass
+            ) {
                 continue;
             }
             // if is "to 1" or n:n or is forced by config
@@ -453,7 +491,10 @@ class DoctrineRepository extends DataSource {
                 // prepare data
                 $foreignEntityIndexes = explode(',', $data[$field]);
                 $targetRepo = $em->getRepository($associationMapping['targetEntity']);
-                $primaryKeys = $entityClassMetadata->getIdentifierFieldNames();
+                $foreignEntityClassMetadata = $em->getClassMetadata(
+                    $associationMapping['targetEntity']
+                );
+                $primaryKeys = $foreignEntityClassMetadata->getIdentifierFieldNames();
                 $addMethod = 'add'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 $getMethod = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 // foreach distant entity

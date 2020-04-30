@@ -26,30 +26,14 @@
  */
 
 /**
- * Filtering controller
- *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author      CLOUDREXX Development Team <info@cloudrexx.com>
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
+ * @access      public
  * @package     cloudrexx
- * @subpackage  coremodule_listing
+ * @subpackage  core_view
  */
+global $_ARRAYLANG;
+$_ARRAYLANG['TXT_CORE_VIEW_INTRO_NEXT'] = "Next";
+$_ARRAYLANG['TXT_CORE_VIEW_INTRO_BACK'] = "Back";
+$_ARRAYLANG['TXT_CORE_VIEW_INTRO_STOP'] = "Close";
 
-namespace Cx\Core_Modules\Listing\Controller;
-
-/**
- * Filtering controller
- *
- * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author      CLOUDREXX Development Team <info@cloudrexx.com>
- * @package     cloudrexx
- * @subpackage  coremodule_listing
- */
-class FilteringController extends ListingHandler {
-
-    /**
-     * @{inheritdoc}
-     */
-    public function handle($config, $params) {
-        return $config;
-    }
-}
