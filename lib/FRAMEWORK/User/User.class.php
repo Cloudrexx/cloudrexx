@@ -859,13 +859,24 @@ class User extends User_Profile
     {
         $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
 
+        $value = false;
         if (isset($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])) {
-            return $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
+            $value = $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
+        } else if (isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId])) {
+            $value = $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId];
         }
-        if (isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId])) {
-            return $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId];
+
+        if ($attributeId == 'gender') {
+            if ($value == 0) {
+                $value = 'gender_undefined';
+            } else {
+                $value = $this->objAttribute->getDefaultAttributeIdByAttributeId(
+                    $value
+                );
+            }
         }
-        return false;
+
+        return $value;
     }
 
 

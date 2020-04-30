@@ -984,45 +984,6 @@ class User_Profile_Attribute
     }
 
 
-    function storeCoreAttributeTitle()
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
-
-        try {
-            if (!$this->id || !preg_match('#([0-9]+)#', $this->id, $pattern)) {
-                $titleId = $this->getAttributeIdByDefaultAttributeId('title');
-                $titleAttr = $attributeRepo->find($titleId);
-                $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
-                $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
-                $attribute->addUserAttributeName($attributeName);
-                $attribute->setAccessId(0);
-                $attribute->setReadAccessId(0);
-                $attributeName->setUserAttribute($attribute);
-
-                if ($titleAttr) {
-                    $attribute->setParent($titleAttr);
-                }
-
-                $em->persist($attribute);
-            } else {
-                $attributeName = $attributeNameRepo->findOneBy(array('id' => $pattern[0]));
-            }
-
-            $attributeName->setName($this->arrName[0]);
-
-            $em->persist($attributeName);
-            $em->flush();
-
-            return true;
-        } catch (\Doctrine\ORM\OptimisticLockException $e) {
-            return false;
-        }
-    }
-
-
     function storeChildrenOrder()
     {
         if ($this->sort_type == 'custom') {
@@ -1258,9 +1219,6 @@ class User_Profile_Attribute
                 }
             }
         }
-// TODO: I suppose the precedence is okay like this.
-//        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
-// However, it would be clearer with a few parentheses.
         return
             (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
@@ -1652,14 +1610,15 @@ class User_Profile_Attribute
         return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
 
-    public function isCustomAttribute($attributeId = null)
-    {
-        if (is_null($attributeId)) {
-            $attributeId = $this->id;
-        }
-        return in_array($attributeId, $this->arrCustomAttributes);
+    /**
+     * Backwards compatibility
+     *
+     * @todo drop in CLX-2255
+     * @deprecated
+     */
+    public function isCoreAttribute($attributeId=null) {
+        return $this->isDefaultAttribute($attributeId);
     }
-
 
     public function setNames($arrNames)
     {
@@ -2149,7 +2108,7 @@ class User_Profile_Attribute
     function getMenuOptionValue()
     {
         return (isset($this->arrAttributes[$this->id]['value'])
-            ? $this->arrAttributes[$this->id]['value'] : $this->id);
+            ? $this->arrAttributes[$this->id]['value'] : $this->getDefaultAttributeIdByAttributeId($this->id));
     }
 
 
@@ -2196,11 +2155,28 @@ class User_Profile_Attribute
 // TODO: check if this methods logic could be replaced by the following code
         $arrNames = array();
         foreach ($this->getSortedAttributeIds() as $attributeId) {
-            if ($this->isCustomAttribute($attributeId)) {
+            if (!$this->isDefaultAttribute($attributeId)) {
                 $arrNames[$attributeId] = str_pad('', $this->getLevel($attributeId)*2, '..').htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET);
             }
         }
         return $arrNames;
     }
 
+    /**
+     * Increase the order ID to move the attribute to the end
+     *
+     * @throws \Cx\Core\Model\DbException
+     */
+    public function moveToEnd()
+    {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $result = $cx->getDb()->getAdoDb()->Execute(
+            'SELECT MAX(`order_id`) AS max_order_id
+         FROM `' . DBPREFIX . 'access_user_attribute`'
+        );
+        if (!$result || $result->EOF) {
+            return;
+        }
+        $this->order_id = $result->fields['max_order_id'] + 1;
+    }
 }

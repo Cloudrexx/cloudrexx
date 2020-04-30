@@ -44,14 +44,11 @@ CREATE TABLE `contrexx_access_user_attribute` (
   INDEX `contrexx_access_user_attribute_parent_id_ibfk` (`parent_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_attribute_name` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `attribute_id` int unsigned NOT NULL,
   `lang_id` int NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `order` int,
-  PRIMARY KEY (`id`),
-  INDEX `contrexx_access_user_attribute_name_attribute_id_ibfk` (`attribute_id`),
-  UNIQUE INDEX fk_module_user_attribute_name_unique_idx (`attribute_id`, `lang_id`)
+  PRIMARY KEY (`lang_id`, `attribute_id`),
+  INDEX `contrexx_access_user_attribute_name_attribute_id_ibfk` (`attribute_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute_value` (
   `attribute_id` int unsigned NOT NULL,
@@ -107,7 +104,7 @@ CREATE TABLE `contrexx_access_users` (
   `expiration` int unsigned NOT NULL DEFAULT '0',
   `validity` int unsigned NOT NULL DEFAULT '0',
   `last_auth` int unsigned NOT NULL DEFAULT '0',
-  `last_auth_status` smallint NOT NULL DEFAULT '0',
+  `last_auth_status` smallint NOT NULL DEFAULT '1',
   `last_activity` int unsigned NOT NULL DEFAULT '0',
   `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',

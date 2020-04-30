@@ -296,7 +296,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     otherwise to 1
      *
      */
-    protected $lastAuthStatus = 0;
+    protected $lastAuthStatus = 1;
 
     /**
      * @var integer Timestamp of the last time the user was active
@@ -435,6 +435,17 @@ class User extends \Cx\Model\Base\EntityBase {
      * @return boolean Whether user has superuser rights
      */
     public function isSuperUser()
+    {
+        return $this->getSuperUser();
+    }
+
+    /**
+     * Get if user is super user
+     *
+     * This does exactly the same as getSuperUser, for backwards compatibility
+     * @deprecated In favor of isSuperUser()
+     */
+    public function getIsAdmin()
     {
         return $this->getSuperUser();
     }
@@ -987,7 +998,7 @@ class User extends \Cx\Model\Base\EntityBase {
      * Get AttributeValue from AttributeValues
      *
      * @param int $attributeId id to find AttributeValue
-     * @return \Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue
+     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
      */
     public function getAttributeValue($attributeId)
     {

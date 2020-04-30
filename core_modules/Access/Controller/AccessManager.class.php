@@ -2787,6 +2787,11 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             $objAttribute->setMultiline(isset($_POST['access_text_multiline_option']) && intval($_POST['access_text_multiline_option']));
             $objAttribute->setMandatory((isset($_POST['access_attribute_mandatory']) ? intval($_POST['access_attribute_mandatory']) : 0));
 
+            if (empty($objAttribute->getId())) {
+                // Only move new attributes to the end
+                $objAttribute->moveToEnd();
+            }
+
             if ($setStatus && $objAttribute->store()) {
                 if (isset($_POST['access_add_child'])) {
                     $objAttribute->createChild($objAttribute->getId());
@@ -2893,7 +2898,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_CHILD_SORT_ORDER_DISPLAY'           => $objAttribute->getSortType() == 'custom' ? 'inline' : 'none'
         ));
 
-        if ((!$objAttribute->getId() || $objAttribute->isCustomAttribute($objAttribute->getId()))) {
+        if ((!$objAttribute->getId() || !$objAttribute->isDefaultAttribute($objAttribute->getId()))) {
             foreach (\FWLanguage::getLanguageArray() as $langId => $arrLanguage) {
                 if ($arrLanguage['frontend']) {
                     $this->_objTpl->setVariable(array(
