@@ -434,14 +434,22 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                         break;
                     }
 
+                    $translationRepo = $this->_em->getRepository(
+                        'Cx\Core\Locale\Model\Entity\Translation'
+                    );
                     // Do not search for user attribute value, search in the attribute names
                     $childAttributeIds = array();
                     foreach ($term as $searchTerm) {
                         foreach ($attribute->getChildren() as $child) {
-                            if (stripos($child->getName(), $searchTerm) !== false) {
-                                // We found the attribute
-                                $childAttributeIds[] = $child->getId();
-                                continue;
+                            $translations = $translationRepo->findTranslations(
+                                $child
+                            );
+                            foreach ($translations as $name) {
+                                if (stripos($name['name'], $searchTerm) !== false) {
+                                    // We found the attribute
+                                    $childAttributeIds[] = $child->getId();
+                                    continue;
+                                }
                             }
                         }
                     }
