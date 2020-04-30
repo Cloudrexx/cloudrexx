@@ -611,12 +611,7 @@ class User extends User_Profile
                 $user = $userRepo->find($this->id);
 
                 if (empty($user)) {
-                    return;
-                }
-
-                // Remove all groups from user
-                foreach ($user->getGroups() as $group) {
-                    $user->removeGroup($group);
+                    return false;
                 }
 
                 $objDatabase->startTrans();
@@ -628,10 +623,6 @@ class User extends User_Profile
                 }
 
                 try {
-                    // Remove all user attribute values
-                    foreach ($user->getUserAttributeValues() as $value) {
-                        $em->remove($value);
-                    }
                     $em->remove($user);
                     $em->flush();
 
@@ -868,13 +859,24 @@ class User extends User_Profile
     {
         $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
 
+        $value = false;
         if (isset($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])) {
-            return $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
+            $value = $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
+        } else if (isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId])) {
+            $value = $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId];
         }
-        if (isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId])) {
-            return $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId];
+
+        if ($attributeId == 'gender') {
+            if ($value == 0) {
+                $value = 'gender_undefined';
+            } else {
+                $value = $this->objAttribute->getDefaultAttributeIdByAttributeId(
+                    $value
+                );
+            }
         }
-        return false;
+
+        return $value;
     }
 
 
@@ -1385,22 +1387,19 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-
-        // check if we have to drop any sessions due to password change
-        if (!empty($this->password)) {
-            // check if we are about to set a new different password
-            $user = $userRepo->findOneBy(array('id' => $this->id, 'password' => $this->password));
-
-            if (!empty($user)) {
-                $passwordHasChanged = true;
-            }
-        }
-
         $user = $userRepo->find($this->id);
 
         if (empty($user)) {
             $userChanged = false;
             return false;
+        }
+
+        // check if we have to drop any sessions  due to password change
+        if (!empty($this->password)) {
+            // check if we are about to set a new different password
+            if ($user->getPassword() == $this->password) {
+                $passwordHasChanged = true;
+            }
         }
 
         $user->setUsername($this->username);
@@ -1420,7 +1419,9 @@ class User extends User_Profile
 
 
         if (!empty($this->password)) {
-            $user->setPassword($this->password);
+            $user->setPassword(
+                new \Cx\Core\Model\Model\Entity\Password($this->password)
+            );
         }
 
         if (!empty($this->auth_token)) {
@@ -1698,10 +1699,6 @@ class User extends User_Profile
         $userIds = array();
         foreach ($users as $user) {
             $userIds[] = $user->getId();
-            // Remove all user attribute values
-            foreach ($user->getUserAttributeValues() as $value) {
-                $em->remove($value);
-            }
             $em->remove($user);
         }
 
@@ -1948,7 +1945,7 @@ class User extends User_Profile
         $user = $userRepo->find($this->id);
 
         if (empty($user)) {
-            return;
+            return false;
         }
 
         // destroy expired auth token
@@ -2026,16 +2023,20 @@ class User extends User_Profile
      */
     public static function registerFailedLogin($username)
     {
-        $usernameCondition = '';
-        $arrUserSettings = \User_Setting::getSettings();
-        if ($arrUserSettings['use_usernames']['status']) {
-            $usernameCondition = ' OR `username` = "' . contrexx_raw2db($username) . '"';
-        }
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $user = $userRepo->findOneBy(array($column => $username));
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->where($qb->expr()->eq('u.email', ':email'))
+            ->setParameter('email', $username);
+
+        $arrUserSettings = \User_Setting::getSettings();
+        if ($arrUserSettings['use_usernames']['status']) {
+            $qb->orWhere($qb->expr()->eq('u.username', ':username'))
+                ->setParameter('username', $username);
+        }
+
+        $user = $qb->getQuery()->getOneOrNullResult();
 
         if (empty($user)) {
             return false;
@@ -2153,18 +2154,10 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $user = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\User'
-            )->find($this->id);
-
-            if (!$user) {
-                return false;
-            }
-
-            $user->setPassword($password);
-            $this->password = $password;
-            $this->updateLoadedUserData('password', $user->getPassword());
+            $this->password = (string) \Cx\Core\Model\Model\Entity\Password::createFromPlaintext(
+                $password
+            );
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {

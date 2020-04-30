@@ -1141,12 +1141,12 @@ class AccessLib
         case 'menu':
             if ($edit) {
                 $childrenCode = array();
-                if ($objAttribute->isCustomAttribute()) {
-                    if ($objAttribute->isMandatory()) {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
-                    } else {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
-                    }
+                if ($objAttribute->isMandatory()) {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
+                // TODO: Implement an option to allow skipping a default value
+                //          and replace the else if accordingly
+                } else if ($attributeId != 'gender' ) {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
                 }
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
                     $childrenCode[] = $this->_getAtrributeCode($objUser, $childAttributeId, $historyId, $edit);
@@ -1183,7 +1183,17 @@ class AccessLib
                     $mandatory= true;
                 }
             }
-            $code = $this->getMenuOptionAttributeCode($objAttribute->getMenuOptionValue(), $objUser->getProfileAttribute($objAttribute->getParent(), $historyId), $mandatory ? $_CORELANG['TXT_ACCESS_PLEASE_SELECT'] : $objAttribute->getName(), $selectOption ? 'border-bottom:1px solid #000000' : '');
+
+            $selectedValue = $objUser->getProfileAttribute(
+                $objAttribute->getParent(),
+                $historyId
+            );
+            $code = $this->getMenuOptionAttributeCode(
+                $objAttribute->getMenuOptionValue(),
+                $selectedValue,
+                $mandatory ? $_CORELANG['TXT_ACCESS_PLEASE_SELECT'] : $objAttribute->getName(),
+                $selectOption ? 'border-bottom:1px solid #000000' : ''
+            );
             break;
 
         case 'group':

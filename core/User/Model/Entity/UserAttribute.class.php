@@ -36,7 +36,7 @@
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Attributes that contain informations about the users.
+ * Attributes that contain information about the users.
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
@@ -143,12 +143,14 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $locale;
 
     /**
-     * @var integer $id
+     * @var integer ID of the user attribute
      */
     protected $id;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @var string The type of the attribute
+     *     possibilities: text, textarea, mail, uri, date, image, checkbox,
+     *         menu, menu_option, group, frame, history
      */
     protected $type = self::TYPE_TEXT;
 
@@ -158,37 +160,47 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $name = '';
 
     /**
-     * @var boolean $mandatory
+     * @var boolean Whether the attribute is mandatory
      */
     protected $mandatory = false;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @var string How the child attributes should be sorted
+     *     possibilities: asc, desc, custom
      */
     protected $sortType = self::SORT_TYPE_ASC;
 
     /**
-     * @var integer $orderId
+     * @var integer The order the attributes get listed
      */
     protected $orderId = 0;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @var string Set a special privilege for users that do not have editing
+     *     rights from assigned group
+     *     possibilities: menu_select_higher, menu_select_lower
      */
     protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
     /**
-     * @var integer $accessId
+     * @var integer Permissions are handled using access IDs. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $accessId;
 
     /**
-     * @var integer $readAccessId
+     * @var integer Unique identifier for reading access. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $readAccessId;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @var \Cx\Core\User\Model\Entity\UserAttribute The associated parent
+     *     attribute
      */
     protected $parent;
 
@@ -198,12 +210,13 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $userAttributeValues;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection $children
+     * @var \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     protected $children;
 
     /**
-     * @var boolean $default
+     * @var boolean Whether the attribute is a default system attribute
      */
     protected $default;
 
@@ -213,7 +226,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $context = '';
 
     /**
-     * @var array[] $arrTypes
+     * @var array[] Default configuration of the default attributes
      */
     protected $arrTypes = array(
         'text' => array(
@@ -615,7 +628,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer ID of the user attribute
      */
     public function getId()
     {
@@ -625,7 +638,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set type
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @param string $type
      */
     public function setType($type)
     {
@@ -635,7 +648,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get type
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @return string The type of the attribute
      */
     public function getType()
     {
@@ -693,7 +706,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get mandatory
      *
-     * @return boolean $mandatory
+     * @return boolean Whether the attribute is mandatory
      */
     public function getMandatory()
     {
@@ -703,7 +716,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set sortType
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @param string $sortType
      */
     public function setSortType($sortType)
     {
@@ -713,7 +726,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get sortType
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @return string How the child attributes should be sorted
      */
     public function getSortType()
     {
@@ -733,7 +746,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get orderId
      *
-     * @return integer $orderId
+     * @return integer Order ID
      */
     public function getOrderId()
     {
@@ -743,7 +756,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set accessSpecial
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @param string $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -753,7 +766,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get accessSpecial
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @return string Special access privilege
      */
     public function getAccessSpecial()
     {
@@ -773,7 +786,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get accessId
      *
-     * @return integer $accessId
+     * @return integer AccessIDs to manage permissions
      */
     public function getAccessId()
     {
@@ -793,7 +806,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get readAccessId
      *
-     * @return integer $readAccessId
+     * @return integer Unique identifier for reading access
      */
     public function getReadAccessId()
     {
@@ -815,7 +828,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean $default
+     * @return boolean Whether attribute is a default system attribute
      */
     public function getDefault()
     {
@@ -828,7 +841,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean $default
+     * @return boolean Whether attribute is a default system attribute
      */
     public function isDefault()
     {
@@ -878,7 +891,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection $child
+     * @return \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     public function getChildren()
     {
@@ -908,7 +922,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get userAttributeValues
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeValues
+     * @return \Doctrine\Common\Collections\Collection Collection of values
+     *     associated to this user attribute
      */
     public function getUserAttributeValues()
     {
@@ -928,7 +943,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @return \Cx\Core\User\Model\Entity\UserAttribute The associated parent
+     *     attribute
      */
     public function getParent()
     {

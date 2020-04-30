@@ -73,10 +73,10 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
     }
 
     /**
@@ -211,12 +211,34 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function setIsAdmin($isAdmin)
+    public function setSuperUser($superUser)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIsAdmin', array($isAdmin));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSuperUser', array($superUser));
 
-        return parent::setIsAdmin($isAdmin);
+        return parent::setSuperUser($superUser);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSuperUser()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSuperUser', array());
+
+        return parent::getSuperUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isSuperUser()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isSuperUser', array());
+
+        return parent::isSuperUser();
     }
 
     /**
