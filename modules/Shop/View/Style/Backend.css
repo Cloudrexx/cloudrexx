@@ -316,6 +316,10 @@ td.small {
 #form-0-relProductAttributes {
     width: 100%;
 }
+#content input.product-order-input {
+    float: left;
+    width: 25px;
+}
 #content input.product-option-checkbox {
     float: left;
     margin: 6px;

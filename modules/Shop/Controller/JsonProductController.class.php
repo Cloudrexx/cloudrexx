@@ -441,9 +441,21 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
         $attributeRepo = $this->cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\Attribute'
         );
+        $qb = $this->cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('DISTINCT a');
+        $qb->from('Cx\Modules\Shop\Model\Entity\Attribute', 'a');
+        $qb->innerJoin('a.options', 'o');
+        $qb->innerJoin('o.relProductAttributes', 'r');
+        $qb->orderBy('r.ord');
+        $attributes = $qb->getQuery()->getResult();
+        foreach ($attributeRepo->findAll() as $attribute) {
+            if (!in_array($attribute, $attributes)) {
+                array_unshift($attributes, $attribute);
+            }
+        }
+
         $relProductAttrRepo = $this->cx->getDb()->getEntityManager()
             ->getRepository('Cx\Modules\Shop\Model\Entity\RelProductAttribute');
-        $attributes = $attributeRepo->findAll();
         $productAttributes = $relProductAttrRepo->findBy(
             array('productId' => $entityId)
         );
@@ -454,11 +466,16 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
             $productOptions[] = $productAttribute->getOptionId();
         }
 
+        $productRepo = $this->cx->getDb()->getEntityManager()
+            ->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+        $product = $productRepo->find($entityId);
+
         $wrapper = $this->getProductOptionCheckboxes(
             $attributes,
             $name,
             $wrapper,
-            $productOptions
+            $productOptions,
+            $product
         );
         return $wrapper;
     }
@@ -471,6 +488,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
      * @param \Cx\Core\Html\Model\Entity\HtmlElement $wrapper wrapper around the
      *                                                        checkboxes
      * @param array $productOptions possible product options
+     * @param \Cx\Modules\Shop\Model\Entity\Product Product to show options for
      * @param \Cx\Core\Html\Model\Entity\HtmlElement $parentElement if a option
      *                                                              has children
      * @return \Cx\Core\Html\Model\Entity\HtmlElement wrapper with append
@@ -478,7 +496,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
      * @throws \Doctrine\ORM\ORMException handle orm interaction fails
      */
     protected function getProductOptionCheckboxes(
-        $options, $name, $wrapper, $productOptions, $parentElement = null
+        $options, $name, $wrapper, $productOptions, $product, $parentElement = null
     ) {
         foreach ($options as $option) {
             $optionWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
@@ -536,6 +554,20 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
                 $label->setAttribute('for', $attrId);
                 $checkbox->setAttribute('name', $attrName);
             } else {
+                // Please note that $option is always an instance of Attribute on
+                // the first level / in this else case
+                $relProductAttributes = $product->getRelProductAttributes()->filter(
+                    function($el) use ($option) {
+                        return $el->getOption()->getAttribute()->getId() == $option->getId();
+                    }
+                );
+                $data = 0;
+                if (count($relProductAttributes)) {
+                    $data = $relProductAttributes->last()->getOrd();
+                }
+                $ordInput = new \Cx\Core\Html\Model\Entity\DataElement('productAttribute[' . $option->getId() . ']', $data);
+                $ordInput->addClass('product-order-input');
+                $optionWrapper->addChild($ordInput);
                 $wrapper->addChild($optionWrapper);
             }
 
@@ -553,6 +585,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
                     $name,
                     $wrapper,
                     $productOptions,
+                    $product,
                     $optionWrapper
                 );
             }
@@ -615,6 +648,21 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
                 );
             }
             $entity->addRelProductAttribute($productAttribute);
+        }
+
+        // set correct ord
+        $checkedAttributes = array();
+        foreach ($entity->getRelProductAttributes() as $rel) {
+            $attributeId = $rel->getOption()->getAttribute()->getId();
+            if (!isset($_POST['productAttribute'][$attributeId])) {
+                continue;
+            }
+            if (!isset($checkedAttributes[$attributeId])) {
+                $checkedAttributes[$attributeId] = contrexx_input2raw(
+                    $_POST['productAttribute'][$attributeId]
+                );
+            }
+            $rel->setOrd($checkedAttributes[$attributeId]);
         }
         return $entity;
     }
