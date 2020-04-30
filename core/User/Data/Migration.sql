@@ -148,7 +148,7 @@ INSERT INTO contrexx_access_user_attribute_value (`attribute_id`, `user_id`, `va
 /** Migrate title attributes to user attributes **/
 INSERT INTO contrexx_access_user_attribute
     (`tmp_name`, `parent_id`, `type`, `order_id`, `access_id`, `read_access_id`, `is_default`)
-    SELECT CONCAT('title_', `id`), @title, 'menu_option', `order_id`, 0, 0, 1  FROM `contrexx_access_user_title`;
+    SELECT CONCAT('title_', `id`), @title, 'menu_option', `order_id`, 0, 0, 0  FROM `contrexx_access_user_title`;
 
 /** Migrate title names to user attribute names **/
 INSERT INTO contrexx_access_user_attribute_name (`attribute_id`, `name`)

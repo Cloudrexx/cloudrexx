@@ -466,8 +466,6 @@ INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `n
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (33, 1, 'Sehr geehrter Herr');
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (32, 2, 'Dear Ms');
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (33, 2, 'Dear Mr');
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (32, 3, 'Madame');
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (33, 3, 'Monsieur');
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (34, 0, 'gender_undefined');
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (35, 0, 'gender_male');
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (36, 0, 'gender_female');
