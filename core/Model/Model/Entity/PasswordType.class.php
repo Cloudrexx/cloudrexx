@@ -89,5 +89,13 @@ class PasswordType extends \Doctrine\DBAL\Types\Type {
     {
         return 'password';
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresSQLCommentHint(\Doctrine\DBAL\Platforms\AbstractPlatform $platform)
+    {
+        return true;
+    }
 }
 

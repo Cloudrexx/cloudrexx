@@ -336,9 +336,14 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
 
     /**
      * Call hook script of current SystemComponent after post-resolving
+     * @todo Re-enable for all modes.
      * @param \Cx\Core\Routing\Model\Entity\Response $response Current response
      */
     public function callAdjustResponseHooks($response) {
+        // temporary work-around
+        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            return;
+        }
         // only call the hook on application pages
         if ($response->getPage()->getType() != \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION) {
             return;

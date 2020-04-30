@@ -176,23 +176,24 @@ form.cx-ui img.previewImage {
 table.adminlist.sortable tr.row2,
 table.adminlist.sortable tr.row1 {
     /*background: none;*/
-    cursor: move;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-table.adminlist.sortable tr.row3 td:first-child,
-table.adminlist.sortable tr.row2 td:first-child,
-table.adminlist.sortable tr.row1 td:first-child {
-    padding-left: 60px;
+table.adminlist.sortable .drag-drop-handle {
+    cursor: ns-resize;
+    display: inline-block;
+    padding-top: 3px;
 }
 
-table.adminlist.sortable tr.row2 td:first-child,
-table.adminlist.sortable tr.row1 td:first-child {
-    background: url(../../../../core/ContentManager/View/Media/Move.png) no-repeat 10px center;
-    background-size: 18px;
+table.adminlist .drag-drop-header {
+    font-weight: 1000;
+    font-size: 16px;
+    width: 13px;
+    display: inline-block;
+    padding-left: 3px;
 }
 
 body.loading {
