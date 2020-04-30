@@ -447,9 +447,16 @@ ALTER TABLE `contrexx_access_user_attribute_value` DROP `tmp_name`;
 ALTER TABLE `contrexx_access_user_attribute` DROP `tmp_name`;
 
 /** Migrate attribute_names **/
-ALTER TABLE `contrexx_access_user_attribute` ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE `contrexx_access_user_attribute`
+    ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '',
+    ADD COLUMN `context` VARCHAR(255) NOT NULL DEFAULT '';
 ALTER TABLE contrexx_access_user_attribute_name DROP FOREIGN KEY FK_90502F6CB6E62EFA;
 DROP INDEX contrexx_access_user_attribute_name_attribute_id_ibfk ON contrexx_access_user_attribute_name;
+
+UPDATE `contrexx_access_user_attribute` AS a1
+    LEFT JOIN `contrexx_access_user_attribute_name` AS a2 ON a1.id = a2.attribute_id
+    SET a1.context = a2.name
+    WHERE a1.is_default = 1;
 
 INSERT INTO `contrexx_translations` (`locale`, `object_class`, `field`, `foreign_key`, `content`)
 SELECT

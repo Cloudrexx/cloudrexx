@@ -208,6 +208,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $default;
 
     /**
+     * @var string To identify attributes with a name
+     */
+    protected $context = '';
+
+    /**
      * @var array[] $arrTypes
      */
     protected $arrTypes = array(
@@ -566,6 +571,26 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     public function isDefault()
     {
         return $this->getDefault();
+    }
+
+    /**
+     * Set context
+     *
+     * @param string $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * Get context
+     *
+     * @return string Name Identifier
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**
