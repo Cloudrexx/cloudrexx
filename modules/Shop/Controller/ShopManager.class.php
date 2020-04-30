@@ -93,8 +93,7 @@ class ShopManager extends ShopLibrary
 
         $index_notes = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_notes','Shop');
         if ($index_notes) {
-            $objProfileAttribute = $objUser->objAttribute->getById($index_notes);
-            $attributeNames = $objProfileAttribute->getAttributeName($index_notes);
+            $attributeNames = $this->getAttributeName($index_notes);
             if (empty($attributeNames)) {
                 $index_notes = false;
             }
@@ -133,8 +132,7 @@ class ShopManager extends ShopLibrary
 
         $index_group = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
         if ($index_group) {
-            $objProfileAttribute = $objUser->objAttribute->getById($index_notes);
-            $attributeNames = $objProfileAttribute->getAttributeName($index_group);
+            $attributeNames = $this->getAttributeName($index_group);
             if (empty($attributeNames)) {
                 $index_group = false;
             }
@@ -4163,4 +4161,21 @@ die("Shopmanager::delete_article_group(): Obsolete method called");
 
         return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_SHOP_EDIT_OR_ADD_IMAGE']);
     }
+
+    /**
+     * Load attribute name in each language
+     * @return mixed Array with names, which may also contains no elements, or FALSE on failure.
+     */
+    function getAttributeName($id)
+    {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attribute = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttribute'
+        )->findOneBy(array('id' => $id));
+        if (empty($attribute)) {
+            return '';
+        }
+        return $attribute->getName();
+    }
+
 }

@@ -1722,23 +1722,6 @@ class User_Profile_Attribute
         $this->readProtected  = false;
     }
 
-    /**
-     * Load attribute name in each language
-     * @return mixed Array with names, which may also contains no elements, or FALSE on failure.
-     */
-    function getAttributeName($id)
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $attribute = $cx->getDb()->getEntityManager()->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttribute'
-        )->findOneBy(array('id' => $id));
-        if (empty($attribute)) {
-            return '';
-        }
-        return $attribute->getName();
-    }
-
-
     function loadName($langId)
     {
         global $_CORELANG;
