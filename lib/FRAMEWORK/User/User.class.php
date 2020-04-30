@@ -2143,7 +2143,9 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
-            $this->password = \Cx\Core\Model\Model\Entity\Password::createFromPlaintext($password);;
+            $this->password = \Cx\Core\Model\Model\Entity\Password::createFromPlaintext(
+                $password
+            )->__toString();
             $this->updateLoadedUserData('password', $this->password);
             return true;
         }
