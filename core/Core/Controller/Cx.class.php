@@ -1586,8 +1586,18 @@ namespace Cx\Core\Core\Controller {
                     } else {
                         $input = file_get_contents('php://input');
                     }
+
                     $dataArguments = array();
-                    parse_str($input, $dataArguments);
+                    // Mind that the content type MAY be followed by
+                    // the encoding: 'application/json; charset=UTF-8'
+                    if (
+                        isset($_SERVER['CONTENT_TYPE']) &&
+                        strpos($_SERVER['CONTENT_TYPE'], 'application/json') === 0
+                    ) {
+                        $dataArguments = json_decode($input, true);
+                    } else {
+                        parse_str($input, $dataArguments);
+                    }
                     $dataArguments = contrexx_input2raw($dataArguments);
 
                     // find component (defaults to help)
