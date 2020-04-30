@@ -340,6 +340,250 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     );
 
     /**
+     * @var array[] default attribute configuration
+     */
+    protected $arrDefaultAttributeTemplates = array(
+        'picture' => array(
+            'type'         => 'image',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PROFILE_PIC',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'gender' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'custom',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_GENDER',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'gender_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'gender_female' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_FEMALE',
+            'order_id'     => 1
+        ),
+        'gender_male' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_MALE',
+            'order_id'     => 2,
+        ),
+        'title' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'desc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_TITLE',
+            'modifiable'   => array('mandatory', 'sort_order', 'access', 'children'),
+        ),
+        'title_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'title',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'value'        => '0',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'designation' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'desc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_DESIGNATION',
+        ),
+        'firstname' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_FIRSTNAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'lastname' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_LASTNAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'company' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_COMPANY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'address' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_ADDRESS',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'city' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_CITY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'zip' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_ZIP',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'country' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_COUNTRY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'country_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'country',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'value'        => '0',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'phone_office' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_OFFICE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_private' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_PRIVATE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_mobile' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_MOBILE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_fax' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_FAX',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'birthday' => array(
+            'type'         => 'date',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_BIRTHDAY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'website' => array(
+            'type'         => 'uri',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_WEBSITE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        /*'skype' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_SKYPE_NAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),*/
+        'profession' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PREFESSION',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'interests' => array(
+            'type'         => 'text',
+            'multiline'    => true,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_INTERESTS',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'signature' => array(
+            'type'         => 'text',
+            'multiline'    => true,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_SIGNATURE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+    );
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -415,7 +659,25 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      */
     public function getName()
     {
-        return $this->name;
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+
+        if (
+            $frontend ||
+            !$this->isDefault() ||
+            !isset(
+                $this->arrDefaultAttributeTemplates[$this->getContext()]['desc']
+            )
+        ) {
+            return $this->name;
+        }
+
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core', $frontend
+        );
+
+        return $_CORELANG[
+            $this->arrDefaultAttributeTemplates[$this->getContext()]['desc']
+        ];
     }
 
     /**
