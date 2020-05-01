@@ -220,7 +220,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     format="boolean",
      *     description="If this is set to true if this field should be mandatory.",
      *     title="Mandatory",
-     *     default="0",
+     *     default="false",
      * )
      *
      * @var boolean $mandatory
