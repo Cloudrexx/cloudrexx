@@ -51,7 +51,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\License(name="CLOUDREXX")
  * )
  * @OA\Server(
- *     url=SWAGGER_API_HOST
+ *     url=CLX_API_HOST
  * )
  * @OA\Get(
  *     path="/json/{endpoint}",
@@ -1154,7 +1154,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             );
 
             define(
-                'SWAGGER_API_HOST',
+                'CLX_API_HOST',
                 \Cx\Core\Routing\Url::fromApi('v1', array())->toString()
             );
             $dbgMode = \DBG::getMode();
