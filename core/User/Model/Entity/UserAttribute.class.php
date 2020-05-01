@@ -161,17 +161,28 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="Define the type of the attribute. There are following choices:
-     * 1.  Text for a one line Textbox
-     * 2.  Textarea for a multiline textbox
-     * 3.  Mail for a email address
-     * 4.  Uri to link a website
-     * 5.  Date to show a datepicker
-     * 6.  Image to get a upload choice
-     * 7.  Checkbox to mark the attribute as checkbox
-     * 8.  Menu for a dropdown-menu
-     * 9.  Group to add a associated group
-     * 10. Menu_option to specify a attributes for the menu
-     * 11. History to setup the possibility for the history.",
+     * -  text
+     *    > a one line Textbox
+     * -  textarea
+     *    > a multiline textbox
+     * -  mail
+     *    > a email address
+     * -  uri
+     *    > to link a website
+     * -  date
+     *    > to show a datepicker
+     * -  image
+     *    > to get a upload choice
+     * -  checkbox
+     *    > to mark the attribute as checkbox
+     * -  menu
+     *    > displays a dropdown-menu
+     * -  group
+     *    > add a associated group
+     * -  menu_option
+     *    > to specify a attributes for the menu
+     * -  history
+     *    > to setup the possibility for the history",
      *     title="User attribute Type",
      *     enum={
      *          "text",
@@ -196,7 +207,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     format="string",
-     *     description="Set the name of the user attribute.",
+     *     description="The name of the user attribute.",
      *     title="Name",
      *     default=" ' ' ",
      * )
@@ -207,7 +218,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set true if we want this field to be mandatory.",
+     *     description="If this is set to true if this field should be mandatory.",
      *     title="Mandatory",
      *     default="0",
      * )
@@ -242,7 +253,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="Set a special privilege for users that do not have editing rights from assigned group. [Documentation](https://wiki.cloudrexx.com/Development_Permissions)
+     *     description="A special privilege for users that do not have editing rights from the assigned group can be set with this attribute. [Documentation](https://wiki.cloudrexx.com/Development_Permissions)
      * 1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
      * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.",
      *     title="User attribute, special access",
