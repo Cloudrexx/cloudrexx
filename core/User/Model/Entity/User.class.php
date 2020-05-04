@@ -205,7 +205,8 @@ class UserValidateUsername extends \CxValidate
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="The user model consists of information about a user. Additionally it contains information about the last login and groups are displayed as well as access information.",
+ *     description="The user model consists of information about a user. Additionally it contains information about the
+ *                  last login and groups are displayed as well as access information.",
  *     title="User",
  *     required={"email",},
  * )
@@ -255,7 +256,8 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Boolean to define if a user has superuser rights. A superuser has permission to read and write in all components as well as changing settings in the administration.",
+     *     description="Boolean to define if a user has superuser rights. A superuser has permission to read and write
+     *                  in all components as well as changing settings in the administration.",
      *     title="Is Superuser",
      *     type="boolean",
      *     default="false",
@@ -277,7 +279,9 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants the password to be complex. If password complexety is on, a password needs to contain at least one upper and one lower case character and one number.",
+     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants
+     *                  the password to be complex. If password complexety is on, a password needs to contain at least
+     *                  one upper and one lower case character and one number.",
      *     title="Password",
      *     maximum=255,
      * )
@@ -299,7 +303,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of user registration. This should be left out, the timestamp will be created automatically.",
+     *     description="Timestamp of user registration. This should be left out, the timestamp will be
+     *                  created automatically.",
      *     title="Register date",
      * )
      *
@@ -336,7 +341,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="When a user failed to login this status will change to 0 and at the next login a captcha will be necessary to login succesfully. When the login is succesfully the value will change to 1.",
+     *     description="When a user failed to login this status will change to 0 and at the next login a captcha will
+     *                  be necessary to login succesfully. When the login is succesfully the value will change to 1.",
      *     title="Last authentication status",
      *     default = 0,
      * )
@@ -370,7 +376,8 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Allow user to define access to their e-mail address. There are three possibilities: For everyone, only members and nobody. Only members is referred to other users of the website.",
+     *     description="Allow user to define access to their e-mail address. There are three possibilities:
+     *                  For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Email access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -394,7 +401,9 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Set the default backend language for the user, for English set to 2 and German to 1. If no language is set the backend will show the default language as chosen in the system Settings under Localization.",
+     *     description="Set the default backend language for the user, for English set to 2 and German to 1.
+     *                  If no language is set the backend will show the default language as chosen in the system
+     *                  Settings under Localization.",
      *     title="Backend language",
      *     default="0",
      * )
@@ -418,7 +427,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Flag to show if the user is verified. The user is verified, if they are created over the website administration. There are two options that are set in the administration:
+     *     description="Flag to show if the user is verified. The user is verified, if they are created over
+     *     the website administration. There are two options that are set in the administration:
      * 1.  Activation by an authorized person (see Backend group permissions under User administration).
      * 2.  Activation by the user where the user has to conifrm an email with a set time the email has to be confirmed.",
      *     title="Verified",
@@ -432,7 +442,9 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Assign a primary group to the user. In the primary group is defined where the user gets redirected on login. This is useful in case a user has more than one group. The value is 0 if no primary group is set.",
+     *     description="Assign a primary group to the user. In the primary group is defined where the user gets
+     *                  redirected on login. This is useful in case a user has more than one group.
+     *                  The value is 0 if no primary group is set.",
      *     title="Primary group",
      *     default="0",
      * )
@@ -443,7 +455,8 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Allows users to define access to their profile. There are three possibilities: For everyone, only members and nobody. Only members is referred to other users of the website.",
+     *     description="Allows users to define access to their profile. There are three possibilities:
+     *                  For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Profile access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -465,7 +478,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set this to true if the user should be able to communicate with other users when using the component U2U messaging (U2U).",
+     *     description="Set this to true if the user should be able to communicate with other users when using
+     *                  the component U2U messaging (U2U).",
      *     title="User to user active",
      *     default="false",
      * )
@@ -476,7 +490,9 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all groups assigned to the user, there can be users without associated group. To POST we use a ID of the desired group, for example 1. To GET, the output consists of the group object of the given ID, for example ID, Name etc.",
+     *     description="List of all groups assigned to the user, there can be users without associated group.
+     *                  To POST we use a ID of the desired group, for example 1. To GET, the output consists of the
+     *                  group object of the given ID, for example ID, Name etc.",
      *     title="User groups",
      *     type="object",
      *     additionalProperties={
@@ -490,7 +506,9 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. The objects are indexed by a unique key that's a serialized ID from fields of the primary key in the corresponding order: attributeId / userId / historyId. Example: 1/1/0.",
+     *     description="List of all attributes that are assigned to the user. The objects are indexed by a unique key
+     *                  that's a serialized ID from fields of the primary key in the corresponding order:
+     *                  attributeId / userId / historyId. Example: 1/1/0.",
      *     title="User Attribute values",
      *     type="object",
      *     additionalProperties={
