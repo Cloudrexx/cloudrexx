@@ -279,10 +279,12 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants
-     *                  the password to be complex. If password complexety is on, a password needs to contain at least
+     *     description="The minimum length of the password consists of 6 characters. The website administrator can
+     *                  decide whether they want the password to be more complex.
+                        If password complexety is turned on, a password needs to contain at least
      *                  one upper and one lower case character and one number.",
      *     title="Password",
+     *     format="password",
      *     maximum=255,
      * )
      *
