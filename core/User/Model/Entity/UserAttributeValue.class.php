@@ -51,7 +51,7 @@ namespace Cx\Core\User\Model\Entity;
 class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Multiple versions of an attribute value can be stored by using different numbers for history.",
      *     title="History",
      *     default="0"

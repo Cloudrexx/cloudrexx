@@ -64,7 +64,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Defines a group with the respective unique identifier",
      *     title="Group ID",
      * )

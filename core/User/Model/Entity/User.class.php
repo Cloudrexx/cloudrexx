@@ -245,7 +245,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Unique identifier for a user.",
      *     title="User ID",
      * )
@@ -304,7 +304,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Timestamp of user registration. This should be left out, the timestamp will be
      *                  created automatically.",
      *     title="Register date",
@@ -316,7 +316,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Timestamp of expiration to enclose certain users.",
      *     title="Expiration date",
      * )
@@ -331,7 +331,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Timestamp of last authentication.",
      *     title="Last authentification date",
      * )
@@ -342,7 +342,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="When a user failed to login this status will change to 0 and at the next login a captcha will
      *                  be necessary to login succesfully. When the login is succesfully the value will change to 1.",
      *     title="Last authentication status",
@@ -355,7 +355,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Timestamp of the last time the user was active.",
      *     title="Last activity",
      * )
@@ -390,7 +390,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Set the default frontend locale for the user.",
      *     title="Frontend language",
      *     default="0",
@@ -402,7 +402,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Set the default backend language for the user, for English set to 2 and German to 1.
      *                  If no language is set the backend will show the default language as chosen in the system
      *                  Settings under Localization.",
@@ -443,7 +443,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Assign a primary group to the user. In the primary group is defined where the user gets
      *                  redirected on login. This is useful in case a user has more than one group.
      *                  The value is 0 if no primary group is set.",

@@ -149,7 +149,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Unique identifier for the Attribute. ",
      *     title="Attribute ID",
      * )
@@ -267,7 +267,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Defines the order the attributes get listed. If no special order is set (default)
      *                  the ID is used to define the order.",
      *     title="Order ID",
@@ -294,7 +294,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Permissions are handled using access IDs. There are two types:
      *                  1.  Static (restrict the access to functions and sections - mostly backend).
      *                  2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
@@ -309,7 +309,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     format="int",
+     *     format="int(32)",
      *     description="Unique identifier for reading access. There are two types:
      *                  1.  Static (restrict the access to functions and sections - mostly backend).
      *                  2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
