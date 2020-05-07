@@ -43,12 +43,16 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     version="1.0.0",
  *     title="Cloudrexx RESTful API",
  *     description="The Cloudrexx RESTful API provides access to edit, delete and create new entries. These changes can be made for the endpoints that are provided by the website owner.",
+ *     termsOfService="https://www.cloudrexx.com/de/Rechtliches/AGBs",
  *     @OA\Contact(
  *         name="Cloudrexx API Support",
  *         url="https://www.cloudrexx.com/support",
  *         email="info@cloudrexx.com"
  *     ),
- *     @OA\License(name="CLOUDREXX")
+ *     @OA\License(
+ *         name="Cloudrexx License",
+ *         url="https://github.com/Cloudrexx/cloudrexx/blob/master/LICENSE.md"
+ *     ),
  * )
  * @OA\Server(
  *     url=CLX_API_HOST
