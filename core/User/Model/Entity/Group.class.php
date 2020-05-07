@@ -45,7 +45,7 @@ namespace Cx\Core\User\Model\Entity;
  *
  * @OA\Schema(
  *     description="A Group can have several associated users, in the group is specified which rights a user has,
- *                  what components the user can act in and whether they have write/read access.",
+ * what components the user can act in and whether they have write/read access.",
  *     title="Group",
  *     required={"name",},
  * )
@@ -97,7 +97,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     format="boolean",
      *     description="Determines whether a group is active or not. If a group is not active it acts the same way
-     *                  as it would when deleted.",
+     * as it would when deleted.",
      *     title="Active",
      *     default="true",
      * )
@@ -109,7 +109,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Defines where the assigned group can act. The group can act in the intended area
-     *                  Frontend and Backend.",
+     * Frontend and Backend.",
      *     title="User group type",
      *     enum={"frontend", "backend"},
      *     default="frontend",
@@ -132,8 +132,8 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Depending of read and write access we have two different outcomes. To write we use a ID,
-     *                  for example 1. If the request is to read, the result consists of the group object of
-     *                  the given ID.",
+     * for example 1. If the request is to read, the result consists of the group object of
+     * the given ID.",
      *     title="Users",
      *     type="object",
      *     additionalProperties={

@@ -253,9 +253,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="Define how the child attributes should be sorted. Child attributes are for example Dear Mr. /
-     *                  Dear Mrs. of the attrubute title. We can order these in three ways: Ascending,
-     *                  descending and custom.
-     *                  If set to custom the attributes will be sorted after the same pattern as the order.",
+     * Dear Mrs. of the attrubute title. We can order these in three ways: Ascending,
+     * descending and custom.
+     *  If set to custom the attributes will be sorted after the same pattern as the order.",
      *     title="User attribute, sorting type",
      *     enum={"asc", "desc", "custom"},
      *     default="asc",
@@ -269,7 +269,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     format="int(32)",
      *     description="Defines the order the attributes get listed. If no special order is set (default)
-     *                  the ID is used to define the order.",
+     * the ID is used to define the order.",
      *     title="Order ID",
      *     default="0",
      * )
@@ -281,9 +281,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="A special privilege for users that do not have editing rights from the assigned group can
-     *                  be set with this attribute. [Documentation](https://wiki.cloudrexx.com/Development_Permissions)
-     *                  1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
-     *                  2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.",
+     * be set with this attribute. [Documentation](https://wiki.cloudrexx.com/Development_Permissions)
+     *  1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
+     *  2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -296,10 +296,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     format="int(32)",
      *     description="Permissions are handled using access IDs. There are two types:
-     *                  1.  Static (restrict the access to functions and sections - mostly backend).
-     *                  2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
-     *
-     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
+     * 1.  Static (restrict the access to functions and sections - mostly backend).
+     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     * [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID",
      * )
      *
@@ -311,10 +310,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     format="int(32)",
      *     description="Unique identifier for reading access. There are two types:
-     *                  1.  Static (restrict the access to functions and sections - mostly backend).
-     *                  2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
-     *
-     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
+     * 1.  Static (restrict the access to functions and sections - mostly backend).
+     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     * [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID read",
      * )
      *
@@ -325,8 +323,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="Lists the user attribute object of the parent. Every attribute that has a parent is a menu
-     *                  option. If the request intends to POST we need to pass the ID, if  the request is to GET we
-     *                  get the user attribute of the given ID. For example the ID 1.",
+     * option. If the request intends to POST we need to pass the ID, if  the request is to GET we
+     * get the user attribute of the given ID. For example the ID 1.",
      *     title="Parent",
      *     type="object",
      *     additionalProperties={
@@ -341,10 +339,10 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="List of all attributes that are assigned to the user. We have a key that's a serialized
-     *                  ID from fields of the primary key in the corresponding order: attributeId / userId / historyId
-     *                  Example: 1/1/0. For POST requests we need to pass the serialized key in the order as before,
-     *                  if we want to GET we use the serialized key with the desired ID's like the example given.
-     *                  Locale can be used for this property.",
+     * ID from fields of the primary key in the corresponding order: attributeId / userId / historyId
+     * Example: 1/1/0. For POST requests we need to pass the serialized key in the order as before,
+     * if we want to GET we use the serialized key with the desired ID's like the example given.
+     * Locale can be used for this property.",
      *     title="User attribute value.",
      *     type="object",
      *     additionalProperties={
@@ -359,8 +357,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="List of the child attributes of the fields with menu options. If the request intends to POST
-     *                  we need to pass the ID, if  the request is to GET we get the attribute names of children
-     *                  with the respective attribute ID. For example the ID 1.",
+     * we need to pass the ID, if  the request is to GET we get the attribute names of children
+     * with the respective attribute ID. For example the ID 1.",
      *     title="Children",
      *     type="object",
      * )
