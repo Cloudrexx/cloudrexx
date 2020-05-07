@@ -234,7 +234,8 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         in="path",
  *         required=true,
  *         @OA\Schema(
- *             type="string"
+ *             type="string",
+ *             enum= {"Group", "User", "UserAttribute", "UserAttributeValue"}
  *         )
  *     ),
  *     @OA\Parameter(
