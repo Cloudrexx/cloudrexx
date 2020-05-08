@@ -342,7 +342,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int(32)",
+     *     format="int(8)",
      *     description="When a user failed to login this status will change to 0 and at the next login a captcha will
      * be necessary to login succesfully. When the login is succesfully the value will change to 1.",
      *     title="Last authentication status",
