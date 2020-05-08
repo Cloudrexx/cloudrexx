@@ -430,7 +430,7 @@ class User extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     format="boolean",
      *     description="Flag to show if the user is verified. The user is verified, if they are created over
-     * he website administration. There are two options that are set in the administration:
+     * the website administration. There are two options that are set in the administration:
      * 1.  Activation by an authorized person (see Backend group permissions under User administration).
      * 2.  Activation by the user where the user has to conifrm an email with a set time the email has to be confirmed.",
      *     title="Verified",
