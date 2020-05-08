@@ -58,12 +58,22 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         description="Find out more about Cloudrexx",
  *         url="https://wiki.cloudrexx.com/"
  * ),
+ * @OA\Tag(
+ *     name="json",
+ *     description="The output module of the Cloudrexx RESTful API is JSON. The response will always be in JSON format.",
+ *     @OA\ExternalDocumentation(
+ *         description="For more Information about the output, you can refer to the following section of the Cloudrexx
+ * documentation.",
+ *         url="https://wiki.cloudrexx.com/RESTful_API#JSON",
+ *   )
+ * ),
  * @OA\Server(
  *     url=CLX_API_HOST
  * )
  * @OA\Get(
  *     path="/json/{endpoint}",
  *     operationId="getFromEntityList",
+ *     tags={"json"},
  *     summary="Get a list of entities of this type",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
@@ -123,6 +133,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Get(
  *     path="/json/{endpoint}/{id}",
  *     operationId="getFromEntity",
+ *     tags={"json"},
  *     summary="Get a single entity of this type",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
@@ -152,6 +163,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Post(
  *     path="/json/{endpoint}",
  *     operationId="postNewEntity",
+ *     tags={"json"},
  *     summary="Add new entity. All fields required by the entity need to be passed.",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
@@ -181,6 +193,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Put(
  *     path="/json/{endpoint}/{id}",
  *     operationId="updateEntityPut",
+ *     tags={"json"},
  *     summary="Update a complete entity by passing all fields required by the entity.",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
@@ -207,6 +220,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Patch(
  *     path="/json/{endpoint}/{id}",
  *     operationId="updateEntityPatch",
+ *     tags={"json"},
  *     summary="Update an entity by passing only changed fields.",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
@@ -236,6 +250,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Delete(
  *     path="/json/{endpoint}/{id}",
  *     operationId="deleteEntity",
+ *     tags={"json"},
  *     summary="Delete an entity.",
  *     @OA\Parameter(
  *         ref="#/components/parameters/endpoint"
