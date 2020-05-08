@@ -109,7 +109,11 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * # see issue https://github.com/OAI/OpenAPI-Specification/issues/892#issuecomment-281449239
  * @OA\Get(
@@ -135,7 +139,11 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * @OA\Post(
  *     path="/json/{endpoint}",
@@ -160,7 +168,11 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * @OA\Put(
  *     path="/json/{endpoint}/{id}",
@@ -182,7 +194,11 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * @OA\Patch(
  *     path="/json/{endpoint}/{id}",
@@ -207,7 +223,11 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * @OA\Delete(
  *     path="/json/{endpoint}/{id}",
@@ -229,9 +249,20 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     @OA\Response(
  *         response="4XX",
  *         ref="#/components/responses/error"
- *     )
+ *     ),
+ *    security={
+ *      {
+ *         "api_key":{}}
+ *     }
  * )
  * @OA\Components(
+ *     @OA\SecurityScheme(
+ *         securityScheme="api_key",
+ *         type="apiKey",
+ *         in="query",
+ *         name="api_key",
+ *         description="API key to authorize requests. The API key can be generatet in the Administration section."
+ *     ),
  *     @OA\Parameter(
  *         name="endpoint",
  *         description="One of the endpoints defined for your Cloudrexx instance.",
