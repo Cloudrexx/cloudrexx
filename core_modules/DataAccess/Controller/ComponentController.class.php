@@ -54,6 +54,10 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         url="https://github.com/Cloudrexx/cloudrexx/blob/master/LICENSE.md"
  *     ),
  * )
+ * @OA\ExternalDocumentation(
+ *         description="Find out more about Cloudrexx",
+ *         url="https://wiki.cloudrexx.com/"
+ * ),
  * @OA\Server(
  *     url=CLX_API_HOST
  * )
