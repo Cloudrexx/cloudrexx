@@ -60,10 +60,9 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * ),
  * @OA\Tag(
  *     name="json",
- *     description="The output module of the Cloudrexx RESTful API is JSON. The response will always be in JSON format.",
+ *     description="The output module is JSON.",
  *     @OA\ExternalDocumentation(
- *         description="For more Information about the output, you can refer to the following section of the Cloudrexx
- * documentation.",
+ *         description="For more Information:.",
  *         url="https://wiki.cloudrexx.com/RESTful_API#JSON",
  *   )
  * ),
