@@ -162,49 +162,49 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     description="Define the type of the attribute. There are following choices:
      * ***
-     * **text**
+     * <code>text</code>
      *
-     * a one line Textbox
+     * One line textbox.
      * * * *
-     * **textarea**
+     * <code>textarea</code>
      *
-     * a multiline textbox
+     * Multiline textbox.
      * * * *
-     * **mail**
+     * <code>mail</code>
      *
-     * a email address
+     * Email address.
      * * * *
-     * **uri**
+     * <code>uri</code>
      *
-     * to link a website
+     * Link to a website.
      * * * *
-     * **date**
+     * <code>date</code>
      *
-     * to show a datepicker
+     * This will show a datepicker when selected in GUI.
      * * * *
-     * **image**
+     * <code>image</code>
      *
-     * to get a upload choice
+     * Get a upload choice.
      * * * *
-     * **checkbox**
+     * <code>checkbox</code>
      *
-     * to mark the attribute as checkbox
+     * Mark the attribute as checkbox.
      * * * *
-     * **menu**
+     * <code>menu</code>
      *
-     * displays a dropdown-menu
+     * Displays a dropdown-menu.
      * * * *
-     * **group**
+     * <code>group</code>
      *
-     * add a associated group
+     * Add a associated group.
      * * * *
-     * **menu_option**
+     * <code>menu_option</code>
      *
-     * to specify a attributes for the menu
+     * Specifies the attributes for the menu.
      * * * *
-     * **history**
+     * <code>history</code>
      *
-     * to setup the possibility for the history
+     * Setup the possibility to support history.
      * * * *",
      *     title="User attribute Type",
      *     enum={
