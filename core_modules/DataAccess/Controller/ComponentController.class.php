@@ -42,7 +42,47 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Info(
  *     version="1.0.0",
  *     title="Cloudrexx RESTful API",
- *     description="The Cloudrexx RESTful API provides access to edit, delete and create new entries. These changes can be made for the endpoints that are provided by the website owner.",
+ *     description="The Cloudrexx RESTful API provides access to edit, delete and create entries.
+ * These changes can be made for the endpoints that are provided by the website owner in the componenet DataAccess.
+ * The DataAccess provides a command 'v1'. It allows access to DataSources configured with permissions.
+ *
+ * To ensure dynamic translation, Cloudrexx uses the Locale identifier.
+ * A 'Locale' is an identifier used to get language, culture, or regionally-specific behavior from an API.
+ * Locales are identified using RFC 4646 language tags.
+ *
+ * In CLI the synopsis is as follows:
+ *
+ * <code>api  v1  [outputModule]  [dataAccessName]  [elementId]  [apikey=apiKey]  [options]</code>
+ *
+ * Piping data into this command will be interpreted like a PUT request to the RESTful API.
+ *
+ * Using the RESTful interface the syntax will be like this:
+ *
+ * <code>/api/v1/outputModule/ataAccessName/[elementId]/[?apikey={apiKey}]/[options] </code>
+ *
+ * ## Arguments
+ * * * *
+ * <code>[outputModule]</code>
+ *
+ * The name of the output module. Currently known output modules are 'json' and 'raw'.
+ * * * *
+ * <code>[endpoint]</code>
+ *
+ * The name of the DataSource to interact with.
+ * * * *
+ * <code>[elementId]</code>
+ *
+ * If this is specified, output is limited to the element with this ID, otherwise all entries are
+ * returned. If the ID of a DataSource has multiple fields (combined key), do join them by a slash.
+ * * * *
+ * <code>[apiKey]</code>
+ *
+ * This allows you to specify the API key if you authenticate by API key.
+ * * * *
+ * <code>[options]</code>
+ *
+ * Options are key/value pairs. In CLI they are separated by a space, in RESTful interface by ampersand.
+ * [Currently known options are listed here.](https://wiki.cloudrexx.com/RESTful_API#.3Coptions.3E)",
  *     termsOfService="https://www.cloudrexx.com/de/Rechtliches/AGBs",
  *     @OA\Contact(
  *         name="Cloudrexx API Support",
