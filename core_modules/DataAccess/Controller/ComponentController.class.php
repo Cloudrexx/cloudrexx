@@ -102,7 +102,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     name="json",
  *     description="The output module is JSON.",
  *     @OA\ExternalDocumentation(
- *         description="For more Information:.",
+ *         description="For more Information",
  *         url="https://wiki.cloudrexx.com/RESTful_API#JSON",
  *   )
  * ),
