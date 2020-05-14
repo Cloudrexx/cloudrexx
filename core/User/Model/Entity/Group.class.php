@@ -111,6 +111,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     description="Defines where the assigned group can act. The group can act in the intended area
      * Frontend and Backend.",
      *     title="User group type",
+     *     type="string",
      *     enum={"frontend", "backend"},
      *     default="frontend",
      * )

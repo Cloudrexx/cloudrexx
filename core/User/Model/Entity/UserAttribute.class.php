@@ -207,6 +207,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * Setup the possibility to support history.
      * * * *",
      *     title="User attribute Type",
+     *     type="string",
      *     enum={
      *          "text",
      *          "textarea",
@@ -257,6 +258,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * descending and custom.
      *  If set to custom the attributes will be sorted after the same pattern as the order.",
      *     title="User attribute, sorting type",
+     *     type="string",
      *     enum={"asc", "desc", "custom"},
      *     default="asc",
      * )
@@ -285,6 +287,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *  1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
      *  2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.",
      *     title="User attribute, special access",
+     *     type="string",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
      *

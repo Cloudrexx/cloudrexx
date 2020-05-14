@@ -381,6 +381,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     description="Allow user to define access to their e-mail address. There are three possibilities:
      * For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Email access",
+     *     type="string",
      *     enum={"everyone", "members_only", "nobody"},
      * )
      *
@@ -460,6 +461,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     description="Allows users to define access to their profile. There are three possibilities:
      * For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Profile access",
+     *     type="string",
      *     enum={"everyone", "members_only", "nobody"},
      * )
      *
