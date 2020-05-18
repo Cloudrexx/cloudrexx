@@ -49,6 +49,23 @@ namespace Cx\Core\View\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
 
     /**
+     * List of steps, grouped by a groupname
+     *
+     * array(
+     *     '<groupName>' => array(
+     *         array(
+     *             "element" => '<cssSelector>',
+     *             "intro" => '<introText>',
+     *         ),
+     *         ...
+     *     ),
+     *     ...
+     * );
+     * @var array
+     */
+    protected $introSteps = array();
+
+    /**
      * Returns all Controller class names for this component (except this)
      *
      * Be sure to return all your controller classes if you add your own
@@ -293,5 +310,102 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 return $fileInCurrentTheme;
             }
         }
+    }
+
+    /**
+     * Returns HTML-Code to show an "experimental" flag
+     *
+     * @param string $tooltip (optional) Tooltip to show when hovering over the flag
+     */
+    public function flagExperimental($tooltip = '') {
+        $template = new \Cx\Core\Html\Sigma(
+            $this->getDirectory() . '/View/Template/Backend'
+        );
+        $template->loadTemplateFile('Experimental.html');
+        if (empty($tooltip)) {
+            $template->hideBlock('with-tooltip');
+            $template->touchBlock('without-tooltip');
+        } else {
+            $template->setVariable('TOOLTIP', $tooltip);
+            $template->touchBlock('with-tooltip');
+            $template->hideBlock('without-tooltip');
+        }
+        return $template->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+        \JS::registerJsLibrary(
+            'intro.js',
+            array(
+                'jsfiles' => array(
+                    'lib/javascript/intro/intro.min.js',
+                ),
+                'cssfiles' => array(
+                    'lib/javascript/intro/intro.css',
+                ),
+                'dependencies' => array(
+                    'cx',
+                    'js-cookie',
+                ),
+            )
+        );
+    }
+
+    /**
+     * Adds steps to show as intro.
+     *
+     * Each step is an array with the indexes "element" and "intro". "element"
+     * contains a CSS selector for the element to highlight and "intro" the
+     * text to display. $steps is a simple list of such arrays.
+     * Please note that more than 32 steps per group are not supported and may
+     * lead to unexpected behavior.
+     * @param array $steps List of steps as described above
+     * @param string $group Optional name to group steps by
+     */
+    public function addIntroSteps(array $steps, string $group = '') {
+        if (empty($group)) {
+            $page = $this->cx->getPage();
+            $component = $page->getModule();
+            $section = $page->getCmd();
+
+            $group = $component;
+            if (!empty($section)) {
+                $group .= '-' . $section;
+            }
+        }
+        if (!isset($this->introSteps[$group])) {
+            $this->introSteps[$group] = array();
+        }
+        $this->introSteps[$group] += $steps;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preFinalize() {
+        global $_ARRAYLANG;
+
+        if (!count($this->introSteps)) {
+            return;
+        }
+        $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('View', false);
+        \ContrexxJavascript::getInstance()->setVariable(array(
+            'TXT_CORE_VIEW_INTRO_NEXT' => $_ARRAYLANG['TXT_CORE_VIEW_INTRO_NEXT'],
+            'TXT_CORE_VIEW_INTRO_BACK' => $_ARRAYLANG['TXT_CORE_VIEW_INTRO_BACK'],
+            'TXT_CORE_VIEW_INTRO_STOP' => $_ARRAYLANG['TXT_CORE_VIEW_INTRO_STOP'],
+        ), 'Core/lang');
+
+        // activate intro.js
+        \JS::activate('intro.js');
+
+        // set steps
+        \ContrexxJavascript::getInstance()->setVariable(
+            'steps',
+            $this->introSteps,
+            'View/intro'
+        );
     }
 }

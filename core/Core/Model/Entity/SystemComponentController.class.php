@@ -66,6 +66,27 @@ class SystemComponentController extends Controller {
     protected $systemComponent;
 
     /**
+     * URL pointing to the end-user documentation for this component
+     *
+     * @var string End-user documentation URL
+     */
+    protected $enduserDocumentationUrl = '';
+
+    /**
+     * URL pointing to the template definitions for this component
+     *
+     * @var string Template documentation URL
+     */
+    protected $templateDocumentationUrl = '';
+
+    /**
+     * URL pointing to the developer documentation for this component
+     *
+     * @var string Developer documentation URL
+     */
+    protected $developerDocumentationUrl = '';
+
+    /**
      * Initializes a controller
      * @param \Cx\Core\Core\Model\Entity\SystemComponent $systemComponent SystemComponent to decorate
      * @param \Cx\Core\Core\Controller\Cx                               $cx         The Cloudrexx main class
@@ -97,6 +118,33 @@ class SystemComponentController extends Controller {
      */
     public function setSystemComponent($systemComponent) {
         $this->systemComponent = $systemComponent;
+    }
+
+    /**
+     * Returns the URL pointing to the end-user documentation for this component.
+     *
+     * @return string URL pointing to the end-user documentation or empty string
+     */
+    public function getEnduserDocumentationUrl(): string {
+        return $this->enduserDocumentationUrl;
+    }
+
+    /**
+     * Returns the URL pointing to the template documentation for this component.
+     *
+     * @return string URL pointing to the template documentation or empty string
+     */
+    public function getTemplateDocumentationUrl(): string {
+        return $this->templateDocumentationUrl;
+    }
+
+    /**
+     * Returns the URL pointing to the developer documentation of this component.
+     *
+     * @return string URL pointing to the developer documentation
+     */
+    public function getDeveloperDocumentationUrl(): string {
+        return $this->developerDocumentationUrl;
     }
 
     /**
@@ -275,13 +323,22 @@ class SystemComponentController extends Controller {
      *
      * @return boolean
      */
-    public function hasAccessToExecuteCommand($command, $arguments)
-    {
+    public function hasAccessToExecuteCommand($command, $arguments) {
         $commands = $this->getCommandsForCommandMode();
         $method = (php_sapi_name() === 'cli') ? array('cli') : null;
 
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, $method, false, null, null, null);
-        if (isset($commands[$command]) && $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) {
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            array(),
+            $method,
+            false,
+            array(),
+            array(),
+            array()
+        );
+        if (
+            isset($commands[$command]) &&
+            $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission
+        ) {
             $objPermission = $commands[$command];
         }
 
@@ -410,6 +467,7 @@ class SystemComponentController extends Controller {
      * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
      * resolve() HOOK.
      *
+     * @todo This is currently only available in "frontend" mode.
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
      */
     public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {}

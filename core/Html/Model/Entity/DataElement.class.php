@@ -121,7 +121,11 @@ class DataElement extends HtmlElement {
     }
 
     public function render() {
-        $this->setAttribute('onkeyup', $this->getValidator()->getJavaScriptCode());
+        $this->setAttribute(
+            'onkeyup',
+            $this->getAttribute('onkeyup') . ';' .
+                $this->getValidator()->getJavaScriptCode()
+        );
         return parent::render();
     }
 }

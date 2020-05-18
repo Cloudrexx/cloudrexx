@@ -144,7 +144,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \User $user (optional) User object to get timezone of
      * @return \DateTime DateTime object in user's timezone
      */
-    public function createDateTimeForUser($time, $user = null) {
+    public function createDateTimeForUser($time = '', $user = null) {
         $userTimezone = \FWUser::getFWUserObject()->objUser->getTimezone();
         if ($user) {
             $userTimezone = $user->getTimezone();
@@ -157,7 +157,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param string A date/time string. Argument for \DateTime::construct()
      * @return \DateTime DateTime object in DB timezone
      */
-    public function createDateTimeForDb($time) {
+    public function createDateTimeForDb($time = '') {
         return new \DateTime($time, $this->databaseTimezone);
     }
 
@@ -249,7 +249,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $customFormatHandlers = array(
             //  The abbreviated weekday name according to the current locale
             '%a' => function($time) use ($_CORELANG) {
-                $days = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV3_ARRAY']);
+                $days = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV_ARRAY']);
                 $dayIdx = strftime('%w', $time);
                 return $days[$dayIdx];
             },

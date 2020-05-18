@@ -81,6 +81,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
         $i = 0;
         $catId= intval($catId);
         $catIds = array();
+        $offset = 0;
 
         if (empty($langId)) {
             $langId = \Env::get('init')->getDefaultFrontendLangId();
@@ -111,7 +112,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                 $catIds = array($catId);
             }
 
-            $objResult = $objDatabase->SelectLimit("
+            $query = "
                 SELECT DISTINCT(tblN.id) AS newsid,
                        tblN.`date` AS newsdate,
                        tblN.typeid,
@@ -143,8 +144,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                    AND tblN.teaser_only='0'
                    AND tblL.lang_id=".$langId."
                    AND tblL.is_active=1
-                   AND (startdate<='".date('Y-m-d H:i:s')."' OR startdate='0000-00-00 00:00:00')
-                   AND (enddate>='".date('Y-m-d H:i:s')."' OR enddate='0000-00-00 00:00:00')".
+                   ".
                    ($this->arrSettings['news_message_protection'] == '1' && !\Permission::hasAllAccess()
                       ? (($objFWUser = \FWUser::getFWUserObject()) && $objFWUser->objUser->login()
                           ? " AND (frontend_access_id IN (".
@@ -152,12 +152,17 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                             ") OR userid=".$objFWUser->objUser->getId().") "
                           : " AND frontend_access_id=0 ")
                       : '').
-                   "ORDER BY date DESC", $newsLimit);
+                   "ORDER BY date DESC";
+            $objResult = $objDatabase->SelectLimit($query, $newsLimit, $offset);
         }
 
         $nextUpdateDate = null;
         if ($objResult !== false && $objResult->RecordCount() >= 0) {
-            while (!$objResult->EOF) {
+            while (
+                !$objResult->EOF &&
+                $i < $newsLimit
+            ) {
+                // check next update date
                 if (
                     $objResult->fields['startdate'] != '0000-00-00 00:00:00' ||
                     $objResult->fields['enddate'] != '0000-00-00 00:00:00'
@@ -184,24 +189,53 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                     }
                 }
 
-                $newsid = $objResult->fields['newsid'];
-                $newsCategories = $this->getCategoriesByNewsId($newsid);
-                $newsUrl   = empty($objResult->fields['redirect'])
-                                ? (empty($objResult->fields['newscontent'])
-                                    ? ''
-                                    : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid)))
-                                : $objResult->fields['redirect'];
+                // check if article shall be published
+                if (
+                    (
+                        $objResult->fields['startdate'] <= date('Y-m-d H:i:s') ||
+                        $objResult->fields['startdate'] == '0000-00-00 00:00:00'
+                    ) && (
+                        $objResult->fields['enddate'] > date('Y-m-d H:i:s') ||
+                        $objResult->fields['enddate'] == '0000-00-00 00:00:00'
+                    )
+                ) {
+                    $newsid = $objResult->fields['newsid'];
+                    $newsCategories = $this->getCategoriesByNewsId(
+                        $newsid,
+                        array($catId)
+                    );
+                    $newsUrl   = empty($objResult->fields['redirect'])
+                                    ? (empty($objResult->fields['newscontent'])
+                                        ? ''
+                                        : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid)))
+                                    : $objResult->fields['redirect'];
 
-                //Parse all the news placeholders
-                $this->parseNewsPlaceholders($this->_objTemplate, $objResult, $newsUrl);
+                    //Parse all the news placeholders
+                    $this->parseNewsPlaceholders(
+                        $this->_objTemplate,
+                        $objResult,
+                        $newsUrl,
+                        '',
+                        array($catId)
+                    );
 
-                $this->_objTemplate->setVariable(array(
-                    'NEWS_CSS'          => 'row'.($i % 2 + 1),
-                ));
+                    $this->_objTemplate->setVariable(array(
+                        'NEWS_CSS'          => 'row'.($i % 2 + 1),
+                    ));
 
-                $this->_objTemplate->parse('headlines_row');
-                $i++;
+                    $this->_objTemplate->parse('headlines_row');
+                    $i++;
+                }
+
                 $objResult->MoveNext();
+
+                if (
+                    $objResult->EOF &&
+                    $i < $newsLimit
+                ) {
+                    $offset += $newsLimit;
+                    $objResult = $objDatabase->SelectLimit($query, $newsLimit, $offset);
+                }
             }
         } else {
             $this->_objTemplate->hideBlock('headlines_row');

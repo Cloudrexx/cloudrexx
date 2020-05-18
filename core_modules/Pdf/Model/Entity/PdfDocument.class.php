@@ -114,10 +114,13 @@ class PdfDocument extends \mPDF
             ->getCodeBaseCoreModulePath();
         $this->noImageFile = $coreModulePath . '/Pdf/View/Media/no_picture.gif';
         if (empty($this->author)) {
-            $this->SetAuthor($_CONFIG['coreCmsName']);
+            if (isset($_CONFIG['coreAdminName'])) {
+                $this->SetAuthor($_CONFIG['coreAdminName']);
+            } else {
+                $this->SetAuthor($_CONFIG['coreCmsName']);
+            }
         }
         $this->SetDisplayPreferences('HideWindowUI');
-        $this->AddPage();
         $this->WriteHTML($this->content);
         if (empty($this->filePath)) {
             $this->filePath = \Cx\Lib\FileSystem\FileSystem::replaceCharacters(

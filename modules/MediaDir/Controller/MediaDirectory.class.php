@@ -115,7 +115,10 @@ class MediaDirectory extends MediaDirectoryLibrary
 
         switch ($_REQUEST['cmd']) {
             case 'delete':
-                if((!empty($_REQUEST['eid'])) || (!empty($_REQUEST['entryId']))) {
+                if(
+                    !empty($_GET['eid']) ||
+                    !empty($_POST['entryId'])
+                ) {
                     parent::checkAccess('delete_entry');
                     $this->deleteEntry();
                 } else {
@@ -225,6 +228,9 @@ class MediaDirectory extends MediaDirectoryLibrary
             $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
         }
 
+        // fetch filter config from template
+        $config = static::fetchMediaDirListConfigFromTemplate('__global__', $this->_objTpl);
+
         //search existing category&level blocks
         $arrExistingBlocks = array();
 
@@ -245,6 +251,8 @@ class MediaDirectory extends MediaDirectoryLibrary
         if($this->arrSettings['settingsShowLevels'] == 1) {
             if (isset($requestParams['lid'])) {
                 $intLevelId = intval($requestParams['lid']);
+            } elseif (isset($config['filter']['level'])) {
+                $intLevelId = $config['filter']['level'];
             } elseif (intval($arrIds[0]) != 0) {
                 $intLevelId = intval($arrIds[0]);
                 $this->cx->getRequest()->getUrl()->setParam('lid', $intLevelId);
@@ -267,8 +275,13 @@ class MediaDirectory extends MediaDirectoryLibrary
             }
         }
 
+        // note: when using pretty urls, then the request param cid
+        // will be set to the value of the request param cmd in case
+        // the request param cmd is set to a category-id
         if (isset($requestParams['cid'])) {
             $intCategoryId = intval($requestParams['cid']);
+        } elseif (isset($config['filter']['category'])) {
+            $intCategoryId = $config['filter']['category'];
         } elseif ($intCategoryCmd != 0) {
             $intCategoryId = intval($intCategoryCmd);
             $this->cx->getRequest()->getUrl()->setParam('cid', $intCategoryId);
@@ -281,8 +294,17 @@ class MediaDirectory extends MediaDirectoryLibrary
             $this->_objTpl->touchBlock($this->moduleNameLC.'Overview');
         }
 
-        //check form cmd
-        if(!empty($_GET['cmd']) && $arrIds[0] != 'search') {
+        // check form filter
+        $formFilter = false;
+        if (isset($config['filter']['form'])) {
+            $formFilter = true;
+        } elseif (
+            !empty($_GET['cmd']) &&
+            $arrIds[0] != 'search'
+        ) {
+            $formFilter = true;
+        }
+        if ($formFilter) {
             $arrFormCmd = array();
 
             $objForms = new MediaDirectoryForm(null, $this->moduleName);
@@ -296,12 +318,24 @@ class MediaDirectory extends MediaDirectoryLibrary
                 ) {
                     continue;
                 }
+
+                if (
+                    isset($config['filter']['form']) &&
+                    $config['filter']['form'] == $intFormId
+                ) {
+                    $intCmdFormId = $intFormId;
+                    break;
+                }
+
                 if(!empty($arrForm['formCmd'])) {
                     $arrFormCmd[$arrForm['formCmd']] = intval($intFormId);
                 }
             }
 
-            if(!empty($arrFormCmd[$_GET['cmd']])) {
+            if (
+                !$intCmdFormId &&
+                !empty($arrFormCmd[$_GET['cmd']])
+            ) {
                 $intCmdFormId = intval($arrFormCmd[$_GET['cmd']]);
             }
         }
@@ -398,6 +432,7 @@ class MediaDirectory extends MediaDirectoryLibrary
             // custom sort order
             $forceAlphabeticalOrder = false;
             $popular = null;
+            $forceLatest = false;
 
             // check for custom sort order
             // but only if option 'legacy behavior' is not set
@@ -416,6 +451,15 @@ class MediaDirectory extends MediaDirectoryLibrary
                 if (isset($config['sort']['popular'])) {
                     $popular = $config['sort']['popular'];
                 }
+                // note: 'popular' has precedence in
+                // MediaDirectoryEntry::getEntries before 'latest'
+                if (
+                    !$popular &&
+                    isset($config['list']['latest'])
+                ) {
+                    $bolLatest = true;
+                    $forceLatest = true;
+                }
                 if (isset($config['list']['limit'])) {
                     $intLimitEnd = $config['list']['limit'];
                 }
@@ -425,6 +469,15 @@ class MediaDirectory extends MediaDirectoryLibrary
             }
 
             $objEntries->getEntries(null,$intLevelId,$intCategoryId,null,$bolLatest,null,1,$intLimitStart, $intLimitEnd, null, $popular, $intCmdFormId);
+
+            // as we are forcing the latest list within the regular
+            // mediadirEntryList template block, we have to reset the latest
+            // option to make the regular processing within the template
+            // block mediadirEntryList work
+            if ($forceLatest) {
+                $bolLatest = false;
+                $objEntries->setStrBlockName($this->moduleNameLC."EntryList");
+            }
 
             // reset default order behaviour
             if ($forceAlphabeticalOrder) {
@@ -679,6 +732,15 @@ class MediaDirectory extends MediaDirectoryLibrary
         if (!empty($cmd)) {
             $objForms = new MediaDirectoryForm(null, $this->moduleName);
             foreach ($objForms->arrForms as $intFormId => $arrForm) {
+                // note: in a previous version of Cloudrexx, there was no check
+                // if the form was active or not. this caused unexpected
+                // behavior
+                if (
+                    !$this->arrSettings['legacyBehavior'] &&
+                    !$arrForm['formActive']
+                ) {
+                    continue;
+                }
                 if (    !empty($arrForm['formCmd'])
                     &&  $arrForm['formCmd'] === $cmd
                     &&  !empty($arrForm['formEntriesPerPage'])
@@ -1232,8 +1294,23 @@ class MediaDirectory extends MediaDirectoryLibrary
 
         $this->_objTpl->setTemplate($this->pageContent, true, true);
 
+        // fetch filter config from template
+        $config = static::fetchMediaDirListConfigFromTemplate('__global__', $this->_objTpl);
+        $intLevelId = null;
+        $intCategoryId = null;
+        $intCmdFormId = null;
+        if (isset($config['filter']['level'])) {
+            $intLevelId = $config['filter']['level'];
+        }
+        if (isset($config['filter']['category'])) {
+            $intCategoryId = $config['filter']['category'];
+        }
+        if (isset($config['filter']['form'])) {
+            $intCmdFormId = $config['filter']['form'];
+        }
+
         $objEntry = new MediaDirectoryEntry($this->moduleName);
-        $objEntry->getEntries(null,null,null,null,null,null,true);
+        $objEntry->getEntries(null,$intLevelId,$intCategoryId,null,null,null,true,null,'n',null,null,$intCmdFormId);
         $objEntry->listEntries($this->_objTpl, 4);
     }
 
@@ -1718,35 +1795,39 @@ class MediaDirectory extends MediaDirectoryLibrary
         //save entry data
         $strOkMessage  = '';
         $strErrMessage = '';
-        if(isset($_POST['submitEntryModfyForm']) && intval($_POST['entryId'])) {
-            $objEntry = new MediaDirectoryEntry($this->moduleName);
 
+        //check id
+        $intEntryId = 0;
+        if (!empty($_GET['eid'])) {
+            $intEntryId = intval($_GET['eid']);
+        }
+
+        if (
+            isset($_POST['submitEntryModfyForm']) &&
+            !empty($_POST['entryId'])
+        ) {
+            $objEntry = new MediaDirectoryEntry($this->moduleName);
             $strStatus = $objEntry->deleteEntry(intval($_POST['entryId']));
 
-            if($strStatus == true) {
+            if ($strStatus) {
+                $intEntryId = 0;
                 $strOkMessage = $_ARRAYLANG['TXT_MEDIADIR_ENTRY']." ".$_ARRAYLANG['TXT_MEDIADIR_SUCCESSFULLY_DELETED'];
             } else {
+                $intEntryId = intval($_POST['entryId']);
                 $strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_ENTRY']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_DELETED'];
             }
         }
 
-         //check id
-        if(intval($_GET['eid']) != 0) {
-            $intEntryId = intval($_GET['eid']);
-        } else {
-            $intEntryId = null;
+        // parse entry only when displaying the delete form
+        if ($intEntryId) {
+            $objEntry = new MediaDirectoryEntry($this->moduleName);
+            if ($this->arrSettings['settingsReadyToConfirm'] == 1) {
+                $objEntry->getEntries($intEntryId,null,null,null,null,null,true,null,1,null,null,null,true);
+            } else {
+                $objEntry->getEntries($intEntryId,null,null,null,null,null,1,null,1);
+            }
+            $objEntry->listEntries($this->_objTpl, 2);
         }
-
-        $objEntry = new MediaDirectoryEntry($this->moduleName);
-
-        if($this->arrSettings['settingsReadyToConfirm'] == 1) {
-            $objEntry->getEntries($intEntryId,null,null,null,null,null,true,null,1,null,null,null,true);
-        } else {
-            $objEntry->getEntries($intEntryId,null,null,null,null,null,1,null,1);
-        }
-
-
-        $objEntry->listEntries($this->_objTpl, 2);
 
         //parse global variables
         $this->_objTpl->setVariable(array(

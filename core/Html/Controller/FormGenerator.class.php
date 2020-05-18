@@ -157,8 +157,13 @@ class FormGenerator {
 
         $tabs = isset($options['tabs']) ? $options['tabs'] : array();
 
+        $classNameParts = explode('\\', $entityClass);
+        $entityClassName = strtolower(end($classNameParts));
+
         $this->form->setAttribute('id', 'form-' . $this->formId);
-        $this->form->setAttribute('class', 'cx-ui');
+        $this->form->setAttribute(
+            'class', 'cx-ui ' . $entityClassName
+        );
         $titleElement = new \Cx\Core\Html\Model\Entity\HtmlElement('legend');
         $titleElement->addChild(new \Cx\Core\Html\Model\Entity\TextElement($title));
 
@@ -180,6 +185,13 @@ class FormGenerator {
             $editIdField = new \Cx\Core\Html\Model\Entity\DataElement('editid', contrexx_input2raw($_REQUEST['editid']), 'input');
             $editIdField->setAttribute('type', 'hidden');
             $this->form->addChild($editIdField);
+        }
+
+        try {
+            $entityObject = \Env::get('em')->getClassMetadata($this->entityClass);
+            $primaryKeyNames = $entityObject->getIdentifierFieldNames();
+        } catch (\Doctrine\Common\Persistence\Mapping\MappingException $e) {
+            $primaryKeyNames = array();
         }
 
         $overviewFields = array_keys($entity);
@@ -276,7 +288,14 @@ class FormGenerator {
                 if (!empty($fieldOptions['type'])) {
                     $type = $fieldOptions['type'];
                 }
-                $dataElement = $this->getDataElement($field, $field, $type, $length, $value, $fieldOptions, $entityId);
+                if (in_array($field, $primaryKeyNames)) {
+                    $dataElement = new \Cx\Core\Html\Model\Entity\TextElement(
+                        $value
+                    );
+                } else {
+                    $dataElement = $this->getDataElement($field, $field, $type, $length, $value, $fieldOptions, $entityId);
+                }
+
                 if (empty($dataElement)) {
                     continue;
                 }
@@ -363,6 +382,7 @@ class FormGenerator {
 
         $group = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
         $group->setAttribute('class', 'group');
+        $group->setAttribute('id', 'group-' . $this->formId . '-' . $field);
         $label = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
         $label->setAttribute('for', 'form-' . $this->formId . '-' . $field);
         $fieldHeader = $field;
@@ -408,30 +428,28 @@ class FormGenerator {
     public function getDataElement($name, $title, $type, $length, $value, &$options, $entityId) {
         global $_ARRAYLANG, $_CORELANG;
 
-        if (isset($options['valueCallback'])) {
-            $value = $this->viewGenerator->callValueCallback(
-                $options['valueCallback'],
-                $value,
-                $name,
-                array(),
-                $options
-            );
+        try {
+            if (isset($options['valueCallback'])) {
+                $value = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $options['valueCallback'],
+                    array(
+                        'fieldvalue' => $value,
+                        'fieldname' => $name,
+                        'rowData' => array(),
+                        'fieldoption' => $options,
+                        'vgId' => $this->viewGenerator->getViewId(),
+                    )
+                );
+            }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
+        try {
+            if (isset($options['formfield'])) {
+                $formFieldGenerator = $options['formfield'];
 
-        if (isset($options['formfield'])) {
-            $formFieldGenerator = $options['formfield'];
-            $formField = '';
-            /* We use json to do the callback. The 'else if' is for backwards compatibility so you can declare
-             * the function directly without using json. This is not recommended and not working over session */
-            if (
-                is_array($formFieldGenerator) &&
-                isset($formFieldGenerator['adapter']) &&
-                isset($formFieldGenerator['method'])
-            ) {
-                $json = new \Cx\Core\Json\JsonData();
-                $jsonResult = $json->data(
-                    $formFieldGenerator['adapter'],
-                    $formFieldGenerator['method'],
+                $formField = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $formFieldGenerator,
                     array(
                         'name' => $title,
                         'type' => $type,
@@ -441,22 +459,21 @@ class FormGenerator {
                         'id' => $entityId,
                     )
                 );
-                if ($jsonResult['status'] == 'success') {
-                    $formField = $jsonResult["data"];
-                }
-            } else if (is_callable($formFieldGenerator)){
-                $formField = $formFieldGenerator($title, $type, $length, $value, $options, $entityId);
-            }
 
-            if (is_a($formField, 'Cx\Core\Html\Model\Entity\HtmlElement')) {
-                return $formField;
-            } else {
-                $value = $formField;
+                if (is_a($formField, 'Cx\Core\Html\Model\Entity\HtmlElement')) {
+                    return $formField;
+                } else {
+                    $value = $formField;
+                }
             }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
+
         if (isset($options['showDetail']) && $options['showDetail'] === false) {
             return '';
         }
+        $type = preg_replace('/^enum_[a-z_0-9]+$/', 'enum', $type);
         switch ($type) {
             case 'bool':
             case 'boolean':
@@ -506,6 +523,9 @@ class FormGenerator {
                 );
                 if (isset($options['attributes'])) {
                     $inputNumber->setAttributes($options['attributes']);
+                }
+                if (isset($options['readonly']) && $options['readonly']) {
+                    $inputNumber->setAttribute('disabled');
                 }
                 $inputNumber->setAttribute('type', 'number');
                 return $inputNumber;
@@ -651,13 +671,15 @@ class FormGenerator {
                 if (empty($data)) {
                     $value = 204;
                 }
-                $options = \Cx\Core\Country\Controller\Country::getMenuoptions($value);
+                $menuoptions = \Cx\Core\Country\Controller\Country::getMenuoptions($value);
                 $select = new \Cx\Core\Html\Model\Entity\DataElement(
                     $title,
                     '',
                     \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
                 );
-                $select->addChild(new \Cx\Core\Html\Model\Entity\TextElement($options));
+                $select->addChild(
+                    new \Cx\Core\Html\Model\Entity\TextElement($menuoptions)
+                );
                 if (isset($options['attributes'])) {
                     $select->setAttributes($options['attributes']);
                 }
@@ -700,7 +722,23 @@ class FormGenerator {
                 break;
             case 'multiselect':
             case 'select':
+            case 'enum':
                 $values = array();
+                if ($type == 'enum') {
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $em = $cx->getDb()->getEntityManager();
+                    $localEntityMetadata = $em->getClassMetadata($this->entityClass);
+                    if (
+                        isset($localEntityMetadata->fieldMappings[$name]) &&
+                        isset($localEntityMetadata->fieldMappings[$name]['values']) &&
+                        is_array($localEntityMetadata->fieldMappings[$name]['values'])
+                    ) {
+                        $values = array_combine(
+                            $localEntityMetadata->fieldMappings[$name]['values'],
+                            $localEntityMetadata->fieldMappings[$name]['values']
+                        );
+                    }
+                }
                 if (isset($options['validValues'])) {
                     if (is_array($options['validValues'])) {
                         $values = $options['validValues'];
@@ -811,6 +849,15 @@ class FormGenerator {
                 }
                 return $textarea;
                 break;
+            case 'div':
+                $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                $text = new \Cx\Core\Html\Model\Entity\TextElement($value);
+                $wrapper->addChild($text);
+                if (isset($options['attributes'])) {
+                    $wrapper->setAttributes($options['attributes']);
+                }
+                return $wrapper;
+                break;
             case 'phone':
                 // input field with type phone
                 $input = new \Cx\Core\Html\Model\Entity\DataElement($title, $value);
@@ -871,8 +918,12 @@ class FormGenerator {
                 return $div;
                 break;
             case 'image':
+                $placeholderPictureUrl = '/core/Html/View/Media/NoPicture.gif';
                 \JS::registerCode('
-                    function javascript_callback_function(data) {
+                    function javascript_callback_function_' . $name . '(data) {
+                        if (data.type != "file") {
+                            return;
+                        }
                         if ( data.data[0].datainfo.extension=="Jpg"
                             || data.data[0].datainfo.extension=="Gif"
                             || data.data[0].datainfo.extension=="Png"
@@ -886,7 +937,7 @@ class FormGenerator {
                     jQuery(document).ready(function(){
                         jQuery(\'.deletePreviewImage\').click(function(){
                             cx.jQuery("#'.$title.'").attr(\'value\', \'\');
-                            cx.jQuery(this).prev(\'img\').attr(\'src\', \'/images/Downloads/no_picture.gif\');
+                            cx.jQuery(this).prev(\'img\').attr(\'src\', \'' . $placeholderPictureUrl . '\');
                             cx.jQuery(this).css(\'display\', \'none\');
                             cx.jQuery(this).nextAll(\'input\').first().attr(\'value\', \'\');
                         });
@@ -895,7 +946,7 @@ class FormGenerator {
                 ');
                 $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                 $mediaBrowser->setOptions(array('type' => 'button'));
-                $mediaBrowser->setCallback('javascript_callback_function');
+                $mediaBrowser->setCallback('javascript_callback_function_' . $name);
                 $defaultOptions = array(
                     'views' => 'filebrowser,uploader',
                     'id' => 'page_target_browse',
@@ -913,22 +964,23 @@ class FormGenerator {
 
                 $div = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
 
-                if((isset($value) && in_array(pathinfo($value, PATHINFO_EXTENSION), Array('gif', 'jpg', 'png'))) || $title == 'imagePath'){
+                // this image is meant to be a preview of the selected image
+                $previewImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                $previewImage->setAttribute('class', 'previewImage');
+                $previewImage->setAttribute('src', ($value != '') ? $value : $placeholderPictureUrl);
 
-                    // this image is meant to be a preview of the selected image
-                    $previewImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
-                    $previewImage->setAttribute('class', 'previewImage');
-                    $previewImage->setAttribute('src', ($value != '') ? $value : '/images/Downloads/no_picture.gif');
-
-                    // this image is uesd as delete function for the selected image over javascript
-                    $deleteImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
-                    $deleteImage->setAttribute('class', 'deletePreviewImage');
-                    $deleteImage->setAttribute('src', '/core/Core/View/Media/icons/delete.gif');
-
-                    $div->addChild($previewImage);
-                    $div->addChild($deleteImage);
-                    $div->addChild(new \Cx\Core\Html\Model\Entity\HtmlElement('br'));
+                // this image is uesd as delete function for the selected image over javascript
+                $deleteImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                $deleteImage->setAttribute('class', 'deletePreviewImage');
+                $deleteImage->setAttribute('src', '/core/Core/View/Media/icons/delete.gif');
+                if (!$value) {
+                    $deleteImage->setAttribute('style', 'display: none;');
                 }
+
+                $div->addChild($previewImage);
+                $div->addChild($deleteImage);
+                $div->addChild(new \Cx\Core\Html\Model\Entity\HtmlElement('br'));
+
                 $div->addChild($input);
                 $div->addChild(new \Cx\Core\Html\Model\Entity\TextElement(
                     $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
@@ -1002,6 +1054,48 @@ CODE;
 
                 return $div;
                 break;
+            case 'password':
+            case 'Cx\Core\Model\Model\Entity\Password':
+                $input = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                if (isset($options['validValues'])) {
+                    $input->setValidator(
+                        new \Cx\Core\Validate\Model\Entity\RegexValidator(
+                            '/^' . $options['validValues'] . '$/'
+                        )
+                    );
+                }
+                $input->setAttribute('type', 'password');
+                $input->setClass('form-control');
+                if (isset($options['readonly']) && $options['readonly']) {
+                    $input->setAttribute('disabled');
+                }
+                if (isset($options['attributes'])) {
+                    $input->setAttributes($options['attributes']);
+                }
+                if (!isset($options['mode']) || $options['mode'] != 'nocomplete') {
+                    return $input;
+                }
+                // in order to circumvent forced autocompletion by modern
+                // browsers we need to add an additional field and set the type
+                // "dynamically"...
+                // For more info see CLX-2388
+                $container = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                $dummyInput = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                $dummyInput->setAttribute('type', 'password');
+                $dummyInput->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput);
+                $input->setAttribute('type', 'text');
+                $input->setAttribute(
+                    'onkeyup',
+                    'if (this.value == \'\') { this.setAttribute(\'type\', \'text\'); } else { this.setAttribute(\'type\', \'password\'); }'
+                );
+                $input->setAttribute(
+                    'style',
+                    'text-security: disc; -webkit-text-security: disc;'
+                );
+                $container->addChild($input);
+                return $container;
+                break;
             case 'string':
             case 'hidden':
             default:
@@ -1026,7 +1120,25 @@ CODE;
                 if (isset($options['attributes'])) {
                     $input->setAttributes($options['attributes']);
                 }
-                return $input;
+                if (!isset($options['mode']) || $options['mode'] != 'nocomplete') {
+                    return $input;
+                }
+                // in order to circumvent forced autocompletion by modern
+                // browsers we need to add an additional field and set the type
+                // "dynamically"...
+                // For more info see CLX-2388
+                $container = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                $dummyInput = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                $dummyInput->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput);
+                $container->addChild($input);
+                $dummyInput2 = new \Cx\Core\Html\Model\Entity\DataElement(
+                    'not-a-' . $title,
+                    ''
+                );
+                $dummyInput2->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput2);
+                return $container;
                 break;
         }
     }

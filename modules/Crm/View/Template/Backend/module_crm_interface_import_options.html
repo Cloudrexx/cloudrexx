@@ -21,8 +21,8 @@
 </script>
 <div id="subnavbar_level2">
     <ul>
-        <li><a class="active" href="./index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=import" title="{TXT_CRM_IMPORT_NAME}">{TXT_CRM_IMPORT_NAME}</a></li>
-        <li><a href="./index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=export" title="{TXT_CRM_EXPORT_NAME}">{TXT_CRM_EXPORT_NAME}</a></li>
+        <li><a class="active" href="index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=import" title="{TXT_CRM_IMPORT_NAME}">{TXT_CRM_IMPORT_NAME}</a></li>
+        <li><a href="index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=export" title="{TXT_CRM_EXPORT_NAME}">{TXT_CRM_EXPORT_NAME}</a></li>
     </ul>
 </div>
 <div id="Import">
@@ -192,7 +192,7 @@
                         <td class="import_step2" colspan="3">
                             <div class="actions">
                                 <input type="button" id="cancel_upload" value="{TXT_CRM_CANCEL}" title="{TXT_CRM_CANCEL}" onClick="window.location.replace('./index.php?cmd=Crm&act=settings&amp;tpl=interface&amp;{CSRF_PARAM}')" />&nbsp;&nbsp;
-                                <input type="submit" id="import_data" class="disabled" value="{TXT_CRM_CONTINUE}" title="{TXT_CRM_CONTINUE}" name="imported" />
+                                <input type="submit" id="import_data" class="disabled" value="{TXT_CRM_CONTINUE}" title="{TXT_CRM_CONTINUE}" name="imported" disabled="disabled"/>
                             </div>
                             <div class="ajax_loading">
                                 <img alt="loading" src="../lib/javascript/jquery/jstree/themes/default/throbber.gif" />{TXT_CRM_LOADING}..
@@ -226,6 +226,7 @@
                         <div id="progressDetails" style="display: none;" >
                             <span class="processed"></span> {TXT_CRM_RECORD_PROCESS} <span class="total"></span>. {TXT_CRM_RECORD_IMPORT} <span class="imported"></span> ,{TXT_CRM_RECORD_SKIPPED} <span class="skiped"></span>
                         </div>
+                        <div id="importMsg"></div>
                     </td>
                 </tr>
             </tbody>

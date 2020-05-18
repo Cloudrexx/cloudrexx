@@ -78,7 +78,6 @@ class Directory extends DirectoryLibrary
     public $arrClient = array();
     public $arrProxy = array();
     public $count = array();
-    public $numLevels = array();
     public $communityModul;
 
     //local settings

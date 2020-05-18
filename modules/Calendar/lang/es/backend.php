@@ -256,7 +256,6 @@ $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ACTIVATE'] = "Activar la notificaci&oacut
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS'] = "Receptor";
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS_INFO'] = "Puedes especificar tantos destinatarios como necesites. Las direcciones de correo electr&oacute;nico deben estar separadas por una coma (,). ";
 $_ARRAYLANG['TXT_CALENDAR_FRONTEND_SETTINGS'] = "A&ntilde;adir evento";
-$_ARRAYLANG['TXT_CALENDAR_SERIES_ACTIVATE'] = "Activar el tipo de serie";
 $_ARRAYLANG['TXT_CALENDAR_SERIES'] = "Serie";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DAILY'] = "Diariamente";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_WEEKLY'] = "Semanalmente";

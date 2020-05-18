@@ -28,18 +28,10 @@
             <!-- END mediadirForms -->
         </div>
         <!-- BEGIN mediadirInputfields -->
-        <!-- BEGIN mediadirEntryAddStepNavigation -->
-        <!-- BEGIN mediadirEntryAddStepNavigationElement -->
-        <input type="button" value="{MEDIADIR_ENTRY_ADDSTEP_NAME}" id="{MEDIADIR_ENTRY_ADDSTEP_ID}" onclick="{MEDIADIR_ENTRY_ADDSTEP_HREF}" class="{MEDIADIR_ENTRY_ADDSTEP_CLASS}" />
-        <!-- END mediadirEntryAddStepNavigationElement -->
-        <!-- END mediadirEntryAddStepNavigation -->
         <input type="hidden" value="{MEDIADIR_ENTRY_ID}" name="entryId" />
         <input type="hidden" value="{MEDIADIR_FORM_ID}" name="formId" />
         <input type="hidden" value="{MEDIADIR_UPLOADER_ID}" name="uploaderId" />
         <!-- BEGIN mediadirInputfieldElement -->
-        <!-- BEGIN mediadirInputfieldAddStep -->
-        {MEDIADIR_INPUTFIELD_ADDSTEP}
-        <!-- END mediadirInputfieldAddStep -->
         <!-- BEGIN mediadirInputfieldList -->
         <p><label>{TXT_MEDIADIR_INPUTFIELD_NAME}</label>{MEDIADIR_INPUTFIELD_FIELD}</p>
         <!-- END mediadirInputfieldList -->
@@ -57,7 +49,6 @@
         {MEDIADIR_READY_TO_CONFIRM}
         <p><input type="submit" class="btn btn-default" value="{TXT_MEDIADIR_SUBMIT}" name="submitEntryModfyForm" /></p>
         <div style="display: none;" class="text-danger" id="mediadirErrorMessage"><p>{TXT_MEDIADIR_PLEASE_CHECK_INPUT}</p></div>
-        {MEDIADIR_INPUTFIELD_ADDSTEP_TERMINATOR}
         <!-- END mediadirInputfields -->
     </form>
     {MEDIADIR_UPLOADER_CODE}

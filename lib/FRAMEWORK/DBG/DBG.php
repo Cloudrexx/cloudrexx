@@ -850,7 +850,14 @@ class DBG
                 $userHash = $counter->getUniqueUserId();
             }
         }
-        $outputModuleStr = empty($outputModule) ? '' : ' "' . $outputModule . '"';
+
+        // fetch parsed response code
+        if ($cx->getResponse()) {
+            $httpResponseCode = $cx->getResponse()->getCode();
+        } else {
+            // as fallback fetch response code from set headers
+            $httpResponseCode = http_response_code();
+        }
 
         register_shutdown_function(
             function() use (
@@ -861,17 +868,26 @@ class DBG
                 $requestUserAgent,
                 $cachedStr,
                 $userHash,
-                $outputModuleStr
+                $outputModule,
+                $httpResponseCode
             ) {
                 $parsingTime = $cx->stopTimer();
-                \DBG::log(
-                    '(Cx: ' . $cx->getId() .
-                    ') Request parsing completed after ' . $parsingTime  .
-                    ' "' . $cachedStr . '" "' . $requestInfo . '" "' .
-                    $requestIp . '" "' . $requestHost . '" "' .
-                    $requestUserAgent . '" "' . memory_get_peak_usage(true) .
-                    '" "' . $userHash . '"' . $outputModuleStr
+                $format = '(Cx: %1$s) Request parsing completed after %2$s "%3$s" "%4$s" "%5$s" "%6$s" "%7$s" "%8$s" "%9$s" "%10$s" "%11$s"';
+                $log = sprintf(
+                    $format,
+                    $cx->getId(),
+                    $parsingTime,
+                    $cachedStr,
+                    $requestInfo,
+                    $requestIp,
+                    $requestHost,
+                    $requestUserAgent,
+                    memory_get_peak_usage(true),
+                    $userHash,
+                    $outputModule,
+                    $httpResponseCode
                 );
+                \DBG::log($log);
             }
         );
     }
@@ -1052,7 +1068,11 @@ class DBG
      * Reset the text that is being put in front of log messags
      */
     public static function resetLogPrefix() {
-        self::$setLogPrefix();
+        self::setLogPrefix();
+    }
+
+    public static function getLogHash() {
+        return self::$logHash;
     }
 }
 

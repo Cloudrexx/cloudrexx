@@ -349,6 +349,14 @@ class Customer extends \User
     function active($active=null)
     {
         if (isset($active)) {
+            // do not change the status of the currently signed-in user
+            if (
+                $this->getId() > 0 &&
+                $this->getId() == \FWUser::getFWUserObject()->objUser->getId()
+            ) {
+                return $this->getActiveStatus();
+            }
+
             $this->setActiveStatus($active);
         }
         return $this->getActiveStatus();
@@ -548,6 +556,7 @@ class Customer extends \User
             $this->firstname(), $this->lastname(), $this->company(), $title);
         $arrSubstitution = array(
             'CUSTOMER_SALUTATION' => $salutation,
+            'CUSTOMER_TITLE' => $title,
             'CUSTOMER_ID' => $this->id(),
             'CUSTOMER_EMAIL' => $this->email(),
             'CUSTOMER_COMPANY' => $this->company(),
@@ -560,7 +569,6 @@ class Customer extends \User
             'CUSTOMER_PHONE' => $this->phone(),
             'CUSTOMER_FAX' => $this->fax(),
             'CUSTOMER_USERNAME' => $this->username(),
-            'CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $this->getProfileAttribute('birthday')),
 // There are not used in any MailTemplate so far:
 //            'CUSTOMER_COUNTRY_ID' => $this->country_id(),
 //            'CUSTOMER_NOTE' => $this->getProfileAttribute($index_notes),
@@ -568,8 +576,17 @@ class Customer extends \User
 //            'CUSTOMER_RESELLER' => $this->getProfileAttribute($index_reseller),
 //            'CUSTOMER_GROUP_ID' => current($this->getAssociatedGroupIds()),
         );
+
+        // parse birthday if it's set
+        if (!empty($this->getProfileAttribute('birthday'))) {
+            $arrSubstitution['CUSTOMER_BIRTHDAY'] = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $this->getProfileAttribute('birthday')
+            );
+        }
+
 //DBG::log("Login: ".$this->username()."/".$_SESSION['shop']['password']);
-        if (isset($_SESSION['shop']['password'])) {
+        if (!empty($_SESSION['shop']['password'])) {
             $arrSubstitution['CUSTOMER_LOGIN'] = array(0 => array(
                 'CUSTOMER_USERNAME' => $this->username(),
                 'CUSTOMER_PASSWORD' => $_SESSION['shop']['password'],

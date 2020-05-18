@@ -70,7 +70,7 @@
                         <input type="radio" name="usercache" value="apc" id="usercache_apc" {CHECKED_USERCACHE_APC} />
                         <!-- END cache_usercache_apc -->
                     </td>
-                    <td><label for="usercache_apc">{TXT_CACHE_APC}</label></td>
+                    <td><label for="usercache_apc">{TXT_CACHE_APC}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{APC_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{APC_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -88,7 +88,7 @@
                         <input type="radio" name="usercache" value="memcache" id="usercache_memcache" {CHECKED_USERCACHE_MEMCACHE} />
                         <!-- END cache_usercache_memcache -->
                     </td>
-                    <td><label for="usercache_memcache">{TXT_CACHE_MEMCACHE}</label></td>
+                    <td><label for="usercache_memcache">{TXT_CACHE_MEMCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{MEMCACHE_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{MEMCACHE_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -138,7 +138,7 @@
                         <input type="radio" name="usercache" value="xcache" id="usercache_xcache" {CHECKED_USERCACHE_XCACHE} />
                         <!-- END cache_usercache_xcache -->
                     </td>
-                    <td><label for="usercache_xcache">{TXT_CACHE_XCACHE}</label></td>
+                    <td><label for="usercache_xcache">{TXT_CACHE_XCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{XCACHE_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{XCACHE_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -189,7 +189,7 @@
                         <input type="radio" name="opcache" value="apc" id="opcache_apc" {CHECKED_OPCACHE_APC} />
                         <!-- END cache_opcache_apc -->
                     </td>
-                    <td><label for="opcache_apc">{TXT_CACHE_APC}</label></td>
+                    <td><label for="opcache_apc">{TXT_CACHE_APC}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{APC_OPCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{APC_OPCACHE_ACTIVE_ICON}" />&nbsp;
@@ -222,7 +222,7 @@
                         <input type="radio" name="opcache" value="xcache" id="opcache_xcache" {CHECKED_OPCACHE_XCACHE} />
                         <!-- END cache_opcache_xcache -->
                     </td>
-                    <td><label for="opcache_xcache">{TXT_CACHE_XCACHE}</label></td>
+                    <td><label for="opcache_xcache">{TXT_CACHE_XCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{XCACHE_OPCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{XCACHE_OPCACHE_ACTIVE_ICON}" />&nbsp;
@@ -419,7 +419,7 @@
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_CACHE_SIZE}</td>
-            <td>{STATS_OPCACHE_SIZE} kB / {STATS_OPCACHE_MAX_SIZE} kB</td>
+            <td>{STATS_OPCACHE_SIZE} MB / {STATS_OPCACHE_MAX_SIZE} MB</td>
         </tr>
         <tr class="row2">
             <td width="20%">
