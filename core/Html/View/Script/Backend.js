@@ -107,6 +107,7 @@ cx.ready(function() {
 
     jQuery('table.sortable tbody').sortable({
         axis: "y",
+        handle: ".drag-drop-handle",
         items: "> tr.row1,> tr.row2 ",
         start: function (event, ui) {
             jQuery(ui.item).data('pIndex', ui.item.index());
@@ -232,6 +233,16 @@ cx.ready(function() {
                 }
             }
         );
+    });
+
+    // make multi action checkboxes behave as they should:
+    cx.jQuery(".multi-action-checkbox").change(function() {
+        var boxCount = cx.jQuery(".multi-action-checkbox").length;
+        var tickedBoxCount = cx.jQuery(".multi-action-checkbox:checked").length;
+        cx.jQuery(".multi-action-checkbox-all").prop("checked", boxCount == tickedBoxCount);
+    });
+    cx.jQuery(".multi-action-checkbox-all").change(function() {
+        cx.jQuery(".multi-action-checkbox").prop("checked", cx.jQuery(this).prop("checked"));
     });
 });
 
@@ -463,6 +474,8 @@ cx.ready(function() {
         var elements = cx.jQuery("[form=" + formId + "]").filter("select,input,textarea").not("[type=button]").not("[type=submit]");
         var vgId = jQuery("#" + formId).data("vg-id");
         var url = cx.tools.decodeURI(document.location.href);
+        // drop paging param from url to show the first page of the results
+        url = url.replace(/pos=[0-9]+&?/, "");
         var attrGroups = {}
         elements.each(function(index, el) {
             el = cx.jQuery(el);
@@ -525,7 +538,7 @@ cx.ready(function() {
     cx.jQuery(".vg-searchSubmit").filter("a,input").click(getSubmitHandler);
     
     (function() {
-        var url = cx.tools.decodeURI(document.location.href);
+        var url = decodeURIComponent(document.location.href);
         var parts = JavaSplit(url, "?", 2);
         if (parts.length < 2) {
             return;

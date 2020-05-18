@@ -1,4 +1,10 @@
 <!-- START module_mediadir_settings_entries.html -->
+<style>
+/* this is a hack to make to tooltip of the legacy option wider */
+.legacy-note.tooltip-message.top {
+    max-width:500px;
+}
+</style>
 <script type="text/javascript">
 function toggleDisplayDourationType(){
     elmSelect = document.getElementById('durationType');
@@ -323,7 +329,7 @@ $J(document).ready(function(){
             <input type="radio" name="legacyBehavior" id="legacyBehaviorOn" value="1" {MEDIADIR_SETTINGS_LEGACY_BEHAVIOR_ON} />
             <label for="legacyBehaviorOn">{TXT_MEDIADIR_ACTIVATE}</label>
             <input type="radio" name="legacyBehavior" id="legacyBehaviorOff" value="0" {MEDIADIR_SETTINGS_LEGACY_BEHAVIOR_OFF} />
-            <label for="legacyBehaviorOff">{TXT_MEDIADIR_DEACTIVATE}&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_LEGACY_BEHAVIOR_INFO}</span></label>
+            <label for="legacyBehaviorOff">{TXT_MEDIADIR_DEACTIVATE}&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="legacy-note tooltip-message">{TXT_MEDIADIR_LEGACY_BEHAVIOR_INFO}</span></label>
         </td>
     </tr>
 </table>

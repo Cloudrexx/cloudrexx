@@ -1153,7 +1153,7 @@ END;
 
                 if (self::isIllegalFileName($file)) {
                     $response->addMessage(
-                        \Cx\Core_Modules\Upload\Controller\UploadResponse::STATUS_ERROR,
+                        \Cx\Core_Modules\Uploader\Controller\UploadResponse::STATUS_ERROR,
                         "You are not able to create the requested file."
                     );
                     \Cx\Lib\FileSystem\FileSystem::delete_file(
@@ -1208,6 +1208,9 @@ END;
         /* unwanted files have been deleted, unallowed filenames corrected.
            we can now simply return the desired target path, as only valid
            files are present in $tempPath                                   */
+
+        // drop complete cache to avoid problems with global placeholders
+        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
 
         return array($data['path'], $data['webPath']);
     }

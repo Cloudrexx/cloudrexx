@@ -1038,6 +1038,10 @@ var _active_tab = '.
     static function getImageChooserBrowser(
         $objImage, $id, $imagetype_key=false, $type=null, $path=null
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image(Image::PATH_NO_IMAGE));
@@ -1146,6 +1150,10 @@ var _active_tab = '.
         $objImage, $id, $imagetype_key='', $path_default='',
         $replace_only=false
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image($path_default));
@@ -2599,6 +2607,10 @@ alert("change: ID mismatch: "+id);
      */
     static function getJavascript_Image($path='')
     {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG; //$_ARRAYLANG,
 
         return '

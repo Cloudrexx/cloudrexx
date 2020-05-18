@@ -39,8 +39,8 @@
 global $_ARRAYLANG;
 
 // Let's start with module info:
-$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER'] = 'Uploader';
-$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_DESCRIPTION'] = 'This is a new module with some sample content to show how to start.';
+$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER'] = 'Datei-Upload';
+$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_DESCRIPTION'] = 'Diese Anwendung ermöglicht den Upload von Dateien.';
 
 // Now our content specific values:
 $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_CONGRATULATIONS'] = 'Congratulations';

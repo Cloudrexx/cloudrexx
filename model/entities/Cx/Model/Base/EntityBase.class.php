@@ -86,7 +86,7 @@ class EntityBase {
      * )
      * @var array
      */
-    protected $validators = null;
+    protected $validators = array();
 
     /**
      * Defines if an entity is virtual and therefore not persistable.
@@ -94,6 +94,36 @@ class EntityBase {
      * @var boolean
      */
     protected $virtual = false;
+
+    /**
+     * List of fields that should be available in the string representation
+     *
+     * @see getStringRepresentationFields()
+     * @var array List of field names
+     */
+    protected $stringRepresentationFields = array();
+
+    /**
+     * Sprintf format for the string representation
+     *
+     * @see getStringRepresentationFormat()
+     * @var string Sprintf format string
+     */
+    protected $stringRepresentationFormat = '';
+
+    /**
+     * Counts the nesting level of __call()
+     * @var int
+     */
+    protected static $nestingCount = 0;
+
+    /**
+     * List of locale codes ordered by translation fallback order per Cx instance
+     *
+     * @see getFallbackLocaleCodes()
+     * @var array Array in the form: array(<instanceId> => array(<localeCode>, ...))
+     */
+    protected static $localeCodes = array();
 
     /**
      * This is an ugly solution to allow $this->cx to be available in all entity classes
@@ -147,41 +177,220 @@ class EntityBase {
     }
 
     /**
+     * Set $this->validators
+     *
+     * Validators can be found in lib/FRAMEWORK/Validator.class.php
+     * These will be executed if validate() is called
+     */
+    public function initializeValidators() { }
+
+    /**
      * @throws ValidationException
      * @prePersist
      */
     public function validate() {
-        if(!$this->validators)
+        $this->initializeValidators();
+
+        if (!count($this->validators)) {
             return;
+        }
 
         $errors = array();
-        foreach($this->validators as $field => $validator) {
+        foreach ($this->validators as $field => $validator) {
             $methodName = 'get'.ucfirst($field);
             $val = $this->$methodName();
-            if($val) {
-                if(!$validator->isValid($val)) {
-                     $errors[$field] = $validator->getMessages();
-                }
+            if (!$validator->isValid($val)) {
+                 $errors[$field] = $validator->getMessages();
             }
         }
-        if(count($errors) > 0)
+        if (count($errors) > 0) {
             throw new ValidationException($errors);
+        }
     }
 
     /**
      * Route methods like getName(), getType(), getDirectory(), etc.
      * @param string $methodName Name of method to call
      * @param array $arguments List of arguments for the method to call
+     * @throws \Exception If __call() nesting level reaches 20
      * @return mixed Return value of the method to call
      */
     public function __call($methodName, $arguments) {
-        return call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        if (static::$nestingCount >= 20) {
+            throw new \Exception('Stopped nesting at method ' . $methodName . '()');
+        }
+        static::$nestingCount++;
+        $res = call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        static::$nestingCount--;
+        return $res;
     }
 
-    public function __toString() {
+    /**
+     * Returns this entity's key
+     *
+     * If this entity has a composite key, the fields are separated by $separator.
+     * @param string $separator (optional) Separator for composite key fields, default "/"
+     * @return string Entity key as string
+     */
+    public final function getKeyAsString($separator = '/') {
         $em = $this->cx->getDb()->getEntityManager();
         $cmf = $em->getMetadataFactory();
         $meta = $cmf->getMetadataFor(get_class($this));
-        return (string) implode('/', $meta->getIdentifierValues($this));
+        return (string) implode($separator, $meta->getIdentifierValues($this));
+    }
+
+    /**
+     * Returns a list of fields available in the string representation
+     *
+     * @return array List of field names
+     */
+    protected function getStringRepresentationFields() {
+        return $this->stringRepresentationFields;
+    }
+
+    /**
+     * Returns the sprintf() format for the string representation
+     *
+     * @return string sprintf() format string
+     */
+    protected function getStringRepresentationFormat() {
+        return $this->stringRepresentationFormat;
+    }
+
+    /**
+     * Returns a list of all locale codes ordered by fallback order
+     *
+     * - First entry is the current locale
+     * - Second entry is the default locale (if different from current, it's omitted otherwise)
+     * - Then all other locales follow (in no particular order)
+     * @todo Order the array by the fallback order (same as in ContentManager)
+     * @return array List of locale codes
+     */
+    protected function getFallbackLocaleCodes() {
+        if (isset(static::$localeCodes[$this->cx->getId()])) {
+            return static::$localeCodes[$this->cx->getId()];
+        }
+        $em = $this->cx->getDb()->getEntityManager();
+        $currentLocaleId = \Env::get('init')->userFrontendLangId;
+        $defaultLocaleId = \Env::get('init')->defaultFrontendLangId;
+        $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+        $locales = $localeRepo->findAll();
+
+        // create an array with all locale codes except current language
+        // with default language (if different) as first entry
+        static::$localeCodes[$this->cx->getId()] = array();
+        foreach ($locales as $locale) {
+            if (
+                $locale->getId() == $defaultLocaleId ||
+                $locale->getId() == $currentLocaleId
+            ) {
+                continue;
+            }
+            static::$localeCodes[$this->cx->getId()][] = $locale->getShortForm();
+        }
+        // if current locale is different from default, add default
+        if ($defaultLocaleId != $currentLocaleId) {
+            array_unshift(
+                static::$localeCodes[$this->cx->getId()],
+                \FWLanguage::getLanguageCodeById($defaultLocaleId)
+            );
+        }
+        // add the current locale as first entry
+        array_unshift(
+            static::$localeCodes[$this->cx->getId()],
+            \FWLanguage::getLanguageCodeById($currentLocaleId)
+        );
+        return static::$localeCodes[$this->cx->getId()];
+    }
+
+    /**
+     * Returns the value of a translatable field using fallback mechanisms
+     *
+     * If the field is not translatable its value is returned anyway.
+     * Tries to return the value in the following locales (if non-empty):
+     * - Current locale
+     * - Default locale
+     * - All other locales
+     * @param string $fieldName Name of a translatable field
+     */
+    public function getTranslatedFieldValue($fieldName) {
+        $em = $this->cx->getDb()->getEntityManager();
+        $entityClassMetadata = $em->getClassMetadata(get_class($this));
+
+        // field has non-empty value in current locale
+        if ($entityClassMetadata->getFieldValue($this, $fieldName) != '') {
+            return $entityClassMetadata->getFieldValue($this, $fieldName);
+        }
+
+        $translationListener = $this->cx->getDb()->getTranslationListener();
+        $config = $translationListener->getConfiguration(
+            $em,
+            get_class($this)
+        );
+
+        // field is not translatable
+        if (!in_array($fieldName, $config['fields'])) {
+            return '';
+        }
+
+        // load all translations of field
+        $translationRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Translation');
+        $translations = $translationRepo->findBy(array(
+            'objectClass' => get_class($this),
+            'field' => $fieldName,
+            'foreignKey' => \Gedmo\Tool\Wrapper\AbstractWrapper::wrap($this, $em)->getIdentifier(),
+        ));
+
+        // if there's but one translation we don't need to calculate which
+        // one is the right one
+        if (count($translations) == 1) {
+            return current($translations)->getContent();
+        }
+
+        $indexedTranslations = array();
+        foreach ($translations as $translation) {
+            $indexedTranslations[$translation->getLocale()] = $translation->getContent();
+        }
+
+        $localeCodes = $this->getFallbackLocaleCodes();
+        foreach ($localeCodes as $localeCode) {
+            if (isset($indexedTranslations[$localeCode])) {
+                return $indexedTranslations[$localeCode];
+            }
+        }
+
+        // giving up, no translation found
+        return '';
+    }
+
+    /**
+     * Returns this entity's identifying value
+     *
+     * By default this returns the same as getKeyAsString(), but this method
+     * might get overridden by subclasses.
+     * @return string Identifying value for this entity
+     */
+    public function __toString() {
+        if ($this->getStringRepresentationFormat() == '') {
+            return $this->getKeyAsString();
+        }
+        if (!count($this->getStringRepresentationFields())) {
+            $stringRepresentation = sprintf($this->getStringRepresentationFormat());
+            if ($stringRepresentation == '') {
+                return $this->getKeyAsString();
+            }
+        }
+        $fieldValues = array();
+        foreach ($this->getStringRepresentationFields() as $fieldName) {
+            $fieldValues[] = $this->getTranslatedFieldValue($fieldName);
+        }
+        $stringRepresentation = vsprintf(
+            $this->getStringRepresentationFormat(),
+            $fieldValues
+        );
+        if ($stringRepresentation == '') {
+            return $this->getKeyAsString();
+        }
+        return $stringRepresentation;
     }
 }

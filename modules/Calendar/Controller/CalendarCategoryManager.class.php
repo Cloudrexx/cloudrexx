@@ -84,11 +84,10 @@ class CalendarCategoryManager extends CalendarLibrary
      * Returns all the calendar categories
      *
      * @global object  $objDatabase
-     * @global integer $_LANGID
      * @return array Returns all calendar categories
      */
     function getCategoryList() {
-        global $objDatabase,$_LANGID;
+        global $objDatabase;
 
         $onlyActive_where = ($this->onlyActive == true ? ' WHERE status=1' : '');
 
@@ -179,15 +178,18 @@ class CalendarCategoryManager extends CalendarLibrary
      *          - Add class constants for option types
      *          - Use \Html::getOptions() in order to handle multiselect
      */
-    function getCategoryDropdown(array $selected_ids,
+    function getCategoryDropdown($selected_ids,
         $type=self::DROPDOWN_TYPE_DEFAULT)
     {
         global $_ARRAYLANG;
+        if (!is_array($selected_ids)) {
+            $selected_ids = array();
+        }
         $this->getSettings();
         $arrOptions = array();
         foreach ($this->categoryList as $objCategory) {
             $arrOptions[$objCategory->id] = $objCategory->name
-                . ($this->arrSettings['countCategoryEntries']
+                . ($this->arrSettings['countCategoryEntries'] != 2
                     ? ' ('.$objCategory->countEntries(false, true).')' : '');
         }
         $options = ''; // Default case: prepend nothing

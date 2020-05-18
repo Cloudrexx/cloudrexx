@@ -20,7 +20,7 @@ CKEDITOR.on('dialogDefinition', function (event) {
                     }
                     $J.ajax({
                         type: "GET",
-                        url: "index.php?cmd=jsondata&object=MediaBrowser&act=createThumbnails&file=" + callback.data[0].datainfo.filepath
+                        url: cx.variables.get('cadminPath') + "index.php?cmd=jsondata&object=MediaBrowser&act=createThumbnails&file=" + callback.data[0].datainfo.filepath
                     });
                     var dialog = cx.variables.get('jquery', 'mediabrowser')(cx.variables.get('thumbnails_template', 'mediabrowser'));
                     var image = dialog.find('.image');
@@ -40,6 +40,13 @@ CKEDITOR.on('dialogDefinition', function (event) {
                                         image = callback.data[0].datainfo.thumbnail[thumbnail];
                                     }
                                     dialogDefinition.dialog.setValueOf(targetType[0], targetType[1], image);
+
+                                    // set shadowbox image
+                                    shadowboxOption = dialogDefinition.dialog.getValueOf('advanced', 'txtdlgGenShadowbox');
+                                    if (shadowboxOption) {
+                                        var originalImage = image.replace(/\.thumb_([^.]+)\.(.{3,4})$/, '.$2').replace(/\.thumb$/,'')
+                                        dialogDefinition.dialog.setValueOf('advanced', 'txtdlgGenShadowboxSrc', originalImage);
+                                    }
                                 }
                             }
                         }
