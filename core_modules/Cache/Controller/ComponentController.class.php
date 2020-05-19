@@ -286,24 +286,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Clear user based page cache of a specific user identified by its
-     * session ID.
+     * Clear user based page cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the page cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedPageCache($sessionId) {
+    public function clearUserBasedPageCache($sessionId = '') {
         $this->cache->clearUserBasedPageCache($sessionId);
     }
 
     /**
-     * Clear user based ESI cache of a specific user identified by its
-     * session ID.
+     * Clear user based ESI cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the esi cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedEsiCache($sessionId) {
+    public function clearUserBasedEsiCache($sessionId = '') {
         $this->cache->clearUserBasedEsiCache($sessionId);
     }
 
@@ -375,7 +387,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getCommandsForCommandMode() {
         return array(
             'Cache' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
+                array(),
                 array('cli'),
                 false
             ),
@@ -395,7 +407,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         if ($short) {
             return 'Allows to clear caches';
         }
-        return 'Cache clear user [<engine> [<pattern>]]
+        return 'Cache clear user [<engine>]
 Cache clear page [<pageId>]
 Cache clear (esi|proxy) [<urlPattern>]
 Cache clear opcode [<engine>]
@@ -424,11 +436,7 @@ Cache clear all';
                         if (count($arguments)) {
                             $options = array_shift($arguments);
                         }
-                        $pattern = '';
-                        if (count($arguments)) {
-                            $pattern = array_shift($arguments);
-                        }
-                        $this->clearCacheCommand($type, $options, $pattern);
+                        $this->clearCacheCommand($type, $options);
                         break;
                     default:
                         echo 'No such command' . "\n";
@@ -450,10 +458,8 @@ Cache clear all';
      * - all: Drop all of the above
      * @param string $type Cache type to clear
      * @param string $options (optional) Engine for user or opcode cache, filter for page, esi and reverse proxy cache
-     * @param   string  $pattern    Optional pattern to restrict the
-     *                              invalidation of the cache by.
      */
-    protected function clearCacheCommand($type, $options = '', $pattern = '') {
+    protected function clearCacheCommand($type, $options = '') {
         $types = array('user', 'page', 'esi', 'proxy', 'opcode');
         if ($type == 'all') {
             $this->clearCache();
@@ -483,11 +489,8 @@ Cache clear all';
                         if (!extension_loaded('memcached')) {
                             dl('memcached');
                         }
-                        $droppedKeys = $this->cache->clearMemcached($pattern);
-                        echo $droppedKeys . ' keys dropped from Memcached' . "\n";
-                        return;
                     }
-                    $this->cache->_deleteAllFiles($options);
+                    $this->cache->forceClearCache($options);
                     break;
                 }
                 $this->cache->_deleteAllFiles();
@@ -538,6 +541,53 @@ Cache clear all';
             return;
         }
         $this->cache->forceUserbasedPageCache();
+    }
+
+    /**
+     * Add an exception that must not get cached
+     *
+     * Case A: $componentOrCallback is a string, $additionalInfo is an empty array
+     * Case B: $componentOrCallback is a string, $additionalInfo is non-empty
+     * Case C: $componentOrCallback is a callback, $additionalInfo is an empty array
+     * Case D: $componentOrCallback is a callback, $additionalInfo is non-empty
+     *
+     * Case A will disable caching for all requests to a component.
+     * Case B will disable caching for all requests to a component that meet
+     * the criteria defined in $additionalInfo.
+     * Case C will execute the callback for each not yet cached request. The
+     * current Cx instance will be passed to the callback as the first argument.
+     * The currently resolved page will be passed to the callback as the second
+     * argument. If the callback returns true, the current request will not be
+     * cached, otherwise it will.
+     * Case D will ignore $additionalInfo and therefore result in case C.
+     *
+     * The format for $additionalInfo is either a list of CMDs or a single
+     * entry which is a callback.
+     * The former will not cache requests to any of
+     * the listed CMDs for the component specified in $componentOrCallback.
+     * The latter will execute the callback for any request to the component
+     * specified in $componentOrCallback. The currently resolved page will be
+     * passed to the callback as the first argument. If the callback returns
+     * true, the current request will not be cached, otherwise it will.
+     *
+     * If there's already an entry for the component specified in
+     * $componentOrCallback one of the following will happen:
+     * - $componentOrCallback is a callback or $additionalInfo is empty: The
+     *   exception will be blindly added. If at least one of the two (or more)
+     *   rules match, the request will not get cached.
+     * - $componentOrCallback is a component name and $additionalInfo is non-
+     *   empty: If there's a hard-coded entry in $this->exceptions in
+     *   static::endContrexxCaching() for the given component the exception
+     *   you're trying to add through this method will get overwritten.
+     *
+     * @param string|Callable $componentOrCallback Component name or callback
+     * @param array $additionalInfo (optional) Conditions
+     */
+    public function addException($componentOrCallback, $additionalInfo = array()) {
+        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            return;
+        }
+        $this->cache->addException($componentOrCallback, $additionalInfo);
     }
 
     /**

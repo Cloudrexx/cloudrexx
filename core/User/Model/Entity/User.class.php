@@ -591,7 +591,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->restoreKey = !empty($restoreKey)
                             ? $restoreKey
-                            : md5($this->email . $this->regdate . time());
+                            : md5($this->email . random_bytes(20));
     }
 
     /**

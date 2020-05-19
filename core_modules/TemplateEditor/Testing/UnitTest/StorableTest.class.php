@@ -56,7 +56,7 @@ class StorableTest extends ContrexxTestCase
      */
     protected $themeOptionRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->testStorage = new TestStorage();
         $this->themeOptionRepository = new OptionSetRepository($this->testStorage);

@@ -207,6 +207,12 @@ class DownloadsManager extends DownloadsLibrary
                     $this->parseDownloadNavigation();
                 }
                 break;
+            case 'categories_delete_download':
+                $this->deleteDownload();
+                $this->loadCategoryNavigation();
+                $this->categories();
+                $this->parseCategoryNavigation();
+                break;
             case 'unlink_download':
                 $this->unlinkDownloadFromCategory();
                 $this->loadCategoryNavigation();
@@ -266,14 +272,13 @@ class DownloadsManager extends DownloadsLibrary
         $downloadOrderDirection = !empty($_GET['download_sort']) ? $_GET['download_sort'] : 'asc';
         $downloadOrderBy = !empty($_GET['download_by']) ? $_GET['download_by'] : 'order';
 
-        $searchTerm = !empty($_REQUEST['search_term']) ? $_REQUEST['search_term'] : Null;
-        $searchTerm = ($searchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD']) ? Null : $searchTerm;
+        $searchTerm = !empty($_REQUEST['search_term']) ? contrexx_input2raw($_REQUEST['search_term']) : '';
 
         // downloads
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_DOWNLOADS'       => $_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS'],
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD' => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
-            'DOWNLOADS_SEARCH_TERM'         => !empty($searchTerm) ? $searchTerm : '',
+            'DOWNLOADS_SEARCH_TERM'         => contrexx_raw2xhtml($searchTerm),
             'DOWNLOADS_CATEGORY_MENU'       => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
             'TXT_DOWNLOADS_SEARCH'          => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
         ));
@@ -293,7 +298,7 @@ class DownloadsManager extends DownloadsLibrary
 
     private function getDownload()
     {
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->load(!empty($_GET['id']) ? intval($_GET['id']) : 0);
         if (!$objDownload->EOF) {
             if (// download is protected
@@ -838,7 +843,7 @@ class DownloadsManager extends DownloadsLibrary
         $arrAssociatedDownloads = array_keys($objCategory->getAssociatedDownloadIds());
         $associatedDownloads = '';
         $notAssociatedDownloads = '';
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $sortOrder   = $this->downloadsSortingOptions[$this->arrConfig['downloads_sorting_order']];
         $objDownload->loadDownloads(null, null, $sortOrder);
         while (!$objDownload->EOF) {
@@ -917,10 +922,9 @@ class DownloadsManager extends DownloadsLibrary
         }
 
         //$categoryId = !empty($_REQUEST['category_id']) ? intval($_REQUEST['category_id']) : 0;
-        $actualSearchTerm = !empty($_GET['search_term']) ? $_GET['search_term'] : Null;
-        $searchTerm = ($actualSearchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD']) ? Null : $actualSearchTerm;
-        $pagingLink = !empty($_GET['search_term']) ? '&search_term='.$_GET['search_term'] : '';
-        $pagingLink .= (!empty($_GET['act']) && $_GET['act'] == 'downloads') ? '&downloads_category_parent_id=0' : '';
+        $searchTerm = !empty($_GET['search_term']) ? contrexx_input2raw($_GET['search_term']) : '';
+        $pagingLink = !empty($searchTerm) ? '&search_term='.contrexx_raw2encodedUrl($searchTerm, true) : '';
+        $pagingLink .= (!empty($_GET['act']) && $_GET['act'] == 'downloads') ? '&downloads_category_parent_id=' . $this->parentCategoryId : '';
         if (isset($_POST['downloads_download_select_action'])) {
             switch ($_POST['downloads_download_select_action']) {
                 case 'order':
@@ -938,7 +942,7 @@ class DownloadsManager extends DownloadsLibrary
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_FILTER'          => $_ARRAYLANG['TXT_DOWNLOADS_FILTER'],
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD' => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
-            'DOWNLOADS_SEARCH_TERM'         => !empty($searchTerm) ? $searchTerm : '',
+            'DOWNLOADS_SEARCH_TERM'         => contrexx_raw2xhtml($searchTerm),
             'DOWNLOADS_CATEGORY_MENU'       => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
             'TXT_DOWNLOADS_SEARCH'          => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
         ));
@@ -948,7 +952,7 @@ class DownloadsManager extends DownloadsLibrary
             $filter = array('category_id' => $objCategory->getId());
         }
 
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->loadDownloads(
             $filter, $searchTerm, $arrOrder, null,
             $_CONFIG['corePagingLimit'], $limitOffset, true
@@ -1014,11 +1018,11 @@ class DownloadsManager extends DownloadsLibrary
         $downloadCount = $objDownload->getFilteredSearchDownloadCount();
         if ($downloadCount > $_CONFIG['corePagingLimit']) {
             $sorting = '';
-            if (!$actualSearchTerm){
+            if (!$searchTerm){
                 $sorting = "&sort=".htmlspecialchars($orderDirection)."&by=".htmlspecialchars($orderBy);
         }
 
-            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
+            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=Downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
 
         }
 
@@ -1163,7 +1167,7 @@ class DownloadsManager extends DownloadsLibrary
     {
         global $_ARRAYLANG;
 
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->load(isset($_GET['id']) ? $_GET['id'] : 0);
 
         if (!$objDownload->EOF) {
@@ -1183,7 +1187,7 @@ class DownloadsManager extends DownloadsLibrary
 
         $succeded = true;
 
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         foreach ($arrDownloadIds as $downloadId) {
             $objDownload->load($downloadId);
 
@@ -1203,7 +1207,7 @@ class DownloadsManager extends DownloadsLibrary
 
     private function switchDownloadStatus()
     {
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->load(isset($_GET['id']) ? intval($_GET['id']) : 0);
         if (!$objDownload->EOF) {
             $objDownload->setActiveStatus(!$objDownload->getActiveStatus());
@@ -1215,7 +1219,7 @@ class DownloadsManager extends DownloadsLibrary
     private function unlinkDownloadFromCategory()
     {
         $categoryId = isset($_GET['parent_id']) ? intval($_GET['parent_id']) : 0;
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->load(isset($_GET['id']) ? intval($_GET['id']) : 0);
         if (!$objDownload->EOF) {
             $arrCategoryAssociations = $objDownload->getAssociatedCategoryIds();
@@ -1282,7 +1286,7 @@ class DownloadsManager extends DownloadsLibrary
         $hasRemoveRight = \Permission::checkAccess(143, 'static', true) || $objCategory->getId() && (!$objCategory->getManageFilesAccessId() || \Permission::checkAccess($objCategory->getManageFilesAccessId(), 'dynamic', true) || $objCategory->getOwnerId() == $objFWUser->objUser->getId());
         $associatedDownloads = '';
         $notAssociatedDownloads = '';
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $sortOrder   = $this->downloadsSortingOptions[$this->arrConfig['downloads_sorting_order']];
         $objDownload->loadDownloads(null, null, $sortOrder);
         while (!$objDownload->EOF) {
@@ -1328,7 +1332,7 @@ class DownloadsManager extends DownloadsLibrary
 
         $arrFailedDownloads = array();
 
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         foreach ($arrDownloadOrder as $downloadId => $orderNr) {
             $objDownload->load($downloadId);
             if (!$objDownload->EOF) {
@@ -1353,9 +1357,13 @@ class DownloadsManager extends DownloadsLibrary
 
         $id = isset($_REQUEST['id']) ? contrexx_input2int($_REQUEST['id']) : 0;
         $objFWUser = \FWUser::getFWUserObject();
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->load($id);
 
+        \ContrexxJavascript::getInstance()->setVariable(
+            array('autoFileNaming' => $this->arrConfig['auto_file_naming']),
+            'downloads'
+        );
         if ($objDownload->getId()
             && !\Permission::checkAccess(143, 'static', true)
             && (($objFWUser = \FWUser::getFWUserObject()) == false || !$objFWUser->objUser->login() || $objDownload->getOwnerId() != $objFWUser->objUser->getId())
@@ -1528,14 +1536,15 @@ class DownloadsManager extends DownloadsLibrary
                 'DOWNLOADS_DOWNLOAD_TYPE_FILE_CHECKED' => $objDownload->getType() == 'file' ? 'checked="checked"' : '',
                 'DOWNLOADS_DOWNLOAD_TYPE_URL_CHECKED' => $objDownload->getType() == 'url' ? 'checked="checked"' : '',
             ));
-            $this->objTemplate->parse('downloads_download_language_content');
-        }
 
-        // parse metakeys
-        if ($this->arrConfig['use_attr_metakeys']) {
-            $this->objTemplate->parse('downloads_download_metakeys');
-        } else {
-            $this->objTemplate->hideBlock('downloads_download_metakeys');
+            // parse metakeys
+            if ($this->arrConfig['use_attr_metakeys']) {
+                $this->objTemplate->touchBlock('downloads_download_metakeys');
+            } else {
+                $this->objTemplate->hideBlock('downloads_download_metakeys');
+            }
+
+            $this->objTemplate->parse('downloads_download_language_content');
         }
 
         // parse type
@@ -1697,7 +1706,7 @@ class DownloadsManager extends DownloadsLibrary
 
         // parse related downloads
         $arrRelatedDownloads = $objDownload->getRelatedDownloadIds();
-        $objAvailableDownload = new Download();
+        $objAvailableDownload = new Download($this->arrConfig);
         $sortOrder = $this->downloadsSortingOptions[$this->arrConfig['downloads_sorting_order']];
         $objAvailableDownload->loadDownloads(null, null, $sortOrder);
         while (!$objAvailableDownload->EOF) {
@@ -1817,8 +1826,9 @@ class DownloadsManager extends DownloadsLibrary
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setCallback('mbCallback');
         $options = array(
-            'type'             => 'button',
-            'data-cx-mb-views' => $type,
+            'type'      => 'button',
+            'views'     => $type,
+            'startview' => $type,
         );
 
         if (!empty($id)) {
@@ -1951,8 +1961,7 @@ class DownloadsManager extends DownloadsLibrary
         $downloadOrderDirection = !empty($_GET['download_sort']) ? $_GET['download_sort'] : 'asc';
         $downloadOrderBy = !empty($_GET['download_by']) ? $_GET['download_by'] : '';
 
-        $searchTerm = !empty($_GET['search_term']) ? $_GET['search_term'] : '';
-        $searchTerm = $searchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'] ? '' : $searchTerm;
+        $searchTerm = !empty($_GET['search_term']) ? contrexx_input2raw($_GET['search_term']) : '';
 
         // parse categories multi action
         if (isset($_POST['downloads_category_select_action'])) {
@@ -2086,7 +2095,7 @@ class DownloadsManager extends DownloadsLibrary
             'TXT_DOWNLOADS_CATEGORY'            => $_ARRAYLANG['TXT_DOWNLOADS_CATEGORY'],
             'DOWNLOADS_CATEGORY_ID'             => $objCategory->getId(),
             'DOWNLOADS_CATEGORY_MENU'           => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
-            'DOWNLOADS_SEARCH_TERM'             => !empty($_GET['search_term']) ? $_GET['search_term'] : '',
+            'DOWNLOADS_SEARCH_TERM'             => contrexx_raw2xhtml($searchTerm),
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD'     => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
             'TXT_DOWNLOADS_FILTER'              => $_ARRAYLANG['TXT_DOWNLOADS_FILTER'],
             'TXT_DOWNLOADS_SEARCH'              => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
@@ -2398,10 +2407,141 @@ class DownloadsManager extends DownloadsLibrary
 
 
         if ($objCategory->getId()) {
-            $this->objTemplate->setVariable('TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY', sprintf($_ARRAYLANG['TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY'], '&bdquo;'.htmlentities($objCategory->getName(), ENT_QUOTES, CONTREXX_CHARSET).'&ldquo;'));
+            $parentNames = array();
+            $this->getParentCategoryNamesByChild($objCategory, $parentNames);
+
+            $categories = array(
+                'root' => array(),
+                'middle' => array(),
+                'previous' => array(),
+                'current' => array(),
+            );
+
+            foreach($parentNames as $position => $parentName) {
+                switch($position) {
+                    case 0:
+                        // Position 0 is the "current category"
+                        // Shorten the name after 60 chars
+                        $categories['current']['long'] = $parentName;
+                        $categories['current']['short'] = substr(
+                            $parentName, 0, 60
+                        );
+                        break;
+                    case 1:
+                        // Position 1 is the "previous category"
+                        // Shorten the name after 30 chars
+                        $categories['previous']['long'] = $parentName;
+                        $categories['previous']['short'] = substr(
+                            $parentName, 0, 30
+                        );
+                        break;
+                    case count($parentNames) - 1:
+                        // The last position is the "root category"
+                        // Shorten the name after 30 chars
+                        $categories['root']['long'] = $parentName;
+                        $categories['root']['short'] = substr(
+                            $parentName, 0, 30
+                        );
+                        break;
+                    default:
+                        // Add the remaining categories to an array
+                        $categories['middle'][] = $parentName;
+                        break;
+                }
+
+            }
+
+            // Flip the array to get the grandparents first
+            $categories['middle'] = array_reverse($categories['middle']);
+
+            $content =
+                sprintf(
+                    $_ARRAYLANG['TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY'],
+                    $this->getCategoryElement($categories['root']) .
+                    $this->getCategoryElement($categories['middle']) .
+                    $this->getCategoryElement($categories['previous']) .
+                    $this->getCategoryElement($categories['current'])
+                );
+
+            $this->objTemplate->setVariable(
+                'TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY',
+                $content
+            );
         }
     }
 
+    /**
+     * Get a span tag with the category name. If the parameter contains a long
+     * and a short category name, the long name will be added as title
+     * attribute. The short name is used as content for the span tag.
+     *
+     * If the parameter only contains category names, the category names are
+     * listed one below the other in the title attribute. The content of the
+     * span tag consists of three dots.
+     *
+     * @param array $category with long and short category name or only names
+     * @return string a span tag or an empty string
+     */
+    protected function getCategoryElement(array $category) : string
+    {
+        if (empty($category)) {
+            return '';
+        }
+
+        $title = '';
+        $text = '...';
+
+        if (!empty($category['long']) && !empty($category['short'])) {
+            $title = $category['long'];
+            $text = $category['short'];
+
+            if ($category['short'] !== $category['long']) {
+                $text .= '...';
+            }
+
+        } else {
+            foreach ($category as $middle) {
+                $title .= $middle . "\n";
+            }
+        }
+
+        $span = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $span->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement($text)
+        );
+        $span->setAttribute('title', $title);
+
+        return $span;
+    }
+
+    /**
+     * Get the name of the child category and all names of the parent categories
+     *
+     * @param \Cx\Modules\Downloads\Controller\Category $child child category
+     * @param array $names previous category names for recursion
+     */
+    protected function getParentCategoryNamesByChild(
+        \Cx\Modules\Downloads\Controller\Category $child,
+        array &$names
+    ) {
+        $names[] = $child->getName();
+        if (empty($child->getParentId())) {
+            return;
+        }
+
+        $parent = \Cx\Modules\Downloads\Controller\Category::getCategory(
+            $child->getParentId()
+        );
+
+        if (empty($parent)) {
+            return;
+        }
+
+        $this->getParentCategoryNamesByChild(
+            $parent,
+            $names
+        );
+    }
 
     private function parseCategoryDownloads($objCategory, $downloadOrderBy, $downloadOrderDirection, $downloadLimitOffset, $categoryOrderBy, $categoryOrderDirection, $categoryLimitOffset, $searchTerm)
     {
@@ -2426,7 +2566,7 @@ class DownloadsManager extends DownloadsLibrary
             );
         }
 
-        $objDownload = new Download();
+        $objDownload = new Download($this->arrConfig);
         $objDownload->loadDownloads(array('category_id' => $objCategory->getId()), $searchTerm, $arrOrder, null, $_CONFIG['corePagingLimit'], $downloadLimitOffset, true);
         $downloadsAvailable = $objDownload->EOF ? false : true;
         while (!$objDownload->EOF) {
@@ -2601,7 +2741,7 @@ class DownloadsManager extends DownloadsLibrary
                     'DOWNLOADS_DOWNLOAD_NAME_JS'            => htmlspecialchars($objDownload->getName(), ENT_QUOTES, CONTREXX_CHARSET),
                 ));
 
-                // parse delete icon
+                // parse unlink icon
                 $this->objTemplate->parse('downloads_download_function_unlink_link');
                 $this->objTemplate->hideBlock('downloads_download_function_no_unlink_link');
             } else {
@@ -2610,6 +2750,42 @@ class DownloadsManager extends DownloadsLibrary
                 $this->objTemplate->hideBlock('downloads_download_function_unlink_link');
             }
 
+            // parse delete button
+            if (// managers are allowed to delete the download
+                \Permission::checkAccess(143, 'static', true)
+                // the owner has the permission to delete it by himself
+                || ($objDownload->getOwnerId() == $objFWUser->objUser->getId())
+            ) {
+                $this->objTemplate->setVariable(
+                    array(
+                        'TXT_DOWNLOADS_DELETE'  => $_ARRAYLANG['TXT_DOWNLOADS_DELETE'],
+                        'DOWNLOADS_DOWNLOAD_NAME_JS_DELETE' => htmlspecialchars(
+                            $objDownload->getName(),
+                            ENT_QUOTES,
+                            CONTREXX_CHARSET
+                        ),
+                    )
+                );
+                \ContrexxJavascript::getInstance()->setVariable(
+                    'DOWNLOADS_CONFIRM_DELETE_DOWNLOAD_TXT',
+                    preg_replace(
+                        '#\n#',
+                        '\\n',
+                        addslashes(
+                            $_ARRAYLANG['TXT_DOWNLOADS_CONFIRM_DELETE_DOWNLOAD']
+                        )
+                    ),
+                    'downloads'
+                );
+
+                // parse delete icon
+                $this->objTemplate->parse('downloads_download_function_delete_link');
+                $this->objTemplate->hideBlock('downloads_download_function_no_delete_link');
+            } else {
+                // parse delete icon
+                $this->objTemplate->hideBlock('downloads_download_function_delete_link');
+                $this->objTemplate->touchBlock('downloads_download_function_no_delete_link');
+            }
 
             $description = $objDownload->getDescription();
             if (strlen($description) > 100) {
@@ -2755,6 +2931,8 @@ class DownloadsManager extends DownloadsLibrary
                     current($linkMethods);
             }
 
+            $this->arrConfig['auto_file_naming']            = isset($_POST['downloads_setting_auto_naming']) ? contrexx_input2raw($_POST['downloads_setting_auto_naming']) : $this->arrConfig['auto_file_naming'];
+            $this->arrConfig['pretty_regex_pattern']        = isset($_POST['downloads_setting_pretty_format']) ? contrexx_input2raw($_POST['downloads_setting_pretty_format']) : $this->arrConfig['pretty_regex_pattern'];
             $this->arrConfig['most_viewed_file_count']      = !empty($_POST['downloads_settings_most_viewed_file_count']) ? intval($_POST['downloads_settings_most_viewed_file_count']) : $this->arrConfig['most_viewed_file_count'];
             $this->arrConfig['most_downloaded_file_count']  = !empty($_POST['downloads_settings_most_downloaded_file_count']) ? intval($_POST['downloads_settings_most_downloaded_file_count']) : $this->arrConfig['most_downloaded_file_count'];
             $this->arrConfig['most_popular_file_count']     = !empty($_POST['downloads_settings_most_popular_file_count']) ? intval($_POST['downloads_settings_most_popular_file_count']) : $this->arrConfig['most_popular_file_count'];
@@ -2765,10 +2943,10 @@ class DownloadsManager extends DownloadsLibrary
             $this->arrConfig['associate_user_to_groups']    = !empty($_POST['downloads_settings_associate_user_to_groups_associated_groups']) ? implode(',', array_map('intval', $_POST['downloads_settings_associate_user_to_groups_associated_groups'])) : $this->arrConfig['associate_user_to_groups'];
             $this->arrConfig['downloads_sorting_order']     = (     !empty($_POST['downloads_settings_sorting_downloads'])
                                                                 && array_key_exists($_POST['downloads_settings_sorting_downloads'], $this->downloadsSortingOptions)
-                                                              ) ? contrexx_input2db($_POST['downloads_settings_sorting_downloads']) : $this->arrConfig['downloads_sorting_order'];
+                                                              ) ? $_POST['downloads_settings_sorting_downloads'] : $this->arrConfig['downloads_sorting_order'];
             $this->arrConfig['categories_sorting_order']    = (     !empty($_POST['downloads_settings_sorting_categories'])
                                                                 &&  array_key_exists($_POST['downloads_settings_sorting_categories'], $this->categoriesSortingOptions)
-                                                              ) ? contrexx_input2db($_POST['downloads_settings_sorting_categories']) : $this->arrConfig['categories_sorting_order'];
+                                                              ) ? $_POST['downloads_settings_sorting_categories'] : $this->arrConfig['categories_sorting_order'];
 
             $this->updateSettings();
         }
@@ -2864,6 +3042,11 @@ class DownloadsManager extends DownloadsLibrary
             'TXT_DOWNLOADS_CHECK_ALL'                       => $_ARRAYLANG['TXT_DOWNLOADS_CHECK_ALL'],
             'TXT_DOWNLOADS_GENERAL'                         => $_ARRAYLANG['TXT_DOWNLOADS_GENERAL'],
             'TXT_DOWNLOADS_INTERFACES'                      => $_ARRAYLANG['TXT_DOWNLOADS_INTERFACES'],
+            'TXT_DOWNLOADS_SETTINGS_ASSET_SELECTION'        => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_ASSET_SELECTION'],
+            'TXT_DOWNLOADS_SETTINGS_AUTO_NAMING'            => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_AUTO_NAMING'],
+            'TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE'    => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE'],
+            'TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE'     => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE'],
+            'TXT_DOWNLOADS_SETTINGS_PRETTY_FORMAT_TOOLTIP'  => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_PRETTY_FORMAT_TOOLTIP'],
             'TXT_DOWNLOADS_EMAIL_TEMPLATES'                 => $_ARRAYLANG['TXT_DOWNLOADS_EMAIL_TEMPLATES'],
             'TXT_DOWNLOADS_USER_ADMIN'                      => $_ARRAYLANG['TXT_DOWNLOADS_USER_ADMIN'],
             'TXT_DOWNLOADS_AUTOMATIC_CATEGORY_CREATION'     => $_ARRAYLANG['TXT_DOWNLOADS_AUTOMATIC_CATEGORY_CREATION'],
@@ -2888,6 +3071,9 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_SETTINGS_ATTRIBUTE_WEBSITE_CHECKED'  => $this->arrConfig['use_attr_website'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_LIST_DOWNLOADS_CURRENT_LANG'=> $this->arrConfig['list_downloads_current_lang'] ? 'checked="checked"' : '',
             'DOWNLOADS_SETTINGS_INTEGRATE_INTO_SEARCH_COMPONENT'=> $this->arrConfig['integrate_into_search_component'] ? 'checked="checked"' : '',
+            'DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE_CHECKED' => $this->arrConfig['auto_file_naming'] == 'off' ? 'checked="checked"' : '',
+            'DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE_CHECKED' => $this->arrConfig['auto_file_naming'] == 'on' ? 'checked="checked"' : '',
+            'DOWNLOADS_SETTINGS_PRETTY_FORMAT'              => contrexx_raw2xhtml($this->arrConfig['pretty_regex_pattern']),
             'DOWNLOADS_SETTINGS_SEARCH_LINK_OPTIONS'        => $linkMethodOptions,
             'DOWNLOADS_SETTINGS_MOST_VIEWED_FILE_COUNT'     => $this->arrConfig['most_viewed_file_count'],
             'DOWNLOADS_SETTINGS_MOST_DOWNLOADED_FILE_COUNT' => $this->arrConfig['most_downloaded_file_count'],

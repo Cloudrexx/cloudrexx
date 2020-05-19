@@ -44,22 +44,18 @@ namespace Cx\Core_Modules\Listing\Controller;
  * @package     cloudrexx
  * @subpackage  coremodule_listing
  */
-class SortingController {
+class SortingController extends ListingHandler {
 
-    public function handle($params, $config) {
-        $paramName = !empty($params['entity']) ? $params['entity'] . 'Order' : 'Order';
-        if (!isset($config[$paramName])) {
-            return $params;
+    /**
+     * @{inheritdoc}
+     */
+    public function handle($config, $params) {
+        $order = $params['order'];
+        if (count($order)) {
+            $sortField = current(array_keys($order));
+            $sortOrder = current($order) == 'ASC' ? SORT_ASC: SORT_DESC;
+            $config['order'] = array($sortField => $sortOrder);
         }
-        $order = explode('/', $config[$paramName]);
-        $sortField = current($order);
-        $sortOrder = SORT_ASC;
-        if (count($order) > 1) {
-            if ($order[1] == 'DESC') {
-                $sortOrder = SORT_DESC;
-            }
-        }
-        $params['order'] = array($sortField => $sortOrder);
-        return $params;
+        return $config;
     }
 }

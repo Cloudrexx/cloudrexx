@@ -88,8 +88,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         return array(
             'getFiles', 'getSites', 'getSources', 'createThumbnails',
             'createDir', 'renameFile', 'removeFile',
-            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
-            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false)
+            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false),
+            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false)
         );
     }
 
@@ -140,12 +140,27 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
      * @return array
      */
     public function getFiles($params) {
-        $filePath  = (strlen($params['get']['path']) > 0)
-            ? $params['get']['path'] : '/';
-        $mediaType = (strlen($params['get']['mediatype']) > 0)
-            ? $params['get']['mediatype'] : 'files';
-        $recursive = (strlen($params['get']['recursive']) > 0)
-            ? $params['get']['recursive'] : false;
+        $filePath = '/';
+        if (
+            isset($params['get']['path']) &&
+            strlen($params['get']['path']) > 0
+        ) {
+            $filePath = $params['get']['path'];
+        }
+        $mediaType = 'files';
+        if (
+            isset($params['get']['mediatype']) &&
+            strlen($params['get']['mediatype']) > 0
+        ) {
+            $mediaType = $params['get']['mediatype'];
+        }
+        $recursive = false;
+        if (
+            isset($params['get']['recursive']) &&
+            strlen($params['get']['recursive']) > 0
+        ) {
+            $recursive = $params['get']['recursive'];
+        }
 
         $mediaTypes = $this->cx->getMediaSourceManager()->getMediaTypes();
         return $mediaTypes[$mediaType]->getFileSystem()->getFileList($filePath, $recursive);

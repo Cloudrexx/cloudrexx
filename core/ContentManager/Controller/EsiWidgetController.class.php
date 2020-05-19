@@ -182,19 +182,12 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
 
                 // fetch canonical-link
                 try {
-                    $linkHeader = $response->getHeader('Link');
+                    $link = $this->getSystemComponentController()->fetchAlreadySetCanonicalLink($response);
                 } catch (\Exception $e) {
                     // no Link header set -> page doesn't have a canonical-link
                     break;
                 }
-                if (!preg_match('/^<([^>]+)>;\s+rel="canonical"/', $linkHeader, $matches)) {
-                    break;
-                }
 
-                $canonicalLink = $matches[1];
-                $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
-                $link->setAttribute('rel', 'canonical');
-                $link->setAttribute('href', $canonicalLink);
                 $widgetValue = (string) $link;
                 break;
         }

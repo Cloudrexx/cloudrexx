@@ -232,7 +232,6 @@ var popUpTimeout = 2000;
 function showPopup(id) {
     var obj = document.getElementById(id);
     if (!obj) {
-//alert('Cannot find element '+id);
         return;
     }
     obj.style.display = 'none';

@@ -89,8 +89,8 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         if ($objMainDomain) {
                             $domainUrl = $objMainDomain->getName();
                             $protocol = 'http';
-                            if ($_CONFIG['forceProtocolFrontend'] != 'none') {
-                                $protocol = $_CONFIG['forceProtocolFrontend'];
+                            if ($_CONFIG['forceProtocolBackend'] != 'none') {
+                                $protocol = $_CONFIG['forceProtocolBackend'];
                             }
                             if (
                                 php_sapi_name() != 'cli' &&
@@ -194,6 +194,34 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                             array('Widget', 'METAIMAGE')
                         );
                     }
+                    break;
+                case 'useVirtualLanguageDirectories':
+                    if ($value == 'on' || $value == $_CONFIG[$objSetting->getName()]) {
+                        break;
+                    }
+
+                    $locale = $this->cx->getDb()->getEntityManager()
+                        ->getRepository('\Cx\Core\Locale\Model\Entity\Locale')
+                        ->findAll();
+                    // Set strong tag to the text
+                    $strongText = new \Cx\Core\Html\Model\Entity\HtmlElement('strong');
+                    $strongText->addChild(
+                        new \Cx\Core\Html\Model\Entity\TextElement(
+                            $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']
+                        )
+                    );
+
+                    if ($value === 'off' && count($locale) > 1) {
+                        \Message::error(
+                            sprintf(
+                                $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'],
+                                $strongText
+                            )
+                        );
+                        $objSetting->setValue('on');
+                    }
+                    break;
+                default :
                     break;
             }
         } catch (YamlSettingEventListenerException $e) {

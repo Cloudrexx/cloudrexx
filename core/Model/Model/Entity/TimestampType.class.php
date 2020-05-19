@@ -69,8 +69,10 @@ class TimestampType extends \Doctrine\DBAL\Types\Type {
         }
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $dateTime = $cx->getComponent('DateTime');
-        $dateTime->db2intern($val);
-        return $val;
+        $dbDate = $dateTime->createDateTimeForDb();
+        $dbDate->setTime($val->format('H'), $val->format('i'), $val->format('s'));
+        $dbDate->setDate($val->format('Y'), $val->format('m'), $val->format('d'));
+        return $dateTime->db2intern($dbDate);
     }
 
     /**

@@ -235,6 +235,8 @@ class JsonNode implements JsonAdapter {
 
             foreach ($moved_node->getPages() as $page) {
                 $page->setupPath($page->getLang());
+                $page->setSlug($page->getSlug());
+                $page->validate();
                 $this->em->persist($page);
             }
 
@@ -299,24 +301,8 @@ class JsonNode implements JsonAdapter {
         $this->em->getConnection()->beginTransaction();
         try {
             // copy the node recursively and persist changes
-            $newNode = $node->copy(true);
+            $newNode = $node->copy(true, null, $position, true);
             $this->em->flush();
-
-            // rename page
-            foreach ($newNode->getPages() as $page) {
-                $title = $page->getTitle() . ' (' . $_CORELANG['TXT_CORE_CM_COPY_OF_PAGE'] . ')';
-                $i = 1;
-                while ($this->titleExists($node->getParent(), $page->getLang(), $title)) {
-                    $i++;
-                    if ($page->getLang() == \FWLanguage::getDefaultLangId()) {
-                        $position++;
-                    }
-                    $title = $page->getTitle() . ' (' . sprintf($_CORELANG['TXT_CORE_CM_COPY_N_OF_PAGE'], $i) . ')';
-                }
-                $page->setTitle($title);
-                $this->em->persist($page);
-            }
-
             // move the node to correct position
             $this->nodeRepo->moveUp($newNode, true);
             $this->nodeRepo->moveDown($newNode, $position, true);
@@ -329,15 +315,6 @@ class JsonNode implements JsonAdapter {
             $this->em->getConnection()->rollback();
             throw $e;
         }
-    }
-
-    protected function titleExists($parentNode, $lang, $title) {
-        foreach ($parentNode->getChildren() as $childNode) {
-            if ($childNode->getPage($lang) && $childNode->getPage($lang)->getTitle() == $title) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

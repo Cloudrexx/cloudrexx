@@ -379,6 +379,14 @@ class EgovManager extends EgovLibrary
             'EGOV_PRODUCT_QUANTITY_LIMIT' => EgovLibrary::GetProduktValue('product_quantity_limit', $product_id),
             // Alternative payment methods, comma separated
             'ALTERNATIVE_NAMES' => EgovLibrary::GetProduktValue('alternative_names', $product_id),
+            'EGOV_PRODUCT_MEDIABROWSER_FILE_BUTTON'       => $this->getMediaBrowserButton(
+                'productFileButton',
+                'mbProductFileCallback'
+            ),
+            'EGOV_PRODUCT_MEDIABROWSER_TARGET_URL_BUTTON' => $this->getMediaBrowserButton(
+                'productTargetUrlButton',
+                'mbProductTargetUrlCallback'
+            ),
         ));
 
         if (EgovLibrary::GetProduktValue('product_per_day', $product_id) == 'yes') {

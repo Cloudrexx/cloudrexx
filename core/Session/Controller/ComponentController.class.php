@@ -58,6 +58,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function preResolve(\Cx\Core\Routing\Url $request) {
         if ($this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
             $sessionObj = $this->getSession();
+            if (!$sessionObj) {
+                return;
+            }
             $sessionObj->cmsSessionStatusUpdate('backend');
         }
     }
