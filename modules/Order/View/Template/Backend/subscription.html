@@ -12,12 +12,12 @@
                 <input type='hidden' name="act" value="subscription" />
                 <input type="text" name="term" placeholder="{TXT_ORDER_SUBSCRIPTIONS_SEARCH_TERM}" id="term"  style="width: 300px;" class="search-box" value="{ORDER_SUBSCRIPTIONS_SEARCH_VALUE}" autocomplete="off" />
                 &nbsp;&nbsp;
-                <select tabindex="7" data-placeholder="{TXT_ORDER_SUBSCRIPTIONS_SEARCH_PRODUCT}" style="width: 300px;" name="filter_product[]" class="chzn-select" size="1" multiple>
+                <select tabindex="7" data-placeholder="{TXT_ORDER_SUBSCRIPTIONS_SEARCH_PRODUCT}" style="width: 300px;" name="filter_product[]" class="chzn-select" data-disable_search="true" size="1" multiple>
                     <!-- BEGIN subscription_product_filter -->
                     <option value="{ORDER_SUBSCRIPTION_PRODUCT_VALUE}" {ORDER_SUBSCRIPTION_PRODUCT_SELECTED}>{ORDER_SUBSCRIPTION_PRODUCT_NAME}</option>
                     <!-- END subscription_product_filter -->
                 </select>
-                <select tabindex="7" data-placeholder="{TXT_ORDER_SUBSCRIPTIONS_SEARCH_STATE}" style="width: 300px;" name="filter_state[]" class="chzn-select" size="1" multiple>
+                <select tabindex="7" data-placeholder="{TXT_ORDER_SUBSCRIPTIONS_SEARCH_STATE}" style="width: 300px;" name="filter_state[]" class="chzn-select" data-disable_search="true" size="1" multiple>
                     <!-- BEGIN subscription_state_filter -->
                     <option value="{ORDER_SUBSCRIPTION_STATE_VALUE}" {ORDER_SUBSCRIPTION_STATE_SELECTED}>{ORDER_SUBSCRIPTION_STATE_NAME}</option>
                     <!-- END subscription_state_filter -->

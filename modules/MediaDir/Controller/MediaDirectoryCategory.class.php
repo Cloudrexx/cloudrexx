@@ -223,7 +223,43 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         }
     }
 
-    function listCategories($objTpl, $intView, $intCategoryId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $intStartLevel=1)
+    /**
+     * Returns a list with IDs of all visible categories that contain published
+     * data
+     *
+     * Published data is identified as categories having any of the following
+     * options set to activated:
+     * - categoryShowEntries
+     * - categoryShowSubcategories
+     *
+     * @return  array   List of IDs of categories
+     */
+    public static function getIdsWithPublishedData() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+        $result = $db->Execute('
+            SELECT `id`
+            FROM `' . DBPREFIX . 'module_mediadir_categories`
+            WHERE `active` = 1
+            AND (
+                `show_subcategories` = 1 OR
+                `show_entries` = 1
+            )
+        ');
+        if (!$result || $result->EOF) {
+            return array();
+        }
+
+        $ids = array();
+        while (!$result->EOF) {
+            $ids[] = $result->fields['id'];
+            $result->MoveNext();
+        }
+
+        return $ids;
+    }
+
+    function listCategories($objTpl, $intView, $intCategoryId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $intStartLevel=1, $cmd = null)
     {
         global $_ARRAYLANG, $_CORELANG, $objDatabase, $objInit;
 
@@ -303,8 +339,13 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 $intNumBlocks = count($arrExistingBlocks);
                 $strIndexHeader = '';
 
-
-                if($this->arrSettings['settingsCategoryOrder'] == 2) {
+                // in a previous version, the system did not start parsing
+                // with the first row block. Instead it began to render the
+                // last column.
+                if(
+                    $this->arrSettings['legacyBehavior'] &&
+                    $this->arrSettings['settingsCategoryOrder'] == 2
+                ) {
                     $i = $intNumBlocks-1;
                 } else {
                     $i = 0;
@@ -363,20 +404,13 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                         $strIndexHeaderTag = null;
                     }
 
-                    //get ids
-                    if(isset($_GET['cmd'])) {
-                        $strCategoryCmd = '&amp;cmd='.$_GET['cmd'];
-                    } else {
-                        $strCategoryCmd = null;
-                    }
-
                     // parse entries
                     if (
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entries') &&
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entry')
                     ) {
                         $objEntry = new MediaDirectoryEntry($this->moduleName);
-                        $objEntry->getEntries(null, $levelId, $arrCategory['catId'], null, false, null, true);
+                        $objEntry->getEntries(null, $levelId, $arrCategory['catId'], null, false, null, true, null, 'n', null, null, $cmd);
                         if ($objEntry->countEntries()) {
                             // set mediadirCategoriesLevels_row_N_entry tempalte block to be parsed
                             $objEntry->setStrBlockName($this->moduleNameLC.'CategoriesLevels_row_'. $intBlockId . '_entry');

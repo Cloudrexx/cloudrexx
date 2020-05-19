@@ -14,5 +14,16 @@
             $('select[name="allowClientSideScriptUploadOnGroups[]"]').closest('tr').css('display', displayClientSideGroupSelection);
         });
         $('#allowClientsideScriptUpload').trigger('change');
+
+        // Show cookieNoteTtl options based on cookieNote on or off
+        jQuery('input[name="cookieNote"]').change(function() {
+            var cookieNoteOpt = jQuery('input[name="cookieNote"]:checked').val();
+            if (cookieNoteOpt === 'off') {
+                jQuery('select[name="cookieNoteTtl"]').closest('tr').hide();
+            } else {
+                jQuery('select[name="cookieNoteTtl"]').closest('tr').show();
+            }
+        });
+        jQuery('input[name="cookieNote"]').trigger('change');
     });
 })(cx.jQuery);

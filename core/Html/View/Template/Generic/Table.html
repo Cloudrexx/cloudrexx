@@ -1,22 +1,30 @@
-<table{TABLE_ATTRIBUTES}><!-- BEGIN caption -->
-    <caption{CAPTION_ATTRIBUTES}>
+<!-- BEGIN form_open -->
+<form name="vg-{HTML_VG_ID}-saveEntries" method="post" action="{HTML_FORM_ACTION}">
+    <!-- END form_open -->
+    <table{TABLE_ATTRIBUTES}><!-- BEGIN caption -->
+        <caption{CAPTION_ATTRIBUTES}>
         {CAPTION_CONTENTS}
-    </caption><!-- END caption --><!-- BEGIN colgroup -->
-    <colgroup{COLGROUP_ATTRIBUTES}><!-- BEGIN col -->
-        <col{COL_ATTRIBUTES} /><!-- END col -->
-    </colgroup><!-- END colgroup --><!-- BEGIN row --><!-- BEGIN thead_open -->
-    <thead{THEAD_ATTRIBUTES}><!-- END thead_open --><!-- BEGIN tbody_open -->
-    <tbody{THEAD_ATTRIBUTES}><!-- END tbody_open --><!-- BEGIN tfoot_open -->
-    <tfoot{THEAD_ATTRIBUTES}><!-- END tfoot_open -->
-        <tr{TR_ATTRIBUTES}><!-- BEGIN row_th -->
-            <th{CELL_ATTRIBUTES}>
-                {CELL_CONTENTS}
-            </th><!-- END row_th --><!-- BEGIN row_td -->
-            <td{CELL_ATTRIBUTES}>
-                {CELL_CONTENTS}
-            </td><!-- END row_td -->
-        </tr><!-- BEGIN thead_close -->
-    </thead><!-- END thead_close --><!-- BEGIN tbody_close -->
-    </tbody><!-- END tbody_close --><!-- BEGIN tfoot_close -->
-    </tfoot><!-- END tfoot_close --><!-- END row -->
-</table>
+        </caption><!-- END caption --><!-- BEGIN colgroup -->
+        <colgroup{COLGROUP_ATTRIBUTES}><!-- BEGIN col -->
+            <col{COL_ATTRIBUTES} /><!-- END col -->
+        </colgroup><!-- END colgroup --><!-- BEGIN row --><!-- BEGIN thead_open -->
+        <thead{THEAD_ATTRIBUTES}><!-- END thead_open --><!-- BEGIN tbody_open -->
+            <tbody{THEAD_ATTRIBUTES}><!-- END tbody_open --><!-- BEGIN tfoot_open -->
+                <tfoot{THEAD_ATTRIBUTES}><!-- END tfoot_open -->
+                    <tr{TR_ATTRIBUTES}><!-- BEGIN row_th -->
+                        <th{CELL_ATTRIBUTES}>
+                            {CELL_CONTENTS}
+                        </th><!-- END row_th --><!-- BEGIN row_td -->
+                        <td{CELL_ATTRIBUTES}>
+                            {CELL_CONTENTS}
+                        </td><!-- END row_td -->
+                    </tr><!-- BEGIN thead_close -->
+                </thead><!-- END thead_close --><!-- BEGIN tbody_close -->
+            </tbody><!-- END tbody_close --><!-- BEGIN tfoot_close -->
+        </tfoot><!-- END tfoot_close --><!-- END row -->
+    </table>
+    <!-- BEGIN form_close -->
+    <br /><br />
+    <input type="submit" name="vg-{HTML_VG_ID}-saveEntry" value="{TXT_HTML_SAVE}" />
+</form>
+<!-- END form_close -->

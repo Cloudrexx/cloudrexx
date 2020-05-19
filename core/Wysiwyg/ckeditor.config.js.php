@@ -68,6 +68,19 @@ if (!empty($pageId) && $pageId != 'new') {
 }
 
 $ymlOption = $wysiwyg->getCustomCSSVariables($skinId);
+
+// load language data
+$lang = 0;
+if (!empty($_GET['locale'])) {
+    $locale = $_GET['locale'];
+    $lang = \FWLanguage::getLanguageIdByCode($locale);
+}
+$_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData(
+    'Wysiwyg',
+    false,
+    $lang
+);
+
 ?>
 //if the wysiwyg css not defined in the session, then load the css variables and put it into the session
 if(!cx.variables.get('css', 'wysiwyg')) {
@@ -184,6 +197,75 @@ CKEDITOR.on('instanceReady',function(){
                 }
             }
         );
+    }
+});
+
+// add shadowbox functionality
+CKEDITOR.on('dialogDefinition', function (event) {
+    var editor = event.editor;
+    var dialogDefinition = event.data.definition;
+
+    // only add functionality to image dialog
+    if (event.data.name != 'image') {
+        return;
+    }
+
+    // add Shadowbox option to advanced tab
+    var advancedTab = dialogDefinition.getContents( 'advanced' );
+    if (advancedTab !== null) {
+        // add checkbox
+        advancedTab.add({
+            type: 'checkbox',
+            label: '<?php echo $_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_LABEL']; ?>',
+            id: 'txtdlgGenShadowbox',
+            onClick: function() {
+                shadowboxSrc = this.getDialog().getContentElement( 'advanced', 'txtdlgGenShadowboxSrc' ).getElement();
+                if (this.getValue()) {
+                    shadowboxSrc.setStyle('display', 'block');
+                    //if (!this.getDialog().getValueOf('advanced', 'txtdlgGenShadowboxSrc')) {
+                        var imageSrc = this.getDialog().getValueOf('info', 'txtUrl');
+                        var originalImage = imageSrc.replace(/\.thumb_([^.]+)\.(.{3,4})$/, '.$2').replace(/\.thumb$/,'')
+                        this.getDialog().setValueOf('advanced', 'txtdlgGenShadowboxSrc', originalImage);
+                    //}
+                } else {
+                    shadowboxSrc.setStyle('display', 'none');
+                }
+            },
+            setup : function( type, element ) {
+                //if ( type == LINK ) {}
+                imgRel = element.getAttribute('data-shadowbox');
+                if (!imgRel) {
+                    this.setValue(false);    
+                } else {
+                    this.setValue(true);
+                }
+            },
+            commit : function( type, element ) {
+                //if ( type == LINK ) {
+                if ( this.getValue()) {
+                    element.setAttribute('data-shadowbox', this.getDialog().getValueOf('advanced', 'txtdlgGenShadowboxSrc'));
+                } else {
+                    element.removeAttributes(['data-shadowbox']);
+                }
+            },
+        });
+        // add input field for shadowbox source 
+        advancedTab.add({
+            type: 'text',
+            label: '<?php echo $_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_SRC']; ?>',
+            id: 'txtdlgGenShadowboxSrc',
+            style: 'display:none',
+            setup : function( type, element ) {
+                //if ( type == LINK ) {}
+                imgRel = element.getAttribute('data-shadowbox');
+                this.setValue(imgRel);
+                if (!imgRel) {
+                    this.getElement().setStyle('display', 'none');
+                } else {
+                    this.getElement().setStyle('display', 'block');
+                }
+            }
+        });
     }
 });
 

@@ -87,4 +87,23 @@ class Mail extends \PHPMailer
         $this->Username = $arrSmtp['username'];
         $this->Password = $arrSmtp['password'];
     }
+
+    /**
+     * Turn off sendmail options for non-sendmail MTA
+     *
+     * If the "sendmail" program is not sendmail itself we need to assume that
+     * it doesn't support sendmail compatible options.
+     *
+     * It would be nicer to do this in mailPassthru(), but since this method is
+     * private we cannot overwrite it.
+     * @todo This could lead to false-positives
+     * @{inheritDoc}
+     */
+    protected function mailSend($header, $body)
+    {
+        if (strpos(ini_get('sendmail_path'), 'sendmail') === false) {
+            $this->UseSendmailOptions = false;
+        }
+        return parent::mailSend($header, $body);
+    }
 }

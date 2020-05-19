@@ -48,6 +48,21 @@ namespace Cx\Core\DataSource\Model\Entity;
 class JsonDataSource extends DataSource {
 
     /**
+     * Returns a list of field names this DataSource consists of
+     * @return array List of field names
+     */
+    public function listFields() {
+        throw new \Exception('Not yet implemented');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        throw new \Exception('Not yet implemented');
+    }
+
+    /**
      * Gets one or more entries from this DataSource
      *
      * If an argument is not provided, no restriction is made for this argument.

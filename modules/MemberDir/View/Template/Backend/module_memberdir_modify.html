@@ -1,6 +1,12 @@
 <!-- START module_memberdir_modify.html -->
 
 <script type="text/javascript">
+  cx.jQuery(document).ready(function(){
+    cx.jQuery('.triggerMediaBrowser').click(function(){
+      cx.jQuery(this).parent('td').find('button').trigger('click');
+    });
+  });
+
 /* <![CDATA[ */
   var fieldID;
 
@@ -9,28 +15,27 @@
     document.getElementById("memberModifyForm").submit()
   }
 
-  var openBrowser = function openBrowser(url, id, attrs) {
-      fieldID=id;
-      try{
-      if(!browserPopup.closed){
-        return browserPopup.focus();
-      }
-    }catch(e){}
-    if (!window.focus){
-      return true;
-    }
-      browserPopup = window.open(url, "", attrs);
-      browserPopup.focus();
-      return false;
+  function mbImageSelectionOne(data)
+  {
+    if (data.type !== 'file' || (typeof data.data[0] === 'undefined')) {
+        return;
     }
 
-    var SetUrl = function(url, width, height, alt) {
-      image = document.getElementById("img"+fieldID);
-      image.src = url;
-      image.style.width = "40px";
-      hidden = document.getElementById("hi"+fieldID);
-      hidden.value = url;
+    var url = data.data[0].datainfo.filepath;
+    cx.jQuery('#hi1').val(url);
+    cx.jQuery('#img1').attr('src', url);
+  }
+
+  function mbImageSelectionTwo(data)
+  {
+    if (data.type !== 'file' || (typeof data.data[0] === 'undefined')) {
+      return;
     }
+
+    var url = data.data[0].datainfo.filepath;
+    cx.jQuery('#hi2').val(url);
+    cx.jQuery('#img2').attr('src', url);
+  }
 /* ]]> */
 </script>
 
@@ -55,8 +60,9 @@
     <td width="150">{TXT_MEMBERDIR_FIELD}:</td>
 <!--    <td><input type="file" style="width: 200px;" name="{MEMBERDIR_FIELD_NAME}" value="{MEMBERDIR_FIELD_VALUE}"/> <span style="margin-left: 15px;">{TXT_MAX_FILE_SIZE}</span></td>-->
       <td>
-        <img id="img{MEMBERDIR_IMAGE_NUMBER}" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');" style="width: {MEMBERDIR_IMAGE_SIZE}px;" src="{MEMBERDIR_IMAGE_SRC}" title="" alt="Hier klicken" />
-        <a href="#" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');">{TXT_EDIT_IMAGE}</a>
+        <img class="triggerMediaBrowser" id="img{MEMBERDIR_IMAGE_NUMBER}" style="width: {MEMBERDIR_IMAGE_SIZE}px;" src="{MEMBERDIR_IMAGE_SRC}" title="" alt="Hier klicken" />
+        <a class="triggerMediaBrowser">{TXT_EDIT_IMAGE}</a>
+        {MEMBERDIR_MEDIABROWSER_BUTTON}
         <input type="hidden" id="hi{MEMBERDIR_IMAGE_NUMBER}" value="{MEMBERDIR_HIDDEN_VALUE}" name="image{MEMBERDIR_IMAGE_NUMBER}" />
       </td>
   </tr>

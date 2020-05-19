@@ -72,6 +72,7 @@ class Payment
         $query = "
             SELECT `payment`.`id`, `payment`.`processor_id`,
                    `payment`.`fee`, `payment`.`free_from`,
+                   `payment`.`type`,
                    `payment`.`ord`, `payment`.`active`, ".
             $arrSqlName['field']."
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_payment` AS `payment`".
@@ -94,6 +95,7 @@ class Payment
                 'name' => $strName,
                 'fee' => $objResult->fields['fee'],
                 'free_from' => $objResult->fields['free_from'],
+                'type' => $objResult->fields['type'],
                 'ord' => $objResult->fields['ord'],
                 'active' => $objResult->fields['active'],
             );
@@ -370,8 +372,7 @@ class Payment
         if (!$objDatabase->Execute("
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_payment
              WHERE id=?", $payment_id)) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_payment");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_payment");
+
         return true;
     }
 
@@ -390,13 +391,21 @@ class Payment
 
         if (empty($_POST['payment_add']) || empty($_POST['name_new']))
             return null;
+        $type = 'fix';
+        if (
+            isset($_POST['fee_type_new']) &&
+            in_array($_POST['fee_type_new'], array('fix', 'percent'))
+        ) {
+            $type = $_POST['fee_type_new'];
+        }
         $query = "
             INSERT INTO ".DBPREFIX."module_shop".MODULE_INDEX."_payment (
-                `processor_id`, `fee`, `free_from`, `ord`, `active`
+                `processor_id`, `fee`, `free_from`, `type`, `ord`, `active`
             ) VALUES (
                 ".intval($_POST['processor_id_new']).",
                 ".floatval($_POST['fee_new']).",
                 ".floatval($_POST['free_from_new']).",
+                '".$type."',
                 0,
                 ".(empty($_POST['active_new']) ? 0 : 1)."
             )";
@@ -438,6 +447,16 @@ class Payment
             $name = contrexx_input2raw($name);
             $fee = floatval($_POST['fee'][$payment_id]);
             $free_from = floatval($_POST['free_from'][$payment_id]);
+            $type = 'fix';
+            if (
+                isset($_POST['fee_type'][$payment_id]) &&
+                in_array(
+                    $_POST['fee_type'][$payment_id],
+                    array('fix', 'percent')
+                )
+            ) {
+                $type = $_POST['fee_type'][$payment_id];
+            }
             $processor_id = intval($_POST['processor_id'][$payment_id]);
 // NTH: The ordinal is implemented, but unused yet
 //            $ord = intval($_POST['ord'][$payment_id]);
@@ -447,6 +466,7 @@ class Payment
             if (   $name == self::$arrPayments[$payment_id]['name']
                 && $fee == self::$arrPayments[$payment_id]['fee']
                 && $free_from == self::$arrPayments[$payment_id]['free_from']
+                && $type == self::$arrPayments[$payment_id]['type']
                 && $processor_id == self::$arrPayments[$payment_id]['processor_id']
 //                && $ord == self::$arrPayments[$payment_id]['ord']
                 && $active == self::$arrPayments[$payment_id]['active']
@@ -463,6 +483,7 @@ class Payment
                    SET processor_id=$processor_id,
                        fee=$fee,
                        free_from=$free_from,
+                       type='$type',
                        active=$active
                  WHERE id=$payment_id";
             if (!$objDatabase->Execute($query)) {
@@ -511,6 +532,7 @@ class Payment
         $i = 0;
         foreach (Payment::getArray() as $payment_id => $arrPayment) {
             $zone_id = Zones::getZoneIdByPaymentId($payment_id);
+            $feeTypeFix = 'checked="checked"';
             $objTemplate->setVariable(array(
                 'SHOP_PAYMENT_STYLE' => 'row'.(++$i % 2 + 1),
                 'SHOP_PAYMENT_ID' => $arrPayment['id'],
@@ -523,10 +545,19 @@ class Payment
                     $zone_id, "zone_id[$payment_id]"),
                 'SHOP_PAYMENT_STATUS' => (intval($arrPayment['active'])
                     ? \Html::ATTRIBUTE_CHECKED : ''),
+                'SHOP_PAYMENT_CURRENCY' => Currency::getActiveCurrencySymbol(),
             ));
+            if ($arrPayment['type'] == 'percent') {
+                $objTemplate->touchBlock('shopPaymentFeePercent');
+                $objTemplate->hideBlock('shopPaymentFeeFix');
+            } else {
+                $objTemplate->touchBlock('shopPaymentFeeFix');
+                $objTemplate->hideBlock('shopPaymentFeePercent');
+            }
             $objTemplate->parse('shopPayment');
         }
         $objTemplate->setVariable(array(
+            'SHOP_PAYMENT_CURRENCY' => Currency::getActiveCurrencySymbol(),
             'SHOP_PAYMENT_HANDLER_MENUOPTIONS_NEW' =>
                 // Selected PSP ID is -1 to disable the "please select" option
                 PaymentProcessing::getMenuoptions(-1),
@@ -534,6 +565,7 @@ class Payment
         ));
         // Payment Service Providers
         $objTemplate->setVariable(array(
+            // Paymill
             'SHOP_PAYMILL_STATUS' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_active','Shop') ? \Html::ATTRIBUTE_CHECKED : '',
             'SHOP_PAYMILL_TEST_SELECTED' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_use_test_account','Shop') == 0 ? \Html::ATTRIBUTE_SELECTED : '',
             'SHOP_PAYMILL_LIVE_SELECTED' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_use_test_account','Shop') == 1 ? \Html::ATTRIBUTE_SELECTED : '',
@@ -543,6 +575,7 @@ class Payment
             'SHOP_PAYMILL_LIVE_PUBLIC_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_live_public_key','Shop')),
             'SHOP_PAYMILL_PRIVATE_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_private_key','Shop')),
             'SHOP_PAYMILL_PUBLIC_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_public_key','Shop')),
+            // Legacy Saferpay
             'SHOP_SAFERPAY_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'),
             'SHOP_SAFERPAY_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_SAFERPAY_TEST_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_use_test_account','Shop'),
@@ -551,11 +584,21 @@ class Payment
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_SAFERPAY_WINDOW_MENUOPTIONS' => \Saferpay::getWindowMenuoptions(
                 \Cx\Core\Setting\Controller\Setting::getValue('saferpay_window_option','Shop')),
+            'SAFERPAY_EXPERIMENTAL' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('View')->flagExperimental(),
+            // JSON Saferpay
+            'SHOP_SAFERPAY_JSON_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_id','Shop'),
+            'SHOP_SAFERPAY_JSON_TERMINAL_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_terminal_id','Shop'),
+            'SHOP_SAFERPAY_JSON_USER' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_user','Shop'),
+            'SHOP_SAFERPAY_JSON_PASS' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_pass','Shop'),
+            'SHOP_SAFERPAY_JSON_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
+            'SHOP_SAFERPAY_JSON_TEST_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_use_test_account','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
+            // Payrexx
             'SHOP_PAYREXX_INSTANCE_NAME' => \Cx\Core\Setting\Controller\Setting::getValue('payrexx_instance_name','Shop'),
             'SHOP_PAYREXX_API_SECRET' => \Cx\Core\Setting\Controller\Setting::getValue('payrexx_api_secret','Shop'),
             'SHOP_PAYREXX_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('payrexx_active','Shop')
                     ? \Html::ATTRIBUTE_CHECKED : ''),
+            // PostFinance
             'SHOP_YELLOWPAY_SHOP_ID' => \Cx\Core\Setting\Controller\Setting::getValue('postfinance_shop_id','Shop'),
             'SHOP_YELLOWPAY_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_active','Shop')
@@ -574,7 +617,7 @@ class Payment
             'SHOP_YELLOWPAY_USE_TESTSERVER_CHECKED' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_use_testserver','Shop')
                     ? \Html::ATTRIBUTE_CHECKED : ''),
-            // Added 20100222 -- Reto Kohli
+            // PostFinance Mobile
             'SHOP_POSTFINANCE_MOBILE_WEBUSER' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_webuser','Shop')),
             'SHOP_POSTFINANCE_MOBILE_SIGN' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_sign','Shop')),
             'SHOP_POSTFINANCE_MOBILE_IJUSTWANTTOTEST_CHECKED' =>
@@ -583,6 +626,7 @@ class Payment
             'SHOP_POSTFINANCE_MOBILE_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_status','Shop')
                   ? \Html::ATTRIBUTE_CHECKED : ''),
+            // Datatrans
             'SHOP_DATATRANS_AUTHORIZATION_TYPE_OPTIONS' => \Datatrans::getReqtypeMenuoptions(\Cx\Core\Setting\Controller\Setting::getValue('datatrans_request_type','Shop')),
             'SHOP_DATATRANS_MERCHANT_ID' => \Cx\Core\Setting\Controller\Setting::getValue('datatrans_merchant_id','Shop'),
             'SHOP_DATATRANS_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('datatrans_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
@@ -592,6 +636,7 @@ class Payment
                 (\Cx\Core\Setting\Controller\Setting::getValue('datatrans_use_testserver','Shop') ? '' : \Html::ATTRIBUTE_CHECKED),
             // Not supported
             //'SHOP_DATATRANS_ACCEPTED_PAYMENT_METHODS_CHECKBOXES' => 0,
+            // PayPal
             'SHOP_PAYPAL_EMAIL' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paypal_account_email','Shop')),
             'SHOP_PAYPAL_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('paypal_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_PAYPAL_DEFAULT_CURRENCY_MENUOPTIONS' => \PayPal::getAcceptedCurrencyCodeMenuoptions(
@@ -628,7 +673,8 @@ class Payment
             'processor_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0'),
             'fee' => array('type' => 'DECIMAL(9,2)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'costs'),
             'free_from' => array('type' => 'DECIMAL(9,2)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'costs_free_sum'),
-            'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'sort_order'),
+            'type' => array('type' => 'ENUM(\'fix\', \'percent\')', 'default' => 'fix', 'notnull' => true, 'after' => 'free_from'),
+            'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'sort_order', 'after' => 'type'),
             'active' => array('type' => 'TINYINT(1)', 'unsigned' => true, 'default' => '1', 'renamefrom' => 'status'),
         );
         $table_index = array();

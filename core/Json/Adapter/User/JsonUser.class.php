@@ -126,28 +126,121 @@ class JsonUser implements JsonAdapter {
         }
 
         $term = !empty($_GET['term']) ? trim($_GET['term']) : '';
+        $terms = explode(' ', $term);
+        array_walk($terms, function(&$value, $key) {
+            $value = '%' . $value . '%';
+        });
 
-        $arrSearch = array(
-            'company' => $term,
-            'firstname' => $term,
-            'lastname' => $term,
-            'username' => $term,
+        $whitelistedFields = array(
+            'company',
+            'address',
+            'city',
+            'zip',
+            'firstname',
+            'lastname',
+            'username',
+            'email',
         );
-        $arrAttributes = array(
-            'company', 'firstname', 'lastname', 'username',
-        );
-        $arrUsers = array();
 
-        if ($objUser = $objFWUser->objUser->getUsers(null, $arrSearch, null, $arrAttributes)) {
-            while (!$objUser->EOF) {
-                $id = $objUser->getId();
-                $title = $objFWUser->getParsedUserTitle($objUser);
-
-                $arrUsers[$id] = $title;
-                $objUser->next();
+        $searchFields = array('company', 'firstname', 'lastname', 'username', 'email');
+        if (!empty($_GET['searchFields'])) {
+            $possibleSearchFields = explode(',', $_GET['searchFields']);
+            foreach ($possibleSearchFields as $key=>$possibleSearchField) {
+                if (!in_array($possibleSearchField, $whitelistedFields)) {
+                    unset($possibleSearchFields[$key]);
+                }
+            }
+            if (count($possibleSearchFields)) {
+                $searchFields = $possibleSearchFields;
+            }
+        }
+        // AND-ed search is only available if 2 or less search fields are
+        // in use and no more than 2 search terms are specified. With higher
+        // values there are an increasing amount of possibilities.
+        // If there's but one search field the sensful search query
+        // results in the same as the OR-ed one. If there's but one term the
+        // same happens.
+        if (
+            count($searchFields) == 2 &&
+            count($terms) == 2 &&
+            isset($_GET['searchAnd']) &&
+            $_GET['searchAnd'] == 'true'
+        ) {
+            // We can search for "Peter Muster" or "Muster Peter"
+            // (field1 = term1 AND field2 = term2) OR (field2 = term1 AND field1 = term2)
+            $arrFilter = array(
+                'OR' => array(
+                    0 => array(
+                        'AND' => array(
+                            0 => array(
+                                $searchFields[0] => $terms[0],
+                            ),
+                            1 => array(
+                                $searchFields[1] => $terms[1],
+                            ),
+                        ),
+                    ),
+                    1 => array(
+                        'AND' => array(
+                            0 => array(
+                                $searchFields[1] => $terms[0],
+                            ),
+                            1 => array(
+                                $searchFields[0] => $terms[1],
+                            ),
+                        ),
+                    ),
+                ),
+            );
+        } else {
+            $arrFilter = array('OR' => array());
+            foreach ($searchFields as $field) {
+                $arrFilter['OR'][][$field] = $terms;
             }
         }
 
+        $arrAttributes = $whitelistedFields;
+
+        $limit = 0;
+        if (isset($_GET['limit'])) {
+            $limit = intval($_GET['limit']);
+        }
+
+        $arrUsers = array();
+        $objUser = $objFWUser->objUser->getUsers(
+            $arrFilter,
+            null,
+            null,
+            $arrAttributes,
+            $limit ? $limit : null
+        );
+
+        if (!$objUser) {
+            return array();
+        }
+        $resultFormat = '%title%';
+        if (!empty($_GET['resultFormat'])) {
+            $resultFormat = contrexx_input2raw($_GET['resultFormat']);
+        }
+        while (!$objUser->EOF) {
+            $id = $objUser->getId();
+            $title = $objFWUser->getParsedUserTitle($objUser);
+
+            $result = str_replace('%id%', $id, $resultFormat);
+            $result = str_replace('%title%', $title, $result);
+            $result = str_replace('%username%', $objUser->getUsername(), $result);
+            $result = str_replace('%email%', $objUser->getEmail(), $result);
+            foreach ($whitelistedFields as $field) {
+                $result = str_replace(
+                    '%' . $field . '%',
+                    $objUser->getProfileAttribute($field),
+                    $result
+                );
+            }
+
+            $arrUsers[$id] = $result;
+            $objUser->next();
+        }
         return $arrUsers;
     }
 

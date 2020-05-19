@@ -252,7 +252,42 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
         }
     }
 
-    function listLevels($objTpl, $intView, $intLevelId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $strClass=null)
+    /**
+     * Returns a list with IDs of all visible levels that contain published data
+     *
+     * Published data is identified as levels having any of the following options
+     * set to activated:
+     * - levelShowEntries
+     * - levelShowCategories
+     *
+     * @return  array   List of IDs of levels
+     */
+    public static function getIdsWithPublishedData() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+        $result = $db->Execute('
+            SELECT `id`
+            FROM `' . DBPREFIX . 'module_mediadir_levels`
+            WHERE `active` = 1
+            AND (
+                `show_categories` = 1 OR
+                `show_entries` = 1
+            )
+        ');
+        if (!$result || $result->EOF) {
+            return array();
+        }
+
+        $ids = array();
+        while (!$result->EOF) {
+            $ids[] = $result->fields['id'];
+            $result->MoveNext();
+        }
+
+        return $ids;
+    }
+
+    function listLevels($objTpl, $intView, $intLevelId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $strClass=null, $cmd = null)
     {
         global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
@@ -330,7 +365,15 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
             case 2:
                 //Frontend View
                 $intNumBlocks = count($arrExistingBlocks);
-                $i = $intNumBlocks-1;
+
+                // in a previous version, the system did not start parsing
+                // with the first row block. Instead it began to render the
+                // last column.
+                if ($this->arrSettings['legacyBehavior']) {
+                    $i = $intNumBlocks-1;
+                } else {
+                    $i = 0;
+                }
                 $strIndexHeader = '';
 
                 //set first index header
@@ -370,20 +413,13 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
                         $strIndexHeaderTag = null;
                     }
 
-                    //get ids
-                    if(isset($_GET['cmd'])) {
-                        $strLevelCmd = '&amp;cmd='.$_GET['cmd'];
-                    } else {
-                        $strLevelCmd = null;
-                    }
-
                     // parse entries
                     if (
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entries') &&
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entry')
                     ) {
                         $objEntry = new MediaDirectoryEntry($this->moduleName);
-                        $objEntry->getEntries(null, $arrLevel['levelId'], $categoryId, null, false, null, true);
+                        $objEntry->getEntries(null, $arrLevel['levelId'], $categoryId, null, false, null, true, null, 'n', null, null, $cmd);
                         if ($objEntry->countEntries()) {
                             // set mediadirCategoriesLevels_row_N_entry tempalte block to be parsed
                             $objEntry->setStrBlockName($this->moduleNameLC.'CategoriesLevels_row_'. $intBlockId . '_entry');

@@ -78,6 +78,12 @@ abstract class Widget extends \Cx\Model\Base\EntityBase {
     protected $type;
 
     /**
+     * Custom parse target to use for sub-widgets
+     * @var \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget
+     */
+    protected $customParseTarget = null;
+
+    /**
      * Instanciates a new widget
      * @param \Cx\Core\Core\Model\Entity\SystemComponentController $component Component registering this widget
      * @param string $name Name of this widget
@@ -230,6 +236,30 @@ abstract class Widget extends \Cx\Model\Base\EntityBase {
                 throw new \Exception('No such widget type for widget "' . $this->getName() . '" of component "' . $this->getRegisteringComponent()->getName() . '"');
                 break;
         }
+    }
+
+    /**
+     * Tells whether this widget has a custom parse target
+     * @return boolean True if this widget has a custom parse target
+     */
+    public function hasCustomParseTarget() {
+        return $this->customParseTarget != null;
+    }
+
+    /**
+     * Returns this widget's custom parse target
+     * @return WidgetParseTarget Widget parse target
+     */
+    public function getCustomParseTarget() {
+        return $this->customParseTarget;
+    }
+
+    /**
+     * Sets this widget's parse target
+     * @param WidgetParseTarget $parseTarget Widget parse target for subwidgets
+     */
+    public function setCustomParseTarget($parseTarget) {
+        $this->customParseTarget = $parseTarget;
     }
 
     /**

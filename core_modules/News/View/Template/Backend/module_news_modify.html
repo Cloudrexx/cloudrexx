@@ -88,13 +88,13 @@
         var options = {};
         switch (sType) {
             case 'image':
-                options = {cxMbViews: 'filebrowser', cxMbStartview: 'MediaBrowserList'};
+                options = {cxMbViews: 'filebrowser', cxMbStartview: 'filebrowser'};
                 break;
             case 'mixed':
                 options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestructure'};
                 break;
             case 'link':
-                options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'MediaBrowserList'};
+                options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'filebrowser'};
                 break;
         }
         cx.variables.get('jquery','mediabrowser')('#newsMediaBrowser').trigger('click', options);
@@ -541,15 +541,15 @@
                 <td colspan="2">{TXT_EXTERNAL_SOURCE}</td>
             </tr>
             <tr class="row1">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_external_source">{TXT_EXTERNAL_SOURCE}</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_external_source">{TXT_NEWS_SOURCE}</label></td>
                 <td><input type="text" name="newsSource" id="news_external_source" style="width: 400px;" value="{NEWS_SOURCE}" maxlength="250" /></td>
             </tr>
             <tr class="row2">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_1">{TXT_LINK} #1</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_1">{TXT_NEWS_LINK1}</label></td>
                 <td><input type="text" name="newsUrl1" id="news_link_1" style="width: 400px;" value="{NEWS_URL1}" maxlength="250" /></td>
             </tr>
             <tr class="row1">
-                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_2">{TXT_LINK} #2</label></td>
+                <td width="12%" height="20" nowrap="nowrap"><label for="news_link_2">{TXT_NEWS_LINK2}</label></td>
                 <td><input type="text" name="newsUrl2" id="news_link_2" style="width: 400px;" value="{NEWS_URL2}" maxlength="250" /></td>
             </tr>
         </table>

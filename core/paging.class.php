@@ -115,7 +115,8 @@ class Paging
         }
 
         // remove all parameters otherwise the url object has parameters like &act=add
-        $requestUrl = clone \Env::get('Resolver')->getUrl();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $requestUrl = clone $cx->getRequest()->getUrl();
         $currentParams = $requestUrl->getParamArray();
         $requestUrl->removeAllParams();
         if (isset($currentParams['section'])) {

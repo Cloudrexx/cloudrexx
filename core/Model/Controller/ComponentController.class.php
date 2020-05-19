@@ -81,4 +81,75 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
         return $string;
     }
+
+    /**
+     * Returns a list of command mode commands provided by this component
+     *
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode()
+    {
+        return array('Model');
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     *
+     * @param string  $command The name of the command to fetch the description from
+     * @param boolean $short   Whether to return short or long description
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false)
+    {
+        switch ($command) {
+            case 'Model':
+                $desc = 'Provides cleanup function for database table';
+                if ($short) {
+                    return $desc;
+                }
+
+                $desc .= PHP_EOL . 'optimize' . "\t" .
+                    'Optimize tables. This speeds up the system and can save some disk space.';
+
+                return $desc;
+            default :
+                return '';
+        }
+    }
+
+    /**
+     * Execute api command
+     *
+     * @param string $command       Name of command to execute
+     * @param array  $arguments     List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array())
+    {
+        $subcommand = null;
+        if (!empty($arguments[0])) {
+            $subcommand = $arguments[0];
+        }
+
+        switch ($command) {
+            case 'Model':
+                switch ($subcommand) {
+                    case 'optimize':
+                        // Optimize all tables based on DBPREFIX
+                        $db        = $this->cx->getDb()->getAdoDb();
+                        $objResult = $db->Execute('SHOW TABLE STATUS LIKE "' . DBPREFIX . '%"');
+
+                        while (!$objResult->EOF) {
+                            $db->Execute('OPTIMIZE TABLE ' . $objResult->fields['Name']);
+                            $objResult->MoveNext();
+                        }
+                        break;
+                    default :
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

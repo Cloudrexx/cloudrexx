@@ -460,9 +460,7 @@ class Attribute
              WHERE `id`=$this->id";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_attribute");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_option");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop_rel_product_attribute");
+
         return true;
     }
 

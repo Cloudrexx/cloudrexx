@@ -159,6 +159,18 @@ class ListingController {
     protected $searchFields = array();
 
     /**
+     * List with callbacks for search
+     * @var array|callable
+     */
+    protected $searchCallback;
+
+    /**
+     * List with callbacks for expanded search
+     * @var array|callable
+     */
+    protected $filterCallback;
+
+    /**
      * Number of entries without filtering or paging
      * @var int
      */
@@ -170,8 +182,14 @@ class ListingController {
     protected $data = null;
 
     /**
+     * List all custom field names that are not as a field in the db
+     * @var array
+     */
+    protected $customFields;
+
+    /**
      * Handles a list
-     * @param mixed $entities Entity class name as string or callback function
+     * @param mixed $entities Entity class name as string or callback function (experimental)
      * @param array $crit (optional) Doctrine style criteria array to use
      * @param array $options (Unused)
      */
@@ -181,9 +199,6 @@ class ListingController {
         }
         if (isset($options['order'])) {
             $this->order  = $options['order'];
-        }
-        if (isset($options['sortBy']['field'])) {
-            $this->order  = $options['sortBy']['field'];
         }
         if (isset($options['sortBy']['entity'])) {
             $this->entityName = $options['sortBy']['entity'];
@@ -195,6 +210,15 @@ class ListingController {
         $this->searching = isset($options['searching']) && $options['searching'];
         if (isset($options['searchFields'])) {
             $this->searchFields = $options['searchFields'];
+        }
+        if (isset($options['searchCallback'])) {
+            $this->searchCallback = $options['searchCallback'];
+        }
+        if (isset($options['filterCallback'])) {
+            $this->filterCallback = $options['filterCallback'];
+        }
+	if (isset($options['customFields'])) {
+            $this->customFields = $options['customFields'];
         }
         // init handlers (filtering, paging and sorting)
         $this->handlers[] = new FilteringController();
@@ -218,17 +242,16 @@ class ListingController {
         }
         $this->criteria = $crit;
         $this->filter = $filter;
-
-        // todo: allow multiple listing controllers per page request
-        $this->args = contrexx_input2raw($_GET);
+        $this->options = $options;
     }
 
     /**
      * Loads the data of an object
+     * @param array $args Pass parsed GET params here
      * @param bool $forceRegen (optional) If set to true, cached data is dropped
-     * @returm Cx\Core_Modules\Listing\Model\DataSet Parsed data
+     * @return Cx\Core_Modules\Listing\Model\DataSet Parsed data
      */
-    public function getData($forceRegen = false) {
+    public function getData($args, $forceRegen = false) {
         if ($this->data && !$forceRegen) {
             return $this->data;
         }
@@ -241,7 +264,7 @@ class ListingController {
             'entity'    => $this->entityName,
         );
         foreach ($this->handlers as $handler) {
-            $params = $handler->handle($params, $this->args);
+            $params = $handler->handle($params, $args);
         }
         $this->offset   = $params['offset'];
         $this->count    = $params['count'];
@@ -301,17 +324,34 @@ class ListingController {
             if ($this->count) {
                 $data = $data->limit($this->count, $this->offset);
             }
+            // Add custom fields
+            foreach ($this->customFields as $customField) {
+                $data->addColumn($customField);
+            }
+
             $this->data = $data;
             return $data;
         }
         $em = \Env::get('em');
-        $entityRepository = $em->getRepository($this->entityClass);
+        if (!$this->callback) {
+            $entityRepository = $em->getRepository($this->entityClass);
+        }
         foreach ($this->order as $field=>&$order) {
             $order = $order == SORT_DESC ? 'DESC' : 'ASC';
         }
 
+        if ($this->callback) {
+            $callback = $this->callback;
+            $entities = $callback(
+                $this->offset,
+                $this->count,
+                $this->criteria,
+                $this->order
+            )->getResult();
+            $this->dataSize = $this->count;
+
         // YAMLRepository:
-        if ($entityRepository instanceof \Countable) {
+        } else if ($entityRepository instanceof \Countable) {
             if (!empty($this->filter)) {
                 \DBG::msg('YAMLRepository does not support "filter" yet');
             }
@@ -324,53 +364,154 @@ class ListingController {
             $this->dataSize = count($entityRepository);
         } else {
             $qb = $em->createQueryBuilder();
-            $qb->select('x')->from($this->entityClass, 'x');
-            $i = 1;
+            $metaData = $em->getClassMetadata($this->entityClass);
+            $qb->select('DISTINCT x')->from($this->entityClass, 'x');
             // filtering: advanced search
             if ($this->filtering) {
-                foreach ($this->criteria as $field=>$crit) {
-                    if (
-                        !empty($this->filterFields) &&
-                        !in_array($field, $this->filterFields)
-                    ) {
-                        continue;
+                if (
+                    is_array($this->filterCallback) &&
+                    isset($this->filterCallback['adapter']) &&
+                    isset($this->filterCallback['method'])
+                ) {
+                    $json = new \Cx\Core\Json\JsonData();
+                    $jsonResult = $json->data(
+                        $this->filterCallback['adapter'],
+                        $this->filterCallback['method'],
+                        array(
+                            'qb' => $qb,
+                            'crit' => $this->criteria,
+                        )
+                    );
+                    if ($jsonResult['status'] == 'success') {
+                        $qb = $jsonResult['data'];
                     }
-                    $qb->andWhere($qb->expr()->eq('x.' . $field, '?' . $i));
-                    $qb->setParameter($i, $crit);
-                    $i++;
+                } else if (is_callable($this->filterCallback)) {
+                    $filterCallback = $this->filterCallback;
+                    $qb = $filterCallback(
+                        $qb,
+                        $this->criteria
+                    );
+                } else {
+                    $i = 1;
+                    foreach ($this->criteria as $field=>$crit) {
+                        if (
+                            !empty($this->filterFields) &&
+                            !in_array($field, $this->filterFields)
+                        ) {
+                            continue;
+                        }
+                        if (isset($metaData->associationMappings[$field])) {
+                            if (
+                                $metaData->associationMappings[$field]['type'] ==
+                                \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                            ) {
+                                $qb->andWhere(
+                                     '?' . $i . ' MEMBER OF ' . 'x.' . $field
+                                );
+                            } else {
+                                $qb->andWhere(
+                                    $qb->expr()->eq('x.' . $field, '?' . $i)
+                                );
+                            }
+                        } else {
+                            $qb->andWhere(
+                                $qb->expr()->like('x.' . $field, '?' . $i)
+                            );
+                        }
+                        $qb->setParameter($i, $crit);
+                        $i++;
+                    }
                 }
             }
             // filtering: simple search by term
             if ($this->searching) {
                 if (!empty($this->filter) && count($this->searchFields)) {
-                    $ors = array();
-                    $orX = new \Doctrine\DBAL\Query\Expression\CompositeExpression(
-                        \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR
-                    );
-                    // TODO: If $this->searchFields is empty allow all
-                    foreach ($this->searchFields as $field) {
-                        $orX->add($qb->expr()->like('x.' . $field, '?' . $i));
+                    if (
+                        is_array($this->searchCallback) &&
+                        isset($this->searchCallback['adapter']) &&
+                        isset($this->searchCallback['method'])
+                    ) {
+                        $json = new \Cx\Core\Json\JsonData();
+                        $jsonResult = $json->data(
+                            $this->searchCallback['adapter'],
+                            $this->searchCallback['method'],
+                            array(
+                                'qb' => $qb,
+                                'fields' => $this->searchFields,
+                                'crit' => $this->filter
+                            )
+                        );
+                        if ($jsonResult['status'] == 'success') {
+                            $qb = $jsonResult['data'];
+                        }
+                    } else if (is_callable($this->searchCallback)) {
+                        $searchCallback = $this->searchCallback;
+                        $qb = $searchCallback(
+                            $qb,
+                            $this->searchFields,
+                            $this->filter
+                        );
+                    } else {
+                        $ors = array();
+                        $orX = new \Doctrine\DBAL\Query\Expression\CompositeExpression(
+                            \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR
+                        );
+                        // TODO: If $this->searchFields is empty allow all
+                        foreach ($this->searchFields as $field) {
+                            $orX->add($qb->expr()->like('x.' . $field, ':term'));
+                        }
+                        $qb->andWhere($orX);
+                        $qb->setParameter('term', '%' . $this->filter . '%');
                     }
-                    $qb->andWhere($orX);
-                    $qb->setParameter($i, '%' . $this->filter . '%');
                 }
             }
             foreach ($this->order as $field=>&$order) {
+                // TODO: Since we don't know how related data is presented we
+                //       cannot sort by it here. Find a solution for sorting
+                //       by relation fields.
+                if (isset($metaData->associationMappings[$field])) {
+                    \DBG::msg('Cannot sort by association "' . $field . '"');
+                    continue;
+                }
                 $qb->orderBy('x.' . $field, $order);
             }
-            $qb->setFirstResult($offset);
+            $qb->setFirstResult($this->offset ? $this->offset : null);
             $qb->setMaxResults($this->count ? $this->count : null);
-            $entities = $qb->getQuery()->getResult();
+            $query = $qb->getQuery();
+            $query->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            );
+            $entities = $query->getResult();
 
             $metaData = $em->getClassMetaData($this->entityClass);
+            $identifierFieldNames = $metaData->getIdentifierFieldNames();
+            $identifierFieldNames = reset($identifierFieldNames);
             $qb->select(
-                'count(x.' . reset($metaData->getIdentifierFieldNames()) . ')'
+                'count(DISTINCT x.' . $identifierFieldNames . ')'
             );
-            $this->dataSize = $qb->getQuery()->getSingleScalarResult();
+            $qb->setFirstResult(null);
+            $qb->setMaxResults(null);
+            $query = $qb->getQuery();
+            $query->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            );
+            $this->dataSize = $query->getSingleScalarResult();
         }
 
         // return calculated data
-        $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($entities);
+        $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+            $entities,
+            null,
+            $this->options
+        );
+
+        // Add custom fields
+        foreach ($this->customFields as $customField) {
+            $data->addColumn($customField);
+        }
+
         $data->setDataType($this->entityClass);
         $this->data = $data;
         return $data;
@@ -386,144 +527,16 @@ class ListingController {
     }
 
     /**
-     * @todo: implement, this is just a draft!
+     * @todo: drop
      */
     public function toHtml() {
-        return $this->getPagingControl();
+        return '';
     }
 
+    /**
+     * @todo: drop
+     */
     public function __toString() {
         return $this->toHtml();
-    }
-
-    /**
-     * Calculates the paging
-     * @throws PagingException when paging type is unknown (see class constants)
-     * @return mixed Array for type DATA_AJAX, HTML as string otherwise
-     * @todo NON_AJAX mode
-     */
-    protected function getPaging() {
-        switch ($this->listableObject->getType()) {
-            case DATA_AJAX:
-                return $this->listableObject->getData($this->offset, $this->count);
-                break;
-            case HTML_AJAX:
-                $html = $this->listableObject->preRender($this->offset, $this->count);
-                for ($i = $this->offset; $i < ($this->offset + $this->count); $i++) {
-                    $html .= $this->listableObject->renderEntry($i);
-                }
-                $html .= $this->listableObject->postRender($this->offset, $this->count);
-                return $html;
-                break;
-            case NON_AJAX:
-                break;
-            default:
-                throw new PagingException('Unknown paging type "' . $this->listableObject->getType() . '"');
-                break;
-        }
-    }
-
-    /**
-     * This renders the template for paging control element
-     * @todo templating!
-     * @todo move to pagingcontroller
-     */
-    protected function getPagingControl() {
-        $html = '';
-        if (!$this->paging || $this->dataSize <= $this->count) {
-            return $html;
-        }
-        $numberOfPages = ceil($this->dataSize / $this->count);
-        $activePageNumber = ceil(($this->offset + 1) / $this->count);
-
-        /*echo 'Number of entries: ' . count($this->entityClass->toArray()) . '<br />';
-        echo 'Entries per page: ' . $this->count . '<br />';
-        echo 'Number of pages: ' . $numberOfPages . '<br />';
-        echo 'Active page: ' . $activePageNumber . '<br />';*/
-
-
-        $paramName = !empty($this->entityName) ? $this->entityName . 'Pos' : 'pos';
-        if ($this->offset) {
-            // render goto start
-            $url = clone \Env::get('cx')->getRequest()->getUrl();
-            $url->setParam($paramName, 0);
-            $html .= '<a href="' . $url . '">&lt;&lt;</a> ';
-
-            // render goto previous
-            $pagePos = ($activePageNumber - 2) * $this->count;
-            if ($pagePos < 0) {
-                $pagePos = 0;
-            }
-            $url = clone \Env::get('cx')->getRequest()->getUrl();
-            $url->setParam($paramName, $pagePos);
-            $html .= '<a href="' . $url . '">&lt;</a> ';
-        } else {
-            $html .= '&lt;&lt;&nbsp;&lt;&nbsp;';
-        }
-
-        $noOfPagesBeforeActive = $activePageNumber - 1;
-        $noOfPagesAfterActive = $numberOfPages - $activePageNumber;
-        $beforeSkipDone = false;
-        $afterSkipDone = false;
-        for ($pageNumber = 1; $pageNumber <= $numberOfPages; $pageNumber++) {
-            if (
-                $pageNumber < $activePageNumber &&
-                $noOfPagesBeforeActive >= 5 &&
-                $pageNumber > 1 &&
-                $pageNumber < $activePageNumber - 1
-            ) {
-                if (!$beforeSkipDone) {
-                    $beforeSkipDone = true;
-                    $html .= ' ... ';
-                }
-                continue;
-            } else if (
-                $pageNumber > $activePageNumber &&
-                $noOfPagesAfterActive >= 5 &&
-                $pageNumber > $activePageNumber + 1 &&
-                $pageNumber < $numberOfPages
-            ) {
-                if (!$afterSkipDone) {
-                    $afterSkipDone = true;
-                    $html .= ' ... ';
-                }
-                continue;
-            } else if ($pageNumber == $activePageNumber) {
-                // render page without link
-                $html .= $pageNumber . ' ';
-                continue;
-            }
-            // render page with link
-            $pagePos = ($pageNumber - 1) * $this->count;
-            $url = clone \Env::get('cx')->getRequest()->getUrl();
-            $url->setParam($paramName, $pagePos);
-            $html .= '<a href="' . $url . '">' . $pageNumber . '</a> ';
-        }
-
-        if ($this->offset + $this->count < $this->dataSize) {
-            // render goto next
-            $pagePos = ($activePageNumber - 0) * $this->count;
-            if ($pagePos < 0) {
-                $pagePos = 0;
-            }
-            $url = clone \Env::get('cx')->getRequest()->getUrl();
-            $url->setParam($paramName, $pagePos);
-            $html .= '<a href="' . $url . '">&gt;</a> ';
-
-            // render goto last page
-            $url = clone \Env::get('cx')->getRequest()->getUrl();
-            $url->setParam($paramName, ($numberOfPages - 1) * $this->count);
-            $html .= '<a href="' . $url . '">&gt;&gt;</a>';
-        } else {
-            $html .= '&gt;&nbsp;&gt;&gt;';
-        }
-        if ($this->offset + $this->count > $this->dataSize) {
-            $to =  $this->dataSize;
-        } else {
-            $to  = $this->offset + $this->count;
-        }
-        // entry x-y out of n
-        $html .= '&nbsp;Einträge ' . ($this->offset+1). ' - ' . $to . ' von ' . $this->dataSize;
-        return $html;
     }
 }

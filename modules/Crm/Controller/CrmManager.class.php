@@ -2894,9 +2894,6 @@ END;
         case 'getCsvRecord':
                 $this->crmInterfaceController->getCsvRecord();
             break;
-        case 'getprogress':
-                $this->crmInterfaceController->getFileImportProgress();
-            break;
         case 'import':
         default:
                 $this->crmInterfaceController->showImport();
@@ -5840,7 +5837,7 @@ END;
             $size = filesize($tempPath . '/' . $file);
             if ($size > $sizeLimit) {
                 $response->addMessage(
-                    \Cx\Core_Modules\Upload\Controller\UploadResponse::STATUS_ERROR,
+                    \Cx\Core_Modules\Uploader\Controller\UploadResponse::STATUS_ERROR,
                     "Server error. Increase post_max_size and upload_max_filesize to $size."
                 );
                 \Cx\Lib\FileSystem\FileSystem::delete_file($tempPath . '/' . $file);
@@ -5850,7 +5847,7 @@ END;
             $info = pathinfo($file);
             if (!in_array(strtolower($info['extension']), array('csv'))) {
                 $response->addMessage(
-                    \Cx\Core_Modules\Upload\Controller\UploadResponse::STATUS_ERROR,
+                    \Cx\Core_Modules\Uploader\Controller\UploadResponse::STATUS_ERROR,
                     'Please choose a csv to upload'
                 );
                 \Cx\Lib\FileSystem\FileSystem::delete_file($tempPath . '/' . $file);
@@ -5869,7 +5866,7 @@ END;
             // move file
             try {
                 $objFile = new \Cx\Lib\FileSystem\File($tempPath . '/' . $file);
-                $objFile->copy($depositionTarget . $prefix . $file, false);
+                $objFile->move($depositionTarget . $prefix . $file, false);
                 $_SESSION['importFilename'] = $prefix . $file;
             } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
                 \DBG::msg($e->getMessage());
@@ -5926,7 +5923,7 @@ END;
                     // move file
                     try {
                         $objFile = new \Cx\Lib\FileSystem\File($tempPath.'/'.$file);
-                        $objFile->copy($depositionTarget.$prefix.$file, false);
+                        $objFile->move($depositionTarget.$prefix.$file, false);
                         // write the uploaded files into database
                         $fields = array(
                             'document_name' => trim($prefix.$file),
@@ -5995,7 +5992,7 @@ END;
                     // move file
                     try {
                         $objFile = new \Cx\Lib\FileSystem\File($tempPath.'/'.$file);
-                        $objFile->copy($depositionTarget.$prefix.$file, false);
+                        $objFile->move($depositionTarget.$prefix.$file, false);
 
                         // create thumbnail
                         if (empty($objImage)) {
@@ -6106,7 +6103,7 @@ END;
                     // move file
                     try {
                         $objFile = new \Cx\Lib\FileSystem\File($tempPath.'/'.$file);
-                        $objFile->copy($depositionTarget.$prefix.$file, false);
+                        $objFile->move($depositionTarget.$prefix.$file, false);
 
                         // create thumbnail
                         if (empty($objImage)) {
@@ -6180,7 +6177,7 @@ END;
                     // move file
                     try {
                         $objFile = new \Cx\Lib\FileSystem\File($tempPath.'/'.$file);
-                        $objFile->copy($depositionTarget.$prefix.$file, false);
+                        $objFile->move($depositionTarget.$prefix.$file, false);
 
                         // create thumbnail
                         if (empty($objImage)) {
