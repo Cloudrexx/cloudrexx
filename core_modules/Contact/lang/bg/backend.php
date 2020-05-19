@@ -172,7 +172,6 @@ $_ARRAYLANG['TXT_CONTACT_SET_MANDATORY_FIELD'] = "All Mandatory field values mus
 $_ARRAYLANG['TXT_CONTACT_FORM_VALUES'] = "Formularwerte";
 $_ARRAYLANG['TXT_FORM_FIELDS'] = "Formularfelder";
 $_ARRAYLANG['TXT_ADVANCED_SETTINGS'] = "Erweiterte Einstellungen";
-$_ARRAYLANG['TXT_FORM_RECIPIENTS'] = "Empfängerliste";
 $_ARRAYLANG['TXT_CONTACT_LANGUAGE'] = "Sprache";
 $_ARRAYLANG['TXT_CONTACT_FORM_NAME'] = "Name";
 $_ARRAYLANG['TXT_CONTACT_FORM_FIELD_TITLE'] = "Formularfelder";

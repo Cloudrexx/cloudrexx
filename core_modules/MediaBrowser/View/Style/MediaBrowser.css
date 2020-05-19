@@ -365,7 +365,7 @@
 }
 
 .uploader-modal .popover.right, .media-browser-modal-window .popover.right {
-    margin-left: 40px;
+    margin-left: -100px;
 }
 
 .uploader-modal .popover.right > .arrow, .media-browser-modal-window .popover.right > .arrow {
@@ -1352,26 +1352,26 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     text-align: right;
 }
 
-.uploader-modal .mediaBrowserListCtrl, .media-browser-modal-window .mediaBrowserListCtrl, .uploader-modal .sitestructureCtrl, .media-browser-modal-window .sitestructureCtrl {
+.uploader-modal .FilebrowserCtrl, .media-browser-modal-window .FilebrowserCtrl, .uploader-modal .sitestructureCtrl, .media-browser-modal-window .sitestructureCtrl {
     overflow-y: scroll;
     height: 100%;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar, .uploader-modal .sitestructureCtrl::-webkit-scrollbar, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar, .uploader-modal .sitestructureCtrl::-webkit-scrollbar, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar {
     width: 10px;
     height: 10px;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-track-piece, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-track-piece {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-track-piece, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-track-piece {
     background-color: #fff;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-thumb:vertical, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:vertical {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-thumb:vertical, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:vertical {
     height: 10px;
     background-color: #666;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-thumb:horizontal, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-thumb:horizontal, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal {
     width: 10px;
     background-color: #666;
 }

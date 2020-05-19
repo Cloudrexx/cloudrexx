@@ -203,59 +203,8 @@ jQuery(function(){
         window.location.href = (newLocation.search('preset=') == -1 ? newLocation + "&preset=" + jQuery(this).val() : newLocation);
     });
 
-    var intro = introJs();
-    intro.setOptions({
-        nextLabel:cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_NEXT","TemplateEditor"),
-        prevLabel:cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_BACK","TemplateEditor"),
-        skipLabel:cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_STOP","TemplateEditor"),
-        doneLabel:cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_STOP","TemplateEditor"),
-        showStepNumbers: false,
-        steps: [
-            {
-                element: '.option.layout',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_LAYOUT_OPTION","TemplateEditor")
-            },
-            {
-                element: '.option.preset',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_OPTION","TemplateEditor")
-            },
-            {
-                element: '.activate-preset',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_ACTIVATE","TemplateEditor")
-            },
-            {
-                element: '.add-preset',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_ADD","TemplateEditor")
-            },
-            {
-                element: '.reset-preset',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_RESET","TemplateEditor")
-            },
-            {
-                element: '.option.view',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_VIEW_OPTION","TemplateEditor")
-            },
-            {
-                element: '.option-list > .option',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_VIEW_OPTION_LIST","TemplateEditor"),
-                position: 'right'
-            },
-            {
-                element: '#preview-template-editor',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PREVIEW","TemplateEditor"),
-                position: 'left'
-            },
-            {
-                element: 'button.save',
-                intro: cx.variables.get("TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_SAVE","TemplateEditor"),
-                position: 'top'
-            }
-        ]
-    });
-
     jQuery('.help').click(function(){
         jQuery('.sidebar .options').scrollTop(0);
-        intro.start();
+        cx.ui.intro.show('TemplateEditor');
     });
-
 });

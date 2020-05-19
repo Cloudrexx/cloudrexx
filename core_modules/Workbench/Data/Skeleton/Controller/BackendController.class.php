@@ -111,10 +111,23 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     }
 
     /**
-     * Return true here if you want the first tab to be an entity view
-     * @return boolean True if overview should be shown, false otherwise
+     * @deprecated In favor of showSplash()
+     * @inheritdoc
      */
     protected function showOverviewPage() {
+        return false;
+    }
+
+    /**
+     * Show splash if no entity contains data
+     * @inheritdoc
+     */
+    protected function showSplash(): bool {
+        foreach ($this->getEntityClassesWithView() as $entityClass) {
+            if ($this->hasEntityData($entityClass)) {
+                return false;
+            }
+        }
         return true;
     }
 }

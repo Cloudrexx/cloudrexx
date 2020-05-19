@@ -177,8 +177,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             exit;
         }
 
+        // get passed options
+        $options = array();
+        if (
+            !empty($arguments['options']) &&
+            is_array($arguments['options'])
+        ) {
+            $options = $arguments['options'];
+        }
+
         $search = new \Cx\Core_Modules\Search\Controller\Search($page);
-        $arraySearchResults = $search->getSearchResult($term);
+        $arraySearchResults = $search->getSearchResult($term, $options);
 
         echo json_encode($arraySearchResults);
         exit;

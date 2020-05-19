@@ -995,7 +995,7 @@ EOF;
             'PODCAST_BROWSE'                    => self::getMediaBrowserButton(
                                                             $_ARRAYLANG['TXT_PODCAST_BROWSE'],
                                                             array(
-                                                                'data-cx-mb-views' => 'filebrowser',
+                                                                'views' => 'filebrowser',
                                                                 'type' => 'button'
                                                             ),
                                                             'mediaBrowserCallback'
@@ -1262,7 +1262,7 @@ EOF;
             'PODCAST_THUMB_BROWSE'              => self::getMediaBrowserButton(
                                                         '',
                                                         array(
-                                                            'data-cx-mb-views' => 'filebrowser',
+                                                            'views' => 'filebrowser',
                                                             'type' => 'button',
                                                             'style' => 'display:none',
                                                             'id' => 'podcast_thumbnail_browser'

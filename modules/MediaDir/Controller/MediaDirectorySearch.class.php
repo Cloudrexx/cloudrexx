@@ -399,10 +399,22 @@ EOF;
                 }
 
                 $intInputfieldType = $objInputfields->arrInputfields[$intInputfieldId]['type'];
+                $inputfieldContextType = $objInputfields->arrInputfields[$intInputfieldId]['context_type'];
                 $strExpTerm = is_array($strExpTerm) ? contrexx_input2db(array_map('trim', $strExpTerm)) : contrexx_input2db(trim($strExpTerm));
                 $strTableName = 'rel_inputfield_'.intval($intInputfieldId);
                 $arrJoins[]  = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS '.$strTableName.' ON '.$strTableName.'.`entry_id` = entry.id';
 
+                switch ($inputfieldContextType) {
+                    case 'zip':
+                        $whereExp = $strTableName.'.`value` REGEXP "(^|[^a-z0-9])'.$strExpTerm.'([^a-z0-9]|$)"';
+                        $arrWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$whereExp.')';
+                        continue;
+
+                        break;
+
+                    default:
+                        break;
+                }
                 switch ($intInputfieldType) {
                     case '11': // 11 = classification
                         switch ($this->arrSettings['settingsClassificationSearch']) {

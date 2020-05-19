@@ -240,6 +240,18 @@ class CommonFunctions
                 if (($index = array_search('STRICT_TRANS_TABLES', $sqlModes)) !== false) {
                     unset($sqlModes[$index]);
                 }
+                if (($index = array_search('STRICT_ALL_TABLES', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('TRADITIONAL', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('NO_ZERO_DATE', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('NO_ZERO_IN_DATE', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
                 $objDb->Execute('SET sql_mode = \'' . implode(',', $sqlModes) . '\'');
 
                 if (($mysqlServerVersion = $this->getMySQLServerVersion()) !== false && !$this->_isNewerVersion($mysqlServerVersion, '4.1')) {

@@ -68,6 +68,20 @@ class Search
     protected $rootPage = null;
 
     /**
+     * List of valid options that can be applied to the search algorithm
+     * @var array
+     */
+    protected $validOptions = array(
+        'zipLookup',
+    );
+
+    /**
+     * Set options (of $validOptions) to be applied to the search algorithm
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * Resolves cmd. If it's a node placeholder, search is limited to the node's
      * branch
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Current page
@@ -111,6 +125,25 @@ class Search
     private function setTerm($term)
     {
         $this->term = $term;
+    }
+
+    /**
+     * Return the set options
+     * @return array List of set options
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+
+    /**
+     * Set the options to be applied on the search algorithms
+     * @param array Options to set
+     */
+    protected function setOptions($options) {
+        $this->options = array_intersect_key(
+            $options,
+            array_flip($this->validOptions)
+        );
     }
 
     /**
@@ -396,11 +429,13 @@ class Search
      * Get a result for search term
      *
      * @param string $term Search value
+     * @param array $options Options to be applied on the search algorithms
      * @return array Return a array of result
      */
-    public function getSearchResult($term)
+    public function getSearchResult($term, $options = array())
     {
         $this->setTerm($term);
+        $this->setOptions($options);
         $eventHandlerInstance = \Env::get('cx')->getEvents();
         $eventHandlerInstance->triggerEvent('SearchFindContent', array($this));
         if ($this->result->size() == 1) {

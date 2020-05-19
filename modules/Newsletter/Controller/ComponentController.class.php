@@ -106,6 +106,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         $newsletterLib = new NewsletterLib();
                         $newsletterLib->autoCleanRegisters();
                         break;
+
+                    case 'View':
+                        Newsletter::displayInBrowser();
+                        // execution is never reached, as Newsletter::displayInBrowser
+                        // does generate its own response
+                        break;
                 }
                 break;
             default:
@@ -155,10 +161,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     *
                     */
                     Newsletter::trackLink();
-                    //execution should never reach this point, but let's be safe and call exit anyway
-                    exit;
-                } elseif ($command == 'displayInBrowser') {
-                    Newsletter::displayInBrowser();
                     //execution should never reach this point, but let's be safe and call exit anyway
                     exit;
                 }

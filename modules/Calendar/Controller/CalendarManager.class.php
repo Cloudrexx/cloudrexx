@@ -117,10 +117,10 @@ class CalendarManager extends CalendarLibrary
             case 'modify_registration':
             case 'add_registration':
                 \Permission::checkAccess(182, 'static');
-                $this->modifyRegistration(intval($_GET['event_id']), intval($_GET['reg_id']));
-                break;
-            case 'get_exception_dates':
-                $this->getExeceptionDates();
+                $this->modifyRegistration(
+                    contrexx_input2int($_GET['event_id']),
+                    contrexx_input2int($_GET['rid'])
+                );
                 break;
             default:
                 $this->showOverview();
@@ -341,8 +341,9 @@ class CalendarManager extends CalendarLibrary
 
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array(
-                    'type'             => 'button',
-                    'data-cx-mb-views' => $type
+                    'type'  => 'button',
+                    'views' => $type,
+                    'startview' => $type,
         ));
         $mediaBrowser->setCallback('setSelected' . ucfirst($name));
 
@@ -363,9 +364,21 @@ class CalendarManager extends CalendarLibrary
         \JS::registerJS("modules/{$this->moduleName}/View/Script/jquery.pagination.js");
         \JS::registerJS('modules/Calendar/View/Script/Backend.js');
 
+        // End of unix timestamp (= max signed 32bit int)
+        // Note: We should instead use \PHP_INT_MAX
+        // However, as MySQL and MariaDB currently do not yet support
+        // 64bit timestamps, we just can't
+        // See https://cloudrexx.atlassian.net/browse/CLX-3009
+        $maxDate = 0x7FFFFFFF;
+        // the day before
+        $maxDate -= 86400;
+        // convert into ms
+        $maxDate *= 1000;
+
         \ContrexxJavascript::getInstance()->setVariable(
             array(
-                'language_id' => \FWLanguage::getDefaultLangId()
+                'language_id' => \FWLanguage::getDefaultLangId(),
+                'maxDate'     => $maxDate,
             ),
             'calendar'
         );
@@ -485,6 +498,16 @@ class CalendarManager extends CalendarLibrary
 
         $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('Html', false);
 
+        \ContrexxJavascript::getInstance()->setVariable(
+            array(
+                'TXT_CALENDAR_START_OF_RECURRENCE' =>
+                    $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'],
+                'TXT_CALENDAR_INVALID_RECURRENCE_DATE' =>
+                    $_ARRAYLANG['TXT_CALENDAR_INVALID_RECURRENCE_DATE'],
+            ),
+            'Calendar'
+        );
+
         //parse globals
         $this->_objTpl->setGlobalVariable(array(
             'TXT_'.$this->moduleLangVar.'_TITLE'                            => $this->_pageTitle,
@@ -527,7 +550,6 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SEATING'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SEATING'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN'                   => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_DURANCE'           => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DURANCE'],
-            'TXT_'.$this->moduleLangVar.'_SERIES_ACTIVATE'                  => $_ARRAYLANG['TXT_CALENDAR_SERIES_ACTIVATE'],
             'TXT_'.$this->moduleLangVar.'_SERIES'                           => $_ARRAYLANG['TXT_CALENDAR_SERIES'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_DAILY'             => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DAILY'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_WEEKLY'            => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_WEEKLY'],
@@ -557,10 +579,16 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_COUNT'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_COUNT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO'         => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_ALL'     => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_ALL_TOOLTIP'     => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_TOOLTIP' => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_REGISTERED' => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_REGISTERED'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_REGISTERED_TOOLTIP' => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_REGISTERED_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_SIGNEDIN'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_SIGNEDIN_TOOLTIP'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_INACTIVE'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_INACTIVE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_INACTIVE_TOOLTIP'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_INACTIVE_TOOLTIP'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_NEW'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_NEW'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_TO_NEW_TOOLTIP'=> $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_TO_NEW_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_EXCLUDE_TOOLTIP'            => $_ARRAYLANG['TXT_CALENDAR_EVENT_EXCLUDE_TOOLTIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE'                       => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE_EVENT'                 => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_EVENT'],
@@ -722,6 +750,16 @@ class CalendarManager extends CalendarLibrary
 
             $this->_objTpl->parse('eventAccess');
         }
+        $permissionLabel = new \Cx\Core\Html\Model\Entity\HtmlElement('i');
+        $permissionLabel->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement(
+                $_CORELANG['TXT_ACCESS_COMMUNITY_EVENTS']
+            )
+        );
+        $this->_objTpl->setVariable(
+            $this->moduleLangVar.'_EVENT_ACCESS_INFO',
+            sprintf($_ARRAYLANG['TXT_'.$this->moduleLangVar.'_EVENT_ACCESS_INFO'], $permissionLabel)
+        );
 
         //parse priority
         for ($i = 1; $i <= 5; $i++) {
@@ -913,7 +951,14 @@ class CalendarManager extends CalendarLibrary
             }
             $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
             foreach ($objEvent->seriesData['seriesAdditionalRecurrences'] as $additionalRecurrence) {
-                $recurrenceDate = $this->format2userDate($additionalRecurrence);
+                // parse or hide time information for event recurrences
+                // depending on the fact if the event is an all-day event
+                // or not
+                if ($objEvent->all_day) {
+                    $recurrenceDate = $this->format2userDate($additionalRecurrence);
+                } else {
+                    $recurrenceDate = $this->formatDateTime2user($additionalRecurrence, $this->getDateFormat() . ' H:i');
+                }
                 $this->_objTpl->setVariable(array(
                     $this->moduleLangVar . '_SERIES_ADDITIONAL_RECURRENCES_DATE' =>  $recurrenceDate,
                     $this->moduleLangVar . '_SERIES_ADDITIONAL_RECURRENCES_FULL_DATE' => $dayArray[$this->formatDateTime2user($additionalRecurrence, "w")] .", ". $recurrenceDate
@@ -1300,7 +1345,8 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_CONFIRM_DELETE_DATA'      => $_ARRAYLANG['TXT_CALENDAR_CONFIRM_DELETE_DATA'],
             'TXT_'.$this->moduleLangVar.'_ACTION_IS_IRREVERSIBLE'   => $_ARRAYLANG['TXT_CALENDAR_ACTION_IS_IRREVERSIBLE'],
             'TXT_'.$this->moduleLangVar.'_INSERT_CATEGORY'          => $_ARRAYLANG['TXT_CALENDAR_INSERT_CATEGORY'] ,
-            'TXT_'.$this->moduleLangVar.'_MAKE_SELECTION'           => $_ARRAYLANG['TXT_CALENDAR_MAKE_SELECTION']
+            'TXT_'.$this->moduleLangVar.'_MAKE_SELECTION'           => $_ARRAYLANG['TXT_CALENDAR_MAKE_SELECTION'],
+            'TXT_'.$this->moduleLangVar.'_COUNT_WITHOUT_SERIES'     => $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'],
         ));
 
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager();
@@ -1550,8 +1596,13 @@ class CalendarManager extends CalendarLibrary
 
             print ("\r\n");
 
+            // parse the event date with or without the time information
+            // depending on the fact if the event is an all-day event or not
+            $dateFormat = $this->getDateFormat();
+            if (!$objEvent->all_day) {
+                $dateFormat .= ' H:i';
+            }
             foreach ($objRegistrationManager->registrationList as $key => $objRegistration) {
-
                 if(intval($objRegistration->firstExport) == 0) {
                     $objRegistration->tagExport();
                 }
@@ -1578,7 +1629,12 @@ class CalendarManager extends CalendarLibrary
                 // $objRegistration->eventDate is a UTC unix timestamp
                 $registrationDate = new \DateTime();
                 $registrationDate->setTimestamp($objRegistration->eventDate);
-                print ($this->parseCsvData($objEvent->title, $fileFormat)." - ". $this->format2userDate($registrationDate).$this->csvSeparator);
+                print ($this->parseCsvData($objEvent->title, $fileFormat) .
+                    " - " . $this->formatDateTime2user(
+                        $registrationDate,
+                        $dateFormat
+                    ) . $this->csvSeparator
+                );
 
                 if($objRegistration->langId == null) {
                     print ($this->arrFrontendLanguages[FRONTEND_LANG_ID]['name'].$this->csvSeparator);
@@ -1759,15 +1815,30 @@ class CalendarManager extends CalendarLibrary
             }
             $filterStartTimeStamp = $filterEndTimeStamp = false;
             if (isset($_GET['date']) && $containerDisplay) {
-                $filterYear = $filterMonth = $filterDate = 0;
-                list($filterYear, $filterMonth, $filterDate) = explode('-', $_GET['date']);
+                $filterYear = $filterMonth = $filterDate = $filterTime = 0;
+                $filter = explode('-', $_GET['date']);
+                foreach (array(
+                    'filterYear', 'filterMonth', 'filterDate', 'filterTime'
+                ) as $filterKey) {
+                    if (!isset($filter[0])) {
+                        break;
+                    }
+                    ${$filterKey} = array_shift($filter);
+                }
 
                 $filterStartYear  = !empty($filterYear) ? $filterYear : date('Y');
                 $filterStartMonth = !empty($filterMonth) ? $filterMonth : 1;
                 $filterStartDay   = !empty($filterDate) ? $filterDate : 1;
                 $filterStartDateTime = new \DateTime();
                 $filterStartDateTime->setDate($filterStartYear, $filterStartMonth, $filterStartDay);
-                $filterStartDateTime->setTime(0, 0, 0);
+
+                // filter registrations by time
+                if ($filterTime) {
+                    list($hour, $minutes) = explode(':', $filterTime);
+                    $filterStartDateTime->setTime($hour, $minutes, 0);
+                } else {
+                    $filterStartDateTime->setTime(0, 0, 0);
+                }
 
                 $filterEndYear  = !empty($filterYear) ? $filterYear : date('Y');
                 $filterEndMonth = !empty($filterMonth) ? $filterMonth : 12;
@@ -1777,7 +1848,14 @@ class CalendarManager extends CalendarLibrary
                 if (empty($filterDate)) {
                     $filterEndDateTime->modify('last day of this month');
                 }
-                $filterEndDateTime->setTime(23, 59, 59);
+
+                // filter registrations by time
+                if ($filterTime) {
+                    list($hour, $minutes) = explode(':', $filterTime);
+                    $filterEndDateTime->setTime($hour, $minutes, 59);
+                } else {
+                    $filterEndDateTime->setTime(23, 59, 59);
+                }
 
                 $filterStartTimeStamp = $filterStartDateTime->getTimestamp();
                 $filterEndTimeStamp   = $filterEndDateTime->getTimestamp();
@@ -1801,7 +1879,7 @@ class CalendarManager extends CalendarLibrary
      * Add / Edit registration
      *
      * @param integer $eventId Event id
-     * @param integer $regId   Rgistration id
+     * @param integer $regId   Registration id
      */
     function modifyRegistration($eventId, $regId)
     {
@@ -1810,25 +1888,29 @@ class CalendarManager extends CalendarLibrary
         $this->_objTpl->loadTemplateFile('module_calendar_modify_registration.html');
 
         if (isset($_POST['submitModifyRegistration'])) {
-            $objRegistration = new \Cx\Modules\Calendar\Controller\CalendarRegistration(intval($_POST['form']), $regId);
+            $objRegistration =
+                new \Cx\Modules\Calendar\Controller\CalendarRegistration(
+                    contrexx_input2int($_POST['form']),
+                    $regId
+                );
             if ($objRegistration->save($_POST)) {
-                    switch ($_POST['registrationType']) {
-                        case 0:
-                            $tpl = 'd';
-                            break;
-                        case 1:
-                        default:
-                            $tpl = 'r';
-                            break;
-                        case 2:
-                            $tpl = 'w';
-                            break;
-                    }
-                    $tpl = !empty($_POST['regtpl']) ? $_POST['regtpl'] : $tpl;
-                    $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_SAVED'];
-                    \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd='.$this->moduleName.'&act=event_registrations&tpl='.$tpl.'&id='.$eventId);
+                switch ($_POST['registrationType']) {
+                    case 0:
+                        $tpl = 'd';
+                        break;
+                    case 1:
+                    default:
+                        $tpl = 'r';
+                        break;
+                    case 2:
+                        $tpl = 'w';
+                        break;
+                }
+                $tpl = !empty($_POST['regtpl']) ? $_POST['regtpl'] : $tpl;
+                $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_SAVED'];
+                \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd='.$this->moduleName.'&act=event_registrations&tpl='.$tpl.'&id='.$eventId);
             } else {
-                    $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_CORRUPT_SAVED'];
+                $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_CORRUPT_SAVED'];
             }
         }
 

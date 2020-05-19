@@ -39,7 +39,6 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "News message";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "Messaggio";
 $_ARRAYLANG['TXT_HYPERLINKS'] = "Hyperlinks";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "External sources";
-$_ARRAYLANG['TXT_LINK'] = "Link";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "News content";
 $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'] = "Related hyperlinks";
 $_ARRAYLANG['TXT_NEWS_SOURCE'] = "Source";

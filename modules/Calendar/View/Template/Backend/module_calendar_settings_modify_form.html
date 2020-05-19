@@ -45,22 +45,30 @@ function ExpandMinimize(toggle, id) {
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
 }
 $J(function(){
+    calendarLoadFormFields();
+});
+function calendarLoadFormFields() {
     var formData = {CALENDAR_FORM_DATA};
     BlankField = $J("#blankField").html();
 
     $J(formData).each(function(index, data){
         $J('#inputfields').append(getField(data));
     });
-});
+}
 function getField(data) {
+    var decodeHtml = function (html) {
+        var txt = document.createElement('textarea');
+        txt.innerHTML = html;
+        return txt.value;
+    };
     var tmpBlankField1 = BlankField.replace(/FIELD_ID/g, data.id);
     tmpBlankField1 = tmpBlankField1.replace(/FIELD_ROW/g, data.row);
     $field = $J(tmpBlankField1);
-    $field.find('.lang_name_master').val(data.name_master);
+    $field.find('.lang_name_master').val(decodeHtml(data.name_master));
     $field.find('.sort_order').val(data.order);
     $field.find('.sort_order').val(data.order);
     $field.find('.field_type').val(data.type);
-    $field.find('.lang_default_value_master').val(data.default_value_master);
+    $field.find('.lang_default_value_master').val(decodeHtml(data.default_value_master));
     if (data.required == '1') {
         $field.find('.field_req').attr('checked', 'checked');
     }
@@ -68,12 +76,12 @@ function getField(data) {
 
     var lang_name = $J.parseJSON(data.field_value);
     $J.each(lang_name, function(index, value){
-        $field.find('.inputNamefield_'+index).val(value);
+        $field.find('.inputNamefield_'+index).val(decodeHtml(value));
     });
 
     var lang_default_value = $J.parseJSON(data.default_field_value);
     $J.each(lang_default_value, function(index, value){
-        $field.find('.inputDefaultfield_'+index).val(value);
+        $field.find('.inputDefaultfield_'+index).val(decodeHtml(value));
     });
 
     changeFieldType($field);

@@ -44,9 +44,12 @@ namespace Cx\Core_Modules\Listing\Controller;
  * @package     cloudrexx
  * @subpackage  coremodule_listing
  */
-class FilteringController {
+class FilteringController extends ListingHandler {
 
-    public function handle($params, $config) {
-        return $params;
+    /**
+     * @{inheritdoc}
+     */
+    public function handle($config, $params) {
+        return $config;
     }
 }

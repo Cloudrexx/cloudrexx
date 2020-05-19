@@ -99,3 +99,7 @@ $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_STYLES'] = 'Format';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_COLORS'] = 'Colors';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_TOOLS'] = 'Tools';
 $_ARRAYLANG['TXT_WYSIWYG_TOOLBAR_BIDI'] = 'Text direction';
+
+// GUI
+$_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_LABEL'] = 'Open image in a modal window (Shadowbox)';
+$_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_SRC'] = 'Image to display in the modal window';

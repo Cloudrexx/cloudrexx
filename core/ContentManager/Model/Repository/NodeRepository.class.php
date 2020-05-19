@@ -175,6 +175,7 @@ class NodeRepository extends NestedTreeRepository {
                     true, //$includeName = true,
                     true, // true, //$includeMetaData = true,
                     true, // true, //$includeProtection = true,
+                    true, // includeEditingStatus
                     false, // true, //$followRedirects = false,
                     false, // true //$followFallbacks = false
                     $destPage

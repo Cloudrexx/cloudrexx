@@ -68,8 +68,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function postComponentLoad() {
         global $objInit;
         // Initialize base system for language and theme
+        if ($this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            $mode = $this->cx->getMode();
+        } else {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
+        }
         // TODO: Get rid of InitCMS class
-        $objInit = new \InitCMS($this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND ? 'frontend' : 'backend', \Env::get('em'));
+        $objInit = new \InitCMS($mode, \Env::get('em'));
         \Env::set('init', $objInit);
     }
 

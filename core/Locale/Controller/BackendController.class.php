@@ -76,13 +76,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $cx = $this->cx;
 
         // permission for Locale and Language management
-        $localeMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, array(50), null);
+        $localeMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(50));
 
         // permission for frontend variable management
-        $variableMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, array(48), null);
+        $variableMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(48));
 
         // backend variable management shall only be available if component SystemInfo is present
-        $variableBackendMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, array(48),
+        $variableBackendMgmtPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), true, array(), array(48),
             function() use ($cx) {
                 return in_array('SystemInfo', $cx->getLicense()->getLegalComponentsList());
             }
@@ -1127,7 +1127,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'DataSource',
                 'DateTime',
                 'Error',
-                'FileBrowser',
                 'GeoIp',
                 'Home',
                 'Html',
@@ -1167,7 +1166,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'SystemLog',
                 'TemplateEditor',
                 'Test',
-                'Upload',
                 'User',
                 'View',
                 'ViewManager',
@@ -1209,7 +1207,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'Sync',
                 'SysLog',
                 'Test',
-                'Upload',
                 'User',
                 'View',
                 'Widget',

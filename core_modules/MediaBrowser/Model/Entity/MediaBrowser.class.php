@@ -61,7 +61,7 @@ class MediaBrowser extends EntityBase
         'mediatypes',
         'multipleselect',
         'modalopened',
-        'modalClosed'
+        'modalclosed'
     ];
 
     /**
@@ -160,7 +160,7 @@ class MediaBrowser extends EntityBase
      */
     function setCallback($callback)
     {
-        $this->options['data-cx-Mb-Cb-Js-Modalclosed'] = $callback;
+        $this->options['data-cx-Mb-Modalclosed'] = $callback;
     }
 
     /**

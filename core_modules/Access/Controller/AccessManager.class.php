@@ -791,7 +791,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array(
                     'type'             => 'button',
-                    'data-cx-mb-views' => 'sitestructure',
+                    'views'            => 'sitestructure',
+                    'startview'        => 'sitestructure',
                     'id'               => 'media-browser-button',
                     'style'            => 'display: none;'
         ));
@@ -930,8 +931,10 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             $areaHidden = 'display:none;';
         }
 
-        $this->_objTpl->setVariable(array(
+        $this->_objTpl->setGlobalVariable(array(
             'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
+        ));
+        $this->_objTpl->setVariable(array(
             'ACCESS_AREA_NAME'          => isset($_CORELANG[$arrAreas[$areaId]['name']]) ? htmlentities($_CORELANG[$arrAreas[$areaId]['name']], ENT_QUOTES, CONTREXX_CHARSET) : $arrAreas[$areaId]['name'],
             'ACCESS_AREA_STYLE_NR'      => $arrAreas[$areaId]['type'] == 'group' ? 3 : ($arrAreas[$areaId]['type'] == 'navigation' ? 1 : 2),
             'ACCESS_AREA_TEXT_INDENT'   => $arrAreas[$areaId]['type'] == 'group' ? 0 : ($arrAreas[$areaId]['type'] == 'navigation' ? 20 : 40),
@@ -941,12 +944,10 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if ($arrAreas[$areaId]['scope'] == $scope || $arrAreas[$areaId]['scope'] == 'global') {
             $this->_objTpl->setVariable(array(
-                'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
-            'ACCESS_AREA_ALLOWED'       => $arrAreas[$areaId]['allowed'] ? 'checked="checked"' : ''
-        ));
+                'ACCESS_AREA_ALLOWED'       => $arrAreas[$areaId]['allowed'] ? 'checked="checked"' : ''
+            ));
             $this->_objTpl->parse('access_permission_in_scope');
 
-            $this->_objTpl->setVariable('ACCESS_AREA_ID', $arrAreas[$areaId]['access_id']);
             $this->_objTpl->parse('access_permission_access_id');
         } else {
             $this->_objTpl->hideBlock('access_permission_in_scope');
@@ -2083,7 +2084,12 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'TXT_ACCESS_ACTIVATION_BY_USER'                     => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_USER'],
             'TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'        => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'],
             'TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'            => $_ARRAYLANG['TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'],
-            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'              => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY']
+            'ACCESS_SIGNUP_NOTIFICATION_TEXT'                   => sprintf($_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION'] . '</strong>'),
+            'TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'        => $_ARRAYLANG['TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'],
+            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'              => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'],
+            'TXT_ACCESS_USER_PROFILE_MODIFICATION'              => $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'],
+            'TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'=> sprintf($_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'] . '</strong>'),
+            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION'  => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION'],
         ));
 
         if (isset($_POST['access_save_settings'])) {
@@ -2125,6 +2131,44 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 }
             }
 
+            if (!empty($_POST['accessSignUpNotification']) && intval($_POST['accessSignUpNotification']) > 0) {
+                $arrSettings['signup_notification_address']['status'] = 1;
+
+                if (!empty($_POST['accessSignUpNotificationAddress'])) {
+                    $notificationAddresses = array_map('trim', explode(',', contrexx_input2raw($_POST['accessSignUpNotificationAddress'])));
+                    $objValidator = new \FWValidator();
+                    foreach ($notificationAddresses as $key => $address) {
+                        if (!$objValidator->isEmail($address)) {
+                            unset($notificationAddresses[$key]);
+                            $status = false;
+                            self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
+                        }
+                    }
+                }
+                $arrSettings['signup_notification_address']['value'] = join(',', $notificationAddresses);
+            } else {
+                $arrSettings['signup_notification_address']['status'] = 0;
+            }
+
+            if (!empty($_POST['accessUserProfileNotification']) && intval($_POST['accessUserProfileNotification']) > 0) {
+                $arrSettings['user_change_notification_address']['status'] = 1;
+
+                if (!empty($_POST['accessUserProfileNotificationAddress'])) {
+                    $notificationAddresses = array_map('trim', explode(',', contrexx_input2raw($_POST['accessUserProfileNotificationAddress'])));
+                    $objValidator = new \FWValidator();
+                    foreach ($notificationAddresses as $key => $address) {
+                        if (!$objValidator->isEmail($address)) {
+                            unset($notificationAddresses[$key]);
+                            $status = false;
+                            self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
+                        }
+                    }
+                }
+                $arrSettings['user_change_notification_address']['value'] = join(',', $notificationAddresses);
+            } else {
+                $arrSettings['user_change_notification_address']['status'] = 0;
+            }
+
             if ($status) {
                 if (\User_Setting::setSettings($arrSettings)) {
                     array_push(self::$arrStatusMsg['ok'], $_ARRAYLANG['TXT_ACCESS_CONFIG_SUCCESSFULLY_SAVED']);
@@ -2155,7 +2199,13 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_USER_ACTIVATION_BOX_1'          => $arrSettings['user_activation']['status'] ? 'block' : 'none',
             'ACCESS_USER_ACTIVATION_BOX_0'          => $arrSettings['user_activation']['status'] ? 'none': 'block',
             'ACCESS_USER_ACTIVATION_TIMEOUT'        => $arrSettings['user_activation_timeout']['value'],
-            'ACCESS_USER_NOTIFICATION_ADDRESS'      => $arrSettings['notification_address']['value']
+            'ACCESS_USER_NOTIFICATION_ADDRESS'      => $arrSettings['notification_address']['value'],
+            'ACCESS_SIGNUP_NOTIFICATION_BOX'        => $arrSettings['signup_notification_address']['status'] ? 'block': 'none',
+            'ACCESS_SIGNUP_NOTIFICATION_CHECKED'    => $arrSettings['signup_notification_address']['status'] ? 'checked="checked"' : '',
+            'ACCESS_SIGNUP_NOTIFICATION_ADDRESS'    => $arrSettings['signup_notification_address']['value'],
+            'ACCESS_USER_PROFILE_NOTIFICATION_BOX'  => $arrSettings['user_change_notification_address']['status'] ? 'block': 'none',
+            'ACCESS_USER_PROFILE_NOTIFICATION_CHECKED'=> $arrSettings['user_change_notification_address']['status'] ? 'checked="checked"' : '',
+            'ACCESS_USER_PROFILE_NOTIFICATION_ADDRESS'=> $arrSettings['user_change_notification_address']['value'],
         ));
         $this->_objTpl->parse('module_access_config_community');
     }

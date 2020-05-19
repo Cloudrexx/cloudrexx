@@ -31,3 +31,5 @@ Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate:
       type: integer
       length: 11
       column: `order`
+      options:
+        default: 0

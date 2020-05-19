@@ -321,10 +321,6 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 $this->rss();
                 break;
 
-            case 'access_user':
-                $this->access_user();
-                break;
-
             default:
                 (intval($this->arrSettings['news_settings_activated'])==0) ? $this->settings() : $this->overview();
                 break;
@@ -562,7 +558,11 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
 
             if ($count>intval($_CONFIG['corePagingLimit'])) {
-                $paging = getPaging($count, $pos, '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']), $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
+                $baseUrl = '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']);
+                if (!empty($_GET['categoryFilter'])) {
+                    $baseUrl .= '&categoryFilter=' . contrexx_input2xhtml($_GET['categoryFilter']);
+                }
+                $paging = getPaging($count, $pos, $baseUrl, $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
             }
             $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'], $pos);
 
@@ -1247,7 +1247,9 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'NEWS_FORM_CAT_ROW'             => $catrow,
             'NEWS_TYPE_MENU'                => $news_type_menu,
             'TXT_EXTERNAL_SOURCE'           => $_ARRAYLANG['TXT_EXTERNAL_SOURCE'],
-            'TXT_LINK'                      => $_ARRAYLANG['TXT_LINK'],
+            'TXT_NEWS_SOURCE'               => $_ARRAYLANG['TXT_NEWS_SOURCE'],
+            'TXT_NEWS_LINK1'                => $_ARRAYLANG['TXT_NEWS_LINK1'],
+            'TXT_NEWS_LINK2'                => $_ARRAYLANG['TXT_NEWS_LINK2'],
             'TXT_NEWS_NEWS_CONTENT'         => $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'],
             'TXT_DATE'                      => $_ARRAYLANG['TXT_DATE'],
             'TXT_PUBLISHING'                => $_ARRAYLANG['TXT_PUBLISHING'],
@@ -1614,7 +1616,9 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'NEWS_FORM_CAT_ROW'             => $catrow,
             'TXT_NEWS_TYPE'                 => $_ARRAYLANG['TXT_NEWS_TYPE'],
             'TXT_EXTERNAL_SOURCE'           => $_ARRAYLANG['TXT_EXTERNAL_SOURCE'],
-            'TXT_LINK'                      => $_ARRAYLANG['TXT_LINK'],
+            'TXT_NEWS_SOURCE'               => $_ARRAYLANG['TXT_NEWS_SOURCE'],
+            'TXT_NEWS_LINK1'                => $_ARRAYLANG['TXT_NEWS_LINK1'],
+            'TXT_NEWS_LINK2'                => $_ARRAYLANG['TXT_NEWS_LINK2'],
             'TXT_NEWS_REDIRECT_NEW_WINDOW'      => $_ARRAYLANG['TXT_NEWS_REDIRECT_NEW_WINDOW'],
             'TXT_NEWS_REDIRECT_NEW_WINDOW_HELP' => $_ARRAYLANG['TXT_NEWS_REDIRECT_NEW_WINDOW_HELP'],
             'TXT_NEWS_NEWS_CONTENT'         => $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'],
@@ -2868,6 +2872,18 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     {
         global $objDatabase, $_ARRAYLANG;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        \JS::registerJS(substr(
+            $cx->getCodeBaseCoreModuleWebPath() .
+                '/News/View/Script/Backend.js',
+            1
+        ));
+        \JS::registerCSS(substr(
+            $cx->getCodeBaseCoreModuleWebPath() .
+                '/News/View/Style/Backend.css',
+            1
+        ));
+
         $this->_objTpl->loadTemplateFile('module_news_category.html', true, true);
         $this->pageTitle = $_ARRAYLANG['TXT_CATEGORY_MANAGER'];
 
@@ -2891,6 +2907,8 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'TXT_EDIT'          => $_ARRAYLANG['TXT_EDIT'],
             'TXT_DELETE'        => $_ARRAYLANG['TXT_DELETE'],
             'TXT_NEWS_EXTENDED' => $_ARRAYLANG['TXT_NEWS_EXTENDED'],
+            'TXT_NEWS_SWITCH_VISIBILITY' =>
+                $_ARRAYLANG['TXT_NEWS_SWITCH_VISIBILITY'],
         ));
 
         // Add a new category
@@ -2945,7 +2963,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         }
 
         // List all categories
-        $arrCatLangData   = $this->getCategoriesLangData();
+        $arrCatLangData   = $this->getCategoriesData();
         $firstLevel       = 2;
         $levelSpacingLeft = 20;
 
@@ -2963,12 +2981,22 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                     $this->_objTpl->hideBlock('categoryHasParent');
                 }
 
+                $name = contrexx_raw2xhtml(
+                    $arrCatLangData[$node['id']]['lang'][
+                        \FWLanguage::getDefaultLangId()
+                    ]
+                );
+                $iconClass = '';
+                if (!$arrCatLangData[$node['id']]['display']) {
+                    $iconClass = 'hidden';
+                }
                 $this->_objTpl->setVariable(array(
                     'NEWS_ROWCLASS'       => $cssStyle,
                     'NEWS_CAT_ID'         => $node['id'],
                     'NEWS_LEVEL_SPACING'  => $level*$levelSpacingLeft,
-                    'NEWS_CAT_NAME'       => contrexx_raw2xhtml($arrCatLangData[$node['id']][\FWLanguage::getDefaultLangId()]),
+                    'NEWS_CAT_NAME'       => $name,
                     'NEWS_CAT_SORT'       => $sort,
+                    'NEWS_CAT_ICON_CLASS' => $iconClass,
                 ));
                 $this->_objTpl->parse('newsRow');
             };
@@ -3028,8 +3056,8 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         }
 
         // get language data from categories
-        $categories = $this->getCategoriesLangData();
-        $categoryLangData = $categories[$id];
+        $categories = $this->getCategoriesData();
+        $categoryLangData = $categories[$id]['lang'];
 
         // get languages which are active
         $arrLanguages = \FWLanguage::getActiveFrontendLanguages();
@@ -3859,7 +3887,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'NEWS_MEDIA_BROWSER_BROWSE_BUTTON'      => self::getMediaBrowserButton(array(
                                                                                     'type'             => 'button',
                                                                                     'id'               => 'newsFeedImage',
-                                                                                    'data-cx-mb-views' => 'filebrowser',
+                                                                                    'views'            => 'filebrowser',
                                                                                     'style'            => 'width:110px;'
                                                                                    ),'SetUrl')
         ));
@@ -4889,41 +4917,6 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'NEWS_TEASER_TITLE_TXT'             => $teaserFrameId != 0 ? $_ARRAYLANG['TXT_EDIT_TEASER_BOX'] : $_ARRAYLANG['TXT_ADD_TEASER_BOX']
         ));
         $this->_objTpl->parse('news_teasers_block');
-    }
-
-    function access_user()
-    {
-        $objFWUser = \FWUser::getFWUserObject();
-        $searchTerm = contrexx_input2raw($_GET['term']);
-        $userType = contrexx_input2raw($_GET['type']);
-        $userGroups = 0;
-
-        if ($userType == 'newsAuthorName') {
-            $userGroups = $this->arrSettings['news_assigned_author_groups'];
-        } elseif ($userType == 'newsPublisherName') {
-            $userGroups = $this->arrSettings['news_assigned_publisher_groups'];
-        }
-
-        $filter = ($userGroups) ? array('group_id' => explode(',', $userGroups)) : '';
-        $objUser = $objFWUser->objUser->getUsers($filter, $searchTerm, null, array());
-
-        $i = 0;
-        $userAttr = array();
-        while($objUser && !$objUser->EOF) {
-            $userName      = $objUser->getUsername();
-            $userId        = $objUser->getId();
-
-            if ($userName) {
-                $userAttr[$i] = array();
-                $userAttr[$i]['id']    = $userId;
-                $userAttr[$i]['label'] = \FWUser::getParsedUserTitle($userId, '', true);
-                $userAttr[$i]['value'] = \FWUser::getParsedUserTitle($userId);
-                $i++;
-            }
-            $objUser->next();
-        }
-        echo json_encode($userAttr);
-        exit();
     }
 
     /**

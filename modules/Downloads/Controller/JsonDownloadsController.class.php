@@ -71,7 +71,7 @@ class JsonDownloadsController extends \Cx\Core\Core\Model\Entity\Controller impl
      */
     public function getDefaultPermissions()
     {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get', 'post'), true);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission();
     }
 
     /**

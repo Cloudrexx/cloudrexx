@@ -319,12 +319,12 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $classNameParts = explode('\\', $entityClassName);
         $classIdentifier = end($classNameParts);
 
-        $sortBy = array();
-        $order  = array('title' => SORT_ASC);
+        $sortBy = array('field' => ['order' => SORT_ASC]);
+        $order  = array('order' => SORT_ASC);
         \Cx\Core\Setting\Controller\Setting::init('Wysiwyg', 'config', 'Yaml');
-        if (\Cx\Core\Setting\Controller\Setting::getValue('sortBehaviour') === 'custom') {
-            $sortBy = array('field' => ['order' => SORT_ASC]);
-            $order  = array();
+        if (\Cx\Core\Setting\Controller\Setting::getValue('sortBehaviour') === 'alphabetical') {
+            $sortBy = array();
+            $order  = array('title' => SORT_ASC);
         }
 
         return array(
@@ -345,6 +345,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'paging'    => true,
                 'filtering' => false,
                 'sortBy'    => $sortBy,
+                'status' => array('field' => 'active'),
             ),
             'fields' => array(
                 'id' => array(
@@ -368,22 +369,12 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_STATE'],
                     'formtext' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ACTIVE'],
                     'sorting' => false,
-                    'table' => array(
-                        'parse' => function($data, $rows) {
-                            $img = 'led_red.gif';
-                            if ($data) {
-                                $img = 'led_green.gif';
-                            }
-                            $data = '<img src="core/Core/View/Media/icons/'.$img.'" />';
-                            return $data;
-                        },
-                    ),
                 ),
                 'imagePath' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_IMAGE_PATH'],
                     'type' => 'image',
                     'showOverview' => false,
-                    'options' => array('data-cx-mb-startmediatype' => 'wysiwyg'),
+                    'options' => array('startmediatype' => 'wysiwyg'),
                 ),
                 'htmlContent' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_HTML_CONTENT'],
@@ -394,6 +385,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'order' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ORDER'],
                     'showOverview' => false,
+                    'showDetail' => false,
                 ),
             ),
         );

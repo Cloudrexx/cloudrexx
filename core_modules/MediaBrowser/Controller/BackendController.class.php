@@ -125,7 +125,7 @@ class BackendController extends SystemComponentBackendController
                 'multipleselect' => true
             ),
             array(
-                'data-cx-Mb-Cb-Js-modalopened' => 'testfunction'
+                'data-cx-Mb-modalopened' => 'testfunction'
             )
         );
 
