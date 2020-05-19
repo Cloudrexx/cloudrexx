@@ -103,6 +103,7 @@ $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_IMPORT_FAILED'] = 'Importing the langu
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOT_FOUND'] = 'Language file not found.';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_SUCCESS'] = 'Default value successfully loaded.';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_ERROR'] = 'Default value not found.';
+$_ARRAYLANG['TXT_CORE_LOCALE_ADD_NEW_INFORMATION'] = 'To add additional locales, the option %1$s (in %2$s) must be deactivated first.';
 
 // Translation view
 $_ARRAYLANG['id'] = 'Placeholder';

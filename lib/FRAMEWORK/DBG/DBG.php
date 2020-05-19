@@ -666,6 +666,8 @@ class DBG
 
     static function dump($val)
     {
+        global $_CONFIG;
+
         if (!self::$enable_dump) return;
 
         self::_escapeDoctrineDump($val);
@@ -684,7 +686,13 @@ class DBG
             // we're logging directly to the browser
             // can't use contrexx_raw2xhtml() here, because it might not
             // have been loaded till now
-            self::_log('DUMP:   <p><pre>'.htmlentities($out, ENT_QUOTES, CONTREXX_CHARSET).'</pre></p>');
+            self::_log(
+                'DUMP:   <p><pre>' . htmlentities(
+                    $out,
+                    ENT_QUOTES,
+                    $_CONFIG['coreCharacterEncoding']
+                ) . '</pre></p>'
+            );
         } else {
             self::_log('DUMP:   '.$out);
         }
@@ -842,7 +850,14 @@ class DBG
                 $userHash = $counter->getUniqueUserId();
             }
         }
-        $outputModuleStr = empty($outputModule) ? '' : ' "' . $outputModule . '"';
+
+        // fetch parsed response code
+        if ($cx->getResponse()) {
+            $httpResponseCode = $cx->getResponse()->getCode();
+        } else {
+            // as fallback fetch response code from set headers
+            $httpResponseCode = http_response_code();
+        }
 
         register_shutdown_function(
             function() use (
@@ -853,17 +868,26 @@ class DBG
                 $requestUserAgent,
                 $cachedStr,
                 $userHash,
-                $outputModuleStr
+                $outputModule,
+                $httpResponseCode
             ) {
                 $parsingTime = $cx->stopTimer();
-                \DBG::log(
-                    '(Cx: ' . $cx->getId() .
-                    ') Request parsing completed after ' . $parsingTime  .
-                    ' "' . $cachedStr . '" "' . $requestInfo . '" "' .
-                    $requestIp . '" "' . $requestHost . '" "' .
-                    $requestUserAgent . '" "' . memory_get_peak_usage(true) .
-                    '" "' . $userHash . '"' . $outputModuleStr
+                $format = '(Cx: %1$s) Request parsing completed after %2$s "%3$s" "%4$s" "%5$s" "%6$s" "%7$s" "%8$s" "%9$s" "%10$s" "%11$s"';
+                $log = sprintf(
+                    $format,
+                    $cx->getId(),
+                    $parsingTime,
+                    $cachedStr,
+                    $requestInfo,
+                    $requestIp,
+                    $requestHost,
+                    $requestUserAgent,
+                    memory_get_peak_usage(true),
+                    $userHash,
+                    $outputModule,
+                    $httpResponseCode
                 );
+                \DBG::log($log);
             }
         );
     }
@@ -919,7 +943,11 @@ class DBG
             }
             self::$memory_logs[] = date($dateFormat).' '.$text;
         } else {
-            echo $text.'<br />';
+            if (php_sapi_name() == 'cli') {
+                echo $text . PHP_EOL;
+            } else {
+                echo $text . '<br />';
+            }
             // force log message output
             if (ob_get_level()) {
                 ob_flush();
@@ -967,6 +995,8 @@ class DBG
 
     public static function logSQL($sql, $forceOutput = false)
     {
+        global $_CONFIG;
+
         $error = preg_match('#^[0-9]+:#', $sql);
 
         if ($error) {
@@ -1003,10 +1033,19 @@ class DBG
                     break;
             }
         }
-        if (!self::$log_file && !self::$log_firephp && !self::$log_memory) {
+        if (
+            !self::$log_file &&
+            !self::$log_firephp &&
+            !self::$log_memory &&
+            php_sapi_name() != 'cli'
+        ) {
             // can't use contrexx_raw2xhtml() here, because it might not
             // have been loaded till now
-            $sql = htmlentities($sql, ENT_QUOTES, CONTREXX_CHARSET);
+            $sql = htmlentities(
+                $sql,
+                ENT_QUOTES,
+                $_CONFIG['coreCharacterEncoding']
+            );
         }
 
         self::_log('SQL: '.$sql, $status);
@@ -1029,18 +1068,30 @@ class DBG
      * Reset the text that is being put in front of log messags
      */
     public static function resetLogPrefix() {
-        self::$setLogPrefix();
+        self::setLogPrefix();
+    }
+
+    public static function getLogHash() {
+        return self::$logHash;
     }
 }
 
 function DBG_log_adodb($msg)
 {
+    global $_CONFIG;
+
     if (strpos($msg, 'password') !== false) {
         DBG::logSQL('*LOGIN (query suppressed)*');
         return;
     }
 
-    $msg = trim(html_entity_decode(strip_tags($msg), ENT_QUOTES, CONTREXX_CHARSET));
+    $msg = trim(
+        html_entity_decode(
+            strip_tags($msg),
+            ENT_QUOTES,
+            $_CONFIG['coreCharacterEncoding']
+        )
+    );
     $sql = preg_replace('#^\([^\)]+\):\s*#', '', $msg);
     DBG::logSQL($sql);
 }

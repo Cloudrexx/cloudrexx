@@ -65,6 +65,16 @@
             }
         }
     }
+    $J(document).ready(function() {
+        $J('input[name="downloads_setting_auto_naming"]').change(function() {
+            if ($J('input[name="downloads_setting_auto_naming"]:checked').val() === 'on') {
+                $J('#downloads_pretty_format').show();
+            } else {
+                $J('#downloads_pretty_format').hide();
+            }
+        });
+        $J('input[name="downloads_setting_auto_naming"]').trigger('change');
+    });
 // ]]>
 </script>
 
@@ -334,6 +344,24 @@
                                 </tr>
                            </tbody>
                         </table>
+                    </td>
+                </tr>
+                <tr class="row3">
+                    <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_SETTINGS_ASSET_SELECTION}</td>
+                </tr>
+                <tr class="row2">
+                    <td width="280">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING}</td>
+                    <td>
+                        <input type="radio" name="downloads_setting_auto_naming" id="auto_naming_off" value="off" {DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE_CHECKED}/>
+                        <label for="auto_naming_off">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE}</label>
+                        <br />
+                        <input type="radio" name="downloads_setting_auto_naming" id="auto_naming_on" value="on" {DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE_CHECKED}/>
+                        <label for="auto_naming_on">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE}</label>
+                        <br />
+                        <div id="downloads_pretty_format">
+                            <input type="text" name="downloads_setting_pretty_format" value="{DOWNLOADS_SETTINGS_PRETTY_FORMAT}" placeholder="#Search#Replace#"/>
+                            <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_DOWNLOADS_SETTINGS_PRETTY_FORMAT_TOOLTIP}</span>
+                        </div>
                     </td>
                 </tr>
             </tbody>

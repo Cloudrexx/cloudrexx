@@ -73,10 +73,10 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'defaultUrlTemplate', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'defaultUrlTemplate', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
     }
 
     /**
@@ -420,6 +420,28 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     /**
      * {@inheritDoc}
      */
+    public function setLastUpdate($lastUpdate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setLastUpdate', array($lastUpdate));
+
+        return parent::setLastUpdate($lastUpdate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLastUpdate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLastUpdate', array());
+
+        return parent::getLastUpdate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getToUri($dataSourceName, $entityIndexData = array (
 ))
     {
@@ -515,6 +537,17 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

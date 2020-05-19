@@ -160,4 +160,39 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Event register for search content
         $evm->addEventListener('SearchFindContent', $pageListener);
     }
+
+    /**
+     * Get the set canonical-link of this request
+     *
+     * @param   \Cx\Core\Routing\Model\Entity\Response  $response Response
+     *                                          object of current request
+     * @return  \Cx\Core\Html\Model\Entity\HtmlElement  Instance of type link
+     * @throws  \Exeception In case no canonical-link has been set so far
+     */
+    public function fetchAlreadySetCanonicalLink($response) {
+        $headers = $response->getHeaders();
+        $linkHeader = '';
+        if (isset($headers['Link'])) {
+            $linkHeader = $headers['Link'];
+        } else {
+            // TODO: as the resolver does itself set his own headers
+            // we have to check them as well as fallback.
+            // This code code be removed once all headers are only
+            // set on the instance of \Cx\Core\Routing\Model\Entity\Response
+            $headers = \Env::get('Resolver')->getHeaders();
+            if (isset($headers['Link'])) {
+                $linkHeader = $headers['Link'];
+            }
+        }
+
+        if (!preg_match('/^<([^>]+)>;\s+rel="canonical"/', $linkHeader, $matches)) {
+            throw new \Exception('no canonical-link header set');
+        }
+
+        $canonicalLink = $matches[1];
+        $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
+        $link->setAttribute('rel', 'canonical');
+        $link->setAttribute('href', $canonicalLink);
+        return $link;
+    }
 }

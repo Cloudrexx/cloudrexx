@@ -57,7 +57,6 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "Nyheder";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "Nyhed";
 $_ARRAYLANG['TXT_HYPERLINKS'] = "Hyperlinks";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "Eksterne kilder";
-$_ARRAYLANG['TXT_LINK'] = "Link";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "Nyhedsindhold";
 $_ARRAYLANG['TXT_STORE'] = "Gem";
 $_ARRAYLANG['TXT_PUBLISHING'] = "Publicer";

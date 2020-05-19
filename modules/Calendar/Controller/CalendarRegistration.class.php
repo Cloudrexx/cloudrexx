@@ -168,7 +168,25 @@ class CalendarRegistration extends CalendarLibrary
      * @var \Cx\Modules\Calendar\Model\Entity\Invite
      */
     protected $invite;
-    
+
+    /**
+     * Registration type normal registration
+     * @var integer
+     */
+    const REGISTRATION_TYPE_REGISTRATION = 1;
+
+    /**
+     * Registration type waiting list
+     * @var integer
+     */
+    const REGISTRATION_TYPE_WAITLIST = 2;
+
+    /**
+     * Registration type cancellation
+     * @var integer
+     */
+    const REGISTRATION_TYPE_CANCELLATION = 0;
+
     /**
      * Constructor for registration class
      * 
@@ -328,11 +346,11 @@ class CalendarRegistration extends CalendarLibrary
             /* } */
         }
         
-        $regId = empty($data['regid']) ? 0 : intval($data['regid']);
-        $eventId = intval($data['id']);
-        $formId = intval($data['form']);
+        $regId     = empty($data['regid']) ? 0 : intval($data['regid']);
+        $eventId   = intval($data['id']);
+        $formId    = intval($data['form']);
         $eventDate = intval($data['date']);
-        $userId = intval($data['userid']);
+        $userId    = intval($data['userid']);
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
 
@@ -341,7 +359,7 @@ class CalendarRegistration extends CalendarLibrary
         ) {
             $eventDate = isset($data['registrationEventDate']) ? contrexx_input2int($data['registrationEventDate']) : $eventDate;
 
-            $endDate   = new \DateTime();
+            $endDate = new \DateTime();
             $endDate->modify('+10 years');
 
             $eventManager = new CalendarEventManager(null, $endDate);
@@ -381,11 +399,11 @@ class CalendarRegistration extends CalendarLibrary
             !empty($objEvent->numSubscriber) &&
             intval($objEvent->getFreePlaces() - $numSeating) < 0
         ) {
-            $type = 2;
+            $type = static::REGISTRATION_TYPE_WAITLIST;
         } elseif (isset($data['registrationType'])) {
             $type = intval($data['registrationType']);
         } else {
-            $type = 1;
+            $type = static::REGISTRATION_TYPE_REGISTRATION;
         }
         $this->saveIn = intval($type);
 
@@ -582,14 +600,23 @@ class CalendarRegistration extends CalendarLibrary
 
         if ($objInit->mode == 'frontend') {
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-            
+
             // send notification mail about successful registration to user
-            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG, $this->id, $objEvent->emailTemplate);
+            $objMailManager->sendMail(
+                $objEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG,
+                $this->id,
+                $objEvent->emailTemplate
+            );
             
             // send notification mail about new registration to admin
-            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG, $this->id);
+            $objMailManager->sendMail(
+                $objEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG,
+                $this->id
+            );
         }
-        
+
         return true;
     }
 

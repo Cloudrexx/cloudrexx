@@ -54,13 +54,15 @@ class PagingController extends ListingHandler {
         $this->countPerPage = $_CONFIG['corePagingLimit'];
     }
 
-    public function handle($params, $config) {
-        $params['offset'] = 0;
-        $paramName = !empty($params['entity']) ? $params['entity'] . 'Pos' : 'pos';
-        if (isset($config[$paramName])) {
-            $params['offset'] = $config[$paramName];
+    /**
+     * @{inheritdoc}
+     */
+    public function handle($config, $params) {
+        $config['offset'] = 0;
+        if (isset($params['pos'])) {
+            $config['offset'] = (int) $params['pos'];
         }
-        $params['count'] = $this->countPerPage;
-        return $params;
+        $config['count'] = $this->countPerPage;
+        return $config;
     }
 }

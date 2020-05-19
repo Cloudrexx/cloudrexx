@@ -313,15 +313,27 @@ class Csrf {
             return;
         }
 
-        $code = ($_SERVER['REQUEST_METHOD'] == 'GET')
-            ? (isset($_GET [self::$formkey]) ? $_GET[self::$formkey] : '')
-            : (isset($_POST[self::$formkey]) ? $_POST[self::$formkey] : '');
+        $code = '';
+        $method = $_SERVER['REQUEST_METHOD']; 
+
+        switch ($method) {
+            case 'GET':
+                $code = isset($_GET [self::$formkey]) ? $_GET[self::$formkey] : '';
+                break;
+
+            case 'POST':
+                $code = isset($_POST[self::$formkey]) ? $_POST[self::$formkey] : '';
+                break;
+
+            default:
+                break;
+        }
 
         self::__cleanup();
         if (! self::__getkey($code)) {
             self::__kill();
         } else {
-            self::__reduce($code);
+            self::__reduce($code, $method);
             if (self::__getkey($code) < 0) {
                 self::__kill();
             }
@@ -406,13 +418,34 @@ class Csrf {
         return htmlspecialchars(contrexx_stripslashes($str), ENT_QUOTES, CONTREXX_CHARSET);
     }
 
-
-    private static function __reduce($code)
+    /**
+     * Decrease the validity of the CSRF tokens
+     *
+     * @param   string  $code   The CSRF token used for this request
+     * @param   string  $method The HTTP request method
+     */
+    private static function __reduce($code, $method)
     {
         foreach ($_SESSION[self::$sesskey] as $key => $value) {
-            $_SESSION[self::$sesskey][$key] = $_SESSION[self::$sesskey][$key] -
-                ($code == $key
-                    ? self::$active_decrease : self::$unused_decrease);
+            // invalidate token immediately in case it has been
+            // used by a POST request
+            if (
+                $method == 'POST' &&
+                $key == $code
+            ) {
+                $_SESSION[self::$sesskey][$key] = 0;
+                continue;
+            }
+
+            // stepwise decrease the validity of the tokens
+            // for GET requests
+            if ($key == $code) {
+                $decreaseValue = self::$active_decrease;
+            } else {
+                $decreaseValue = self::$unused_decrease;
+            }
+
+            $_SESSION[self::$sesskey][$key] -= $decreaseValue;
         }
     }
 

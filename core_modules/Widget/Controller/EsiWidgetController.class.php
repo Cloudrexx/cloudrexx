@@ -95,7 +95,7 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
      * @return Cx\Core_Modules\Access\Model\Entity\Permission Required permission
      */
     public function getDefaultPermissions() {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false);
     }
 
     /**
@@ -153,6 +153,7 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
             $_REQUEST += $params['post'];
         }
 
+        $params = $this->objectifyParams($params);
         if ($widget->getType() != \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK) {
             $widgetContent = '{' . $params['get']['name'] . '}';
         } else {
@@ -175,14 +176,22 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
         \LinkGenerator::parseTemplate($widgetContent);
         $this->cx->parseGlobalPlaceholders($widgetContent);
         $widgetTemplate->setTemplate($widgetContent);
+
+        $targetComponent = $params['get']['targetComponent'];
+        $targetEntity = $params['get']['targetEntity'];
+        $targetId = $params['get']['targetId'];
+        if ($widget->hasCustomParseTarget()) {
+            $targetComponent = $widget->getCustomParseTarget()->getComponentController()->getName();
+            $targetEntity = (new \ReflectionClass($widget->getCustomParseTarget()))->getShortName();
+            $targetId = $widget->getCustomParseTarget()->getId();
+        }
         $this->getComponent('Widget')->parseWidgets(
             $widgetTemplate,
-            $params['get']['targetComponent'],
-            $params['get']['targetEntity'],
-            $params['get']['targetId'],
+            $targetComponent,
+            $targetEntity,
+            $targetId,
             array($params['get']['name'])
         );
-        $params = $this->objectifyParams($params);
         $this->parseWidget(
             $params['get']['name'],
             $widgetTemplate,
@@ -214,6 +223,7 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
     protected function objectifyParams($params) {
         $possibleGetParams = array(
             'page' => function($pageId) use ($params) {
+                $page = null;
                 if (!isset(static::$esiParamPage[$pageId])) {
                     $em = $this->cx->getDb()->getEntityManager();
                     $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');

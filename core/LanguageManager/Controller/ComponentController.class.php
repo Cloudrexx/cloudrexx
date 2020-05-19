@@ -244,6 +244,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             return;
         }
         $currentPage = $this->cx->getPage();
+
+        // check if current page has a different canonical-link
+        try {
+            // fetch set canonical-link
+            $link = $this->getComponent('ContentManager')->fetchAlreadySetCanonicalLink($this->cx->getResponse());
+            $canonicalLinkUrl = $link->getAttribute('href');
+            $currentPageUrl = \Cx\Core\Routing\Url::fromPage($currentPage)->toString();
+
+            // if the canonical-link of this request points to a different
+            // url than the currently requested url, we must not generate
+            // a hreflang-tag-list as this would otherwise confuse seo-bots
+            if ($canonicalLinkUrl != $currentPageUrl) {
+                return;
+            }
+        } catch (\Exception $e) {
+            // no Link header set -> page doesn't have a canonical-link
+            // -> hreflang-tags can be set without problem
+        }
+
         $listProtectedPages = \Cx\Core\Setting\Controller\Setting::getValue(
             'coreListProtectedPages',
             'Config'
@@ -364,7 +383,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $widget->setEsiVariable(
                 \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
                 \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL |
-                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_PATH
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_PATH |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_QUERY
             );
             $widgetController->registerWidget(
                 $widget

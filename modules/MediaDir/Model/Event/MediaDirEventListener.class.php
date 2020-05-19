@@ -61,7 +61,9 @@ class MediaDirEventListener extends DefaultEventListener
         // note: inclusion check is done in method MediaDirectoryEntry::searchResultsForSearchModule()
 
         $objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
-        $result   = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($objEntry->searchResultsForSearchModule($search->getTerm()));
+        $result   = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+            $objEntry->searchResultsForSearchModule($search)
+        );
         $search->appendResult($result);
     }
 

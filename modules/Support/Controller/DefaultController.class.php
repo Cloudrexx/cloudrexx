@@ -136,7 +136,7 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
             if (!empty($feedBackSubject) && !empty($feedBackComment)) {
                 //get the hostname domain
                 $domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
-                $domain = $domainRepo->findOneBy(array('id' => 0));
+                $domain = $domainRepo->getHostDomain();
                 $arrFields = array (
                     'name'         => contrexx_raw2xhtml($customerName),
                     'fromEmail'    => contrexx_raw2xhtml($customerEmailId),

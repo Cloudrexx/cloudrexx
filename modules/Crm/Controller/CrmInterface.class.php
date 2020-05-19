@@ -56,6 +56,11 @@ namespace Cx\Modules\Crm\Controller;
 class CrmInterface extends CrmLibrary
 {
     /**
+     * constant MiB2 2megabytes
+     */
+    const MiB2 = 2097152;
+
+    /**
      * delimiter
      *
      * @access private
@@ -111,6 +116,11 @@ class CrmInterface extends CrmLibrary
      * @var object
      */
     public $_objTpl;
+
+    /**
+     * @var integer
+     */
+    protected $memoryLimit;
 
     /**
      * php 5.3 contructor
@@ -770,9 +780,7 @@ class CrmInterface extends CrmLibrary
      */
     function saveCsvData()
     {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
-
-        $json = array();
+        global $objDatabase, $_LANGID, $_ARRAYLANG;
 
         $csvSeprator    = isset ($_POST['csv_delimiter']) && in_array($_POST['csv_delimiter'], array_keys($this->_delimiter)) ? $this->_delimiter[$_POST['csv_delimiter']]['value'] : $this->_delimiter[0]['value'];
         $csvDelimiter   = isset ($_POST['csv_enclosure']) && in_array($_POST['csv_enclosure'], array_keys($this->_enclosure)) ? $this->_enclosure[$_POST['csv_enclosure']]['value'] : $this->_enclosure[0]['value'];
@@ -781,7 +789,9 @@ class CrmInterface extends CrmLibrary
         $fileName       = isset ($_POST['fileUri']) ? \FWValidator::getCleanFileName(contrexx_input2raw($_POST['fileUri'])) : '';
         $objFWUser      = \FWUser::getFWUserObject();
 
-        $_SESSION[$fileName] = array();
+        if (empty($_SESSION[$fileName])) {
+            $_SESSION[$fileName] = array();
+        }
 
         $importOptions = array_column($this->getImportOptions(), 'value');
         foreach ($_POST['crm_contact_option_base'] as $colId => $value) {
@@ -790,25 +800,39 @@ class CrmInterface extends CrmLibrary
             }
         }
 
+        $processedLines = $_SESSION[$fileName]['processedRows'] ?? 0;
+        $importedLines  = $_SESSION[$fileName]['importedRows'] ?? 0;
+        $skipedLines    = $_SESSION[$fileName]['skippedRows'] ?? 0;
         if (isset($firstname) || isset($lastname) || isset($company)) {
             $this->contact = new \Cx\Modules\Crm\Model\Entity\CrmContact();
 
-            $objCsv        = new CrmCsv($this->_mediaPath.'/'.$fileName, $csvSeprator, $csvDelimiter);
+            $objCsv        = new CrmCsv($this->_mediaPath . '/' . $fileName, $csvSeprator, $csvDelimiter);
             $line          = $objCsv->NextLine();
-            $first         = true;
-            $totalLines    = 0;
-            $importedLines = 0;
-            $skipedLines   = 0;
+            $first         = $_SESSION[$fileName]['ignoreFirstRow'] ?? true;
+            $processRowCnt = $processedLines + 10;
+
+            $i = 1;
             while ($line) {
-                session_start();
-                $_SESSION[$fileName]['totalRows'] = $totalLines;
+                if (!$this->checkMemoryLimit()) {
+                    $this->sendCsvImportResponse(
+                        $fileName,
+                        'error',
+                        $_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_MEMORY_ERROR']
+                    );
+                }
+
+                if ($i <= $processedLines) {
+                    $i++;
+                    $line = $objCsv->NextLine();
+                    continue;
+                }
+
                 if (!$first || !$csvIgnoreFirst) {
                     $this->contact->clean();
                     $this->contact->contactType = !empty($line[$firstname]) || !empty($line[$lastname])
                                                  ? 2
                                                  : (!empty($line[$company]) ? 1 : 0);
                     if (!empty($this->contact->contactType)) {
-
                         $this->contact->datasource       = 3;
 
                         $this->contact->family_name      = $this->contact->contactType == 2
@@ -1007,22 +1031,36 @@ class CrmInterface extends CrmLibrary
                             $skipedLines++;
                             $_SESSION[$fileName]['skippedRows'] = $skipedLines;
                         }
+                    } else {
+                        $skipedLines++;
+                        $_SESSION[$fileName]['skippedRows'] = $skipedLines;
                     }
+                } else {
+                    $skipedLines++;
+                    $_SESSION[$fileName]['skippedRows'] = $skipedLines;
                 }
-                $totalLines++;
+                $processedLines++;
+                $_SESSION[$fileName]['processedRows'] = $processedLines;
                 $first = false;
-                $line = $objCsv->NextLine();
-                session_write_close();
-                echo '    ';
+                $line  = $objCsv->NextLine();
+                if ($i == $processRowCnt) {
+                    $_SESSION[$fileName]['ignoreFirstRow'] = $first;
+                    $this->sendCsvImportResponse(
+                        $fileName,
+                        'success',
+                        $_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS']
+                    );
+                }
+                $i++;
             }
-            if (!$line) {
-                echo $json['success'] = 'Record Imported Successfully.';
-            }
+            $importStatus = 'success';
+            $importMsg    = $_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS'];
         } else {
-            echo $json['error'] = $_ARRAYLANG['TXT_CRM_CHOOSE_NAME_ERROR'];
+            $importStatus = 'error';
+            $importMsg    = $_ARRAYLANG['TXT_CRM_CHOOSE_NAME_ERROR'];
         }
 
-        exit();
+        $this->sendCsvImportResponse($fileName, $importStatus, $importMsg);
     }
 
     /**
@@ -1167,30 +1205,49 @@ class CrmInterface extends CrmLibrary
     }
 
     /**
-     * Get file import result
+     * Send a response for csv import
      *
-     * @return null
+     * @param string $fileName     File name
+     * @param string $importStatus Import status success or error
+     * @param String $importMsg    Import message
      */
-    function getFileImportProgress()
+    protected function sendCsvImportResponse($fileName, $importStatus, $importMsg)
     {
-        $file = isset($_GET['file']) ? contrexx_input2raw($_GET['file']) : '';
-
-        $json = array();
-        if (!empty($file)) {
-            if (isset($_SESSION[$file])) {
-                $json['totalRows'] = isset ($_SESSION[$file]['totalRows']) ? $_SESSION[$file]['totalRows'] : 0;
-                $json['skippedRows'] = isset ($_SESSION[$file]['skippedRows']) ? $_SESSION[$file]['skippedRows'] : 0;
-                $json['importedRows'] = isset ($_SESSION[$file]['importedRows']) ? $_SESSION[$file]['importedRows'] : 0;
-                $json['percentCompleted'] = 100;
-
-            } else {
-                $json['error'] = "File import not yet started";
-            }
-        } else {
-            $json['error'] = "File is empty..!";
-        }
-
+        $json = array(
+            'status'        => $importStatus,
+            'message'       => $importMsg,
+            'processedRows' => $_SESSION[$fileName]['processedRows'] ?? 0,
+            'skippedRows'   => $_SESSION[$fileName]['skippedRows'] ?? 0,
+            'importedRows'  => $_SESSION[$fileName]['importedRows'] ?? 0
+        );
         echo json_encode($json);
         exit();
+    }
+
+    /**
+     * This method checks the required memory is available for the import process
+     * if not then it will try to increase the memory limit.
+     *
+     * @return boolean True if memory limit is greater than required memory,
+     *                 otherwise false if unable to set a memory limit
+     */
+    protected function checkMemoryLimit()
+    {
+        if (empty($this->memoryLimit)) {
+            $memoryLimit = \FWSystem::getBytesOfLiteralSizeFormat(@ini_get('memory_limit'));
+            //if memory limit is empty then set default php memory limit of 8MiBytes
+            $this->memoryLimit = !empty($memoryLimit) ? $memoryLimit : self::MiB2 * 4;
+        }
+
+        $potentialRequiredMemory = memory_get_usage() + self::MiB2;
+        if ($potentialRequiredMemory > $this->memoryLimit) {
+            // try to set a higher memory_limit
+            if (!@ini_set('memory_limit', $potentialRequiredMemory)) {
+                return false;
+            }
+            $this->memoryLimit = $potentialRequiredMemory;
+        }
+
+        return true;
     }
 }

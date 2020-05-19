@@ -178,9 +178,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $mediaWebPath = '/'. $mediaWebPath; // Filesysystem removes the beginning slash(/)
 
                 $url = \Cx\Core\Routing\Url::fromPage($page, array(
-                    'path' => rawurlencode($mediaWebPath),
+                    'path' => $mediaWebPath,
                     'act' => 'download',
-                    'file' => rawurlencode($name),
+                    'file' => $name,
                 ));
                 if (!$url) {
                     continue;

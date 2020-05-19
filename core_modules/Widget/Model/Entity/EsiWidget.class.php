@@ -359,7 +359,7 @@ class EsiWidget extends Widget {
                         );
                         break;
                     case static::ESI_VAR_NAME_QUERY:
-                        $params = $_GET;
+                        $params = $this->cx->getRequest()->getUrl()->getParamArray();
                         unset($params['__cap']);
                         unset($params['section']);
                         unset($params['cmd']);

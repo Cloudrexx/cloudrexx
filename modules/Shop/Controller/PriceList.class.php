@@ -619,10 +619,7 @@ class PriceList
      */
     static function decode($string)
     {
-        global $_CONFIG;
-
-        return ($_CONFIG['coreCharacterEncoding'] == 'UTF-8'
-          ? utf8_decode($string) : $string);
+        return $string;
     }
 
 

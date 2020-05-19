@@ -602,7 +602,7 @@ die("MailTemplate::init(): Empty section!");
                 if ($field == 'message_html') {
                     $convertToHtmlEntities = true;
                 }
-                self::substitute($value, $substitution, $convertToHtmlEntities);
+                self::substitute($value, $substitution, $convertToHtmlEntities, false);
             }
             if ($strip) self::clearEmptyPlaceholders($value);
         }
@@ -710,7 +710,7 @@ die("MailTemplate::init(): Empty section!");
             }
 //DBG::log("MailTemplate::send(): ".var_export($objMail, true));
 // TODO: Comment for test only!
-            $result &= $objMail->Send();
+            $result = $result && $objMail->Send();
 // TODO: $objMail->Send() seems to sometimes return true on localhost where
 // sending the mail is actually impossible.  Dunno why.
         }
@@ -763,8 +763,8 @@ die("MailTemplate::init(): Empty section!");
      * before the next value is even looked at.
      *
      * Final note:
-     * To replace any blocks or placeholders from the string that have not been
-     * substituted, call {@see clearEmptyPlaceholders()} after *all* values
+     * To skip replacing any blocks or placeholders from the string that have
+     * not been substituted, set $clearEmptyPlaceholders to false
      * have been substituted.  This will take care both of unused blocks and
      * placeholders.  See {@see send()} for an example.
      * @param   string    $string         The string to be searched and replaced,
@@ -772,8 +772,9 @@ die("MailTemplate::init(): Empty section!");
      * @param   array     $substitution   The array of placeholders and values,
      *                                    by reference
      * @param   boolean   $convertToHtmlEntities if true, converts the values to html entities
+     * @param   boolean   $clearEmptyPlaceholders If set to false does not clear empty blocks and placeholders
      */
-    static function substitute(&$string, &$substitution, $convertToHtmlEntities = false)
+    public static function substitute(&$string, &$substitution, $convertToHtmlEntities = false, $clearEmptyPlaceholders = true)
     {
         if (empty($string)) return;
 //DBG::log("substitute($string, \$substitution): Entered");
@@ -794,7 +795,7 @@ die("MailTemplate::init(): Empty section!");
                     // Parse block with subarray contents (nested block)
                     foreach ($value as $value_inner) {
                         $block = $block_template;
-                        self::substitute($block, $value_inner, $convertToHtmlEntities);
+                        self::substitute($block, $value_inner, $convertToHtmlEntities, false);
                         $block_parsed .= $block;
 //echo("substitute(): Block parsed: ".htmlentities($block)."<br />");
                     }
@@ -804,7 +805,7 @@ die("MailTemplate::init(): Empty section!");
                     // it does not contain any placeholder present
                     // in the substitution (conditional block)
                     $block = $block_template;
-                    self::substitute($block, $substitution, $convertToHtmlEntities);
+                    self::substitute($block, $substitution, $convertToHtmlEntities, false);
                     if ($block != $block_template) {
                         $block_parsed = $block;
                     }
@@ -828,6 +829,9 @@ die("MailTemplate::init(): Empty section!");
         }
 //echo("substitute($string, ".var_export($substitution, true)."): Leaving<hr />");
 //echo("substitute($string, \$substitution): Leaving<hr />");
+        if ($clearEmptyPlaceholders) {
+            static::clearEmptyPlaceholders($string);
+        }
     }
 
 
@@ -835,7 +839,7 @@ die("MailTemplate::init(): Empty section!");
      * Removes left over placeholders and blocks from the string
      * @param   string    $value        The string, by reference
      */
-    static function clearEmptyPlaceholders(&$value)
+    public static function clearEmptyPlaceholders(&$value)
     {
         // Replace left over blocks
         $value = preg_replace('/\[(\[\w+\]).+?\1\]/s', '', $value);
@@ -943,7 +947,7 @@ die("MailTemplate::init(): Empty section!");
              WHERE `key`='".addslashes($key)."'")) {
             return \Message::error($_CORELANG['TXT_CORE_MAILTEMPLATE_DELETING_FAILED']);
         }
-        $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."core_mail_template`");
+
         return \Message::ok($_CORELANG['TXT_CORE_MAILTEMPLATE_DELETED_SUCCESSFULLY']);
     }
 
@@ -1222,8 +1226,7 @@ die("MailTemplate::init(): Empty section!");
                     : $_CORELANG['TXT_CORE_MAILTEMPLATE_NEW']);
                 $icon =
                     '<a href="'.
-                        CONTREXX_DIRECTORY_INDEX.
-                        "?cmd=$section&amp;act=".$act.
+                        $uri_edit.
                         '&amp;key='.$key.
                         '&amp;userFrontendLangId='.$lang_id.'"'.
                     ' title="'.$title.'">'.
@@ -1366,7 +1369,7 @@ die("MailTemplate::init(): Empty section!");
                         'MAILTEMPLATE_ROWCLASS' => ( ++$i % 2 + 1),
                         'MAILTEMPLATE_SPECIAL' => new \Cx\Core\Wysiwyg\Wysiwyg(
                             $name,
-                            $value,
+                            contrexx_raw2xhtml($value),
                             'fullpage'
                         ),
                     ));
@@ -1527,8 +1530,12 @@ die("MailTemplate::init(): Empty section!");
             return $objTemplate;
         }
         $to_test = contrexx_input2raw($_POST['to_test']);
-        $objTemplate->setVariable('CORE_MAILTEMPLATE_TO_TEST', $to_test);
-        self::sendTestMail($section, $key, $to_test);
+        $objTemplate->setVariable(array(
+            'CORE_MAILTEMPLATE_TO_TEST' => $to_test,
+            'TXT_CORE_MAILTEMPLATE_TESTMAIL_NOTE' => $_CORELANG[
+                'TXT_CORE_MAILTEMPLATE_TESTMAIL_NOTE'
+            ],
+        ));
         return $objTemplate;
     }
 
@@ -1537,10 +1544,24 @@ die("MailTemplate::init(): Empty section!");
 
         if (empty($email)) return;
 
+        // try to load "from" and use it if it contains no placeholder
+        $from = '';
+        $template = static::get($section, $key);
+        if (
+            $template &&
+            isset($template['from']) &&
+            !preg_match('/\[.*\]/', $template['from'])
+        ) {
+            $from = $template['from'];
+        }
+
         $sent = self::send(array(
             'section' => $section,
             'key' => $key,
             'to' => $email,
+            'from' => $from,
+            'cc' => '',
+            'bcc' => '',
             'do_not_strip_empty_placeholders' => true, ));
         if ($sent) {
             \Message::ok(sprintf(

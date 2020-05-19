@@ -311,7 +311,6 @@ $_ARRAYLANG['TXT_CUSTOMER_DETAILS'] = "Customer Details";
 $_ARRAYLANG['TXT_MAKE_NEW_PRICELIST'] = "Create New Price List";
 $_ARRAYLANG['TXT_ARTICLE_GROUPS'] = "Product Categories";
 $_ARRAYLANG['TXT_NEW_MAIN_ARTICLE_GROUP'] = "New Product Category";
-$_ARRAYLANG['TXT_CONFIRM_DELETE_SHOP_CATEGORIES'] = "Do you really want to delete all selected categories with all included products?";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Save changes";
 $_ARRAYLANG['TXT_DELETE_MARKED'] = "Delete marked";
 $_ARRAYLANG['TXT_EDIT_ PRODUCT_GROUP'] = "Edit product group";

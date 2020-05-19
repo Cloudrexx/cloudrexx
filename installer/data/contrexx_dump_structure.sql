@@ -56,7 +56,8 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`,`user_id`,`history_id`),
   FULLTEXT KEY `value` (`value`),
-  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
+  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
+  INDEX `attribute_user_idx` (`attribute_id`, `user_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_core_attribute` (
   `id` varchar(25) NOT NULL,
@@ -79,7 +80,7 @@ CREATE TABLE `contrexx_access_user_groups` (
   PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_mail` (
-  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation') NOT NULL DEFAULT 'reg_confirm',
+  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation','signup_notification', 'user_profile_modification') NOT NULL DEFAULT 'reg_confirm',
   `lang_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `sender_mail` varchar(255) NOT NULL DEFAULT '',
   `sender_name` varchar(255) NOT NULL DEFAULT '',
@@ -273,7 +274,7 @@ CREATE TABLE `contrexx_core_mail_template` (
 CREATE TABLE `contrexx_core_data_source` (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `identifier` varchar(255) NOT NULL,
-  `options` longtext NOT NULL,
+  `options` longtext NOT NULL COMMENT '(DC2Type:array)',
   `type` varchar(50) NOT NULL,
   PRIMARY KEY(`id`),
   UNIQUE KEY `identifier` (`identifier`)
@@ -309,10 +310,10 @@ CREATE TABLE `contrexx_core_modules_access_permission` (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `allowed_protocols` longtext NOT NULL COMMENT '(DC2Type:array)',
   `allowed_methods` longtext NOT NULL COMMENT '(DC2Type:array)',
-  `requires_login` tinyint(1) DEFAULT NULL,
-  `valid_user_groups` longtext DEFAULT NULL COMMENT '(DC2Type:array)',
-  `valid_access_ids` longtext DEFAULT NULL COMMENT '(DC2Type:array)',
-  `callback` longtext DEFAULT NULL COMMENT '(DC2Type:array)',
+  `requires_login` tinyint(1) NOT NULL,
+  `valid_user_groups` longtext NOT NULL COMMENT '(DC2Type:array)',
+  `valid_access_ids` longtext NOT NULL COMMENT '(DC2Type:array)',
+  `callback` longtext NOT NULL COMMENT '(DC2Type:array)',
   PRIMARY KEY(`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `contrexx_core_module_data_access` (
@@ -526,6 +527,7 @@ CREATE TABLE `contrexx_core_wysiwyg_template` (
   `imagePath` varchar(255) NOT NULL,
   `htmlContent` text,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_core_wysiwyg_toolbar` (
@@ -611,7 +613,8 @@ CREATE TABLE `contrexx_log_entry` (
   UNIQUE KEY `log_version_lookup_idx` (`version`,`object_id`,`object_class`),
   KEY `log_class_lookup_idx` (`object_class`),
   KEY `log_date_lookup_idx` (`logged_at`),
-  KEY `log_user_lookup_idx` (`username`)
+  KEY `log_user_lookup_idx` (`username`),
+  INDEX `log_id_class_lookup_idx` ( `object_id`, `object_class`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_block_blocks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -665,81 +668,6 @@ CREATE TABLE `contrexx_module_block_targeting_option` (
   `type` enum('country') NOT NULL DEFAULT 'country',
   `value` text NOT NULL,
   PRIMARY KEY (`block_id`,`type`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_categories` (
-  `category_id` int(4) unsigned NOT NULL DEFAULT '0',
-  `lang_id` int(2) unsigned NOT NULL DEFAULT '0',
-  `is_active` enum('0','1') NOT NULL DEFAULT '1',
-  `name` varchar(100) NOT NULL DEFAULT '',
-  PRIMARY KEY (`category_id`,`lang_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_comments` (
-  `comment_id` int(7) unsigned NOT NULL AUTO_INCREMENT,
-  `message_id` int(6) unsigned NOT NULL DEFAULT '0',
-  `lang_id` int(2) unsigned NOT NULL DEFAULT '0',
-  `is_active` enum('0','1') NOT NULL DEFAULT '1',
-  `time_created` int(14) unsigned NOT NULL DEFAULT '0',
-  `ip_address` varchar(32) NOT NULL DEFAULT '',
-  `user_id` int(5) unsigned NOT NULL DEFAULT '0',
-  `user_name` varchar(50) DEFAULT NULL,
-  `user_mail` varchar(250) DEFAULT NULL,
-  `user_www` varchar(255) DEFAULT NULL,
-  `subject` varchar(250) NOT NULL DEFAULT '',
-  `comment` text NOT NULL,
-  PRIMARY KEY (`comment_id`),
-  KEY `message_id` (`message_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_message_to_category` (
-  `message_id` int(6) unsigned NOT NULL DEFAULT '0',
-  `category_id` int(4) unsigned NOT NULL DEFAULT '0',
-  `lang_id` int(2) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`message_id`,`category_id`,`lang_id`),
-  KEY `category_id` (`category_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_messages` (
-  `message_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(5) unsigned NOT NULL DEFAULT '0',
-  `time_created` int(14) unsigned NOT NULL DEFAULT '0',
-  `time_edited` int(14) unsigned NOT NULL DEFAULT '0',
-  `hits` int(7) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`message_id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_blog_messages_lang` (
-  `message_id` int(6) unsigned NOT NULL,
-  `lang_id` int(2) unsigned NOT NULL,
-  `is_active` enum('0','1') NOT NULL DEFAULT '1',
-  `subject` varchar(250) NOT NULL DEFAULT '',
-  `content` text NOT NULL,
-  `tags` varchar(250) NOT NULL DEFAULT '',
-  `image` varchar(250) NOT NULL DEFAULT '',
-  PRIMARY KEY (`message_id`,`lang_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_networks` (
-  `network_id` int(8) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(250) NOT NULL DEFAULT '',
-  `url` varchar(255) NOT NULL DEFAULT '',
-  `url_link` varchar(255) NOT NULL DEFAULT '',
-  `icon` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`network_id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_blog_networks_lang` (
-  `network_id` int(8) unsigned NOT NULL DEFAULT '0',
-  `lang_id` int(2) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`network_id`,`lang_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_settings` (
-  `name` varchar(50) NOT NULL,
-  `value` varchar(250) NOT NULL,
-  PRIMARY KEY (`name`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_blog_votes` (
-  `vote_id` int(8) unsigned NOT NULL AUTO_INCREMENT,
-  `message_id` int(6) unsigned NOT NULL DEFAULT '0',
-  `time_voted` int(14) unsigned NOT NULL DEFAULT '0',
-  `ip_address` varchar(32) NOT NULL DEFAULT '',
-  `vote` enum('1','2','3','4','5','6','7','8','9','10') NOT NULL DEFAULT '1',
-  PRIMARY KEY (`vote_id`),
-  KEY `message_id` (`message_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_calendar_category` (
   `id` int(5) NOT NULL AUTO_INCREMENT,
@@ -987,43 +915,6 @@ CREATE TABLE `contrexx_module_calendar_style` (
   `stdCat` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_general` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `value` int(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_mails` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` text NOT NULL,
-  `content` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_yellowpay` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` text NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_transactions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `time` int(10) NOT NULL DEFAULT '0',
-  `status` enum('confirmed','waiting','cancelled') NOT NULL,
-  `invoice_number` varchar(255) NOT NULL,
-  `invoice_currency` int(11) NOT NULL DEFAULT '1',
-  `invoice_amount` int(15) NOT NULL,
-  `contact_title` enum('mister','miss') NOT NULL,
-  `contact_forename` varchar(255) NOT NULL DEFAULT '',
-  `contact_surname` varchar(255) NOT NULL DEFAULT '',
-  `contact_company` varchar(255) NOT NULL DEFAULT '',
-  `contact_street` varchar(255) NOT NULL DEFAULT '',
-  `contact_postcode` varchar(255) NOT NULL DEFAULT '',
-  `contact_place` varchar(255) NOT NULL DEFAULT '',
-  `contact_country` int(11) NOT NULL DEFAULT '204',
-  `contact_phone` varchar(255) NOT NULL DEFAULT '',
-  `contact_email` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `mails` text NOT NULL,
@@ -1048,7 +939,8 @@ CREATE TABLE `contrexx_module_contact_form_data` (
   `lang` varchar(64) NOT NULL DEFAULT '',
   `browser` varchar(255) NOT NULL DEFAULT '',
   `ipaddress` varchar(15) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `id_form` (`id_form`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1058,7 +950,8 @@ CREATE TABLE `contrexx_module_contact_form_field` (
   `is_required` set('0','1') NOT NULL DEFAULT '0',
   `check_type` int(3) NOT NULL DEFAULT '1',
   `order_id` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `id_form` (`id_form`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form_field_lang` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1164,7 +1057,8 @@ CREATE TABLE `contrexx_module_crm_currency` (
   `hourly_rate` text NOT NULL,
   `default_currency` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(255))
+  KEY `name` (`name`(255)),
+  FULLTEXT KEY `fulltext` (`name`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_crm_customer_comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2091,123 +1985,6 @@ CREATE TABLE `contrexx_module_guestbook_settings` (
   `value` varchar(250) NOT NULL DEFAULT '',
   KEY `name` (`name`)
 ) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `reference` varchar(20) NOT NULL DEFAULT '-',
-  `ref_nr_note` varchar(255) DEFAULT NULL,
-  `logo` enum('logo1','logo2') NOT NULL DEFAULT 'logo1',
-  `special_offer` tinyint(1) NOT NULL DEFAULT '0',
-  `visibility` enum('disabled','reference','listing') NOT NULL DEFAULT 'disabled',
-  `object_type` enum('flat','house','multifamily','estate','industry','parking') NOT NULL DEFAULT 'flat',
-  `new_building` tinyint(1) NOT NULL DEFAULT '0',
-  `property_type` enum('purchase','rent') NOT NULL DEFAULT 'purchase',
-  `longitude` decimal(18,15) NOT NULL DEFAULT '0.000000000000000',
-  `latitude` decimal(18,15) NOT NULL DEFAULT '0.000000000000000',
-  `zoom` tinyint(3) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `reference` (`reference`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_contact` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL DEFAULT '',
-  `name` varchar(255) NOT NULL DEFAULT '',
-  `firstname` varchar(255) NOT NULL DEFAULT '',
-  `street` varchar(255) NOT NULL DEFAULT '',
-  `zip` int(5) NOT NULL DEFAULT '0',
-  `location` varchar(255) NOT NULL DEFAULT '',
-  `company` varchar(255) NOT NULL DEFAULT '',
-  `telephone` varchar(30) NOT NULL DEFAULT '',
-  `telephone_office` varchar(30) NOT NULL DEFAULT '',
-  `telephone_mobile` varchar(30) NOT NULL DEFAULT '',
-  `purchase` tinyint(1) NOT NULL DEFAULT '0',
-  `funding` tinyint(1) NOT NULL DEFAULT '0',
-  `comment` text NOT NULL,
-  `immo_id` int(11) NOT NULL DEFAULT '0',
-  `field_id` int(11) NOT NULL DEFAULT '0',
-  `timestamp` int(14) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `immo_id` (`immo_id`),
-  KEY `field_id` (`field_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_content` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `immo_id` int(11) NOT NULL DEFAULT '0',
-  `lang_id` tinyint(4) NOT NULL DEFAULT '0',
-  `field_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `fieldvalue` text NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `field_id` (`field_id`),
-  KEY `immo_id` (`immo_id`),
-  KEY `fieldvalue` (`fieldvalue`(64))
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_field` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` enum('text','textarea','img','link','protected_link','panorama','digits_only','price') NOT NULL DEFAULT 'text',
-  `order` int(11) NOT NULL DEFAULT '1000',
-  `mandatory` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_fieldname` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `field_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `lang_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `name` varchar(255) NOT NULL DEFAULT '-',
-  PRIMARY KEY (`id`),
-  KEY `field_id` (`field_id`),
-  KEY `lang_id` (`lang_id`),
-  KEY `name` (`name`(5))
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_image` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `immo_id` int(11) NOT NULL DEFAULT '0',
-  `field_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `uri` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  KEY `immo_id` (`immo_id`),
-  KEY `field_id` (`field_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_interest` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `immo_id` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(60) NOT NULL DEFAULT '',
-  `firstname` varchar(60) NOT NULL DEFAULT '',
-  `street` varchar(100) NOT NULL DEFAULT '',
-  `zip` varchar(10) NOT NULL DEFAULT '',
-  `location` varchar(100) NOT NULL DEFAULT '',
-  `email` varchar(60) NOT NULL DEFAULT '',
-  `phone_office` varchar(40) NOT NULL DEFAULT '',
-  `phone_home` varchar(40) NOT NULL DEFAULT '',
-  `phone_mobile` varchar(40) NOT NULL DEFAULT '',
-  `doc_via_mail` tinyint(1) NOT NULL DEFAULT '0',
-  `funding_advice` tinyint(1) NOT NULL DEFAULT '0',
-  `inspection` tinyint(1) NOT NULL DEFAULT '0',
-  `contact_via_phone` tinyint(1) NOT NULL DEFAULT '0',
-  `comment` text NOT NULL,
-  `time` int(14) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `immo_id` (`immo_id`)
-) ENGINE=InnoDB;
-CREATE TABLE `contrexx_module_immo_languages` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `language` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_immo_settings` (
-  `setid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `setname` varchar(80) NOT NULL DEFAULT '',
-  `setvalue` text NOT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`setid`),
-  UNIQUE KEY `setname` (`setname`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_immo_statistics` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `immo_id` int(11) NOT NULL DEFAULT '0',
-  `field_id` int(11) NOT NULL DEFAULT '0',
-  `hits` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_jobs` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
   `date` int(14) DEFAULT NULL,
@@ -2236,11 +2013,25 @@ CREATE TABLE `contrexx_module_jobs_categories` (
   `sort_style` enum('alpha','date','date_alpha') NOT NULL DEFAULT 'alpha',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_flag` (
+  `id` int NOT NULL AUTO_INCREMENT ,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` text NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_module_jobs_location` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_rel_flag_job` (
+  `job` int(6) unsigned NOT NULL,
+  `flag` int NOT NULL,
+  PRIMARY KEY (`job`,`flag`),
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_1` FOREIGN KEY (`job`) REFERENCES `contrexx_module_jobs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_2` FOREIGN KEY (`flag`) REFERENCES `contrexx_module_jobs_flag` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_jobs_rel_loc_jobs` (
   `job` int(10) unsigned NOT NULL DEFAULT '0',
   `location` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2518,7 +2309,6 @@ CREATE TABLE `contrexx_module_mediadir_inputfield_types` (
   `active` int(1) NOT NULL,
   `multi_lang` int(1) NOT NULL,
   `exp_search` int(7) NOT NULL,
-  `dynamic` int(1) NOT NULL,
   `comment` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
@@ -2742,6 +2532,7 @@ CREATE TABLE `contrexx_module_news_categories` (
   `right_id` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `level` int(11) NOT NULL,
+  `display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_news_categories_catid` (
@@ -3160,7 +2951,8 @@ CREATE TABLE `contrexx_module_recommend` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `value` text NOT NULL,
   `lang_id` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `data` (`name`,`lang_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_repository` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -3173,7 +2965,7 @@ CREATE TABLE `contrexx_module_repository` (
   `displaystatus` set('on','off') NOT NULL DEFAULT 'on',
   `username` varchar(250) NOT NULL DEFAULT '',
   `displayorder` smallint(6) NOT NULL DEFAULT '100',
-  UNIQUE KEY `contentid` (`id`),
+  PRIMARY KEY  (`id`),
   FULLTEXT KEY `fulltextindex` (`title`,`content`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_article_group` (
@@ -3326,6 +3118,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `processor_id` int(10) unsigned NOT NULL DEFAULT '0',
   `fee` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
+  `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)

@@ -111,8 +111,6 @@ class Stats extends StatsLibrary
     function getContent(){
         global $objTemplate;
 
-        $this->_optimizeTables();
-
         if(!isset($_GET['stat'])){
             $_GET['stat'] = "";
         }
@@ -163,27 +161,6 @@ class Stats extends StatsLibrary
 
         $this->act = $_REQUEST['stat'];
         $this->setNavigation();
-    }
-
-    function _optimizeTables() {
-        global $objDatabase;
-        $query = "OPTIMIZE TABLE `".DBPREFIX."stats_browser`,
-                                 `".DBPREFIX."stats_colourdepth`,
-                                 `".DBPREFIX."stats_config`,
-                                 `".DBPREFIX."stats_country`,
-                                 `".DBPREFIX."stats_hostname`,
-                                 `".DBPREFIX."stats_javascript`,
-                                 `".DBPREFIX."stats_operatingsystem`,
-                                 `".DBPREFIX."stats_referer`,
-                                 `".DBPREFIX."stats_requests`,
-                                 `".DBPREFIX."stats_requests_summary`,
-                                 `".DBPREFIX."stats_screenresolution`,
-                                 `".DBPREFIX."stats_search`,
-                                 `".DBPREFIX."stats_spiders`,
-                                 `".DBPREFIX."stats_spiders_summary`,
-                                 `".DBPREFIX."stats_visitors`,
-                                 `".DBPREFIX."stats_visitors_summary`";
-        $objDatabase->Execute($query);
     }
 
     private function showVisitors() {

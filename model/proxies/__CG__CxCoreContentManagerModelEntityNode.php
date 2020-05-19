@@ -453,12 +453,12 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     /**
      * {@inheritDoc}
      */
-    public function copy($recursive = false, \Cx\Core\ContentManager\Model\Entity\Node $newParent = NULL, $persist = true)
+    public function copy($recursive = false, \Cx\Core\ContentManager\Model\Entity\Node $newParent = NULL, &$nodePosition = 0, $addCopySuffix = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($recursive, $newParent, $persist));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($recursive, $newParent, $nodePosition, $addCopySuffix));
 
-        return parent::copy($recursive, $newParent, $persist);
+        return parent::copy($recursive, $newParent, $nodePosition, $addCopySuffix);
     }
 
     /**
@@ -481,6 +481,17 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'unserialize', array($data));
 
         return parent::unserialize($data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isChildOf($parent)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isChildOf', array($parent));
+
+        return parent::isChildOf($parent);
     }
 
     /**
@@ -514,6 +525,17 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
