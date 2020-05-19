@@ -156,7 +156,8 @@ Drops all no-longer required profile images';
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
 
-                global $plainCmd, $isRegularPageRequest;
+                global $plainCmd;
+
                 $objTemplate = $this->cx->getTemplate();
                 $objFWUser = \FWUser::getFWUserObject();
 
@@ -192,10 +193,6 @@ Drops all no-longer required profile images';
                 if (!$objFWUser->objUser->login(true) && $plainCmd != 'JsonData') {
                     $plainCmd = 'Login';
                     // If the user isn't logged in, the login mask will be showed.
-                    // This mask has its own template handling.
-                    // So we don't need to load any templates in the index.php.
-                    $isRegularPageRequest = false;
-
                     // abort further processing
                     break;
                 } else {
@@ -217,7 +214,7 @@ Drops all no-longer required profile images';
                 }
 
                 $objTemplate->setVariable(array(
-                    'TXT_PROFILE' => $txtProfile,
+                    'TXT_PROFILE' => contrexx_raw2xhtml($txtProfile),
                     'USER_ID' => $objFWUser->objUser->getId(),
                 ));
 

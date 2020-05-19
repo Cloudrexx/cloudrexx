@@ -271,7 +271,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
     }
     
     // Customizing for old Calendar sync config:
-    public function getHostEntitiesIncludingLegacy($cached = true) {
+    public function getHostEntitiesIncludingLegacy($cached = true, $host = '') {
         if ($cached && isset($this->cachedHostEntities)) {
             return $this->cachedHostEntities;
         }
@@ -307,6 +307,9 @@ class Sync extends \Cx\Model\Base\EntityBase {
             WHERE
                 `host`.`status` = 0
         ';
+        if ($host) {
+            $query .= 'AND `host`.`uri` = "' . contrexx_raw2db($host) . '"';
+        }
         $results = $objDatabase->Execute($query);
         if (!$results || $results->EOF) {
             return $hostEntities;
@@ -508,7 +511,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
             }
             $relatedHosts[] = $hostEntity['host'];
         }
-        foreach ($this->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+        foreach ($this->getHostEntitiesIncludingLegacy() as $hostEntity) {
             if (in_array($hostEntity['host'], $relatedHosts)) {
                 continue;
             }
@@ -620,7 +623,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
         if (!$simpleField) {
             // this replaces image paths...
             $allImg = array();
-            preg_match_all('/src="([^"]*)"/', $input, $allImg, PREG_PATTERN_ORDER);
+            preg_match_all('/(?:src|href|action)="([^"]*)"/', $input, $allImg, PREG_PATTERN_ORDER);
             $size = sizeof($allImg[1]);
             
             $i = 0;

@@ -451,6 +451,9 @@ cx.ready(function () {
                 flash_swf_url: cx.variables.get('basePath', 'contrexx') + 'lib/plupload/js/Moxie.swf',
                 silverlight_xap_url: cx.variables.get('basePath', 'contrexx') + 'lib/plupload/js/Moxie.xap',
                 chunk_size: cx.variables.get('chunk_size', 'mediabrowser'),
+                max_file_size: cx.variables.get('max_file_size', 'mediabrowser'),
+                prevent_duplicates: true,
+                max_retries: 3,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Check-CSRF': 'false'
@@ -1064,14 +1067,40 @@ cx.ready(function () {
             }
             array.sort(function (a, b) {
                 if (a.datainfo && b.datainfo) {
-                    a = (a['datainfo'][attribute]);
-                    b = (b['datainfo'][attribute]);
+                    // check if any of the entries is a directory
+                    aIsDir = a['datainfo']['type'] == 'dir';
+                    bIsDir = b['datainfo']['type'] == 'dir';
+
+                    // fetch the value to sort by
+                    aSortFlag = a['datainfo'][attribute];
+                    bSortFlag = b['datainfo'][attribute];
+
+                    // first list directories
+                    if (aIsDir && !bIsDir) return -1;
+                    if (!aIsDir && bIsDir) return 1;
+
+                    // then list files
+                    //
+                    // but if we're sorting by size,
+                    // we have to modify the behaviour
+                    // a bit
+                    if (attribute == 'cleansize') {
+                        // cast sort value to integers
+                        aSortFlag = parseInt(aSortFlag, 10);
+                        bSortFlag = parseInt(bSortFlag, 10);
+
+                        // list directories alphabetical
+                        if (aIsDir && bIsDir) {
+                            aSortFlag = a['datainfo']['name'];
+                            bSortFlag = b['datainfo']['name'];
+                        }
+                    }
                     if (reverse) {
-                        if (a < b) return -1;
-                        if (a > b) return 1;
+                        if (aSortFlag < bSortFlag) return -1;
+                        if (aSortFlag > bSortFlag) return 1;
                     } else {
-                        if (a < b) return 1;
-                        if (a > b) return -1;
+                        if (aSortFlag < bSortFlag) return 1;
+                        if (aSortFlag > bSortFlag) return -1;
                     }
                 }
                 return 0;

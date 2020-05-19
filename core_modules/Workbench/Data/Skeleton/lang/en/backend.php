@@ -41,6 +41,7 @@ global $_ARRAYLANG;
 // Let's start with module info:
 $_ARRAYLANG['TXT_MODULE_SKELETON'] = '{COMPONENT_NAME}';
 $_ARRAYLANG['TXT_MODULE_SKELETON_DESCRIPTION'] = 'This is a new module with some sample content to show how to start.';
+$_ARRAYLANG['TXT_MODULE_SKELETON_INTRODUCTION'] = 'You may add an introductive text in the language files instead of this one and set the end-user and development documentation variables in the ComponentController of your component.';
 
 // Here come the ACTs:
 $_ARRAYLANG['TXT_MODULE_SKELETON_ACT_DEFAULT'] = 'Overview';

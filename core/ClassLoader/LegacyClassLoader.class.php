@@ -181,6 +181,10 @@ class LegacyClassLoader {
             if ($this->testLoad($this->cx->getCodeBaseFrameworkPath() . '/cxjs/'.$name.'.interface.php', $origName)) {return; }
             if ($this->testLoad($this->cx->getCodeBaseFrameworkPath() . '/cxjs/i18n/'.preg_replace('/JQueryUiI18nProvider/', 'jQueryUi', $name).'.class.php', $origName)) {return; }
 
+            // Try to load using composer-style autoloading
+            $libraryName = array_shift($parts);
+            if ($this->testLoad($this->cx->getCodeBaseLibraryPath() . '/' . $libraryName . '/src/' . implode('/', $parts) . '.php', $origName)) {return; }
+
             // This is sort of like giving in...
             $this->fallbackLoad($origName, $name);
         }

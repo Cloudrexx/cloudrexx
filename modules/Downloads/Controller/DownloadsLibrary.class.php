@@ -86,6 +86,7 @@ class DownloadsLibrary
         'integrate_into_search_component'=> 1,
         'auto_file_naming'     => 'off',
         'pretty_regex_pattern' => '',
+        'global_search_linking'         => 'detail',
     );
 
     /**
@@ -215,7 +216,7 @@ class DownloadsLibrary
                 // language
                 $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
                 $locale = $localeRepo->findOneByCode($iso1Code);
-            } catch (DownloadsLibraryException $e) {}
+            } catch (\Doctrine\ORM\NoResultException $e) {}
         }
 
         if (!$locale) {

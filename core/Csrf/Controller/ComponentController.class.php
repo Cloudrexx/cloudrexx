@@ -74,7 +74,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // the check has failed somehow.
         // The CSRF code needn't to be checked in the login module
         // because the user isn't logged in at this point.
-        if (!empty($plainCmd) && !empty($cmd) and !in_array($plainCmd, array('Upload', 'Login', 'Home'))) {
+        if (!empty($plainCmd) && !empty($cmd) and !in_array($plainCmd, array('Login', 'Home'))) {
             // Since language initialization in in the same hook as this
             // and we cannot define the order of module-processing,
             // we need to check if language is already initialized:

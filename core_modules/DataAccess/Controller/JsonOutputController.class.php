@@ -53,7 +53,7 @@ class JsonOutputController extends OutputController {
      * @todo: Handle encoding (json_encode() fails for non-UTF8 contents)
      */
     public function parse($data) {
-        header('Content-Type: text/json');
+        header('Content-Type: application/json');
         return json_encode($data);
     }
 }

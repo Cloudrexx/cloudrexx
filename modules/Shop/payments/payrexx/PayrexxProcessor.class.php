@@ -152,12 +152,28 @@ EOF;
             return false;
         }
 
-        if ($_POST['transaction']['status'] === 'waiting') {
-            die(); // we don't want the shop to update the status to cancelled or confirmed
-        }
+        /*
+            Payrexx knows the following states
 
+            - Order placed (status: waiting)
+            - Successful payment processed (status: confirmed) --> Payment was successful
+            - Payment aborted by customer (status: cancelled) --> Payment failed
+            - Payment declined (status: declined) --> Payment failed
+            - Technical error (status: error)
+
+            Additional for cloudrexx non-relevant states:
+            - Pre-authorization successful (status: authorized)
+            - Payment (partial-) refunded by merchant (status: refunded / partially-refunded)
+            - Refund pending (status: refund_pending)
+            - Chargeback by card holder (status: chargeback)
+        */
+
+        // Return null in any other case than 'confirmed'.
+        // This shall enure compatability with payrexx as the gateway sends
+        // status notifications of all events including when a card is
+        // declined and more.
         if ($_POST['transaction']['status'] !== 'confirmed') {
-            return false;
+            return null;
         }
 
         $invoiceId = $_POST['transaction']['invoice']['paymentRequestId'];

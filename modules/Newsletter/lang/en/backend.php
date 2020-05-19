@@ -71,7 +71,6 @@ $_ARRAYLANG['TXT_EMAIL_ADDRESS'] = "E-mail";
 $_ARRAYLANG['TXT_LIST'] = "Lists";
 $_ARRAYLANG['TXT_WILDCART_INFOS'] = "Placeholder informaion";
 $_ARRAYLANG['TXT_LIST_NAME'] = "Name of the list";
-$_ARRAYLANG['TXT_SENDER'] = "Sender";
 $_ARRAYLANG['TXT_HEADER'] = "Header";
 $_ARRAYLANG['TXT_FOOTER'] = "Footer";
 $_ARRAYLANG['TXT_TITLE'] = "Title";
@@ -220,6 +219,7 @@ $_ARRAYLANG['TXT_NEWSLETTER_REGISTRATION_DATE'] = "Registration date";
 $_ARRAYLANG['TXT_NEWSLETTER_SELECT_CATEGORY'] = "Choose Category";
 $_ARRAYLANG['TXT_NEWSLETTER_IMPORT_HINT'] = "E-Mail Addresses will be automatically extracted";
 $_ARRAYLANG['TXT_NEWSLETTER_EMAIL_CAMPAIGNS'] = "E-Mail Campaigns";
+$_ARRAYLANG['TXT_NEWSLETTER_DEFAULTS_FOR_EMAIL_CAMPAIGNS'] = "Defaults for new E-Mail Campaigns";
 $_ARRAYLANG['TXT_NEWSLETTER_LISTS'] = "Lists";
 $_ARRAYLANG['TXT_NEWSLETTER_ADMINISTRATION'] = "Administration";
 $_ARRAYLANG['TXT_NEWSLETTER_NEWS'] = "News";
@@ -350,13 +350,11 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "An error occured while u
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Add New Recipient";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "The e-mail address is already in use by an other recipient!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "You must enter a valid E-Mail address!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Number of characters per line in text emails";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Test Recipient";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "For errors and undeliverable E-Mails";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Blindkopien";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALID_EMAIL'] = "Invalid email specified!";
 $_ARRAYLANG['TXT_NEWSLETTER_OVERVIEW_ENTRIES'] = "Number of Newsletter Overview Entries";
-$_ARRAYLANG['TXT_NEWSLETTER_REPLY_EMAIL'] = "Reply E-Mail Address";
 $_ARRAYLANG['TXT_NEWSLETTER_ERROR_SAVE_RETRY'] = "Error while saving. Please try again!";
 $_ARRAYLANG['TXT_NEWSLETTER_SUBJECT_ALREADY_EXISTS'] = "This E-Mail subject already exists!  Please choose another subject.";
 $_ARRAYLANG['TXT_NEWSLETTER_ERROR_NO_SUBJECT'] = "Please specify a subject!";
@@ -529,3 +527,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_CONSENT_SOURCE_OPT_IN'] = 'Opt-In at %s';
 $_ARRAYLANG['TXT_NEWSLETTER_CONSENT_TOOLTIP'] = 'Tells whether the recipient gave his consent. <ul><li><img src="/core/Core/View/Media/icons/led_green.gif" alt="Green" /> means that the recipient gave consent by double-opt-in.</li><li><img src="/core/Core/View/Media/icons/led_orange.gif" alt="Orange" /> means that the recipient has either been added manually using the back-end console or that he has been imported via API.</li></ul><br />
 If the recipients are filtered by list, the second icon shows the consent for this list.<br /><br />
 Hover over an icon to see detailed information.';
+$_ARRAYLANG['TXT_NEWSLETTER_DELIVER_USER_RECIPIENTS'] = 'Deliver to User Groups';
+$_ARRAYLANG['TXT_NEWSLETTER_DELIVER_CRM_RECIPIENTS'] = 'Deliver to CRM Customer groups';
+$_ARRAYLANG['TXT_NEWSLETTER_USE_CRM_FILTER'] = 'Filter by CRM Customer groups';
