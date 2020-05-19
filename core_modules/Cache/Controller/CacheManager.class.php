@@ -120,6 +120,9 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'TXT_EMPTY_DESC_XCACHE' => $_ARRAYLANG['TXT_CACHE_EMPTY_DESC_FILES_AND_ENRIES'],
             'TXT_STATS_FILES' => $_ARRAYLANG['TXT_CACHE_STATS_FILES'],
             'TXT_STATS_FOLDERSIZE' => $_ARRAYLANG['TXT_CACHE_STATS_FOLDERSIZE'],
+            'CACHE_EXPERIMENTAL' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent(
+                'View'
+            )->flagExperimental(),
         ));
         $this->objTpl->setVariable($_ARRAYLANG);
 
@@ -210,7 +213,6 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             && $this->getUserCacheActive()
         ){
             $this->objTpl->touchBlock('memcachedCachingStats');
-            $memcachedStats = $this->memcached->getStats();
         }else{
             $this->objTpl->hideBlock('memcachedCachingStats');
         }
@@ -247,12 +249,6 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
         $memcacheConfiguration = $this->getMemcacheConfiguration();
         $memcacheServerKey = $memcacheConfiguration['ip'].':'.$memcacheConfiguration['port'];
-        $memcachedServerEntriesCount = isset($memcachedStats[$memcacheServerKey]['curr_items']) ? $memcachedStats[$memcacheServerKey]['curr_items'] : 0;
-        $memcachedServerSizeMb = isset($memcachedStats[$memcacheServerKey]['bytes']) ? $memcachedStats[$memcacheServerKey]['bytes'] / (1024 *1024) : 0;
-        $memcachedEntriesCount = $this->getMemcachedEntryCount();
-        $memcachedSizeMb = $memcachedServerEntriesCount ? $memcachedServerSizeMb / $memcachedServerEntriesCount * $memcachedEntriesCount : 0;
-
-        $memcachedMaxSizeMb = isset($memcachedStats[$memcacheServerKey]['limit_maxbytes']) ? $memcachedStats[$memcacheServerKey]['limit_maxbytes'] / (1024 *1024) : 0;
 
         $this->objTpl->setVariable(array(
             'SETTINGS_STATUS_ON' => ($this->arrSettings['cacheEnabled'] == 'on') ? 'checked' : '',
@@ -286,37 +282,12 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'STATS_MEMCACHE_CACHE_ENTRIES_COUNT'    => $memcacheEntriesCount,
             'STATS_MEMCACHE_SIZE'                   => number_format($memcacheSizeMb, 2, '.', '\''),
             'STATS_MEMCACHE_MAX_SIZE'               => number_format($memcacheMaxSizeMb, 2, '.', '\''),
-            'STATS_MEMCACHED_CACHE_ENTRIES_COUNT'   => $memcachedEntriesCount,
-            'STATS_MEMCACHED_SIZE'                  => number_format($memcachedSizeMb, 2, '.', '\''),
-            'STATS_MEMCACHED_MAX_SIZE'              => number_format($memcachedMaxSizeMb, 2, '.', '\''),
         ));
 
         $objTemplate->setVariable(array(
             'CONTENT_TITLE' => $_ARRAYLANG['TXT_SETTINGS_MENU_CACHE'],
             'ADMIN_CONTENT' => $this->objTpl->get()
         ));
-    }
-
-    /**
-     * Return the number of cached entries by Memcached.
-     * It returns the number of cached entries of the current Cx instance.
-     *
-     * @return  integer Number of cached entries by Memcached
-     */
-    protected function getMemcachedEntryCount() {
-        if (!$this->isConfigured(self::CACHE_ENGINE_MEMCACHED)){
-            return;
-        }
-
-        $count = 0;
-        $keys = $this->memcached->getAllKeys();
-        foreach($keys as $key){
-            if (strpos($key, $this->getCachePrefix()) !== false) {
-                $count++;
-            }
-        }
-
-        return $count;
     }
 
     /**
@@ -580,41 +551,9 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
      * @param string $cacheEngine
      */
     public function forceClearCache($cacheEngine = null){
+        global $objTemplate, $_ARRAYLANG;
 
-        global $_ARRAYLANG, $objTemplate;
-
-        switch ($cacheEngine) {
-            case 'cxEntries':
-            case 'cxPages':
-                $this->_deleteAllFiles($cacheEngine);
-                break;
-            case 'cxEsi':
-                $this->clearSsiCache();
-                break;
-            case self::CACHE_ENGINE_APC:
-            case 'apc':
-                $this->clearCache(self::CACHE_ENGINE_APC);
-                break;
-            case self::CACHE_ENGINE_ZEND_OPCACHE:
-            case 'zendop':
-                $this->clearCache(self::CACHE_ENGINE_ZEND_OPCACHE);
-                break;
-            case self::CACHE_ENGINE_MEMCACHE:
-            case 'memcache':
-                $this->clearCache(self::CACHE_ENGINE_MEMCACHE);
-                break;
-            case 'memcached':
-                $this->clearCache(self::CACHE_ENGINE_MEMCACHED);
-                break;
-            case self::CACHE_ENGINE_XCACHE:
-            case 'xcache':
-                $this->clearCache(self::CACHE_ENGINE_XCACHE);
-                break;
-            default:
-                $this->clearCache(null);
-                break;
-        }
-
+        parent::forceClearCache($cacheEngine);
         $objTemplate->SetVariable('CONTENT_OK_MESSAGE', $_ARRAYLANG['TXT_CACHE_EMPTY_SUCCESS']);
     }
 }

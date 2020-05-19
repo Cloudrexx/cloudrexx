@@ -49,15 +49,24 @@ $J(function(){
     </tr> -->
     <tr class="row2">
         <td valign="top">{TXT_MEDIADIR_SHOW_CATEGORIES}</td>
-        <td><input type="radio" name="levelShowCategories" value="1" {MEDIADIR_LEVEL_SHOW_CATEGORIES_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="levelShowCategories" value="0" {MEDIADIR_LEVEL_SHOW_CATEGORIES_OFF} /> {TXT_MEDIADIR_DEACTIVATE}</td>
+        <td>
+            <input type="radio" name="levelShowCategories" id="levelShowCategoriesOn" value="1" {MEDIADIR_LEVEL_SHOW_CATEGORIES_ON} /><label for="levelShowCategoriesOn">{TXT_MEDIADIR_ACTIVATE}</label>
+            <input type="radio" name="levelShowCategories" id="levelShowCategoriesOff" value="0" {MEDIADIR_LEVEL_SHOW_CATEGORIES_OFF} /><label for="levelShowCategoriesOff">{TXT_MEDIADIR_DEACTIVATE}</label>
+        </td>
     </tr>
     <tr class="row1">
         <td valign="top">{TXT_MEDIADIR_SHOW_ENTRIES}</td>
-        <td><input type="radio" name="levelShowEntries" value="1" {MEDIADIR_LEVEL_SHOW_ENTRIES_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="levelShowEntries" value="0" {MEDIADIR_LEVEL_SHOW_ENTRIES_OFF} /> {TXT_MEDIADIR_DEACTIVATE}</td>
+        <td>
+            <input type="radio" name="levelShowEntries" id="levelShowEntriesOn" value="1" {MEDIADIR_LEVEL_SHOW_ENTRIES_ON} /><label for="levelShowEntriesOn">{TXT_MEDIADIR_ACTIVATE}</label>
+            <input type="radio" name="levelShowEntries" id="levelShowEntriesOff" value="0" {MEDIADIR_LEVEL_SHOW_ENTRIES_OFF} /><label for="levelShowEntriesOff">{TXT_MEDIADIR_DEACTIVATE}</label>
+        </td>
     </tr>
     <tr class="row2">
         <td valign="top">{TXT_MEDIADIR_VISIBLE}</td>
-        <td><input type="radio" name="levelActive" value="1" {MEDIADIR_LEVEL_ACTIVE_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="levelActive" value="0" {MEDIADIR_LEVEL_ACTIVE_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_VISIBLE_LEVEL_INFO}</span></td>
+        <td>
+            <input type="radio" name="levelActive" id="levelActiveOn" value="1" {MEDIADIR_LEVEL_ACTIVE_ON} /><label for="levelActiveOn">{TXT_MEDIADIR_ACTIVATE}</label>
+            <input type="radio" name="levelActive" id="levelActiveOff" value="0" {MEDIADIR_LEVEL_ACTIVE_OFF} /><label for="levelActiveOff">{TXT_MEDIADIR_DEACTIVATE}</label>&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_VISIBLE_LEVEL_INFO}</span>
+        </td>
     </tr>
 </table>
 <br />

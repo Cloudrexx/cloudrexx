@@ -63,14 +63,13 @@ class GuestBookManager extends GuestBookLibrary
      */
     function __construct()
     {
-        global  $objDatabase, $_ARRAYLANG, $objTemplate, $objInit;
+        global $_ARRAYLANG, $objTemplate, $objInit;
 
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/GuestBook/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $this->imagePath = ASCMS_MODULE_FOLDER;
         $this->langId=$objInit->userFrontendLangId;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_guestbook");
         $this->getSettings();
     }
     private function setNavigation()

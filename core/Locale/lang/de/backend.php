@@ -103,6 +103,7 @@ $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_IMPORT_FAILED'] = 'Importieren der Spr
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_NOT_FOUND'] = 'Sprachdatei nicht gefunden.';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_SUCCESS'] = 'Standardwert erfolgreich geladen.';
 $_ARRAYLANG['TXT_CORE_LOCALE_LANGUAGEFILE_RESET_ERROR'] = 'Standardwert nicht gefunden.';
+$_ARRAYLANG['TXT_CORE_LOCALE_ADD_NEW_INFORMATION'] = 'Bevor weitere Sprachversionen hinzugefügt werden können, muss die Option %1$s (unter %2$s) zuerst aktiviert werden.';
 
 // Translation view
 $_ARRAYLANG['id'] = 'Platzhalter';

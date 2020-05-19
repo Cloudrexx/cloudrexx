@@ -75,7 +75,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
                 $objTemplate = $this->cx->getTemplate();
 
-                $subMenuTitle = $_CORELANG['TXT_LINKS_MODULE_DESCRIPTION'];
+                $subMenuTitle = $_CORELANG['TXT_DIRECTORY_MODULE'];
                 $objDirectoryManager = new DirectoryManager();
                 $objDirectoryManager->getPage();
                 break;

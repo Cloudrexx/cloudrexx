@@ -1,4 +1,9 @@
 docker-compose.yml
 tmp/*
 _meta
+<<<<<<< HEAD
 cx.bat
+=======
+cx.bat
+*.sw*
+>>>>>>> remotes/origin/master

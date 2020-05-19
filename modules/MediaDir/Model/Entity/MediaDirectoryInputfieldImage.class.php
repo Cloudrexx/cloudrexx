@@ -69,6 +69,17 @@ class MediaDirectoryInputfieldImage extends \Cx\Modules\MediaDir\Controller\Medi
         parent::__construct('.', $name);
         parent::getFrontendLanguages();
         parent::getSettings();
+
+        // register thumbnail formats
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $thumbnailFormats = $cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnails();
+        foreach ($thumbnailFormats as $thumbnailFormat) {
+            $placeholderSrc = 'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMBNAIL_FORMAT_';
+            $placeholderImg = 'MEDIADIR_INPUTFIELD_VALUE_THUMBNAIL_FORMAT_';
+            $format = strtoupper($thumbnailFormat['name']);
+            $this->arrPlaceholders[] = $placeholderSrc . $format;
+            $this->arrPlaceholders[] = $placeholderImg . $format;
+        }
     }
 
 
@@ -465,8 +476,9 @@ INPUT;
         $imageHeight    = $arrImageInfo[1]+20;
         $arrImageInfo   = pathinfo($strValue);
         $strImageName    = $arrImageInfo['basename'];
+        $imagePath      = $arrImageInfo['dirname'];
 
-        return array(
+        $data = array(
             'TXT_MEDIADIR_INPUTFIELD_NAME' => htmlspecialchars(
                 $arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET),
             'MEDIADIR_INPUTFIELD_VALUE' =>
@@ -491,6 +503,27 @@ INPUT;
                 ' title="'.$arrInputfield['name'][0].'"'.
                 ' alt="'.$arrInputfield['name'][0].'" />',
         );
+
+        // fetch thumbnails
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $thumbnailFormats = $cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnails();
+        $thumbnails = $this->cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnailsFromFile($imagePath, $strImageName, true);
+        foreach ($thumbnailFormats as $thumbnailFormat) {
+            if (!isset($thumbnails[$thumbnailFormat['size']])) {
+                continue;
+            }
+            $format = strtoupper($thumbnailFormat['name']);
+            $thumbnail = $thumbnails[$thumbnailFormat['size']];
+            $placeholderSrc = 'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMBNAIL_FORMAT_';
+            $placeholderImg = 'MEDIADIR_INPUTFIELD_VALUE_THUMBNAIL_FORMAT_';
+            $data[$placeholderSrc . $format] = $thumbnail;
+            $data[$placeholderImg . $format] = 
+                '<img src="'.$thumbnail.'"'.
+                ' title="'.$arrInputfield['name'][0].'"'.
+                ' alt="'.$arrInputfield['name'][0].'" />';
+        }
+
+        return $data;
     }
 
     function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {

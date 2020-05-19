@@ -110,28 +110,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $newsObj = new News($page->getContent());
                 $page->setContent($newsObj->getNewsPage());
-                $newsObj->getPageTitle($page->getTitle());
-
-                if (substr($page->getCmd(), 0, 7) == 'details') {
-                    $page->setTitle($newsObj->newsTitle);
-                    $page->setContentTitle($newsObj->newsTitle);
-                    $page->setMetaTitle($newsObj->newsTitle);
-                    $page->setMetakeys($newsObj->newsMetaKeys);
-
-                    // Set the meta page description to the teaser text if displaying news details
-                    $teaser = $newsObj->getTeaser();
-                    if ($teaser) {
-                        $page->setMetadesc(contrexx_strip_tags(html_entity_decode($teaser, ENT_QUOTES, CONTREXX_CHARSET)));
-                    } else {
-                        $page->setMetadesc(contrexx_strip_tags(html_entity_decode($newsObj->newsText, ENT_QUOTES, CONTREXX_CHARSET)));
-                    }
-
-                    // Set the meta page image to the thumbnail if displaying news details
-                    $image = $newsObj->newsThumbnail;
-                    if ($image) {
-                        $page->setMetaimage($image);
-                    }
-                }
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
@@ -295,7 +273,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $refUrl = new \Cx\Lib\Net\Model\Entity\Url($response->getRequest()->getUrl()->toString());
         }
 
+        $newsId = 0;
         if ($refUrl->hasParam('newsid')) {
+            $newsId = $refUrl->getParam('newsid');
             $canonicalUrlArguments = array('newsid');
         } else {
             $canonicalUrlArguments = array('category', 'tag', 'pos');
@@ -318,15 +298,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         );
 
         if (
-             !$page ||
-             $page->getModule() !== $this->getName() ||
-             !$page->getCmd() === 'details'
+            !$page ||
+            $page->getModule() !== $this->getName() ||
+            substr($page->getCmd(), 0, 7) != 'details'
         ) {
             return;
         }
 
         $news = new News('');
-        $news->getNewsPage();
+        $news->getDetails($newsId);
 
         //Set title's, if news title is not empty
         if (!empty($news->newsTitle)) {
@@ -340,16 +320,18 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         if (!empty($news->getTeaser())) {
             $metaDesc = $news->getTeaser();
         }
-        $page->setMetadesc(contrexx_raw2xhtml(
+        $page->setMetadesc(
             contrexx_strip_tags(
                 html_entity_decode($metaDesc, ENT_QUOTES, CONTREXX_CHARSET)
             )
-        ));
+        );
 
         //Set meta image, if news thumbnail is not empty
         if (!empty($news->newsThumbnail)) {
             $page->setMetaimage($news->newsThumbnail);
         }
+
+        $page->setMetakeys($news->newsMetaKeys);
     }
 
     /**

@@ -398,7 +398,7 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
     /**
      * {@inheritDoc}
      */
-    public function setCallback($callback)
+    public function setCallback(\Cx\Core_Modules\Access\Model\Entity\Callback $callback)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCallback', array($callback));
@@ -460,6 +460,17 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

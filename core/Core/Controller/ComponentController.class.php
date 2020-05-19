@@ -80,7 +80,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array(
             'help' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
                 array(),
-                array('get', 'post', 'cli', 'head'),
+                array('get', 'post', 'cli', 'head', 'put', 'delete', 'patch', 'options'),
                 false
             ),
             'status' => $cliOnlyPermission,
@@ -89,6 +89,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'install' => $cliOnlyPermission,
             'activate' => $cliOnlyPermission,
             'deactivate' => $cliOnlyPermission,
+            'cleanTempFiles' => $cliOnlyPermission,
         );
     }
 
@@ -141,6 +142,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 return 'Deactivates a component. Usage:
 
 ./cx deactivate <component_type> <component_name>';
+                break;
+            case 'cleanTempFiles':
+                if ($short) {
+                    return 'Cleans up no longer used publicly accesible temp files';
+                }
+                return 'Cleans up no longer used publicly accesible temp files. Usage:
+
+./cx cleanTempFiles';
                 break;
         }
         return '';
@@ -261,6 +270,36 @@ Available commands:
                 $component->deactivate();
                 echo 'Done';
                 break;
+            case 'cleanTempFiles':
+                $basePath = $this->cx->getWebsitePublicTempPath();
+
+                // step 1: delete all files older than XY
+                $di = new \RecursiveDirectoryIterator($basePath, \RecursiveDirectoryIterator::SKIP_DOTS);
+                $fi = new \RecursiveCallbackFilterIterator($di, function($file, $key, $iterator) {
+                    if ($iterator->hasChildren()) {
+                        return true;
+                    }
+                    return new \DateTime('@' . $file->getMTime()) < new \DateTime('1 hours ago');
+                });
+
+                foreach (new \RecursiveIteratorIterator($fi) as $file) {
+                    \Cx\Lib\FileSystem\FileSystem::delete_file($file->getRealPath());
+                }
+
+                // step 2: delete all empty directories
+                $fi = new \RecursiveCallbackFilterIterator($di, function($file, $key, $iterator) {
+                    if ($iterator->hasChildren()) {
+                        return true;
+                    }
+                    return false;
+                });
+                foreach (new \RecursiveIteratorIterator($fi, \RecursiveIteratorIterator::SELF_FIRST) as $file) {
+                    $file = new \SplFileObject($file->getRealPath());
+                    if (!$file->hasChildren()) {
+                        \Cx\Lib\FileSystem\FileSystem::delete_folder($file->getRealPath());
+                    }
+                }
+                break;
         }
         echo '
 ';
@@ -302,5 +341,34 @@ Available commands:
         // todo: we should allow overriding the call using event system (for cloud)
         $command = static::CLI_SCRIPT_NAME . implode(' ', $arguments) . ' > /dev/null 2>&1 &';
         exec($command);
+    }
+
+    /**
+     * Returns a publicly readable folder name with a unique random name
+     *
+     * Its intended use is for asynchronously generated files that need to be
+     * readable by a user.
+     * @todo: This should be part of a component "Temp" of type "core_module"
+     *          which registers a MediaSource and returns a folder object. This
+     *          includes the CLI command to clean up no longer needed folders.
+     * @return string Unique absolute publicly readable folder path
+     */
+    public function getPublicUserTempFolder() {
+        $basePath = $this->cx->getWebsitePublicTempPath();
+        $folderName = '';
+        do {
+            $folderName = substr(
+                str_replace(
+                    ['+', '/', '='],
+                    '',
+                    base64_encode(random_bytes(32))
+                ),
+                0,
+                32
+            );
+            $path = $basePath . '/' . $folderName . '/';
+        } while (file_exists($path));
+        \Cx\Lib\FileSystem\FileSystem::make_folder($path);
+        return $path;
     }
 }

@@ -257,6 +257,7 @@ $_ARRAYLANG['TXT_ACCESS_COUNTRY_RELATED'] = "Zuständig für Länder";
 $_ARRAYLANG['TXT_ACCESS_PLEASE_SELECT'] = "S'il vous plaît sélectionnez";
 $_ARRAYLANG['TXT_CORE_DAY'] = "Jour";
 $_ARRAYLANG['TXT_CORE_DAYS'] = "Jours";
+$_ARRAYLANG['TXT_CORE_DAY_ABBREV_ARRAY'] = "dim.,lun.,mar.,mer.,jeu.,ven.,sam.";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV2_ARRAY'] = "Di,Lu,Ma,Me,Je,Ve,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV3_ARRAY'] = "Dim,Lun,Mar,Mer,Jeu,Ven,Sam";
 $_ARRAYLANG['TXT_CORE_DAY_ARRAY'] = "Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi";
