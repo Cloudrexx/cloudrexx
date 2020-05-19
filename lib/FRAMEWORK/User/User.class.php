@@ -1711,7 +1711,7 @@ class User extends User_Profile
             return;
         }
 
-        $this->restore_key = md5($this->email.$this->regdate.time());
+        $this->restore_key = md5($this->email . random_bytes(20));
         $this->restore_key_time = time() + 3600;
     }
 
@@ -2690,17 +2690,17 @@ class User extends User_Profile
     {
         global $objDatabase;
 
-        $column = 'email';
+        $usernameCondition = '';
         $arrUserSettings = \User_Setting::getSettings();
         if ($arrUserSettings['use_usernames']['status']) {
-            $column = 'username';
+            $usernameCondition = ' OR `username` = "' . contrexx_raw2db($username) . '"';
         }
 
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
-        ');
+             WHERE `email` = "' . contrexx_raw2db($username) . '"
+        ' . $usernameCondition);
     }
 
 

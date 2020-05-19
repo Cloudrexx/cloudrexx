@@ -329,7 +329,16 @@ class Downloads extends DownloadsLibrary
                 $this->parseCategory($objCategory);
 
                 // parse subcategories
-                $this->parseCategories($objCategory, array('downloads_subcategory_list', 'downloads_subcategory'), null, 'SUB');
+                $this->parseCategories(
+                    $objCategory,
+                    array('downloads_subcategory_list', 'downloads_subcategory'),
+                    null,
+                    'SUB',
+                    null,
+                    null,
+                    null,
+                    'SUBCATEGORY_'
+                );
 
                 // parse downloads of selected category
                 $this->parseDownloads($objCategory);
@@ -370,7 +379,16 @@ class Downloads extends DownloadsLibrary
             }
         } else {
             /* CATEGORY OVERVIEW PAGE */
-            $this->parseCategories($objCategory, array('downloads_overview', 'downloads_overview_category'), null, null, 'downloads_overview_row', array('downloads_overview_subcategory_list', 'downloads_overview_subcategory'), $this->arrConfig['overview_max_subcats']);
+            $this->parseCategories(
+                $objCategory,
+                array('downloads_overview', 'downloads_overview_category'),
+                null,
+                null,
+                'downloads_overview_row',
+                array('downloads_overview_subcategory_list', 'downloads_overview_subcategory'),
+                $this->arrConfig['overview_max_subcats'],
+                'OVERVIEW_CATEGORY_'
+            );
 
             if (!empty($this->searchKeyword)) {
                 $this->parseDownloads($objCategory);
@@ -999,12 +1017,12 @@ JS_CODE;
                         null,
                         null,
                         null,
-                        'OVERVIEW_'
+                        'OVERVIEW_SUBCATEGORY_'
                     );
                 }
                 $this->parseDownloads(
                     $objSubcategory,
-                    $subPrefix . 'SUBCATEGORY_'
+                    $subPrefix
                 );
 
                 // parse category

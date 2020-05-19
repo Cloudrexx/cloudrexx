@@ -325,7 +325,18 @@ class CacheLib
         $isMobile = (
             \InitCMS::_is_mobile_phone() &&
             !\InitCMS::_is_tablet() &&
-            !isset($_REQUEST['smallscreen'])
+            // neither a COOKIE preference is set,
+            // nor a preference through GET has been requested
+            !isset($_GET['smallscreen']) &&
+            !isset($_COOKIE['smallscreen'])
+        ) || (
+            // mobile preference through GET has been requested
+            !empty($_GET['smallscreen'])
+        ) || (
+            // no mobile preference through GET has been requested,
+            // but preference is stored in COOKIE
+            !isset($_GET['smallscreen']) &&
+            !empty($_COOKIE['smallscreen'])
         );
 
         // Use data of $_GET and $_POST to uniquely identify a request.

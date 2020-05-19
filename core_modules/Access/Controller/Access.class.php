@@ -994,7 +994,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
 
             // parse body of mail
             $body = $objUserMail->getBodyText();
-            \Cx\Core\MailTemplate\Controller\MailTemplate::substitute($body, $substitution);
+            \Cx\Core\MailTemplate\Controller\MailTemplate::substitute($body, $substitution, false, false);
             $body = preg_replace('/\[\[([A-Za-z0-9_]*?)\]\]/', '{\\1}', $body);
             \LinkGenerator::parseTemplate($body, true);
             \Cx\Core\MailTemplate\Controller\MailTemplate::clearEmptyPlaceholders($body);
@@ -1023,7 +1023,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
 
             // parse body of mail
             $body = $objUserMail->getBodyHtml();
-            \Cx\Core\MailTemplate\Controller\MailTemplate::substitute($body, $substitution);
+            \Cx\Core\MailTemplate\Controller\MailTemplate::substitute($body, $substitution, false, false);
             $body = preg_replace('/\[\[([A-Za-z0-9_]*?)\]\]/', '{\\1}', $body);
             \LinkGenerator::parseTemplate($body, true);
             \Cx\Core\MailTemplate\Controller\MailTemplate::clearEmptyPlaceholders($body);

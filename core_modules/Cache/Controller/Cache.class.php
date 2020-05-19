@@ -192,7 +192,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 $headers = unserialize(file_get_contents($headerFile));
                 if (is_array($headers)) {
                     foreach ($headers as $name=>$value) {
-                        if ($name == static::HTTP_STATUS_CODE_HEADER) {
+                        if (strtolower($name) == strtolower(static::HTTP_STATUS_CODE_HEADER)) {
                             http_response_code(intval($value));
                             continue;
                         }
@@ -203,7 +203,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                         }
                         // If expire header is set, check if the cache
                         // is still valid
-                        if ($name == 'Expires') {
+                        if (strtolower($name) == 'expires') {
                             $expireDate = new \DateTime($value);
                             if ($expireDate < new \DateTime()) {
                                 // cache is no longer valid
@@ -265,9 +265,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         
         $this->exceptions += array(
-            // never cache errors
-            'Error', 
-
             // never cache when caching is disabled
             function($cx, $page) {
                 return !$this->boolIsEnabled;
@@ -283,7 +280,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
             // here come the modules:
             'Access',
-            'Blog',
             'Calendar' => array(
                 'my_events',
                 'add',
@@ -292,7 +288,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 'sign',
                 'success',
             ),
-            'Checkout',
             'Crm',
             'Directory',
             'DocSys',
@@ -313,11 +308,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 },
             ),
             'Market',
-            'Media',
-            'Media1',
-            'Media2',
-            'Media3',
-            'Media4',
             'MediaDir' => array(
                 'latest',
                 'popular',
@@ -368,7 +358,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
      */
     public function writeCacheFileForRequest($page, $headers, $endcode, $forceUserbased = false) {
         $userbased = $forceUserbased;
-        $pageId = '';
+        $pageId = '0';
         if ($page) {
             $pageId = $page->getId();
             if ($page->isFrontendProtected()) {
