@@ -23,7 +23,7 @@ Cx\Core\DataSource\Model\Entity\DataSource:
     identifier:
       type: string
     options:
-      type: text
+      type: array
   uniqueConstraints:
     key_UNIQUE:
       columns: [ identifier ]

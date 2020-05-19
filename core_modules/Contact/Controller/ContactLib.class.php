@@ -112,9 +112,19 @@ class ContactLib
             $order = ' ORDER BY ' . $order;
         }
 
-        $where = ' WHERE `l`.`langID` = ' . FRONTEND_LANG_ID;
+        $where = array();
+        $frontend = false;
+        if (\Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            $where[] = ' `l`.`langID` = ' . FRONTEND_LANG_ID;
+            $frontend = true;
+        }
         if ($id) {
-            $where .= ' AND `f`.`id` = ' . contrexx_raw2db($id);
+            $where[] = '`f`.`id` = ' . contrexx_raw2db($id);
+        }
+        if (count($where)) {
+            $where = ' WHERE ' .  implode(' AND ', $where);
+        } else {
+            $where = '';
         }
         // load form meta information
         $query = 'SELECT `f`.`id`,
@@ -132,8 +142,8 @@ class ContactLib
                          (SELECT COUNT(`id`) FROM `'.DBPREFIX.'module_contact_form_data` AS `d` WHERE `d`.`id_form` = `f`.`id`)  AS `numberOfEntries`,
                          (SELECT MAX(`time`) FROM `'.DBPREFIX.'module_contact_form_data` AS `d` WHERE `d`.`id_form` = `f`.`id`) AS `latestEntry`
                     FROM `'.DBPREFIX.'module_contact_form` AS `f`
-                    LEFT JOIN `'.DBPREFIX.'module_contact_form_lang` AS `l`
-                        ON `f`.`id` = `l`.`formID`
+                    '. ($frontend ? 'LEFT JOIN `'.DBPREFIX.'module_contact_form_lang` AS `l`
+                        ON `f`.`id` = `l`.`formID`' : '') . '
                     ' . $where . ' ' . $order;
         $objResult = $objDatabase->Execute($query);
         if ($objResult) {

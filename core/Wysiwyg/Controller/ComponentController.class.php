@@ -175,7 +175,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $templates = array();
         $em = $this->cx->getDb()->getEntityManager();
         $wysiwygTemplatesRepo = $em->getRepository('Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate');
-        $wysiwygTemplates = $wysiwygTemplatesRepo->findBy(array('active'=>'1'));
+
+        $field = 'order';
+        \Cx\Core\Setting\Controller\Setting::init('Wysiwyg', 'config', 'Yaml');
+        if (\Cx\Core\Setting\Controller\Setting::getValue('sortBehaviour') === 'alphabetical') {
+            $field = 'title';
+        }
+
+        $wysiwygTemplates = $wysiwygTemplatesRepo->findBy(
+            array('active' => '1'),
+            array($field => 'ASC')
+        );
         foreach ($wysiwygTemplates as $wysiwygTemplate) {
             $templates[] = array(
                 'title'         => $wysiwygTemplate->getTitle(),

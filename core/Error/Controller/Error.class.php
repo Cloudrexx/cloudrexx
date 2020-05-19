@@ -110,6 +110,8 @@ class Error
             break;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getResponse()->setCode($errorNo);
         \header($_SERVER['SERVER_PROTOCOL'] . ' ' . $errorNo . ' ' . $errorMsg);
 
         /*

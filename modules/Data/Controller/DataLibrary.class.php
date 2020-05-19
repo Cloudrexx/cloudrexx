@@ -454,83 +454,6 @@ class DataLibrary
     }
 
     /**
-     * Creates an array containing all sozializing networks.
-     *
-     * Contents:
-     * $arrEntries[$intNetworkId]['name']                =>    Name of the service provider.
-     * $arrEntries[$intNetworkId]['www']                =>    Link to the service provider.
-     * $arrEntries[$intNetworkId]['submit']                =>    Submit-Link for new submissions.
-     * $arrEntries[$intNetworkId]['icon']                =>    Icon of the service provider.
-     * $arrEntries[$intNetworkId]['icon_img']            =>    Icon of the service provider as am <img>-tag.
-     * $arrEntries[$intNetworkId]['status'][$langId]    =>    Activation status of a specific language.
-     *
-     * @global     ADONewConnection
-     * @param     integer        $intStartingIndex: can be used for paging. The value defines, with which row the result should start.
-     * @param     integer        $intLimitIndex: can be used for paging. The value defines, how many categories will be returned (starting from $intStartingIndex). If the value is zero, all entries will be returned.
-     * @return    array        $arrReturn
-     */
-    function createNetworkArray($intStartingIndex=0, $intLimitIndex=0) {
-        global $objDatabase;
-
-        $arrReturn = array();
-
-        if ($intLimitIndex == 0) {
-            $intLimitIndex = $this->countNetworks();
-        }
-
-        $objResult = $objDatabase->Execute('SELECT        network_id,
-                                                        name,
-                                                        url,
-                                                        url_link,
-                                                        icon
-                                            FROM        '.DBPREFIX.'module_data_networks
-                                            ORDER BY    name ASC
-                                            LIMIT         '.$intStartingIndex.','.$intLimitIndex.'
-                                        ');
-
-        if ($objResult->RecordCount() > 0) {
-            while (!$objResult->EOF) {
-                $intNetworkId     = intval($objResult->fields['network_id']);
-                $strName         = htmlentities(stripslashes($objResult->fields['name']), ENT_QUOTES, CONTREXX_CHARSET);
-                $strWWW            = htmlentities(stripslashes($objResult->fields['url']), ENT_QUOTES, CONTREXX_CHARSET);
-
-                $arrReturn[$intNetworkId] = array(    'name'        =>    $strName,
-                                                    'www'        =>    $strWWW,
-                                                    'submit'    =>    htmlentities(stripslashes($objResult->fields['url_link']), ENT_QUOTES, CONTREXX_CHARSET),
-                                                    'icon'        =>    htmlentities(stripslashes($objResult->fields['icon']), ENT_QUOTES, CONTREXX_CHARSET),
-                                                    'icon_img'    =>    ($objResult->fields['icon'] != '') ? '<img src="'.$objResult->fields['icon'].'" title="'.$strName.' ('.$strWWW.')" alt="'.$strName.' ('.$strWWW.')" />' : '',
-                                                    'status'    =>    array()
-                                                );
-
-                $objResult->MoveNext();
-            }
-
-            foreach (array_keys($arrReturn) as $intNetworkId) {
-                //Initialize the array first
-                foreach (array_keys($this->_arrLanguages) as $intLanguageId) {
-                    $arrReturn[$intNetworkId]['status'][$intLanguageId] = 0;
-                }
-
-                //Now check for active languages
-                $objStatusResult = $objDatabase->Execute('    SELECT    lang_id
-                                                            FROM    '.DBPREFIX.'module_data_networks_lang
-                                                            WHERE    network_id='.$intNetworkId.'
-                                                        ');
-
-                if ($objStatusResult->RecordCount() > 0) {
-                    while(!$objStatusResult->EOF) {
-                        $arrReturn[$intNetworkId]['status'][$objStatusResult->fields['lang_id']] = 1;
-                        $objStatusResult->MoveNext();
-                    }
-                }
-            }
-        }
-
-        return $arrReturn;
-    }
-
-
-    /**
      * Returns an array containing the necessary user-details for an user.
      *
      * @global     ADONewConnection
@@ -660,24 +583,6 @@ class DataLibrary
 
         return intval($objVotingResult->fields['numberOfVotes']);
     }
-
-
-    /**
-     * Counts all existing networks in the database.
-     *
-     * @global     ADONewConnection
-     * @return     integer        number of networks in the database
-     */
-    function countNetworks() {
-        global $objDatabase;
-
-        $objNetworkResult = $objDatabase->Execute('    SELECT    COUNT(network_id) AS numberOfNetworks
-                                                    FROM    '.DBPREFIX.'module_data_networks
-                                            ');
-
-        return intval($objNetworkResult->fields['numberOfNetworks']);
-    }
-
 
 
     /**

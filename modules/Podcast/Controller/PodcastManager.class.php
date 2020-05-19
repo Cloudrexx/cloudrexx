@@ -790,7 +790,7 @@ class PodcastManager extends PodcastLib
             'PODCAST_BROWSE'                    => self::getMediaBrowserButton(
                                                             $_ARRAYLANG['TXT_PODCAST_BROWSE'],
                                                             array(
-                                                                'data-cx-mb-views' => 'filebrowser',
+                                                                'views' => 'filebrowser',
                                                                 'type' => 'button',
                                                                 'style'=> 'width:110px;'
                                                             ),

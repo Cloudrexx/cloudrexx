@@ -182,8 +182,7 @@ class DocSys extends DocSysLibrary
         $this->_objTpl->setVariable("DOCSYS_NO_CATEGORY",
             $_ARRAYLANG['TXT_CATEGORY']);
         $this->_objTpl->setVariable("DOCSYS_CAT_MENU",
-            $this->getCategoryMenu($this->langId, array($selectedId),
-                $_REQUEST['cmd']));
+            $this->getCategoryMenu($this->langId, array($selectedId)));
         $this->_objTpl->setVariable("TXT_PERFORM", $_ARRAYLANG['TXT_PERFORM']);
         $count = $this->countOverviewEntries($selectedId);
         $entries = $this->getOverviewTitles($pos, $selectedId, $sortType);

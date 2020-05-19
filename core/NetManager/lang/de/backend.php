@@ -40,7 +40,7 @@ global $_ARRAYLANG;
 
 // Let's start with module info:
 $_ARRAYLANG['TXT_CORE_NETMANAGER'] = 'Domains';
-$_ARRAYLANG['TXT_CORE_NETMANAGER_DESCRIPTION'] = 'This module shows the all Domain Alias';
+$_ARRAYLANG['TXT_NETMANAGER_MODULE_DESCRIPTION'] = 'Verwaltung der mit der Website verknüpften Domains.';
 
 // Here come the ACTs:
 $_ARRAYLANG['TXT_CORE_NETMANAGER_ACT_DEFAULT'] = 'Overview';

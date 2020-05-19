@@ -139,10 +139,17 @@ class Cart
                 + self::get_discount_amount()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
+            'total_price_cart_without_vat' => Currency::formatPrice(
+                  self::get_price()
+                + self::get_discount_amount()
+            ),
             'total_price' => Currency::formatPrice(
                   self::get_price()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
+            'total_price_without_vat' => Currency::formatPrice(
+                  self::get_price()
+            ),
             'item_count' => $itemCount,
             'unit' => Currency::getActiveCurrencySymbol()
         );

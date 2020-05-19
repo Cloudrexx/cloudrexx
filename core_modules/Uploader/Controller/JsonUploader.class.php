@@ -100,20 +100,28 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
     {
         global $_ARRAYLANG;
         $id = null;
-        $session = $this->cx->getComponent('Session')->getSession();
         if (isset($params['get']['id']) && preg_match('/^[a-z0-9]+$/i', $params['get']['id'])
         ) {
             $id = ($params['get']['id']);
             $uploadedFileCount = isset($params['get']['uploadedFileCount']) ? intval($params['get']['uploadedFileCount']) : 0;
+            $session = $this->cx->getComponent('Session')->getSession();
             $path = $session->getTempPath() . '/'.$id.'/';
             $tmpPath = $path;
         } elseif (isset($params['post']['path'])) {
-            $path_part = explode("/", $params['post']['path'], 2);
-            $mediaSourceManager
-                = $this->cx->getMediaSourceManager();
-            $path = $mediaSourceManager->getMediaTypePathsbyNameAndOffset($path_part[0],0)
-                . '/' . $path_part[1];
-
+            // This case is deprecated and should not be used!
+            \DBG::msg('Using deprecated upload case without upload ID!');
+            $path_part = explode('/', $params['post']['path'], 2);
+            if (!isset($params['mediaSource'])) {
+                $mediaSourceManager = $this->cx->getMediaSourceManager();
+                $path = $mediaSourceManager->getMediaTypePathsbyNameAndOffset(
+                    $path_part[0],
+                    0
+                );
+            } else {
+                $path = current($params['mediaSource']->getDirectory());
+            }
+            $path .= '/' . $path_part[1];
+            $session = $this->cx->getComponent('Session')->getSession();
             $tmpPath = $session->getTempPath();
         } else {
             return array(

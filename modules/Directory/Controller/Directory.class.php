@@ -78,7 +78,6 @@ class Directory extends DirectoryLibrary
     public $arrClient = array();
     public $arrProxy = array();
     public $count = array();
-    public $numLevels = array();
     public $communityModul;
 
     //local settings
@@ -568,6 +567,7 @@ $this->arrRows[2] = '';
 
         if (isset($lid)) {
             $levelLink = "&lid=".$lid;
+            $lid = intval($lid);
         }
 
         if ($this->settings['sortOrder']['value'] == 1) {

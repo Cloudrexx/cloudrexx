@@ -110,7 +110,7 @@ class CalendarCategory extends CalendarLibrary
      * @return null
      */
     function get($catId) {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
         $query = "SELECT category.`id` AS `id`,
                          category.`pos` AS `pos`,
@@ -120,7 +120,7 @@ class CalendarCategory extends CalendarLibrary
                          ".DBPREFIX."module_".$this->moduleTablePrefix."_category_name AS name
                    WHERE category.id = '".intval($catId)."'
                      AND category.id = name.cat_id
-                     AND name.lang_id = '".intval($_LANGID)."'
+                     AND name.lang_id = '".FRONTEND_LANG_ID."'
                    LIMIT 1";
 
         $objResult = $objDatabase->Execute($query);
@@ -139,7 +139,7 @@ class CalendarCategory extends CalendarLibrary
      * @return null
      */
     function getData() {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
         //get category name(s)
         $query = "SELECT `name`,`lang_id`
@@ -150,7 +150,7 @@ class CalendarCategory extends CalendarLibrary
 
         if ($objResult !== false) {
             while (!$objResult->EOF) {
-            	if($objResult->fields['lang_id'] == $_LANGID) {
+            	if($objResult->fields['lang_id'] == FRONTEND_LANG_ID) {
             		$this->arrData['name'][0] = htmlentities($objResult->fields['name'], ENT_QUOTES, CONTREXX_CHARSET);
             	}
                 $this->arrData['name'][intval($objResult->fields['lang_id'])] = htmlentities($objResult->fields['name'], ENT_QUOTES, CONTREXX_CHARSET);
@@ -255,7 +255,7 @@ class CalendarCategory extends CalendarLibrary
      */
     function save($data)
     {
-        global $objDatabase, $_LANGID;
+        global $objDatabase;
 
         $arrHosts = array();
         if (isset($data['selectedHosts'])) {
@@ -316,7 +316,7 @@ class CalendarCategory extends CalendarLibrary
             foreach ($arrNames as $langId => $categoryName) {
                 if($langId != 0) {
                     $categoryName = ($categoryName == '') ? $arrNames[0] : $categoryName;
-                    if($_LANGID == $langId) {
+                    if($langId == FRONTEND_LANG_ID) {
                         $categoryName = $arrNames[0] != $this->name ? $arrNames[0] : $categoryName;
                     }
 
@@ -508,7 +508,7 @@ class CalendarCategory extends CalendarLibrary
             $startDate = null;
         }
 
-        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, $endDate, $this->id, $searchTerm, true, false, $onlyActive);
+        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, $endDate, $this->id, $searchTerm, false, false, $onlyActive);
         $objEventManager->getEventList();
         $count = count($objEventManager->eventList);
 
@@ -525,7 +525,6 @@ class CalendarCategory extends CalendarLibrary
      */
     public function getCategoryEntity($id, $formData = array())
     {
-        global $_LANGID;
 
         if (empty($id)) {
             $category = new \Cx\Modules\Calendar\Model\Entity\Category();
@@ -552,7 +551,7 @@ class CalendarCategory extends CalendarLibrary
                         continue;
                     }
                     $value = ($value == '') ? $fieldValue[0] : $value;
-                    if ($langId == $_LANGID) {
+                    if ($langId == FRONTEND_LANG_ID) {
                         $value = ($fieldValue[0] != $this->name)
                             ? $fieldValue[0] : $value;
                     }

@@ -57,7 +57,12 @@ class DataElement extends HtmlElement {
                     $option->addChild(
                         new \Cx\Core\Html\Model\Entity\TextElement($val)
                     );
-                    if ($key == $value) {
+                    // Numeric array keys are automatically converted to int by
+                    // PHP http://ch1.php.net/manual/en/language.types.array.php#example-58
+                    if (is_numeric($value) || is_bool($value)) {
+                        $value = (int)$value;
+                    }
+                    if ($key === $value) {
                         $option->setAttribute('selected');
                     }
                     $this->addChild($option);
@@ -116,7 +121,11 @@ class DataElement extends HtmlElement {
     }
 
     public function render() {
-        $this->setAttribute('onkeyup', $this->getValidator()->getJavaScriptCode());
+        $this->setAttribute(
+            'onkeyup',
+            $this->getAttribute('onkeyup') . ';' .
+                $this->getValidator()->getJavaScriptCode()
+        );
         return parent::render();
     }
 }

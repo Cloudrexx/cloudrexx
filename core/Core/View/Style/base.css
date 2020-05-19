@@ -113,10 +113,9 @@ a:active {
 
 #metanavigation>ul li {
     float: left;
-    width: 100%;
-    clear: both;
     list-style: none;
     position: relative;
+    margin-left: 20px;
 }
 
 #metanavigation>ul a {
@@ -142,6 +141,10 @@ a:active {
 
 #metanavigation>ul>li:hover ul {
     display: block;
+}
+
+#metanavigation>ul>li>ul>li {
+    margin-left: 0;
 }
 
 #metanavigation>ul>li>ul a {
@@ -1908,4 +1911,96 @@ a.cke_dialog_ui_button_ok:hover {
 .modal-header {
     background-color: #0a85c8;
     color: #fff;
+}
+
+/* ComponentManager */
+.componentList .description:hover {
+    cursor: pointer;
+}
+.componentList .description > div > img {
+    font-size: 20px;
+    vertical-align: middle;
+    margin-left: 5px;
+    -webkit-transition: transform .2s linear 0s;
+    -moz-transition: transform .2s linear 0s;
+    -ms-transition: transform .2s linear 0s;
+    -o-transition: transform .2s linear 0s;
+    transition: transform .2s linear 0s;
+}
+.componentList .description > .showText > img {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.componentList .description .desc-extended {
+    display: none;
+}
+
+.experimental:after {
+    content: "Experimental";
+    vertical-align: super;
+    font-size: 8px;
+    background-color: #fcc;
+    padding: 1px 0 0 1px;
+    font-weight: normal;
+    font-family: monospace;
+    line-height: initial;
+}
+
+#splash-text {
+    max-width: 500px;
+    float: left;
+    overflow-x: hidden;
+}
+#splash-text h1 {
+    float: none;
+}
+#splash .box {
+    margin-left: 30px;
+    min-height: 148px;
+    height: 148px;
+    padding-bottom: 50px;
+    background-color: #0a85c8;
+    position: relative;
+    float: left;
+    width: 301px;
+    height: auto !important;
+    padding: 10px 10px 0 10px;
+    overflow: hidden;
+}
+#splash .box h2 {
+    margin: 0 0 9px 0;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: normal;
+}
+#splash .box ul {
+    clear: both;
+    float: left;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+#splash .box ul li {
+    clear: both;
+}
+#splash .box ul li a {
+    float: left;
+    width: auto;
+    background: url(/core_modules/Home/View/Media/dashboard_box_list_style.png) no-repeat left 4px;
+    padding: 0 0 0 9px;
+    margin: 0 0 5px 0;
+    color: #ffffff;
+}
+#splash .box .icon {
+    width: 30px;
+    height: 30px;
+    background: url(/core_modules/Home/View/Media/dashboard_box_1_icon.png) no-repeat;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    float: left;
 }

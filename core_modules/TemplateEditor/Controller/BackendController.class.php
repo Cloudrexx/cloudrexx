@@ -304,7 +304,7 @@ class BackendController extends SystemComponentBackendController
                         'templateEditor' => 1
                     )
                 ),
-                'TEMPLATEEDITOR_BACKURL' => './index.php?cmd=ViewManager'
+                'TEMPLATEEDITOR_BACKURL' => Url::fromBackend('ViewManager')
             )
         );
         $template->setGlobalVariable($_ARRAYLANG);

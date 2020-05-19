@@ -84,6 +84,9 @@ class DownloadsLibrary
         'associate_user_to_groups'      => '',
         'list_downloads_current_lang'   => 1,
         'integrate_into_search_component'=> 1,
+        'auto_file_naming'     => 'off',
+        'pretty_regex_pattern' => '',
+        'global_search_linking'         => 'detail',
     );
 
     /**
@@ -213,7 +216,7 @@ class DownloadsLibrary
                 // language
                 $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
                 $locale = $localeRepo->findOneByCode($iso1Code);
-            } catch (DownloadsLibraryException $e) {}
+            } catch (\Doctrine\ORM\NoResultException $e) {}
         }
 
         if (!$locale) {
@@ -236,7 +239,14 @@ class DownloadsLibrary
         global $objDatabase;
 
         foreach ($this->arrConfig as $key => $value) {
-            $objDatabase->Execute("UPDATE `".DBPREFIX."module_downloads_settings` SET `value` = '".addslashes($value)."' WHERE `name` = '".$key."'");
+            $objDatabase->Execute('
+                UPDATE
+                    `' . DBPREFIX . 'module_downloads_settings`
+                SET
+                    `value` = "' . contrexx_input2db($value) . '"
+                WHERE
+                    `name` = "' . $key . '"
+            ');
         }
         //clear Esi Cache
         static::clearEsiCache();
@@ -545,6 +555,9 @@ class DownloadsLibrary
 
         // clear contrexx cache
         \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Downloads');
+
+        // clear search cache
+        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Search');
     }
 
     /**
@@ -628,5 +641,46 @@ class DownloadsLibrary
         }
 
         throw new DownloadsLibraryException('No active application page found');
+    }
+
+    /**
+     * Format a filename according to configuration option 'Pretty format'
+     * of currently loaded downloads file.
+     *
+     * @param string $fileName  The filename to pretty format
+     * @return string The pretty formatted filename. In case of any error
+     *                 or if the function to pretty format is disabled,
+     *                 then the original $filename is being returned.
+     */
+    public function getPrettyFormatFileName($fileName)
+    {
+        if (empty($fileName)) {
+            return '';
+        }
+
+        // return original filename in case pretty format function is disabled
+        if ($this->arrConfig['auto_file_naming'] == 'off') {
+            return $fileName;
+        }
+
+        // check if a regexp is set
+        $regexpConf = $this->arrConfig['pretty_regex_pattern'];
+
+        // generate pretty formatted filename
+        try {
+            $regularExpression = new \Cx\Lib\Helpers\RegularExpression($regexpConf);
+            $prettyFileName = $regularExpression->replace($fileName);
+
+            // return pretty filename if conversion was successful
+            if (!is_null($prettyFileName)) {
+                return $prettyFileName;
+            }
+        } catch (\Exception $e) {
+            \DBG::msg($e->getMessage());
+        }
+
+        // return original filename in case anything
+        // didn't work out as expected
+        return $fileName;
     }
 }
