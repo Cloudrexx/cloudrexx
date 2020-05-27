@@ -402,8 +402,22 @@ class Permission extends \Cx\Model\Base\EntityBase {
         $protocol = $this->cx->getRequest() ? \Env::get('cx')->getRequest()->getUrl()->getProtocol() : '';
         $method = $this->cx->getRequest()->getHttpRequestMethod();
 
-        if ($this->cx->isCliCall()) {
-            $method = 'cli';
+        // Special case when calling from CLI
+        //
+        // As the user making the call from CLI has full access to the system
+        // anyway, we simply have to check if the permission has been made
+        // available to CLI
+        if (
+            $this->cx->isCliCall() &&
+            !empty($this->allowedMethods) &&
+            in_array('cli', $this->allowedMethods)
+        ) {
+            return true;
+        } elseif ($this->cx->isCliCall()) {
+            // if we are in CLI, but the permission is not available in CLI,
+            // then we can abort right away
+            \DBG::msg(__METHOD__ . ': permission not avaiable in CLI');
+            return false;
         }
 
         //protocol check
