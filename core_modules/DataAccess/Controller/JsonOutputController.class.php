@@ -54,6 +54,6 @@ class JsonOutputController extends OutputController {
      */
     public function parse($data) {
         header('Content-Type: application/json');
-        return json_encode($data);
+        return json_encode($data, JSON_FORCE_OBJECT);
     }
 }
