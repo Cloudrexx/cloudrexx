@@ -1061,13 +1061,43 @@ namespace Cx\Core\Core\Controller {
         }
 
         /**
+         * Checks if the current call is cli.
+         *
+         * @return bool the result whether it is a cli call
+         */
+        public function isCliCall() {
+
+            if (defined('STDIN')) {
+                return true;
+            }
+
+            if (php_sapi_name() === 'cli') {
+                return true;
+            }
+
+            if (array_key_exists('SHELL', $_ENV)) {
+                return true;
+            }
+
+            if (
+                empty($_SERVER['REMOTE_ADDR']) &&
+                !isset($_SERVER['HTTP_USER_AGENT']) &&
+                count($_SERVER['argv']) > 0
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
          * Set the mode Cloudrexx is used in
          * @param mixed $mode Mode as string or true for front- or false for backend
          */
         protected function setMode($mode) {
             global $_CONFIG;
 
-            if ((!$mode || $mode == 'command') && php_sapi_name() === 'cli') {
+            if ((!$mode || $mode == 'command') && $this->isCliCall()) {
                 $this->mode = self::MODE_COMMAND;
                 return;
             }
@@ -1521,6 +1551,9 @@ namespace Cx\Core\Core\Controller {
                     define('MODULE_INDEX', '');
                 }
 
+                //checks if is in cli-mode
+                $isCliCall = $this->isCliCall();
+
                 try {
                     // cleanup params
                     $params = array();
@@ -1576,7 +1609,8 @@ namespace Cx\Core\Core\Controller {
                     // parse body arguments:
                     // todo: this does not work for form-data encoded body (boundary...)
                     $input = '';
-                    if (php_sapi_name() == 'cli') {
+
+                    if ($isCliCall) {
                         $read = array(fopen('php://stdin', 'r'));
                         $write = null;
                         $except = null;
@@ -1613,7 +1647,7 @@ namespace Cx\Core\Core\Controller {
                     $objCommand->executeCommand($command, $params, $dataArguments);
                     return;
                 } catch (\Exception $e) {
-                    if (php_sapi_name() != 'cli') {
+                    if (!$isCliCall) {
                         throw $e;
                     }
                     fwrite(STDERR, 'ERROR: ' . $e->getMessage() . PHP_EOL);
