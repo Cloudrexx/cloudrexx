@@ -77,4 +77,12 @@ options:
     translation:
       1: Logo
       2: Logo
+  -
+    name: home_images
+    specific:
+      urls: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ImageSeriesOption
+    translation:
+      1: 'Bilder Startseite'
+      2: 'Homepage Images'
       
