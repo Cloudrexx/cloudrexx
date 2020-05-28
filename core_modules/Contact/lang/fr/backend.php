@@ -173,7 +173,6 @@ $_ARRAYLANG['TXT_CONTACT_FORM_MULTIPLE_UPLOAD_FIELDS'] = "You created multiple u
 $_ARRAYLANG['TXT_CONTACT_FORM_VALUES'] = "valeurs de formulaire";
 $_ARRAYLANG['TXT_FORM_FIELDS'] = "Champs du formulaire";
 $_ARRAYLANG['TXT_ADVANCED_SETTINGS'] = "Paramètres élargies ";
-$_ARRAYLANG['TXT_FORM_RECIPIENTS'] = "Liste de destinataires";
 $_ARRAYLANG['TXT_CONTACT_LANGUAGE'] = "Langue ";
 $_ARRAYLANG['TXT_CONTACT_FORM_NAME'] = "Nom";
 $_ARRAYLANG['TXT_CONTACT_FORM_FIELD_TITLE'] = "Champs du formulaire";

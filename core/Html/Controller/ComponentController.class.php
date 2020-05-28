@@ -76,6 +76,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
+     * @{inheritdoc}
+     */
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+        global $_ARRAYLANG;
+        $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('Html', false);
+
+        $this->getComponent('View')->addIntroSteps(
+            array(
+                array(
+                    'element' => '.adminlist .vg-add:first-child img',
+                    'intro' => $_ARRAYLANG['TXT_CORE_HTML_NEW_BUTTON_MOVED'],
+                )
+            ),
+            'Html/vg-intro'
+        );
+    }
+
+    /**
      * Adds a request param set to the whitelist
      *
      * This manages entries in a whitelist in the session. It is used to

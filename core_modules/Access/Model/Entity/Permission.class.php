@@ -401,7 +401,8 @@ class Permission extends \Cx\Model\Base\EntityBase {
     public function hasAccess(array $params = array()) {
         $protocol = $this->cx->getRequest() ? \Env::get('cx')->getRequest()->getUrl()->getProtocol() : '';
         $method = $this->cx->getRequest()->getHttpRequestMethod();
-        if (php_sapi_name() === 'cli') {
+
+        if ($this->cx->isCliCall()) {
             $method = 'cli';
         }
 
@@ -423,7 +424,12 @@ class Permission extends \Cx\Model\Base\EntityBase {
         }
 
         //callback function check
-        if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
+        try {
+            if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
+                return false;
+            }
+        } catch (CallbackException $e) {
+            \DBG::msg('Permission callback failed with message ' . $e->getMessage());
             return false;
         }
 

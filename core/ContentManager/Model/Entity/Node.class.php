@@ -333,6 +333,9 @@ class Node extends \Cx\Model\Base\EntityBase implements \Serializable
     /**
      * Set parent
      *
+     * This intentionally does not allow to set parent to NULL. Making an
+     * existing node a root node is not supported. To create a new root node
+     * simply create a new entity as the default value for $this->parent is NULL.
      * @param \Cx\Core\ContentManager\Model\Entity\Node $parent
      */
     public function setParent(\Cx\Core\ContentManager\Model\Entity\Node $parent)

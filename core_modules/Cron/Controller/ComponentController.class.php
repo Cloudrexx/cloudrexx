@@ -134,9 +134,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             } catch (\Exception $e) {
                 $executedJobs++;
                 $severity = 'FATAL';
-                $details[$cron->getCommand()] = 'Exception of type "' .
+                $message = 'Exception of type "' .
                     get_class($e) . '" with message "' . $e->getMessage() .
                     '" caught in ' . $e->getFile() . ' on line ' . $e->getLine();
+                \DBG::msg($message);
+                $details[$cron->getCommand()] = $message;
             }
         }
         return $details;

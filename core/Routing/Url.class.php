@@ -254,7 +254,8 @@ class Url {
      * therefore unable to perform its task, it will return TRUE as fallback.
      *
      * @todo This does not work correctly if setPath() is called from outside
-     * @return boolean True for internal URL, false otherwise
+     * @return boolean True for internal URL, false otherwise. In case the
+     * domain repository can't be loaded, the method will always return TRUE.
      */
     public function isInternal() {
         try {
@@ -278,6 +279,12 @@ class Url {
                 return false;
             }
         } catch (\Doctrine\Common\Persistence\Mapping\MappingException $e) {
+            // In case the domain repository can't be loaded,
+            // doctrine's entity manager will throw an exception.
+            // We catch this exception for that specific case to make
+            // the web-installer work.
+            \DBG::msg($e->getMessage());
+        } catch (\Doctrine\ORM\Mapping\MappingException $e) {
             // In case the domain repository can't be loaded,
             // doctrine's entity manager will throw an exception.
             // We catch this exception for that specific case to make
@@ -541,6 +548,13 @@ class Url {
      * @return  string
      */
     public static function array2params($array = array()) {
+        if (
+            !is_array($array) &&
+            !is_object($array)
+        ) {
+            return '';
+        }
+
         if (isset($array['csrf'])) {
             unset($array['csrf']);
         }
@@ -581,7 +595,8 @@ class Url {
     }
 
     public static function fromRequest() {
-        if (php_sapi_name() === 'cli') {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if ($cx->isCliCall()) {
             return new Url('file://' . getcwd());
         }
         $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';

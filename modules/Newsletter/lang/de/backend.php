@@ -71,7 +71,6 @@ $_ARRAYLANG['TXT_EMAIL_ADDRESS'] = "E-Mail";
 $_ARRAYLANG['TXT_LIST'] = "Listen";
 $_ARRAYLANG['TXT_WILDCART_INFOS'] = "Platzhalter-Informationen";
 $_ARRAYLANG['TXT_LIST_NAME'] = "Name der Liste";
-$_ARRAYLANG['TXT_SENDER'] = "Absender ";
 $_ARRAYLANG['TXT_HEADER'] = "Kopfzeile";
 $_ARRAYLANG['TXT_FOOTER'] = "Fusszeile";
 $_ARRAYLANG['TXT_TITLE'] = "Titel";
@@ -220,6 +219,7 @@ $_ARRAYLANG['TXT_NEWSLETTER_REGISTRATION_DATE'] = "Registrierungsdatum";
 $_ARRAYLANG['TXT_NEWSLETTER_SELECT_CATEGORY'] = "Kategorie wählen";
 $_ARRAYLANG['TXT_NEWSLETTER_IMPORT_HINT'] = "E-Mail Adressen werden automatisch extrahiert";
 $_ARRAYLANG['TXT_NEWSLETTER_EMAIL_CAMPAIGNS'] = "E-Mail-Kampagnen";
+$_ARRAYLANG['TXT_NEWSLETTER_DEFAULTS_FOR_EMAIL_CAMPAIGNS'] = "Standard-Werte für neue E-Mail-Kampagnen";
 $_ARRAYLANG['TXT_NEWSLETTER_LISTS'] = "Verteilerlisten";
 $_ARRAYLANG['TXT_NEWSLETTER_ADMINISTRATION'] = "Verwaltung";
 $_ARRAYLANG['TXT_NEWSLETTER_NEWS'] = "News";
@@ -350,13 +350,11 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "Beim aktualisieren des E
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Neuen Empfänger hinzufügen";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "Diese E-Mail Adresse wird bereits von einem anderen Empfänger benutzt!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "Sie müssen eine gültige E-Mail Adresse angeben!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Anzahl Zeichen pro Zeile bei Textmails";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Test-Empfänger";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "Für Fehler und unzustellbare E-Mails";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Blindkopien";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALID_EMAIL'] = "Es wurde kein gültiges E-Mail zum versenden angegeben!";
 $_ARRAYLANG['TXT_NEWSLETTER_OVERVIEW_ENTRIES'] = "Anzahl Einträge in der Übersicht";
-$_ARRAYLANG['TXT_NEWSLETTER_REPLY_EMAIL'] = "Antwort E-Mail Adresse";
 $_ARRAYLANG['TXT_NEWSLETTER_ERROR_SAVE_RETRY'] = "Beim Speichern trat ein Fehler auf. Versuchen Sie den Vorgang zu wiederholen!";
 $_ARRAYLANG['TXT_NEWSLETTER_SUBJECT_ALREADY_EXISTS'] = "Wählen Sie einen anderen <i>Betreff / Titel</i> für das E-Mail, da bereits ein E-Mail mit demselben <i>Betreff / Titel</i> existiert!";
 $_ARRAYLANG['TXT_NEWSLETTER_ERROR_NO_SUBJECT'] = "Sie müssen einen <i>Betreff / Titel</i> angeben!";
@@ -528,3 +526,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_CONSENT_SOURCE_OPT_IN'] = 'Double-Opt-In am %s';
 $_ARRAYLANG['TXT_NEWSLETTER_CONSENT_TOOLTIP'] = 'Gibt an, ob der Teilnehmer seine Zustimmung gegeben hat. <ul><li><img src="/core/Core/View/Media/icons/led_green.gif" alt="Grün" /> bedeutet, dass der Teilnehmer seine Zustimmung per Double-Opt-In bestätigt hat.</li><li><img src="/core/Core/View/Media/icons/led_orange.gif" alt="Orange" /> bedeutet, dass der Teilnehmer manuell über die Administrationskonsole erfasst, oder via API importiert wurde.</li></ul><br />
 Wenn nach Verteilerliste gefilter wird, wird zudem nachfolgend die Zustimmung zu der entsprechenden Liste aufgeführt.<br /><br />
 Fahren Sie mit der Maus über die Symbole um detailliertere Informationen zu erhalten.';
+$_ARRAYLANG['TXT_NEWSLETTER_DELIVER_USER_RECIPIENTS'] = 'Versand an Benutzergruppen';
+$_ARRAYLANG['TXT_NEWSLETTER_DELIVER_CRM_RECIPIENTS'] = 'Versand an CRM Kundengruppen';
+$_ARRAYLANG['TXT_NEWSLETTER_USE_CRM_FILTER'] = 'Filterung nach CRM Kundengruppen';

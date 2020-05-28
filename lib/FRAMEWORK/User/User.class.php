@@ -688,6 +688,7 @@ class User extends User_Profile
                     return true;
                 } else {
                     $objDatabase->failTrans();
+                    $objDatabase->completeTrans();
                     $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_USER_DELETE_FAILED'], $this->username);
                 }
             } else {
@@ -1184,6 +1185,7 @@ class User extends User_Profile
      * </pre>
      * @param   integer $limit The maximal number of Users to load from the database. If not set, all matched users will be loaded.
      * @param   integer $offset The optional parameter $offset can be used to specify the number of found records to skip in the result set.
+     *                          <i>Note that this parameter only works if the limit is set!</i>
      * @return  User
      */
     public function getUsers(
@@ -1709,7 +1711,7 @@ class User extends User_Profile
             return;
         }
 
-        $this->restore_key = md5($this->email.$this->regdate.time());
+        $this->restore_key = md5($this->email . random_bytes(20));
         $this->restore_key_time = time() + 3600;
     }
 
@@ -2286,6 +2288,7 @@ class User extends User_Profile
         $arrCurrentGroups = $this->loadGroups();
         $arrAddedGroups = array_diff($this->getAssociatedGroupIds(), $arrCurrentGroups);
         $arrRemovedGroups = array_diff($arrCurrentGroups, $this->getAssociatedGroupIds());
+        $groupAssociationChange = false;
         foreach ($arrRemovedGroups as $groupId) {
             if (!$objDatabase->Execute('
                 DELETE FROM `'.DBPREFIX.'access_rel_user_group`
@@ -2294,7 +2297,7 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
         }
         foreach ($arrAddedGroups as $groupId) {
@@ -2307,8 +2310,17 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
+        }
+        if ($groupAssociationChange) {
+            $associationChange = true;
+
+            // flush all user based cache to ensure new permissions are enforced
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cache = $cx->getComponent('Cache');
+            $cache->clearUserBasedPageCache();
+            $cache->clearUserBasedEsiCache();
         }
         return $status;
     }
@@ -2678,17 +2690,17 @@ class User extends User_Profile
     {
         global $objDatabase;
 
-        $column = 'email';
+        $usernameCondition = '';
         $arrUserSettings = \User_Setting::getSettings();
         if ($arrUserSettings['use_usernames']['status']) {
-            $column = 'username';
+            $usernameCondition = ' OR `username` = "' . contrexx_raw2db($username) . '"';
         }
 
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
-        ');
+             WHERE `email` = "' . contrexx_raw2db($username) . '"
+        ' . $usernameCondition);
     }
 
 
@@ -2703,6 +2715,7 @@ class User extends User_Profile
     public function setUsername($username)
     {
         $this->username = $username;
+        $this->updateLoadedUserData('username', $this->username);
     }
 
 
@@ -2723,6 +2736,9 @@ class User extends User_Profile
             $this->validity = $validity;
             $this->setExpirationDate(($validitySeconds = $validity*60*60*24) ? mktime(23, 59, 59, date('m', time() + $validitySeconds), date('d', time() + $validitySeconds), date('Y', time() + $validitySeconds)) : 0);
         }
+
+        $this->updateLoadedUserData('validity', $this->validity);
+
         return true;
     }
 
@@ -2730,6 +2746,7 @@ class User extends User_Profile
     public function setExpirationDate($expiration)
     {
         $this->expiration = $expiration;
+        $this->updateLoadedUserData('expiration', $this->expiration);
     }
 
 
@@ -2752,6 +2769,8 @@ class User extends User_Profile
         }
         // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         $this->email = $email;
+
+        $this->updateLoadedUserData('email', $this->email);
     }
 
 
@@ -2787,6 +2806,7 @@ class User extends User_Profile
                 return false;
             }
             $this->password = $this->hashPassword($password);
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2804,6 +2824,7 @@ class User extends User_Profile
      */
     public function setHashedPassword($hashedPassword) {
         $this->password = $hashedPassword;
+        $this->updateLoadedUserData('password', $this->password);
     }
 
     /**
@@ -2830,6 +2851,7 @@ class User extends User_Profile
     {
         $this->frontend_language = intval($langId);
         $this->validateLanguageId('frontend');
+        $this->updateLoadedUserData('frontend_lang_id', $this->frontend_language);
     }
 
 
@@ -2844,6 +2866,7 @@ class User extends User_Profile
     {
         $this->backend_language = intval($langId);
         $this->validateLanguageId('backend');
+        $this->updateLoadedUserData('backend_lang_id', $this->backend_language);
     }
 
 
@@ -2858,6 +2881,7 @@ class User extends User_Profile
     public function setActiveStatus($status)
     {
         $this->is_active = (bool)$status;
+        $this->updateLoadedUserData('active', $this->is_active);
     }
 
     /**
@@ -2870,6 +2894,7 @@ class User extends User_Profile
      */
     public function setVerification($verified) {
         $this->verified = $verified;
+        $this->updateLoadedUserData('verified', $this->verified);
         return true;
     }
 
@@ -2891,6 +2916,8 @@ class User extends User_Profile
         } else {
             $this->primary_group = 0;
         }
+
+        $this->updateLoadedUserData('primary_group', $this->primary_group);
     }
 
 
@@ -2911,6 +2938,7 @@ class User extends User_Profile
 
         if ($status || !$this->isLastAdmin() || $force) {
             $this->is_admin = (bool)$status;
+            $this->updateLoadedUserData('is_admin', $this->is_admin);
             return true;
         }
         $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_CHANGE_PERM_LAST_ADMIN_USER'], $this->getUsername());
@@ -2954,6 +2982,7 @@ class User extends User_Profile
     {
         $this->email_access = in_array($emailAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $emailAccess : $this->defaultEmailAccessType;
+        $this->updateLoadedUserData('email_access', $this->email_access);
     }
 
 
@@ -2961,6 +2990,7 @@ class User extends User_Profile
     {
         $this->profile_access = in_array($profileAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $profileAccess : $this->defaultProfileAccessTyp;
+        $this->updateLoadedUserData('profile_access', $this->profile_access);
     }
 
 
@@ -3170,6 +3200,34 @@ class User extends User_Profile
     }
 
     /**
+     * Update a specific profile attribute of the user
+     *
+     * @param   string  $attribute  ID of profile attribute to update
+     * @param   string|integer|boolean  $value  Value to set the profile
+     *                                          attribute to
+     */
+    protected function updateLoadedUserData($attribute, $value) {
+        if (!$this->id) {
+            return;
+        }
+
+        if (!isset($this->arrLoadedUsers[$this->id])) {
+            return;
+        }
+
+        $this->arrLoadedUsers[$this->id][$attribute] = $value;
+    }
+
+    /**
+     * Get object data as array
+     *
+     * @param    array   Return data of user object as array
+     */
+    public function toArray() {
+        return $this->arrLoadedUsers[$this->id];
+    }
+
+    /**
      * Tries to form a valid and unique username from the words given
      *
      * Usually, you would use first and last names as parameters.
@@ -3332,5 +3390,14 @@ class User extends User_Profile
         }
 
         throw new UserException('Failed to generate a new password hash');
+    }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
     }
 }

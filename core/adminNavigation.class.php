@@ -301,7 +301,6 @@ class adminMenu
                                     case 'Downloads':
                                     case 'Calendar':
                                     case 'Podcast':
-                                    case 'Blog':
                                         $requestedArchive = 'ContentManager';
                                         break;
                                     case 'themes':

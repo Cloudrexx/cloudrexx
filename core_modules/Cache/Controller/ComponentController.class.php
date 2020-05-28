@@ -82,10 +82,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             //- ATTENTION: never load CacheManager here, because it uses not yet defined constants which will cause a fatal error
             $this->cache = new \Cx\Core_Modules\Cache\Controller\CacheLib();
         }
+
         // disable user cache when calling Cache command from CLI
         if (
             $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_COMMAND &&
-            php_sapi_name() == 'cli' &&
+            $this->cx->isCliCall() &&
             isset($argv) &&
             count($argv) > 2 &&
             $argv[1] == 'Cache'
@@ -286,24 +287,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Clear user based page cache of a specific user identified by its
-     * session ID.
+     * Clear user based page cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the page cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedPageCache($sessionId) {
+    public function clearUserBasedPageCache($sessionId = '') {
         $this->cache->clearUserBasedPageCache($sessionId);
     }
 
     /**
-     * Clear user based ESI cache of a specific user identified by its
-     * session ID.
+     * Clear user based ESI cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the esi cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedEsiCache($sessionId) {
+    public function clearUserBasedEsiCache($sessionId = '') {
         $this->cache->clearUserBasedEsiCache($sessionId);
     }
 

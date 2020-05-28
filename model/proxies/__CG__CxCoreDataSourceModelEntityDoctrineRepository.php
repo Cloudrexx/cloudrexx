@@ -73,10 +73,10 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
+            return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
+        return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
     }
 
     /**
@@ -185,7 +185,30 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     /**
      * {@inheritDoc}
      */
-    public function get($elementId = NULL, $filter = array (
+    public function listFields()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'listFields', array());
+
+        return parent::listFields();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIdentifierFieldNames()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIdentifierFieldNames', array());
+
+        return parent::getIdentifierFieldNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function get($elementId = array (
+), $filter = array (
 ), $order = array (
 ), $limit = 0, $offset = 0, $fieldList = array (
 ))
@@ -227,6 +250,28 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'remove', array($elementId));
 
         return parent::remove($elementId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isVersionable()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVersionable', array());
+
+        return parent::isVersionable();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCurrentVersion(array $elementId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCurrentVersion', array($elementId));
+
+        return parent::getCurrentVersion($elementId);
     }
 
     /**
@@ -302,6 +347,17 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     /**
      * {@inheritDoc}
      */
+    public function getOption($key)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOption', array($key));
+
+        return parent::getOption($key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccesses)
     {
 
@@ -346,6 +402,39 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     /**
      * {@inheritDoc}
      */
+    public function hasField($field)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasField', array($field));
+
+        return parent::hasField($field);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSupportedOperations()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSupportedOperations', array());
+
+        return parent::getSupportedOperations();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supportsOperation($operation)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'supportsOperation', array($operation));
+
+        return parent::supportsOperation($operation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -374,6 +463,17 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
