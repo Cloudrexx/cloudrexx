@@ -1279,7 +1279,7 @@ class Category
                     $objSubcategory->setPermissionsRecursive(true);
                     $objSubcategory->setPermissions($arrPermissions);
                     $objSubcategory->setVisibility($this->visibility);
-                    $objSubcategory->store();
+                    $objSubcategory->storePermissions();
                     $objSubcategory->next();
                 }
             }
