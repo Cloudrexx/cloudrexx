@@ -82,10 +82,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             //- ATTENTION: never load CacheManager here, because it uses not yet defined constants which will cause a fatal error
             $this->cache = new \Cx\Core_Modules\Cache\Controller\CacheLib();
         }
+
         // disable user cache when calling Cache command from CLI
         if (
             $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_COMMAND &&
-            php_sapi_name() == 'cli' &&
+            $this->cx->isCliCall() &&
             isset($argv) &&
             count($argv) > 2 &&
             $argv[1] == 'Cache'
