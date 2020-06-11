@@ -32,7 +32,6 @@
  * @package     cloudrexx
  * @subpackage  modules_newsletter
  */
-
 namespace Cx\Modules\Newsletter\Controller;
 
 /**
@@ -51,7 +50,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
      */
     public function parseWidget($name, $template, $response, $params)
     {
-
         $newsletter = new \Cx\Modules\Newsletter\Controller\Newsletter('');
         $newsletter->newsletterSignUp($template);
 
