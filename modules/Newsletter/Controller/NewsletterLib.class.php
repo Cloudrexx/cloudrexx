@@ -771,6 +771,7 @@ class NewsletterLib
     static function _getHTML($onlyId=false)
     {
         global $objDatabase, $_ARRAYLANG;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Newsletter');
 
         $html = '';
         if ($onlyId) {
