@@ -197,5 +197,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $widgetController->registerWidget(
             $widget
         );
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'NEWSLETTER_BLOCK'
+        );
+        $widget->setEsiVariables(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_LOCALE
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
     }
 }
