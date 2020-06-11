@@ -1102,15 +1102,6 @@ class Newsletter extends NewsletterLib
         return false;
     }
 
-
-
-    function setBlock(&$code)
-    {
-        $html = $this->_getHTML();
-        $code = str_replace("{NEWSLETTER_BLOCK}", $html, $code);
-    }
-
-
     /**
      * displays newsletter contentn in browser
      *
