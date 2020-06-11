@@ -785,8 +785,6 @@ class NewsletterLib
 
             if ($onlyId || $objResult->RecordCount() == 1) {
                 $html .= '<input type="hidden" name="list['.($onlyId ? $onlyId : $objResult->fields['id']).']" value="1" />'."\n";
-            } elseif ($objResult->RecordCount() == 0) {
-                self::setPlaceholderIfNoCategories();
             } else {
                 while (!$objResult->EOF) {
                     $html .= '<input type="checkbox" name="list['.$objResult->fields['id'].']" id="list_'.$objResult->fields['id'].'" value="1" /> <label for="list_'.$objResult->fields['id'].'">'.htmlentities($objResult->fields['name'], ENT_QUOTES, CONTREXX_CHARSET)."</label><br />\n";
@@ -802,11 +800,6 @@ class NewsletterLib
         }
 
         return $html;
-    }
-
-    protected function setPlaceholderIfNoCategories() {
-        global $_ARRAYLANG;
-        $this->_objTpl->setVariable('TXT_NO_CATEGORIES', $_ARRAYLANG['TXT_NO_CATEGORIES']);
     }
 
     /**
