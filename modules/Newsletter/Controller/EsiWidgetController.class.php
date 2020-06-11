@@ -62,6 +62,11 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                     true
                 );
                 break;
+            case 'NEWSLETTER_BLOCK':
+                $langData = \Env::get('init')->getComponentSpecificLanguageData('Newsletter');
+                $template->setVariable($name, \Cx\Modules\Newsletter\Controller\NewsletterLib::_getHTML());
+                $template->setVariable($langData);
+                break;
         }
     }
 }
