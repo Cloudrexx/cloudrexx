@@ -50,11 +50,11 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
      */
     public function parseWidget($name, $template, $response, $params)
     {
-        $newsletter = new \Cx\Modules\Newsletter\Controller\Newsletter('');
-        $newsletter->newsletterSignUp($template);
-
         switch ($name) {
             case 'newsletter_subscribe':
+                $newsletter = new \Cx\Modules\Newsletter\Controller\Newsletter('');
+                $newsletter->newsletterSignUp($template);
+                
                 $template->replaceBlock(
                     'newsletter_subscribe',
                     $newsletter->_objTpl->get(),
