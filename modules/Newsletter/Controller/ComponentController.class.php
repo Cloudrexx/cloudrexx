@@ -176,15 +176,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Do something before content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $newsletter, $_ARRAYLANG, $page_template, $themesPages, $objInit;
-    }
-
-    /**
      * Do something after system initialization
      *This event must be registered in the postInit-Hook definition
      *file config/postInitHooks.yml.
