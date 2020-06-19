@@ -511,7 +511,7 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
         }
         return true;
     }
-    
+
     public function onEvent($eventName, array $eventArgs) {        
         $this->$eventName(current($eventArgs));
     }
