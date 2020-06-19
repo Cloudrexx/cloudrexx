@@ -55,6 +55,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     protected $messages = '';
     protected $reminders = array(3, 14);
     protected $db;
+
+    protected static $protocolOfServer = '';
+
     /*
      * Constructor
      */
@@ -3522,6 +3525,9 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
 
         $website = $multiSiteRepo->findByDomain(\Cx\Core\Setting\Controller\Setting::getValue('websitePath','MultiSite').'/', $_SERVER['HTTP_HOST']);
         if ($website) {
+            // remember the configured API protocol for usage by the website
+            static::$protocolOfServer = $this->getApiProtocol();
+
             $this->deployWebsite($cx, $website);
             exit;
         }
@@ -3628,6 +3634,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
      * @return string $protocolUrl
      */
     public static function getApiProtocol() {
+        $protocolUrl = '';
         switch (\Cx\Core\Setting\Controller\Setting::getValue('multiSiteProtocol','MultiSite')) {
             case 'http':
                 $protocolUrl = 'http://';
@@ -3636,12 +3643,19 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
                 $protocolUrl = 'https://';
                 break;
             case 'mixed':
-// TODO: this is a workaround for Websites, as they are not aware of the related configuration option
             default:
-                return empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http://' : 'https://';
                 break;
         }
-        return $protocolUrl;
+
+        if (!empty($protocolUrl)) {
+            return $protocolUrl;
+        }
+
+        if (!empty(static::$protocolOfServer)) {
+            return static::$protocolOfServer;
+        }
+
+        return empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http://' : 'https://';
     }
     
     /**
