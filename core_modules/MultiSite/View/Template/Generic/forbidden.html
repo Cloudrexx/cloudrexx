@@ -1,0 +1,217 @@
+<!Doctype html>
+<html>
+    <head>
+        <title>Request forbidden</title>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            html, body {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                font-family: "Roboto", "sans-serif"
+            }
+
+            a,
+            a:link,
+            a:visited {
+                color: #1a74bd;
+                text-decoration: none;
+            }
+
+            a:hover,
+            a:focus,
+            a:active {
+                color: #0b4c7a;
+                cursor: pointer;
+            }
+
+            #container {
+                position: relative;
+                float: left;
+                width: auto;
+                min-width: 100%;
+                min-height: 100%;
+                background: #ffffff;
+            }
+
+            * html #container {/* for ie6 */
+                height: 100%;
+            }
+
+            .maintenance-content {
+
+                background: #616161;
+                width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 150px;
+                display: block;
+                text-align: center;
+                color: #fff;
+                padding: 23px 0 30px 0;
+            }
+            
+            .maintenance-content h1 {
+                font-size: 32px;
+                font-weight: normal;
+                margin: 5px 0 0 0;
+                float: none;
+            }
+            
+            .maintenance-content span {
+                font-size: 14px;
+                font-weight: normal;
+            }
+            
+            @media (max-width: 767px) {
+                .maintenance-content {
+                    width: 95%;
+                    margin-top: 120px;
+                    margin-bottom: 50px;
+                }
+            }
+            
+            #header {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 53px;
+                background-color: #0071bc;
+            }
+
+            #header a.logo {
+                position: absolute;
+                left: 12px;
+                top: 14px;
+                width: 145px;
+                height: 25px;
+                background: url("https://media.cloudrexx.com/1.0.0/cloudrexx_logo_145x25.png") no-repeat;
+                outline: 0;
+            }
+            
+            #footer {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 24px;
+                background-color: #0071bc;
+            }
+
+            #footer a {
+                display: block;
+                position: absolute;
+                left: 12px;
+                top: 5px;
+                width: auto;
+                font-size: 11px;
+                color: #ffffff;
+                outline: 0;
+            }
+
+            #footer a:hover,
+            #footer a:focus {
+                background: transparent;
+            }
+
+            div.maintenance-content {
+                width: 600px;
+                box-shadow: 2px 2px 2px #444444;
+            }
+
+            div.maintenance-content h1 {
+                border-style: solid;
+                border-width: 0;
+                border-color: white;
+                border-bottom-width: 1px;
+                margin-left: 20px !important;
+                margin-right: 20px !important;
+                padding-bottom: 20px;
+            }
+
+            div.maintenance-content p {
+                font-size: 18px;
+                margin: 20px;
+                margin-top: 30px;
+            }
+
+            div.maintenance-content a,
+            div.maintenance-content a:visited {
+                color: white;
+                text-decoration: underline !important;
+            }
+
+            div.maintenance-content a:hover,
+            div.maintenance-content a:active,
+            div.maintenance-content a:focus {
+                color: white;
+                text-decoration: none !important;
+            }
+
+            div.maintenance-content a.button {
+                display: inline-block;
+                background-color: #95C700;
+                padding: 10px 16px;
+                font-size: 18px;
+                color: white;
+                text-decoration: none !important;
+                box-shadow: 2px 2px 2px #444444;
+            }
+
+            div.maintenance-content a.button:nth-child(2n) {
+                background-color: #2196f3;
+                margin-left: 40px;
+            }
+        </style>
+        <script type="text/javascript">
+            var lang = "en";
+            var langData = {
+                "en": {
+                    "TITLE": "Access denied",
+                    "TEXT": "Your request has been denied for security reasons."
+                },
+                "de": {
+                    "TITLE": "Zugriff verweigert",
+                    "TEXT": "Ihre Anfrage wurde aus Sicherheitsgründen abgewiesen."
+                }
+            };
+
+            // language auto-detection: German if browser language starts with "de", "en" otherwise
+            var browserLang = window.navigator.userLanguage || window.navigator.language;
+            if (browserLang.startsWith("de")) {
+                lang = "de";
+            }
+
+            function __(index) {
+                return langData[lang][index];
+            }
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                function() {
+                    var elements = document.getElementsByClassName('langtext');
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].innerHTML = __(elements[i].getAttribute("data-lang"));
+                    }
+                }
+            );
+        </script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <a class="logo" href="index.php"></a>
+            </div>            
+            <div class="maintenance-content">
+                <h1 class="langtext" data-lang="TITLE"></h1>
+                <p class="langtext" data-lang="TEXT"></p>
+                <img src="data:image/png;base64,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" />
+            </div>
+            <div id="footer">
+                <a href="https://www.cloudrexx.com/" target="_blank">&copy; CLOUDREXX AG, Switzerland</a>
+            </div>
+        </div>
+    </body>
+</html>
