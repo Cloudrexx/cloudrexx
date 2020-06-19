@@ -4135,7 +4135,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     return array(
                         'status'  => 'success', 
                         'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_BACKUP_SUCCESS'],
-                        'log'     => \DBG::getMemoryLogs(),
+                        'log'     => array('see logs on service server of command websiteBackup'),//\DBG::getMemoryLogs(),
                         'backups' => $archives,
                     );
                     break;
@@ -4205,21 +4205,24 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     protected function createWebsiteArchive($websiteBackupPath) 
     {
         // increase memory_limit to be able to handle huge websites
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '2048M');
         $archiveFilePath         = $websiteBackupPath . '_'.date('Y-m-d H-i-s').'.zip';
         $websiteZipArchive       = new \PclZip($archiveFilePath);
+        \DBG::msg(__METHOD__ . ': add data from ' . $websiteBackupPath);
         $websiteArchiveFileCount = $websiteZipArchive->add($websiteBackupPath, PCLZIP_OPT_REMOVE_PATH, $websiteBackupPath);
 
         if ($websiteArchiveFileCount == 0) {
             throw new MultiSiteJsonException(__METHOD__.' : Failed to create Zip Archiev ' . $websiteZipArchive->errorInfo(true));
         }
 
+        \DBG::msg(__METHOD__ . ': exclude non-relevant data');
         $explodeFileCount = $websiteZipArchive->delete(PCLZIP_OPT_BY_PREG, '/\/tmp\/session_*|.ftpaccess$/');
         if ($explodeFileCount == 0) {
             throw new MultiSiteJsonException(__METHOD__.' : Failed to explode .ftpaccess in the  Archiev' . $websiteZipArchive->errorInfo(true));
         }
 
         //cleanup website Backup Folder
+        \DBG::msg(__METHOD__ . ': clean up');
         \Cx\Lib\FileSystem\FileSystem::delete_folder($websiteBackupPath, true);
 
         return basename($archiveFilePath);
@@ -4962,7 +4965,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         'backup_website_name' => $backupWebsiteName,
                         'backup_date' => $backupDate,
                         'backup_source' => $websiteBackupFilePath,
-                        'log'       => \DBG::getMemoryLogs(),
+                        'log'     => array('see logs on service server of command websiteBackup'),//\DBG::getMemoryLogs(),
                     ); 
                     break;
                 default:
@@ -5138,7 +5141,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
      */
     protected function websiteRepositoryRestore($websitePath, $websiteBackupFilePath)
     {
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '2048M');
         if (!\Cx\Lib\FileSystem\FileSystem::exists($websiteBackupFilePath)) {
             throw new MultiSiteJsonException(__METHOD__.' failed! : Website Backup file does not exists!.');
         }
