@@ -3975,14 +3975,14 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
         $data['reload'] = $reload;
         
         if ($status) {
-            return $json->json(new \Cx\Lib\Net\Model\Entity\Response(array(
+            return $json->json(new \Cx\Core\Routing\Model\Entity\Response(array(
                 'status' => 'success',
                 'data'   => $data,
             )));
         }
 
         if (!$status) {
-            return $json->json(new \Cx\Lib\Net\Model\Entity\Response(array(
+            return $json->json(new \Cx\Core\Routing\Model\Entity\Response(array(
                 'status'  => 'error',
                 'message' => $message,
             )));
