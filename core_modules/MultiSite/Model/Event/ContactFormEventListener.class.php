@@ -39,7 +39,6 @@ class ContactFormEventListener implements \Cx\Core\Event\Model\Entity\EventListe
     public function prePersist($eventArgs) {
         \DBG::msg('Multisite (ContactFormEventListener): prePersist');
         
-        global $_ARRAYLANG;
         try {
             \Cx\Core\Setting\Controller\Setting::init('MultiSite', '','FileSystem');
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
@@ -49,6 +48,7 @@ class ContactFormEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                         $forms = \Env::get('em')->getRepository('Cx\Core_Modules\Contact\Model\Entity\Form')->findAll();
                         $formCount = $forms ? count($forms) : 0;
                         if ($formCount >= $options['Form']) {
+                            $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData('MultiSite', false);
                             throw new \Cx\Core\Error\Model\Entity\ShinyException(sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAXIMUM_FORMS_REACHED'], $options['Form']).' <a href="index.php?cmd=Contact">'.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'].'</a>');
                         }
                     }
