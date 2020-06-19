@@ -1196,23 +1196,42 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         // register request as intersystem communication request (ISC)
         self::$isIscRequest = true;
 
-        // skip memory-logging for remote-login request
+        // skip memory-logging certain POST requests
         if (
             isset($params['post']['act']) &&
-            $params['post']['act'] == 'generateAuthToken'
+            in_array(
+                $params['post']['act'],
+                array(
+                    // remote-login request
+                    'generateAuthToken',
+                    'linkSsl',
+                )
+            )
         ) {
             return true;
         }
 
-        // skip memory-logging for website modifications
+        // skip memory-logging certain GET requests
         if (
             isset($params['get']['act']) &&
-            $params['get']['act'] == 'setWebsiteDetails'
+            in_array(
+                $params['get']['act'],
+                array(
+                    // website modifications
+                    'setWebsiteDetails',
+                    // website backup creation (on service server)
+                    'websiteBackup',
+                    // website restore creation (on service server)
+                    'websiteRestore',
+                    'linkSsl',
+                )
+            )
         ) {
             return true;
         }
 
         // activate memory-logging
+        \DBG::msg('activate memory logging');
         $this->activateDebuggingToMemory();
 
         return true;
