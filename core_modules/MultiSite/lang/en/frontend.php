@@ -96,5 +96,7 @@ $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_TOTAL_LABEL'] = 'Total';
 $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_PAYOUT_BUTTON_LABEL'] = 'Payout';
 $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_NOTIFICATION_UNSUBSCRIBE_SUCCESS'] = 'You\'ve unsubscribed successfully.';
 $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_NOTIFICATION_UNSUBSCRIBE_ERROR'] = 'An error occured while trying to unsubscribe from the notification emails. Please contact our <a href="mailto:%s">customer service</a> for assistance.';
+
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_COMPANY_INFO_TITLE'] = 'About your company';
 $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_SEARCH_WEBSITE_OR_DOMAIN'] = 'Website / Domain';
 $_ARRAYLANG['TXT_CORE_MODULES_MULTISITE_SEARCH_BUTTON'] = 'Search';
