@@ -1515,10 +1515,8 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
                         }
                     }
                     
-                    $spfText = 'v=spf1 mx a mx:' . $website->getBaseDn()->getName();
-                    if($mailServiceServerStatus){
-                        $spfText .= ' mx:' . $website->getMailDn()->getName();
-                    }
+                    // TODO: this should be put into a configuration option
+                    $spfText = 'v=spf1 include:spf.cloudrexx.com';
                     
                     $objTemplate->setVariable(array(
                         'TXT_MULTISITE_SPF_DOMAIN_INFO' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SPF_INFO'], $domainName),
