@@ -518,7 +518,7 @@ class Website extends \Cx\Model\Base\EntityBase {
         global $_DBCONFIG, $_ARRAYLANG, $_CORELANG;
         
         \DBG::msg('Website::setup()');
-        \DBG::msg($options);
+        \DBG::dump($options);
         \DBG::msg('change Website::$status from "'.$this->status.'" to "'.self::STATE_SETUP.'"');
         $this->status = self::STATE_SETUP;
         \Env::get('em')->persist($this);
@@ -591,10 +591,10 @@ class Website extends \Cx\Model\Base\EntityBase {
             $hostController = \Cx\Core_Modules\MultiSite\Controller\ComponentController::getHostingController();
             $hostController->createWebDistribution($websiteName);
 
+            \DBG::msg('Website: setupDatabase..');
             $objDb = new \Cx\Core\Model\Model\Entity\Db($_DBCONFIG);
             $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
 
-            \DBG::msg('Website: setupDatabase..');
             $this->setupDatabase($langId, $this->owner, $objDb, $objDbUser);
 
             \DBG::msg('Website: setupDataFolder..');
