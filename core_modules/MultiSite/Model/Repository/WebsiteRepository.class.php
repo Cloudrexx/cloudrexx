@@ -186,7 +186,7 @@ class WebsiteRepository extends \Doctrine\ORM\EntityRepository {
     /**
      * Find websites by the search term
      * 
-     * @param string  $term
+     * @param string $term
      * 
      * @return array
      */
@@ -204,7 +204,7 @@ class WebsiteRepository extends \Doctrine\ORM\EntityRepository {
         $websites = $qb->getQuery()->getResult();
         return !empty($websites) ? $websites : array();
     }
-    
+
     /**
      * get the websites by search term and subscription id
      * 

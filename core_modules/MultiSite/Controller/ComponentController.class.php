@@ -474,6 +474,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
                 ) {
                     continue;
                 }
+
                 if (empty($description)) {
                     if (   $websiteCollection instanceof \Cx\Core_Modules\MultiSite\Model\Entity\WebsiteCollection
                         && $websiteCollection->getWebsites()
@@ -3546,6 +3547,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             // remember the configured API protocol for usage by the website
             static::$protocolOfServer = $this->getApiProtocol();
 
+            // deploy website
             $this->deployWebsite($cx, $website);
             exit;
         }

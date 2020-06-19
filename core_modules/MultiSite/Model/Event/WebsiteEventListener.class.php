@@ -45,7 +45,7 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
         ) {
             $this->setOwnerUser($eventArgs);
         }
-        
+
         foreach ($domains as $domain) {
             \DBG::msg('Update domain (map to new IP of Website): '.$domain->getName());
             if ($domain->getComponentType() == \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_WEBSITE
@@ -131,6 +131,7 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
                 
                 //hostName
                 $websiteServiceServer = $website->getWebsiteServiceServer();
+
                 //Update the Website Status and codeBase
                 $params = array(
                     'websiteId'   => $website->getId(),
@@ -214,9 +215,8 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
             }
         }
     }
-    
+
     public function onEvent($eventName, array $eventArgs) {        
         $this->$eventName(current($eventArgs));
     }
 }
-
