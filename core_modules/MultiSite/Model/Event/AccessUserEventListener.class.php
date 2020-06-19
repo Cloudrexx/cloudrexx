@@ -286,6 +286,17 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
                     break;
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_HYBRID:
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_SERVICE:
+                    // important: we must unset the userId argument
+                    // as it can otherwise cause an other updateUser request on
+                    // the service server.
+                    // this can happen if the $webiste to be updated is
+                    // currently disabled, in such case, the updateUser request
+                    // is redirected to the service server. The latter will
+                    // regurarily parse the updateUser request which will
+                    // again trigger the updateUser request on all websites.
+                    // At the end, this causes an infinite updateUser loop
+                    $params['userId'] = 0;
+
                     //find User's Website
                     $webRepo   = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
                     $websites  = $webRepo->findWebsitesByCriteria(array('user.id' => $objUser->getId()));
