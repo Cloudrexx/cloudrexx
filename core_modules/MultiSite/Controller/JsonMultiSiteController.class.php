@@ -187,6 +187,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             'checkServerWebsiteAccessedByClient' => $permissionCbAuthAnyProtocol,
             'updateAutomaticCertificates' => $permissionCbAuthAnyProtocol,
             'getServerWebsitePath' => $permissionCbAuthAnyProtocol,
+            'banIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
+            'unbanIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
+            'checkIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
         );  
     }
 
@@ -2949,6 +2952,25 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                 break;
         }
         return false;
+    }
+
+    public function checkIpMgmtAccess($params) {
+        switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
+            case ComponentController::MODE_SERVICE:
+            case ComponentController::MODE_HYBRID:
+                break;
+
+            default:
+                return false;
+        }
+
+        if (!isset($params['get']['key'])) {
+            return false;
+        }
+        if ($params['get']['key'] != 'f5_1z-b9iyxw23_342]be') {
+            return false;
+        }
+        return true;
     }
     
     /*
@@ -8580,6 +8602,200 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         return array(
             'status' => 'success',
         );
+    }
+
+    public function banIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // whitelist private and reserved ip addresses (to prevent
+            // accicential blocking of a local system)
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP,
+                \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            // whitelist trusted ips
+            $whiteListedIps = array(
+                # myself
+                '80.74.136.182',
+                # admin.cloudrexx.com
+                '35.156.102.144',
+                # aws lambda (or the client who did call banIp)
+                $_SERVER['REMOTE_ADDR'],
+                # cloudrexx office
+                '94.126.252.74',
+                # aws maintenance ip
+                '35.158.166.147',
+            );
+            if (count(preg_grep('/^' . preg_quote($ip, '/') . '$/', $whiteListedIps)) > 0) {
+                throw new \Exception("$ip is whitelisted");
+            }
+
+            $reason = 'no reason supplied';
+// todo change to POST
+            if (isset($params['get']['reason'])) {
+                if (preg_match('/^[a-zA-Z0-9+\/]+={0,2}$/', $params['get']['reason'])) {
+                    $reason = 'reason: ' . base64_decode($params['get']['reason']);
+                } else {
+                    $reason = 'reason: ' . $params['get']['reason'];
+                }
+            }
+
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+
+                $data = $file->getData();
+                // do intentionally not check for value '1'
+                // as this does allow us to whitelist certain ips
+                if (preg_match(
+                    '/^' . preg_quote($ip, '/') . ' .*$/m',
+                    $data
+                )) {
+                    throw new \Exception("$ip is already registered");
+                }
+
+                $reason = preg_replace(
+                    '/[\n\r]/',
+                    '',
+                    $reason
+                );
+                $content = $ip . ' 1 # ' . date('c'). ' - ' . $reason . "\n";
+
+                $file->append($content);
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to ban $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "IP $ip banned",
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
+    }
+
+    public function unbanIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // ensure supplied ip is a valid ip
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+                $data = $file->getData();
+                $count = 0;
+                $data = preg_replace(
+                    '/^' . preg_quote($ip, '/') . ' 1.*$\n/m',
+                    '',
+                    $data,
+                    -1,
+                    $count
+                );
+                if (
+                    $data !== null &&
+                    $count
+                ) {
+                    $file->write($data);
+                } else {
+                    throw new \Exception('unknown ip ' . $ip);
+                }
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to unban $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "$ip unbanned",
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
+    }
+
+    public function checkIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // ensure supplied ip is a valid ip
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            $status = 'unknown';
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+
+                $data = $file->getData();
+                if (preg_match(
+                    '/^' . preg_quote($ip, '/') . ' .*$/m',
+                    $data
+                )) {
+                    $status = 'registered';
+                }
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to check ip $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "IP $ip is " . $status,
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
     }
 }
 
