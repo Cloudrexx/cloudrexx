@@ -104,13 +104,6 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
 \tFlush memcached cache by optional <pattern>";
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function postComponentLoad() {
-         self::errorHandler();
-    }
-
     public function executeCommand($command, $arguments, $dataArguments = array())
     {
         $subcommand = null;
