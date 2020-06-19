@@ -1293,7 +1293,7 @@ throw new WebsiteException('implement secret-key algorithm first!');
         $this->websiteController->createDb($objDb, $objDbUser);
 
         //call core db class to create db connection object
-        $dbClass = new \Cx\Core\Model\Db($objDb, $objDbUser);
+        $dbClass = new \Cx\Core\Model\Db($objDb, $objDbUser, null);
         $websitedb = $dbClass->getAdoDb();       
 
         return $websitedb;
