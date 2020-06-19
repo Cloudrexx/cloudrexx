@@ -3480,6 +3480,12 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             && $requestedDomainName != $marketingWebsiteDomainName
             && $requestedDomainName != $customerPanelDomainName
         ) {
+            // This is a hacky workaround to make the webmail link from Plesk work.
+            // Unfortunately, the webmail link in the Plesk panel can't be customized.
+            if (preg_match('/^webmail.[^.]+.mail.cloudrexx.com$/', $requestedDomainName)) {
+                header('Location: https://webmail.cloudrexx.com?_user=' . $_GET['_user'], true, 301);
+                exit;
+            }
             // Redirect by 302 as the request might have been targeted a
             // customer's website of which the DNS propagation did not
             // yet complete. If we would redirect by 301, the browser
