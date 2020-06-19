@@ -3482,7 +3482,13 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             && $requestedDomainName != $marketingWebsiteDomainName
             && $requestedDomainName != $customerPanelDomainName
         ) {
-            header('Location: '.$this->getApiProtocol().$marketingWebsiteDomainName, true, 301);
+            // Redirect by 302 as the request might have been targeted a
+            // customer's website of which the DNS propagation did not
+            // yet complete. If we would redirect by 301, the browser
+            // would cache the redirect and then once the DNS
+            // propagation will be completed, the browser won't
+            // re-try to access the customer's website.
+            header('Location: '.$this->getApiProtocol().$marketingWebsiteDomainName, true, 302);
             exit;
         }
 
