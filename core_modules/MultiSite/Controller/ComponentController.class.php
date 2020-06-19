@@ -149,7 +149,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
             $page->setCmd($pageCmd);
             $page->setModule('MultiSite');
-            $pageContent = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page);
+            $pageContent = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page, null, \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB, false);
             \LinkGenerator::parseTemplate($pageContent, true, new \Cx\Core\Net\Model\Entity\Domain(\Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
             $objTemplate = new \Cx\Core\Html\Sigma();
             $objTemplate->setTemplate($pageContent);
