@@ -7995,11 +7995,10 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     {
         global $_ARRAYLANG;
 
-        if (   empty($params['post']) 
-            || empty($params['post']['websiteName']) 
-            || empty($params['post']['domainName']) 
-            || empty($params['post']['certificateName']) 
-            || empty($params['post']['privateKey']) 
+        if (   empty($params['post'])
+            || empty($params['post']['websiteName'])
+            || empty($params['post']['domainName'])
+            || empty($params['post']['certificateName'])
         ) {
             \DBG::msg('JsonMultiSiteController::linkSsl() failed: Insufficient arguments supplied: ' . var_export($params, true));
             throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SSL_FAILED']);
@@ -8014,6 +8013,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     $siteList = $hostingController->getAllWebDistributionAliases(
                         $websiteName
                     );
+
+                    // list of installed ssl certificates
+                    $sslCertificates = array();
                     
                     if (!in_array($params['post']['domainName'], $siteList)) {
                         // this should not happen, WebDistributionAlias should already exist!
@@ -8027,21 +8029,28 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                             $websiteName,
                             $params['post']['domainName']
                         );
-                        if (!empty($sslCertificates)) {
-                            $hostingController->removeSSLCertificates(
-                                $websiteName,
-                                $params['post']['domainName'],
-                                $sslCertificates
-                            );
-                        }
                     }
-                    
+
+                    // abort in caes no custom ssl-certificat has been
+                    // submitted. In that case the server will automatically
+                    // issue a self-signed certificate
+                    if (
+                        empty($params['post']['privateKey']) &&
+                        empty($params['post']['certificate'])
+                    ) {
+                        return array(
+                            'status' => 'success',
+                            'log'    => \DBG::getMemoryLogs(),
+                        );
+                    }
+
+                    // install supplied custom ssl-certificate
                     $installSslCertificate = $hostingController->installSSLCertificate(
                         $websiteName,
-                                                                        $params['post']['certificateName'], 
-                                                                        $params['post']['domainName'], 
-                                                                        $params['post']['privateKey'],
-                                                                        $params['post']['certificate'], 
+                        $params['post']['certificateName'],
+                        $params['post']['domainName'],
+                        $params['post']['privateKey'],
+                        $params['post']['certificate'],
                         $params['post']['caCertificate']
                     );
                     if ($installSslCertificate) {
@@ -8050,6 +8059,14 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                             $params['post']['certificateName'],
                             $siteId
                         )) {
+                            // drop old (now obsolete) ssl certificates
+                            if ($sslCertificates) {
+                                $hostingController->removeSSLCertificates(
+                                    $websiteName,
+                                    $params['post']['domainName'],
+                                    $sslCertificates
+                                );
+                            }
                             return array('status' => 'success');
                         }
                     }

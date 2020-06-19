@@ -1427,6 +1427,24 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
                     
                     case 'Ssl':
                         $certificateName = $domainName;//isset($_POST['certificate_name']) ? contrexx_input2raw($_POST['certificate_name']) : '';
+
+                        $certificateData = isset($_POST['certificate']) ? contrexx_input2raw($_POST['certificate']) : '';
+                        if (
+                            !empty($certificateData) &&
+                            function_exists('openssl_x509_parse')
+                        ) {
+                            $certificateInfo = openssl_x509_parse($certificateData);
+                            $certificateIssuer = '';
+                            if (isset($certificateInfo['issuer']['O'])) {
+                                $certificateIssuer = $certificateInfo['issuer']['O'];
+                            }
+                            $certificateSubject = '';
+                            if (isset($certificateInfo['subject']['CN'])) {
+                                $certificateSubject = $certificateInfo['subject']['CN'];
+                            }
+                            $installDate = date('Y-m-d H:i:s');
+                            $certificateName = "$certificateIssuer - $certificateSubject / $installDate";
+                        }
                         $privateKey      = isset($_POST['private_key']) ? contrexx_input2raw($_POST['private_key']) : '';
                         if (empty($certificateName) || empty($privateKey)) {
                             return $this->parseJsonMessage($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SSL_FAILED'], false);
@@ -1437,7 +1455,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
                             'domainName'      => $domainName,
                             'certificateName' => $certificateName,
                             'privateKey'      => $privateKey,
-                            'certificate'     => isset($_POST['certificate']) ? contrexx_input2raw($_POST['certificate']) : '',
+                            'certificate'     => $certificateData,
                             'caCertificate'   => isset($_POST['ca_certificate']) ? contrexx_input2raw($_POST['ca_certificate']) : ''
                         );
                         break;
