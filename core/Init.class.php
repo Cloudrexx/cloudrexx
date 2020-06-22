@@ -124,8 +124,10 @@ class InitCMS
     /**
      * Constructor
      */
-    function __construct($mode='frontend', $entityManager = null)
-    {
+    function __construct(
+        $mode = \Cx\Core\Core\Controller\Cx::MODE_FRONTEND,
+        $entityManager = null
+    ) {
         // TODO: what is this used for?
         $this->em = $entityManager;
         $this->mode=$mode;
@@ -139,7 +141,7 @@ class InitCMS
         $this->defaultBackendLangId = \FWLanguage::getDefaultBackendLangId();
         $this->arrBackendLangNames = \FWLanguage::getNameArray('backend');
 
-        if ($mode == 'frontend') {
+        if ($mode == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
             //$this->_initBackendLanguage();
             $this->getUserFrontendLangId();
         }
@@ -325,143 +327,12 @@ class InitCMS
      */
     function _selectBestLanguage()
     {
-        global $_CONFIG;
-
-        if (
-            !isset($_CONFIG['languageDetection']) ||
-            $_CONFIG['languageDetection'] == 'off'
-        ) {
-            return $this->defaultFrontendLangId;
-        }
-
-        // Try to find best locale with GeoIp
-        if (
-            \Cx\Core\Core\Controller\Cx::instanciate()
-                ->getComponent('GeoIp')
-                ->isGeoIpEnabled() &&
-            $bestLang = $this->selectLocaleByGeoIp()
-        ) {
-            return $bestLang;
-        }
-
-        // no locale found with GeoIp. Try over http
-        if (
-            $bestLang = $this->selectLocaleByHttp()
-        ) {
-            return $bestLang;
-        }
-
-        // no locale found, return default one
-        return $this->defaultFrontendLangId;
-    }
-
-    /**
-     * Finds all locales by a country, detected with GeoIp,
-     * and then checks if one of them matches any of the browser languages
-     * If no browser language matches, the first found locale is returned.
-     * If no locale is found, 0 is returned.
-     *
-     * @return int The found locale's id, otherwise 0
-     */
-    public function selectLocaleByGeoIp() {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-
-        // get country code
-        $country = $cx->getComponent('GeoIp')->getCountryCode(null);
-        if (!$country || !$countryCode = $country['content']) {
-            return 0;
-        }
-
-        // find locales with found country code
-        $em = $cx->getDb()->getEntityManager();
-        $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
-        $localesByCountry = $localeRepo->findBy(
-            array('country' => $countryCode)
+        return \Cx\Core\Locale\Controller\ComponentController::selectBestLocale(
+            $cx,
+            $cx->getComponent('Locale')->getLocaleData()
         );
-        if (!$localesByCountry) {
-            return 0;
-        }
-
-        // check if combination of country code and browser lang exists
-        $acceptedLanguages = array_keys($this->_getClientAcceptedLanguages());
-        foreach($acceptedLanguages as $acceptedLanguage) {
-            foreach($localesByCountry as $locale) {
-                if ($locale->getIso1()->getIso1() == $acceptedLanguage) {
-                    return $locale->getId();
-                }
-            }
-        }
-
-        // No combination found, return the first (most relevant) one
-        return $localesByCountry[0]->getId();
     }
-
-    /**
-     * Tries to find a locale by the browser language
-     *
-     * Loops over the client accepted languages (ordered by relevance)
-     * and checks for existing locale.
-     * For full locales with language and country (e.g "en-US")
-     * it strips it and tries to find a locale with the lang code only
-     *
-     * @return int The found locale's id, otherwise 0
-     */
-    public function selectLocaleByHttp() {
-        $arrAcceptedLanguages = $this->_getClientAcceptedLanguages();
-        $strippedMatch = 0;
-        foreach (array_keys($arrAcceptedLanguages) as $language) {
-            // check for full match
-            if ($langId = \FWLanguage::getLanguageIdByCode($language)) {
-                return $langId;
-            } elseif(!$strippedMatch) {
-                // stripped lang: e.g 'en-US' becomes 'en'
-                if ($pos = strpos($language, '-')) {
-                    $language = substr($language, 0, $pos);
-                }
-                // check for existence of stripped language
-                if (
-                    // only check for actual stripped languages
-                    $pos &&
-                    $langId = \FWLanguage::getLanguageIdByCode(
-                        $language
-                    )
-                ) {
-                    $strippedMatch = $langId;
-                }
-            }
-        }
-        // No match with full locale or geoip, try to return stripped match
-        if ($strippedMatch) {
-            return $strippedMatch;
-        }
-        return 0;
-    }
-
-
-    /**
-     * Returns an array with the accepted languages as keys and their
-     * quality as values
-     * @access  private
-     * @return  array
-     */
-    function _getClientAcceptedLanguages()
-    {
-        $arrLanguages = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) : array();
-        $arrAcceptedLanguages = array();
-        $q = 1;
-        foreach ($arrLanguages as $languageString) {
-            $arrLanguage = explode(';q=', trim($languageString));
-            $language = trim($arrLanguage[0]);
-            $quality = isset($arrLanguage[1]) ? trim($arrLanguage[1]) : $q;
-            isset($arrLanguage[1]) ? $q = trim($arrLanguage[1]) : '';
-            $q -= 0.1;
-            $arrAcceptedLanguages[$language] = (float) $quality;
-        }
-        arsort($arrAcceptedLanguages, SORT_NUMERIC);
-
-        return $arrAcceptedLanguages;
-    }
-
 
     /**
      * Returns the selected User Frontend Language id
@@ -661,8 +532,6 @@ class InitCMS
         $this->templates['directory_content']       = $this->getThemeFileContent($themesPath, 'directory.html');
         $this->templates['forum_content']           = $this->getThemeFileContent($themesPath, 'forum.html');
         $this->templates['podcast_content']         = $this->getThemeFileContent($themesPath, 'podcast.html');
-        $this->templates['blog_content']            = $this->getThemeFileContent($themesPath, 'blog.html');
-        $this->templates['immo']                    = $this->getThemeFileContent($themesPath, 'immo.html');
 
         if (!$this->hasCustomContent() || !$this->loadCustomContent($page)) {
             // load default content layout if page doesn't have a custom content
@@ -806,7 +675,7 @@ class InitCMS
         $templateFiles = array();
         $folder = $customTemplateForTheme->getFoldername();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $templateFiles = $cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem()->getFileList($folder);
+        $templateFiles = $cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem()->getFileList($folder, false);
 
         foreach ($templateFiles as $fileName => $fileInfo){
             $match = null;
@@ -853,7 +722,6 @@ class InitCMS
                             $this->arrModulePath[$objResult->fields['name']] = $cx->getCodeBaseDocumentRootPath() . '/lang/';
                             $this->arrModulePath['Core'] = $cx->getCodeBaseDocumentRootPath() . '/lang/';
                             break;
-                        case 'DatabaseManager':
                         case 'SystemInfo':
                         case 'ComponentManager':
                         case 'ViewManager':
@@ -890,19 +758,23 @@ class InitCMS
      * @return    array         The language array, either local $_ARRAYLANG or
      *                          the global $_CORELANG
      */
-    function loadLanguageData($module='', $loadFromYaml=true)
+    function loadLanguageData($module='', $loadFromYaml=true, $mode = '')
     {
 // NOTE: This method is called on the (global) Init object, so
 // there's no need to "global" that!
 //        global $objInit;
         global $_CORELANG, $_CONFIG, $objDatabase, $_ARRAYLANG;
 
+        if (empty($mode)) {
+            $mode = $this->mode;
+        }
+
         if(!isset($_ARRAYLANG))
             $_ARRAYLANG = array();
 
         if(!isset($_CORELANG))
             $_CORELANG = array();
-        if ($this->mode == 'backend') {
+        if ($mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
             if (isset($this->arrBackendLang[$this->backendLangId])) {
                 $langCode = $this->arrBackendLang[$this->backendLangId]['lang'];
             } else {
@@ -918,7 +790,7 @@ class InitCMS
 
         // check which module will be loaded
         if (empty($module)) {
-            if ($this->mode == 'backend') {
+            if ($mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
                 $module = isset($_REQUEST['cmd']) ? addslashes(strip_tags($_REQUEST['cmd'])) : 'core';
             } else {
                 $module = isset($_REQUEST['section']) ? addslashes(strip_tags($_REQUEST['section'])) : 'core';
@@ -932,16 +804,16 @@ class InitCMS
             $module = '';
         } else {
             //load english language file first...
-            $path = $this->getLangFilePathByCode($module, 'en');
+            $path = $this->getLangFilePathByCode($module, 'en', $mode);
             if (!empty($path)) {
-                $this->loadLangFile($path, $loadFromYaml, $module);
+                $this->loadLangFile($path, $loadFromYaml, $module, $mode);
             }
             //...and overwrite with actual language where translated.
             //...but only if $langCode is set (otherwise it will overwrite English by the default language
             if($langCode && $langCode != 'en') { //don't do it for english, already loaded.
-                $path = $this->getLangFilePathByCode($module, $langCode);
+                $path = $this->getLangFilePathByCode($module, $langCode, $mode);
                 if (!empty($path)) {
-                    $this->loadLangFile($path, $loadFromYaml, $module);
+                    $this->loadLangFile($path, $loadFromYaml, $module, $mode);
                 }
             }
             return $_ARRAYLANG;
@@ -968,7 +840,11 @@ class InitCMS
     public function getComponentSpecificLanguageData($componentName, $frontend = true, $languageId = 0, $loadFromYaml=true) {
         global $_ARRAYLANG;
 
-        $mode = $frontend ? 'frontend' : 'backend';
+        if ($frontend) {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        } else {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
+        }
 
         if (!$languageId) {
             if ($frontend) {
@@ -995,22 +871,19 @@ class InitCMS
 
         // save init state
         $langBackup = $_ARRAYLANG;
-        $modeBackup = $this->mode;
         $frontentLangIdBackup = $this->frontendLangId;
         $backendLangIdBackup = $this->backendLangId;
 
         // set custom init state
-        $this->mode = $mode;
         $_ARRAYLANG = array();
         $this->frontendLangId = $languageId;
         $this->backendLangId = $languageId;
 
         // load language data
-        $this->moduleSpecificLanguageData[$languageId][$frontend][$componentName] = $this->loadLanguageData($componentName, $loadFromYaml);
+        $this->moduleSpecificLanguageData[$languageId][$frontend][$componentName] = $this->loadLanguageData($componentName, $loadFromYaml, $mode);
 
         // restore init state
         $_ARRAYLANG = $langBackup;
-        $this->mode = $modeBackup;
         $this->frontendLangId = $frontentLangIdBackup;
         $this->backendLangId = $backendLangIdBackup;
 
@@ -1034,7 +907,11 @@ class InitCMS
         $arrayLangBackup = $_ARRAYLANG;
         $_ARRAYLANG = array();
 
-        $mode = $frontend ? 'frontend' : 'backend';
+        if ($frontend) {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        } else {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
+        }
 
         if ($componentName == 'Core') {
             $componentName = lcfirst($componentName);
@@ -1044,10 +921,12 @@ class InitCMS
         $path = \Env::get('ClassLoader')->getFilePath($this->arrModulePath[$componentName].$langCode.'/'.$mode.'.php');
 
         if (!$path) {
+            // restore $_ARRAYLANG
+            $_ARRAYLANG = $arrayLangBackup;
             throw new \InitCMSException($arrayLangBackup['TXT_CORE_LOCALE_LANGUAGEFILE_NOT_FOUND']);
         }
 
-        $componentSpecificLanguageData = $this->loadLangFile($path, $loadFromYaml, $componentName);
+        $componentSpecificLanguageData = $this->loadLangFile($path, $loadFromYaml, $componentName, $mode);
 
         // restore $_ARRAYLANG
         $_ARRAYLANG = $arrayLangBackup;
@@ -1055,11 +934,20 @@ class InitCMS
         return $componentSpecificLanguageData;
     }
 
-    protected function getLangFilePathByCode($module, $langCode) {
-        // check whether the language file exists
-        $mode = in_array($this->mode, array('backend', 'update')) ? 'backend' : 'frontend';
+    protected function getLangFilePathByCode($module, $langCode, $mode) {
+        if (
+            in_array(
+                $mode,
+                array(\Cx\Core\Core\Controller\Cx::MODE_BACKEND, 'update')
+            )
+        ) {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
+        } else {
+            $mode = \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        }
 
-        if ($mode == 'backend') {
+        // check whether the language file exists
+        if ($mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
             $path = \Env::get('ClassLoader')->getFilePath($this->arrModulePath[$module].$langCode.'/'.$mode.'.php');
         } else {
             $path = \Env::get('ClassLoader')->getFilePath($this->arrModulePath[$module].$langCode.'/'.$mode.'.php');
@@ -1070,7 +958,7 @@ class InitCMS
         }
         
         // file path of default language (if not yet requested)
-        if ($this->mode == 'backend') {
+        if ($mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
             $defaultLangCode = $this->arrBackendLang[\FWLanguage::getDefaultBackendLangId()]['lang'];
         } else {
             $defaultLangCode = $this->arrLang[\FWLanguage::getDefaultLangId()]['iso1'];
@@ -1078,7 +966,7 @@ class InitCMS
         if ($langCode == $defaultLangCode) {
             return '';
         }
-        return $this->getLangFilePathByCode($module, $defaultLangCode);
+        return $this->getLangFilePathByCode($module, $defaultLangCode, $mode);
     }
 
     /**
@@ -1091,7 +979,7 @@ class InitCMS
      * @param boolean $loadFromYaml Wether to load customized placeholders from yaml or not
      * @param string $componentName The name of the language file's component
      */
-    protected function loadLangFile($path, $loadFromYaml=true, $componentName='Core')
+    protected function loadLangFile($path, $loadFromYaml=true, $componentName='Core', $mode = '')
     {
         global $_ARRAYLANG;
 
@@ -1112,7 +1000,10 @@ class InitCMS
         // load customized language placeholders from yaml
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
-        $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        if (empty($mode)) {
+            $mode = $cx->getMode();
+        }
+        $frontend = $mode == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
         try {
             if ($frontend) {
                 // get language by frontend locale
@@ -1122,7 +1013,7 @@ class InitCMS
                     $this->frontendLangId
                 );
                 $language = $locale->getSourceLanguage();
-            } elseif ($cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
+            } elseif ($mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
                 // TODO: we must load the language specified by $path
                 $backendLangId = !empty($this->backendLangId) ? $this->backendLangId : $this->defaultBackendLangId;
                 $backend = $em->find(
@@ -1205,9 +1096,10 @@ class InitCMS
      *  See {@see getJavascript_activetab()} for details, and
      *  {@see \Cx\Core\Setting\Controller\Setting::show()} and {@see \Cx\Core\Setting\Controller\Setting::show_external()}
      *  for implementations.
+     * @param boolean $force (optional) Wheter to force a non-empty return value, default false
      * @return  string            The HTML language dropdown menu code
      */
-    function getUserFrontendLangMenu()
+    function getUserFrontendLangMenu($force = false)
     {
         global $_ARRAYLANG;
 
@@ -1218,27 +1110,15 @@ class InitCMS
         }
 
         $action = CONTREXX_DIRECTORY_INDEX;
-        $command = isset($_REQUEST['cmd']) ? contrexx_input2raw($_REQUEST['cmd']) : '';
+        if ($force) {
+            $command = 'force';
+        } else {
+            $command = isset($_REQUEST['cmd']) ? contrexx_input2raw($_REQUEST['cmd']) : '';
+        }
         switch ($command) {
-            /*case 'xyzzy':
-                // Variant 1:  Use selected GET parameters only
-                // Currently unused, but this could be extended by a few required
-                // parameters and might prove useful for some modules.
-                $query_string = '';
-                // Add more as needed
-                $arrParameter = array('cmd', 'act', 'tpl', 'key', );
-                foreach ($arrParameter as $parameter) {
-                    $value = (isset($_GET[$parameter])
-                      ? $_GET[$parameter] : null);
-                    if (isset($value)) {
-                        $query_string .= "&$parameter=".contrexx_input2raw($value);
-                    }
-                }
-                Html::replaceUriParameter($action, $query_string);
-                // The dropdown is built below
-                break;*/
             case 'Shop':
             case 'country':
+            case 'force':
                 // Variant 2:  Use any (GET) request parameters
                 // Note that this is generally unsafe, as most modules/methods do
                 // not rely on posted data only!
@@ -1254,7 +1134,7 @@ class InitCMS
                 // The old way
                 $i = 0;
                 $return = "\n<form action='' method='post' name='userFrontendLangIdForm'>\n";
-                $return .= "<select name='userFrontendLangId' size='1' class='chzn-select' onchange=\"document.forms['userFrontendLangIdForm'].submit()\">\n";
+                $return .= "<select name='userFrontendLangId' size='1' class='chzn-select' data-disable_search='true' onchange=\"document.forms['userFrontendLangIdForm'].submit()\">\n";
                 foreach ($this->arrLang as $id=>$value){
                     if ($this->arrLang[$id]['frontend']==1) {
                         $i++;
@@ -1289,7 +1169,8 @@ class InitCMS
                 FWLanguage::getMenuoptions($this->userFrontendLangId),
                 false,
                 'submitUserFrontendLanguage();',
-                'size="1" class="chzn-select"')."\n</form>\n";
+                'size="1" class="chzn-select" data-disable_search="true"'
+            ) . "\n</form>\n";
     }
 
 

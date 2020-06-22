@@ -78,16 +78,16 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                 SET
                     `order` = '0',
                     `form_id` = '".$formId."',
-                    `create_date` = '".mktime()."',
-                    `validate_date` = '".mktime()."',
+                    `create_date` = '".time()."',
+                    `validate_date` = '".time()."',
                     `added_by` = '".$intUserId."',
-                    `lang_id` = '".FRONTEND_LANG_ID."',
+                    `lang_id` = '" . static::getOutputLocale()->getId() . "',
                     `ready_to_confirm` = '1',
                     `confirmed` =  '1',
                     `active` =  '1',
                     `duration_type` =  '1',
                     `duration_notification` =  '0',
-                    `translation_status` = '".FRONTEND_LANG_ID."'
+                    `translation_status` = '" . static::getOutputLocale()->getId() . "'
             ");
 
             $newEntryId = $objDatabase->Insert_ID();
@@ -102,7 +102,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
                         SET
                             `entry_id`='".intval($newEntryId)."',
-                            `lang_id`='".intval(FRONTEND_LANG_ID)."',
+                            `lang_id`='" . static::getOutputLocale()->getId() . "',
                             `form_id`='".intval($formId)."',
                             `field_id`='".intval($givenFieldId)."',
                             `value`='".$newValue."'
@@ -116,7 +116,7 @@ class MediaDirectoryImport extends MediaDirectoryLibrary
                     ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
                 SET
                     `entry_id`='".intval($newEntryId)."',
-                    `lang_id`='".intval(FRONTEND_LANG_ID)."',
+                    `lang_id`='" . static::getOutputLocale()->getId() . "',
                     `form_id`='".intval($formId)."',
                     `field_id`='".intval(118)."',
                     `value`='/cms/images/mediadir/images/".$objResultImport->fields['refnr'].".gif'

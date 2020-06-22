@@ -46,7 +46,11 @@ namespace Cx\Core\PageTree;
  */
 class DropdownNavigationPageTree extends SigmaPageTree {
 
-    protected $subNavTag = '<ul id="menubuilder%s" class="menu">{SUB_MENU}</ul>';
+    protected $version = 1;
+    protected $subNavTag = array(
+        1 => '<ul id="menubuilder%s" class="menu">{SUB_MENU}</ul>',
+        2 => '<ul class="level_%s menu">{SUB_MENU}</ul>',
+    );
     private $cache = array();
     private $previousLevel = 1;
 
@@ -143,7 +147,11 @@ class DropdownNavigationPageTree extends SigmaPageTree {
             // we're descending (moving down)
             // we're parsing the first page of a subnavigation
 
-            $this->cache[$blockName] = str_replace("{SUB_MENU}", $output.'{NEXT_MENU}', sprintf($this->subNavTag, $this->menuIndex++)); //sprintf for js dropdown unique ID
+            $nextLevelIndex = $this->menuIndex++;
+            if ($this->version == 2) {
+                $nextLevelIndex = $level;
+            }
+            $this->cache[$blockName] = str_replace("{SUB_MENU}", $output.'{NEXT_MENU}', sprintf($this->subNavTag[$this->version], $nextLevelIndex)); //sprintf for js dropdown unique ID
             //\DBG::msg('__first SUB ('.$level.'): '.$this->cache[$blockName]);
         } else {
             // we're parsing the next page on the same level (first page of this level has already been parsed)
@@ -242,6 +250,17 @@ class DropdownNavigationPageTree extends SigmaPageTree {
         $ret = str_replace('{SUB_MENU}', '', isset($this->cache['level_1']) ? $this->cache['level_1'] : ''); //remove remaining sub_menu tags
         unset($this->cache);
         return $ret;
+    }
+
+    /**
+     * Sets the version based on [[V<version>]] placeholders
+     */
+    protected function preRender($lang) {
+        parent::preRender($lang);
+        $this->version = 1;
+        if ($this->template->placeholderExists('V2')) {
+            $this->version = 2;
+        }
     }
 
     public function preRenderLevel($level, $lang, $parentNode) {}

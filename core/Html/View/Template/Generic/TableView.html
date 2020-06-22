@@ -1,6 +1,6 @@
 <form method="get" id="vg-{VG_ID}-searchForm" data-vg-id="{VG_ID}"></form>
 <!-- BEGIN search -->
-<p>
+<div id="vg-{VG_ID}-filterSearch">
     <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
         <tbody>
             <tr>
@@ -11,7 +11,7 @@
                     <input type="text" name="term" placeholder="{TXT_CORE_SEARCH_TERM}" class="vg-encode" form="vg-{VG_ID}-searchForm">
                     <input type="<!-- BEGIN submitSearch -->submit<!-- END submitSearch --><!-- BEGIN buttonSearch -->button<!-- END buttonSearch -->" value="{TXT_SEARCH}" class="vg-searchSubmit" form="vg-{VG_ID}-searchForm">
                     <!-- BEGIN showExtendedSearch -->
-                    <a href="#" onclick="cx.jQuery('#vg-{VG_ID}-extendedSearch').toggle(500)">
+                    <a href="#" onclick="cx.jQuery('#vg-{VG_ID}-extendedSearch').toggle(500); return false;">
                         {TXT_EXP_SEARCH}
                     </a>
                     <!-- END showExtendedSearch -->
@@ -19,10 +19,11 @@
             </tr>
         </tbody>
     </table> 
-</p>
+</div>
+<br />
 <!-- END search -->
 <!-- BEGIN filter -->
-<p id="vg-{VG_ID}-extendedSearch"<!-- BEGIN hideFilter --> style="display:none;"<!-- END hideFilter -->>
+<div id="vg-{VG_ID}-extendedSearch"<!-- BEGIN hideFilter --> style="display:none;"<!-- END hideFilter -->>
     <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
         <tbody>
             <tr>
@@ -45,10 +46,22 @@
             </tr>
         </tbody>
     </table> 
-</p>
+</div>
+<br />
 <!-- END filter -->
+<!-- BEGIN filter-alphabetical -->
+<div id="vg-{VG_ID}-alphabeticalSearch">
+    <ul class="vg-alphabeticalSearch">
+        <!-- BEGIN letter -->
+        <li <!-- BEGIN selected -->class="selected"<!-- END selected -->>
+            <a href="{ALPHABETICAL_URL}">{LETTER}</a>
+        </li>
+        <!-- END letter -->
+    </ul>
+</div>
+<!-- END filter-alphabetical -->
 <!-- BEGIN no-entries -->
-<p>No entries</p>
+<p class="vg-noresult">{TXT_NO_RESULT}</p>
 <!-- END no-entries -->
 <!-- BEGIN table -->
 {TABLE}<br />

@@ -1,76 +1,272 @@
-Contrexx – Lizenzvereinbarung - 02.11.2012
-COMVATION AG, 3600 Thun, Switzerland
+Cloudrexx Download Lizenzbestimmungen - EULA & AGPL
+Cloudrexx Download ist dual lizenziert. Die Endnutzer-Lizenzbestimmungen („EULA“) für die Business Standard-, Business Enterprise- und Non-Profit-Editionen finden Sie unter I., die GNU Affero General Public License („AGPLv3“) für die Community-Edition finden Sie unter II.
 
-1. Präambel
+I.	Endnutzer-Lizenzbestimmungen („EULA“)
 
-Diese Lizenzvereinbarung bezieht sich auf das von der COMVATION AG veröffentlichte Web Content Management System Contrexx, welches alle Bestandteile des von der COMVATION AG bereitgestellten Quelltextes, also den gesamten Inhalt der gelieferten Dateien darstellt.
+1.	Geltungsbereich
 
-Contrexx ist eine urheberrechtlich geschützte Arbeit. Das Urheberrecht liegt bei der COMVATION AG, 3600 Thun, Switzerland. Alle Rechte an Contrexx, die mit dieser Lizenzvereinbarung nicht ausdrücklich an den Lizenznehmer übertragen werden, bleiben ausschliesslich dem Lizenzgeber vorbehalten.
+Diese Endnutzer-Lizenzbestimmungen („EULA“) gelten für Verträge, durch die ein Unternehmer („Kunde“) Cloudrexx Download von der Cloudrexx AG als Business Standard-, Business Enterprise- oder  Non-Profit-Edition erwirbt. Die Verträge werden im Folgenden in Business Standard-, Business Enterprise- oder Non-Profit-Vertrag unterschieden.
 
-Sollten Sie Fragen zu dieser Lizenzvereinbarung haben, wenden Sie sich bitte an die COMVATION AG, info@comvation.com. Weitere Informationen finden Sie unter http://www.contrexx.com/.
+2.	Leistungsgegenstand
 
-2. Verwendung
+2.1.	Gegenstand des Business Standard-, Business Enterprise- oder Non-Profit-Vertrags ist Cloudrexx Download („Basis-Produkt“). Cloudrexx Download ist eine Customer Experience Management Software (CXM). Sie ist ein Standard-CXM, das zum Betrieb einer Webseite konzipiert ist. Mit ihm kann der Kunde seinen eigenen Webauftritt umsetzen.
 
-Unter der Voraussetzung, dass der Lizenznehmer die Verpflichtungen gemäss dieser Lizenzvereinbarung einhält, ist der Lizenznehmer für jede erworbene Lizenz berechtigt, eine Kopie der Serversoftware auf einem einzigen Server zu installieren. Falls eine weitere Kopie der Serversoftware auf dem gleichen Server installiert wird, ist dafür eine zusätzliche Lizenz (Lizenzschlüssel) erforderlich.
+2.2.	Das Basis-Produkt wird als Open Source Software in der Community-Edition sowie proprietär in den Editionen Business Standard, Business Enterprise und Non-Profit angeboten. Gegenstand dieser EULAs sind allein die proprietären Editionen Business Standard, Business Enterprise und Non-Profit. Die Lizenzbedingungen der Community-Edition finden sich unter II.
 
-Es ist dem Lizenznehmer untersagt Komponenten zu verwenden, zu deren Verwendung er keine gültige Lizenz (Lizenzschlüssel) besitzt.
+2.3.	Business Standard-Vertrag
+Leistungsgegenstand des Business Standard-Vertrags sind das Basis-Produkt und die Erbringung von Support-Leistungen für eine Installation für dieses Produkt. Die Regelung der Supportleistungen finden Sie unter https://www.cloudrexx.com/Produktsupport.
 
-Die Vervielfältigung von Lizenzen (einschliesslich Lizenzschlüssel) ist ausdrücklich untersagt.
+2.4.	Business Enterprise-Vertrag
+Leistungsgegenstand des Business Enterprise-Vertrags sind das Basis-Produkt und die Erbringung von Support-Leistungen für fünf Installationen dieses Produkts. Die Regelung der Supportleistungen finden Sie unter https://www.cloudrexx.com/Produktsupport.
 
-3. Verbreitung
+2.5	Non-Profit-Vertrag
+Leistungsgegenstand des Non-Profit-Vertrags sind das Basis-Produkt und die Erbringung von Support-Leistungen für eine Installation für dieses Produkt. Die Regelung der Supportleistungen finden Sie unter https://www.cloudrexx.com/Produktsupport.
 
-Sie dürfen auf beliebigen Medien unveränderte Kopien des Quelltextes des Programms, wie sie ihn erhalten haben, anfertigen und verbreiten. Voraussetzung hierfür ist, dass Sie mit jeder Kopie einen entsprechenden Copyright-Vermerk sowie einen Haftungsausschluss veröffentlichen und desweiteren allen anderen Empfängern des Programms zusammen mit dem Programm eine Kopie dieser Lizenzvereinbarung zukommen lassen. Sie dürfen für den eigentlichen Kopiervorgang eine Gebühr verlangen.
+3.	Vergütung
 
-Es ist nicht erlaubt, Contrexx im Rahmen dieser Lizenzvereinbarung gegen eine Gebühr zu verkaufen, verleihen oder zu vermieten, als Grundlage für eigene Softwareprogramme zu verwenden oder weiter zu lizensieren, es sei denn unter ausdrücklicher schriftlicher Genehmigung des Lizenzgebers.
+Es gelten die sich aus der Preisliste zum Zeitpunkt des Vertragsschlusses ergebenden Preise. Alle Preise verstehen sich als Netto-Preise. Die Preisliste ist unter https://www.cloudrexx.com/de/Preise/Download einsehbar.
 
-Ohne Einschränkungen des Vorausgehenden ist das Kopieren oder Reproduzieren der Software auf einem anderen Server oder an anderer Stelle zum Zwecke der weiteren Reproduktion oder des Weitervertriebes ausdrücklich verboten.
+4.	Nutzungsrecht zum Betrieb von Webseiten
 
-Für Programmkomponenten, welche in Contrexx verwendet wurden und unter eigener Lizenzvereinbarung stehen, gelten die jeweiligen spezifischen Lizenzvereinbarungen.
+4.1.	Das Basis-Produkt inkl aller Plugins ist urheberrechtlich geschützt.
 
-Die Weitergabe von Lizenzen (einschliesslich Lizenzschlüsseln) ist ausdrücklich untersagt.
+4.2.	Die Cloudrexx AG räumt dem Kunden das einfache, nicht ausschliessliche Recht, mit dem Basis-Produkt und – soweit vom Vertrag erfasst – den Cloudrexx-Plugins auf eine durch die Zahlung der Lizenzgebühr verlängerte Dauer eine dem jeweiligen Vertrag entsprechende Anzahl von Webseiten zu betreiben. 
 
-4. Weiterentwicklung
+4.3.	Anzahl der Webseiten
+4.3.1.	Business Standard-Vertrag
+Die Cloudrexx AG räumt dem Kunden das einfache, nicht ausschliessliche Recht ein, mit dem Basis-Produkt und den Plugins auf Dauer eine Webseite zu betreiben und das Basis-Produkt und die Plugins im dazu erforderlichen Umfang auf einem Web- oder Datenbankserver zu installieren, es ablaufen zu lassen und zu diesen Zwecken zu vervielfältigen. Die Rechte werden pro Vertrag allein für die Nutzung auf einem Web- oder Datenbank-Server eingeräumt. Die Nutzung der Software zum Betrieb einer weiteren Webseite bedarf der erneuten und weiteren Einräumung von Nutzungsrechten durch die Cloudrexx AG („Erweiterung durch Cloudrexx Mandanten“ oder eine zusätzliche Lizenz).
 
-Anpassungen oder Erweiterungen an Contrexx dürfen für den eigenen Verwendungszweck unter Einhaltung der unter 4.1 definierten Einschränkungen vorgenommen werden. Bedingung ist, dass Anpassungen oder Erweiterungen die bestehenden Copyright Angaben im Quelltext nicht ändern oder entfernen.
+4.3.2.	Business Enterprise-Vertrag
+Die Cloudrexx AG räumt dem Kunden das einfache, nicht ausschliessliche Recht ein, mit dem Basis-Produkt und den Plugins auf Dauer 5 Webseiten zu betreiben und das Basis-Produkt und die Plugins im dazu erforderlichen Umfang auf jeweils einem Web- oder Datenbankserver zu installieren, sie ablaufen zu lassen und zu diesen Zwecken zu vervielfältigen. Die Rechte werden pro Vertrag für die Nutzung auf jeweils einem Web- oder Datenbank-Server eingeräumt. Die Nutzung der Software zum Betrieb einer weiteren Website bedarf der erneuten und weiteren Einräumung von Nutzungsrechten durch die Cloudrexx AG („Erweiterung durch Cloudrexx Mandanten“ oder eine zusätzliche Lizenz).
 
-Die Support- und Updateleistungen des Lizenzgebers werden dadurch per sofort aufgehoben.
+4.3.3.	Non-Profit-Vertrag
+Die Cloudrexx AG räumt dem Kunden das einfache, nicht ausschliessliche Recht ein, mit dem Basis-Produkt und den Plugins auf Dauer eine Webseite einer Non-Profit Organisation zu betreiben und das Basis-Produkt und die Plugins im dazu erforderlichen Umfang auf einem Web- oder Datenbankserver zu installieren, es ablaufen zu lassen und zu diesen Zwecken zu vervielfältigen. Die Rechte werden pro Vertrag allein für die Nutzung auf einem Web- oder Datenbank-Server eingeräumt. Die Nutzung der Software zum Betrieb einer weiteren Webseite bedarf der erneuten und weiteren Einräumung von Nutzungsrechten durch die Cloudrexx AG („Erweiterung durch Cloudrexx Mandanten“ oder eine zusätzliche Lizenz).
+4.4.	Der Kunde kann das Basis-Produkt nutzen, sobald er es von der Webseite der Cloudrexx AG heruntergeladen, eine EULA erworben hat und die Cloudrexx AG die Vergütung erhalten hat. 
+4.5.	Das Basis-Produkt kann heruntergeladen werden unter https://www.cloudrexx.com/latest_release_full
 
-Anpassungen oder Erweiterungen, welche weitergegeben werden, müssen als Sourcecode mit dieser Lizenzvereinbarung weitergegeben und klar als solche gekennzeichnet werden.
+5.	Bearbeitungsrecht
 
-Es ist nicht erlaubt, Anpassungen oder Erweiterungen gegen eine Gebühr weiterzugeben, zu verkaufen, verleihen oder zu vermieten, es sei denn unter schriftlicher Genehmigung des Lizenzgebers.
+Die Cloudrexx AG räumt dem Kunden das Recht ein, das Basis-Produkt inkl Plugins beliebig zu verändern, um sie den Bedürfnissen seiner Webseite anzupassen, insbesondere indem er im Frontend Anpassungen vornimmt. Die Weitergabe des bearbeiteten Basis-Produkts bzw. der bearbeiteten Cloudrexx-Plugins ist unzulässig.
 
-Contrexx Partnerfirmen mit gültigem Contrexx Partnervertrag dürfen, in Rücksprache mit dem Lizenzgeber, Anpassungen oder Erweiterungen an Drittkunden gegen eine Gebühr veräussern. Sie dürfen für den eigentlichen Kopiervorgang eine Gebühr verlangen.
+6.	Nutzungsverbote
 
-Der Lizenzgeber behält sich das Recht vor, Anpassungen oder Erweiterungen von Drittentwicklern ohne Einschränkungen zu verwenden.
+6.1.	Jede über die nach Ziffern 4 und 5 erlaubte Nutzung hinausgehende Nutzung des Basis-Produkts oder Cloudrexx-Plugins ist unzulässig. Insbesondere ist es unzulässig, die Produkte ohne ausdrückliche Zustimmung der Cloudrexx AG zu verbreiten, zu vervielfältigen, zu vermieten oder öffentlich zugänglich zu machen.
 
-4.1 Einschränkungen
+6.2.	Ziffer 6.1. schränkt nicht das Recht des Kunden ein, das Basis-Produkt oder – soweit sie Gegenstand des Vertrags sind – die Cloudrexx-Plugins nachträglich auf einem anderen Web- oder Datenbank-Server und einer anderen Domain zu nutzen („Umzug“). Der Kunde hat die Produkte auf dem Server, auf dem sie bisher genutzt wurden, zu löschen und diese Löschung gegenüber der Cloudrexx AG beispielsweise durch Abgabe einer Vernichtungserklärung nachzuweisen.
 
-Es ist dem Lizenznehmer untersagt jegliche Änderungen und Manipulationen am Lizenzsystem vorzunehmen.
+6.3. 	Alle sonstigen Eingriffe in die Produkte, wie z.B. Dekompilierung, Disassemblierung und Reverse Engineering sind unzulässig. Das gilt jedoch nicht für Veränderungen entsprechend Ziffer 5.
 
-Es ist dem Lizenznehmer untersagt jegliche Änderungen und Manipulationen an Komponenten vorzunehmen, zu deren Verwendung er keine gültige Lizenz (Lizenzschlüssel) besitzt.
+6.4.	Die Nutzungsverbote dieser Ziffer gelten dann nicht, wenn Nutzungshandlungen durch gesetzliche Schranken, fair-use-Grundsätze oder andere Regelungen des Landes gestattet sind, in dem sich der Web- oder Datenbankserver befindet, auf dem das Basis-Produkt bzw. die Cloudrexx Plugins genutzt werden.
 
-5. Rechtliche Folgen
+7.	Weitergabe der Produkte
 
-Verstösst der Lizenznehmer gegen eine oder mehrere der beschriebenen Bestimmungen, steht dem Lizenzgeber ein Schadenersatz von CHF 50'000 zu. In diesem Sinne ist jegliche Reproduktion oder jeglicher Weitervertrieb der Software ausserhalb der Bestimmungen der Lizenzvereinbarung rechtlich ausdrücklich untersagt und kann schwere zivil- und strafrechtliche Folgen nach sich ziehen. Jede Zuwiderhandlung wird exzessiv verfolgt.
+7.1.	Das Basis-Produkt und – soweit vom Vertrag erfasst – die Cloudrexx Plugins sowie die nach den Ziffern 4 und 5 eingeräumten Rechte dürfen dauerhaft auf Dritte übertragen werden, wenn der Dritte diesen Nutzungsbedingungen zustimmt. Der Dritte ist zur Nutzung in demselben Umfang berechtigt, wie der Kunde es aufgrund des mit der Cloudrexx AG geschlossenen Business Standard-, Business Enterprise- oder Non-Profit-Vertrags war.
 
-6. Gewährleistung
+7.2.	Im Fall der Übertragung ist der Kunde verpflichtet, sämtliche auf den Web- oder Datenbank-Servern vorhandenen Kopien der Produkte zu löschen und diese Löschung gegenüber der Cloudrexx AG beispielsweise durch Abgabe einer Vernichtungserklärung nachzuweisen.
 
-Dem Lizenznehmer wird Contrexx im Rahmen dieser Lizenzvereinbarung so wie es ist, ohne Gewährleistung, zur Verfügung gestellt.
+8.	GEWÄHRLEISTUNG
 
-Es besteht keine Gewährleistung für die Software, weder ausgedrückt oder unterstellt, einschliesslich, aber nicht darauf beschränkt, etwaiger unterstellter Gewährleistungen, die sich auf Marktgängigkeit und Gebrauchsfähigkeit für einen bestimmten Zweck beziehen.
+8.1.	DIE CLOUDREXX AG ÜBERNIMMT NACH DEN GESETZLICHEN BESTIMMUNGEN DIE GEWÄHRLEISTUNG DAFÜR, DASS DAS DIE DEM KUNDEN ÜBERLASSENEN PRODUKTE BESTIMMUNGSGEMÄSS FUNKTIONIEREN. DIE CLOUDREXX AG ÜBERNIMMT JEDOCH KEINE GEWÄHRLEISTUNG FÜR DIE ERFOLGREICHE UMSETZUNG DER WEBSEITE DURCH DEN KUNDEN UND DEN ERFOLG DES MIT DEN PRODUKTEN UMGESETZTEN WEBSEITE. KEINE GEWÄHRLEISTUNG ÜBERNIMMT DIE CLOUDREXX AG FÜR STÖRUNGEN, DIE AUF DEM VON DEM KUNDEN EINGESETZTEN INTERNET-ZUGANG BZW. INTERNETPROVIDER, DEM WEB- ODER DATENBANK-SERVER SOWIE AUF HARD- ODER SOFTWARE BERUHEN, DIE NICHT GEGENSTAND DES BUSINESS STANDARD-, BUSINESS ENTERPRISE- ODER NON-PROFIT-VERTRAGS SIND.
 
-Keinesfalls übernimmt der Lizenzgeber und/oder deren Lieferanten Haftungen für indirekte oder Folgeschäden oder sonstige Schäden, die auf Nutzungsausfall, Verlust von Daten oder entgangenem Gewinn gestützt werden und die durch die oder im Zusammenhang mit der Verwendung von auf diesem Server verfügbaren Informationen entstanden sind. Der Lizenzgeber und dessen Lieferanten behalten sich die Möglichkeit vor, jederzeit Verbesserungen und/oder Änderungen an den hier beschriebenen Produkten und/oder Programmen vorzunehmen. Insbesondere ist die Haftung für Veränderungen von dritter Seite ausgeschlossen.
+8.2.	DIE CLOUDREXX AG HAT DIE PRODUKTE SORGFÄLTIG DARAUF GEPRÜFT, DASS SIE FREI VON RECHTEN DRITTER SIND BZW. KEINE RECHTSMÄNGEL AUFWEIST. SOLLTE EIN DRITTER ANSPRÜCHE WEGEN ANGEBLICHER RECHTE AN DER SOFTWARE ODER WEGEN UNZULÄSSIGKEIT DES VERTRAGSGEMÄSSEN EINSATZES DER SOFTWARE ERHEBEN, WIRD DER JEWEILS IN ANSPRUCH GENOMMENE VERTRAGSTEIL DIE ANDERE PARTEI HIERÜBER UNVERZÜGLICH INFORMIEREN. UNBESCHADET DER GESETZLICHEN GEWÄHRLEISTUNGSRECHTE IST DER KUNDE IN DIESEN FÄLLEN GEHALTEN, AUF AUFFORDERUNG DER CLOUDREXX AG UNVERZÜGLICH DIE NUTZUNG DER PRODUKTE EINZUSTELLEN UND/ODER SIE VON DEN WEB- ODER DATENBANK-SERVERN ZU LÖSCHEN.
 
-7. Einverständnis
+9.	HAFTUNG
 
-Sofern der Lizenznehmer mit dem Lizenzgeber von Contrexx nicht schriftlich eine anders lautende Lizenzvereinbarung abgeschlossen hat, erklärt er durch das Herunterladen, Installieren oder Anpassen von Contrexx ausdrücklich sein Einverständnis mit den Bestimmungen der vorliegenden Lizenzvereinbarung. Mit der Annahme der Lizenzvereinbarung gewährt Ihnen der Lizenzgeber eine nicht-ausschliessliche und nicht übertragbare Lizenz (Lizenzschlüssel) zur Nutzung von Contrexx.
+9.1.	DIE CLOUDREXX AG HAFTET NACH DEN GESETZLICHEN BESTIMMUNGEN FÜR SCHÄDEN DES KUNDEN, DIE VORSÄTZLICH ODER GROB FAHRLÄSSIG VERURSACHT WURDEN ODER DIE AUF EINER SCHULDHAFTEN VERLETZUNG WESENTLICHER VERTRAGSPFLICHTEN (SO GENANNTER KARDINALSPFLICHTEN) BERUHEN, DAS HEISST SOLCHER VERTRAGLICHER PFLICHTEN, DEREN ERFÜLLUNG DIE ORDNUNGSGEMÄSSE DURCHFÜHRUNG DES VERTRAGES ÜBERHAUPT ERST ERMÖGLICHT UND AUF DEREN EINHALTUNG DER VERTRAGSPARTNER REGELMÄSSIG VERTRAUEN DARF, UND DEREN VERLETZUNG AUF DER ANDEREN SEITE DIE ERREICHUNG DES VERTRAGSZWECKS GEFÄHRDET. DIE CLOUDREXX AG HAFTET AUSSERDEM NACH DEN GESETZLICHEN BESTIMMUNGEN FÜR SCHÄDEN, DIE AUF DEM FEHLEN EINER ZUGESICHERTEN EIGENSCHAFT BERUHEN, DIE FOLGE EINER VON DER CLOUDREXX AG ZU VERTRETENDEN VERLETZUNG DER GESUNDHEIT, DES KÖRPERS ODER DES LEBENS SIND, ODER FÜR DIE EINE HAFTUNG NACH DEM PRODUKTHAFTUNGSGESETZ VORGESEHEN IST.
 
-Sollte der Lizenznehmer einigen oder allen Bedingungen dieser Lizenzvereinbarung nicht zustimmen, ist ihm die Nutzung der Software nicht, auch nicht in Teilen, gestattet und muss umgehend entfernt werden.
+9.2 .	BEI VERLETZUNG EINER KARDINALPFLICHT IST DIE HAFTUNG – SOWEIT DER SCHADEN LEDIGLICH AUF LEICHTER FAHRLÄSSIGKEIT BERUHT UND NICHT LEIB, LEBEN ODER GESUNDHEIT BETRIFFT – BESCHRÄNKT AUF SOLCHE SCHÄDEN, MIT DEREN ENTSTEHUNG IM RAHMEN DER ERBRINGUNG VON LEISTUNGEN WIE DER VERTRAGSGEGENSTÄNDLICHEN LEISTUNGEN TYPISCHERWEISE UND VORSEHBARERWEISE GERECHNET WERDEN MUSS.
 
-8. Gerichtsstand
+9.3.	ABGESEHEN VON DEN IN DEN VORSTEHENDEN ZIFFERN GENANNTEN FÄLLEN IST DIE HAFTUNG DER CLOUDREXX AG – GLEICH AUS WELCHEM RECHTSGRUND – AUSGESCHLOSSEN. DIE CLOUDREXX AG HAFTET INSBESONDERE NICHT FÜR SCHÄDEN IM ZUSAMMENHANG MIT DEM VERLUST VON DATEN, SOWEIT DIE SCHÄDEN DURCH EINE REGELMÄSSIGE UND VOLLSTÄNDIGE SICHERUNG ALLER RELEVANTEN DATEN DURCH DEN KUNDEN VERMIEDEN WORDEN WÄREN. DIE CLOUDREXX AG HAFTET AUSSERDEM NICHT FÜR SCHÄDEN, DIE ALLEIN DARAUS RESULTIEREN, DASS DER KUNDE VERTRAGSWIDRIG ÄNDERUNGEN AN DEN PRODUKTEN VORGENOMMEN HAT.
 
-Für Streitigkeiten aus dieser Lizenzvereinbarung gilt der Gerichtsstand Thun (Schweiz).
+10.	Datenverarbeitung
+
+Die Cloudrexx AG legt hohen Wert auf die Einhaltung datenschutzrechtlicher Bestimmungen. Sie verwendet die vom Kunden mitgeteilten personenbezogenen Daten ausschliesslich zur Durchführung der vertraglichen Verpflichtungen. Daten werden nicht an Dritte weitergegeben. Nähere Informationen finden Sie in der Datenschutzerklärung.
+
+11.	Schlussbestimmungen
+
+11.1.	Sollten einzelne Regelungen dieser EULA unwirksam sein oder werden, wird dadurch die Wirksamkeit der übrigen Regelungen nicht berührt.
+
+11.2.	Auf den Business Standard-, Business Enterprise- oder Non-Profit-Verträgen findet ausschliesslich das Recht der Schweiz Anwendung.
+
+11.3. 	Gerichtsstand für den Lizenznehmer und die Cloudrexx AG ist der Sitz der Cloudrexx AG. Letztere jedoch ist berechtigt, den Lizenznehmer an dessen Sitz zu belangen. Das Rechtsverhältnis untersteht dem schweizerischen Recht.
 
 
-Copyright © 2007-2012
-Comvation AG, 3600 Thun, Switzerland - Alle Rechte vorbehalten.
+II.	GNU Affero General Public License, V3, 09.11.2007 (AGPL)
+Copyright © 2007 Free Software Foundation, Inc. (http://fsf.org) 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+Übersetzung von Wolfgang Straub vom 25.06.2014 (basierend auf der deutschen Erstübersetzung der GNU GPL von Peter Gerwinski vom 05.07.2007). Rechtlich verbindlich ist nur der englische Originaltext. Dieser ist unter http://www.gnu.org/licenses/agpl-3.0.html verfügbar.
+
+Vorwort
+
+Die GNU General Public License ist eine freie Copyleft-Lizenz für Software und andere Arten von Werken.
+Die meisten Lizenzen für Software und andere nutzbare Werke zielen darauf ab, Ihnen die Freiheit zu nehmen, die Werke mit anderen zu teilen und zu verändern. Im Gegensatz dazu soll Ihnen die GNU General Public License die Freiheit garantieren, alle Versionen eines Programms mit anderen zu teilen und zu verändern. Sie soll sicherstellen, dass die Software für alle ihre Benutzer frei bleibt. Wir, die Free Software Foundation, nutzen die GNU General Public License für den grössten Teil unserer Software. Sie gilt ausserdem für jedes andere Werk, dessen Autoren es auf diese Weise freigegeben haben. Auch Sie können die vorliegende Lizenz auf Ihre Programme anwenden.
+Wenn wir von ‘freier Software’ sprechen, so beziehen wir uns auf Freiheit der Benutzung, nicht auf den Preis. Unsere General Public Licenses (GPL) wollen sicherstellen,
+dass Sie Kopien freier Software verbreiten können (und dafür eine Vergütung verlangen, wenn Sie möchten),
+dass Sie den Sourcecode der Software bekommen oder diesen auf Wunsch erhalten,
+dass Sie die Software ändern oder Teile davon in neuen freien Programmen verwenden dürfen und
+dass Sie wissen, dass Sie dies alles tun dürfen.
+Um Ihre Rechte zu schützen, müssen wir andere daran hindern, Ihnen diese Rechte zu verweigern oder Sie aufzufordern, auf entsprechende Rechte zu verzichten. Aus diesem Grund tragen Sie eine Verantwortung, wenn Sie Kopien der Software verbreiten oder die Software verändern: die Verantwortung, die Freiheit anderer zu respektieren.
+Wenn Sie diese Software oder Teile davon modifizieren, indem Sie diese mit Plug-Ins, welche vollständig von Ihnen entwickelt wurden, erweitern, gewährt Ihnen der Lizenzgeber zusätzliche Freiheiten, diese Plug-Ins unter den Lizenzbedingungen Ihrer Wahl zu veröffentlichen, vorausgesetzt dass diese Lizenzbedingungen keine zusätzlichen Einschränkungen an der Software implizieren. (Zusatz zu Section 7 der AGPLv3)
+Wenn Sie beispielsweise die Kopien eines solchen Programms verbreiten – kostenlos oder gegen Bezahlung – müssen Sie den Empfängern dieselben Freiheiten weitergeben, die Sie selbst erhalten haben. Sie müssen sicherstellen, dass auch die Empfänger die Software im Sourcecode erhalten bzw. den Sourcecode erhalten können. Und Sie müssen ihnen die vorliegenden Lizenzbedingungen zeigen, damit sie ihre Rechte kennen.
+Software-Entwickler, welche die GNU GPL nutzen, schützen Ihre Rechte in zwei Schritten:
+sie stellen ihr eigenes Urheberrecht (Copyright) an der Software sicher, und
+sie bieten Ihnen die vorliegende Lizenz an, welche Ihnen das Recht gibt, die Software zu vervielfältigen, zu verbreiten und / oder zu verändern.
+Um die Entwickler und Autoren zu schützen, stellt die GPL darüber hinaus klar, dass für diese freie Software keinerlei Garantie besteht. Sowohl im Interesse der Anwender als auch der Autoren erfordert die GPL, dass neue Versionen der Software als solche gekennzeichnet werden, damit Probleme in Zusammenhang mit der modifizierten Software nicht fälschlicherweise mit den Autoren der früheren Versionen in Verbindung gebracht werden.
+Manche Geräte und Hardwarekomponenten wurden von den Herstellern so konzipiert, dass nur die Hersteller selbst – nicht aber die Anwender – modifizierte Versionen der darauf laufenden Software installieren können. Dies ist unvereinbar mit der Freiheit der Anwender, die Software zu modifizieren. Derartige gezielte missbräuchliche Verhaltensmuster finden auf dem Gebiet persönlicher Gebrauchsgegenstände statt – also genau dort, wo sie am wenigsten akzeptabel sind. Aus diesem Grund will die vorliegende Version der GPL solche Praktiken für diese Produkte verbieten. Sollten derartige Probleme in erheblichem Umfang auch auf anderen Gebieten auftauchen, werden wir die entsprechende Regelung auf diese Gebiete ausdehnen, soweit dies notwendig ist um die Freiheit der Benutzer zu schützen
+Jedes Computerprogramm ist latent durch Software-Patente bedroht. Staaten sollten es nicht zulassen, dass Patente die Entwicklung und Anwendung von Software für allgemein einsetzbare Computer einschränken. In Staaten, wo dies geschieht, wollen wir jedoch die Gefahr vermeiden, dass Patente dazu verwendet werden, ein freies Programm proprietär zu machen. Um dies zu verhindern, stellt die GPL sicher, dass Patente nicht verwendet werden können, um das Programm zu monopolisieren.
+Es folgen die einzelnen Bedingungen für das Kopieren, Verbreiten und Modifizieren.
+
+Lizenzbedingungen
+
+Section 0:	Definitionen
+Die vorliegende Lizenz’ bezieht sich auf die Version 3 der GNU General Public License.
+Mit ‘Urheberrecht’ sind auch urheberrechtsähnliche Rechte gemeint, die auf andere Arten von Werken Anwendung finden, beispielsweise auf Halbleitertopografien.
+‘Das Programm’ bezeichnet jedes urheberrechtlich schützbare Werk, das unter die vorliegende Lizenz gestellt wurde. Jeder Lizenznehmer / jede Lizenznehmerin wird als ‘Sie’ angeredet. ‘Lizenznehmer’ und ‘Empfänger’ können natürliche oder juristische Personen sein.
+Ein Werk zu ‘modifizieren’ bedeutet, aus einem Werk zu kopieren oder es ganz oder zum Teil in einer Weise umzuarbeiten, die eine urheberrechtliche Erlaubnis erfordert und kein Eins-zu-eins-Kopieren darstellt. Das daraus hervorgehende Werk wird als ‘modifizierte Version’ des früheren Werks oder als auf dem früheren Werk ‘basierendes’ Werk bezeichnet.
+Ein ‘umfasstes Werk’ (covered work) bezeichnet entweder das unmodifizierte Programm oder ein auf diesem basierendes Werk.
+Ein Werk zu ‘verbreiten’ (propagate) bezeichnet jede Handlung mit dem Werk, für die man – wenn sie unerlaubt begangen wird – wegen Verletzung anwendbaren Urheberrechts direkt oder indirekt zur Verantwortung gezogen werden könnte. Ausgenommen davon sind das Ausführen auf einem Computer oder das Modifizieren einer privaten Kopie. Unter das Verbreiten eines Werks fallen das Kopieren, das Weitergeben (mit oder ohne Modifikationen), das öffentliche Zugänglichmachen und in manchen Staaten noch weitere Tätigkeiten.
+Ein Werk zu ‘übertragen’ (convey) bezeichnet jede Art von Verbreitung, die es Dritten ermöglicht, das Werk zu kopieren oder Kopien zu erhalten. Reine Interaktion mit einem Benutzer über ein Computer-Netzwerk ohne Übergabe einer Kopie ist keine Übertragung.
+Bei interaktiven Benutzeroberflächen bestehen ‘korrekte rechtliche Hinweise’ in einer klar erkennbaren Funktion, welche
+einen angemessenen Copyright-Hinweis zeigt und
+den Benutzer informiert,
+dass – soweit nicht eine besondere Garantie übernommen wurde – keine Haftung oder Gewährleistung für das Werk besteht,
+dass die Lizenznehmer das Werk gemäss der vorliegenden Lizenz übertragen dürfen und
+wo sie ein Exemplar der vorliegenden Lizenzbedingungen finden.
+Wenn die Benutzerschnittstelle eine Liste von Befehlen oder Optionen anzeigt (z.B. ein Menü), dann erfüllt ein klar ersichtliches Element in dieser Liste dieses Kriterium.
+
+Section 1:	Sourcecode (neu)
+Als ‘Sourcecode’ wird diejenige Form eines Werkes bezeichnet, welche vorzugsweise für Bearbeitungen verwendet wird. ‘Objectcode’ bezeichnet jede Nicht-Sourcecode-Form eines Werks.
+Eine ‘Standardschnittstelle’ (standard interface) bezeichnet einerseits eine Schnittstelle, die ein offizieller Standard eines anerkannten Standardisierungsgremiums ist. Andererseits bezeichnet sie Schnittstellen, die für eine spezielle Programmiersprache spezifiziert wurden, und unter Entwicklern, die in dieser Programmiersprache arbeiten, allgemein gebräuchlich sind.
+Die ‘Systembibliotheken’ eines ausführbaren Werks enthalten alles – ausser dem Werk als Ganzes – was
+normalerweise zum Lieferumfang einer Hauptkomponente gehört, aber selbst nicht die Hauptkomponente ist, und
+ausschliesslich dazu dient, das Werk zusammen mit der Hauptkomponente benutzen zu können oder eine Standardschnittstelle zu implementieren, deren Sourcecode öffentlich zugänglich ist.
+Eine ‘Hauptkomponente’ bezeichnet in diesem Zusammenhang eine grössere wesentliche Komponente (Betriebssystemkern, Bildschirmfenstersystem etc.)
+des spezifischen Betriebssystems (soweit vorhanden), auf dem das ausführbare Werk läuft,
+oder des Compilers, der zur Erzeugung des Objectcodes eingesetzt wurde,
+oder des für die Ausführung verwendeten Objectcode-Interpreters.
+Der ‘entsprechende Sourcecode’ eines Werks in Form von Objectcode bezeichnet den vollständigen Sourcecode, der benötigt wird
+um das Werk zu erzeugen
+um es zu installieren
+um – im Falle eines ausführbaren Programms – den Objectcode auszuführen und
+um das Werk zu modifizieren, einschliesslich der Skripte zur Steuerung dieser Aktivitäten.
+Der entsprechende Sourcecode schliesst hingegen nicht zu diesen Zwecken verwendete Systembibliotheken, allgemein einsetzbare Werkzeuge oder freie erhältliche Computerprogramme mit ein, welche selbst nicht Teil des Werks sind. Der entsprechende Sourcecode enthält aber die zum Programm gehörenden Schnittstellendefinitionsdateien sowie die Sourcecodes von dynamisch eingebundenen Bibliotheken und Unterprogrammen, auf die das Werk konstruktionsbedingt angewiesen ist (z.B. zur internen Datenkommunikation oder Ablaufsteuerung zwischen diesen Unterprogrammen und anderen Teilen des Werks).
+Der entsprechende Sourcecode braucht nichts zu enthalten, was der Anwender aus anderen Teilen desselben automatisch generieren kann.
+Der entsprechende Sourcecode eines Werks in Sourcecodeform ist das Werk selbst.
+
+Section 2:	Grundlegende Erlaubnisse (neu)
+Alle unter der vorliegenden Lizenz gewährten Rechte werden auf Grundlage des Urheberrechts am Programm gewährt. Sie sind unwiderruflich, solange die festgelegten Bedingungen erfüllt sind. Die vorliegende Lizenz hält ausdrücklich Ihr uneingeschränktes Recht zur Ausführung des unmodifizierten Programms fest. Die beim Ausführen einer von der vorliegenden Lizenz umfassten Software erzeugten Arbeitsergebnisse fallen nur dann unter die vorliegende Lizenz, wenn sie aufgrund ihres Inhalts ein von der vorliegenden Lizenz umfasstes Werk darstellen. Die vorliegende Lizenz anerkennt Ihre urheberrechtlichen Ansprüche auf angemessene Benutzung solcher Werke.
+Sie dürfen von der vorliegenden Lizenz umfasste Werke, die Sie nicht übertragen, uneingeschränkt erzeugen, ausführen und verbreiten, solange Ihre Lizenz besteht. Sie dürfen von der vorliegenden Lizenz umfasste Werke auf Dritte übertragen, welche Modifikationen ausschliesslich für Sie durchführen oder Einrichtungen für Sie bereitstellen, um diese Werke auszuführen. Voraussetzung dafür ist jedoch, dass Sie alle Bedingungen der vorliegenden Lizenz für das Übertragen von Material erfüllen, dessen Urheberrecht nicht bei Ihnen liegt. Diejenigen, die auf diese Weise von der vorliegenden Lizenz umfasste Werke für Sie anfertigen oder ausführen, müssen dies ausschliesslich in Ihrem Namen tun, unter Ihrer Anleitung und Kontrolle und unter Bedingungen, die ihnen verbieten, ausserhalb der Beziehung zu Ihnen weitere Kopien Ihres urheberrechtlich geschützten Materials anzufertigen.
+Eine Übertragung lizenzierter Werke ist in jedem Fall ausschliesslich unter den in der vorliegenden Lizenz enthaltenen Bedingungen gestattet. Eine Unterlizenzierung ist nicht gestattet, ist aber aufgrund von Section 10 unnötig.
+
+Section 3:	Schutz der Anwenderrechte gegenüber Gesetzen, welche die Umgehung von Kopierschutzmechanismen verbieten (neu)
+Kein von der vorliegenden Lizenz umfasstes Werk soll als Teil einer wirksamen technischen Massnahme entsprechend einer anwendbaren Gesetzesbestimmung zur Umsetzung von Artikel 11 des am 20. Dezember 1996 verabschiedeten WIPO-Urheberrechtsvertrages oder ähnlicher Bestimmungen betrachtet werden, welche die Umgehung solcher Massnahmen verbieten oder einschränken.
+Wenn Sie ein von der vorliegenden Lizenz umfasstes Werk übertragen, verzichten Sie auf allfällige Rechte, die Umgehung solcher technischer Schutzmassnahmen zu verbieten, soweit die Umgehungshandlung im Rahmen des lizenzkonformen Gebrauchs erfolgt. Sie verzichten auch darauf, die Benutzung oder Modifikation des Werks einzuschränken, um Ihre Rechtsansprüche oder Rechtsansprüche Dritter zum Verbot der Umgehung technischer Massnahmen gegen die Anwender des Werks durchzusetzen.
+
+Section 4:	Unveränderte Kopien (Section 1 GPLv2)
+Sie dürfen auf beliebigen Medien unveränderte Kopien des Sourcecodes des Programms – so wie Sie ihn selbst erhalten haben – übertragen, sofern Sie
+klar erkennbar auf jeder Kopie einen angemessenen Urheberrechts-Vermerk veröffentlichen
+alle Hinweise unverändert lassen, dass die vorliegende Lizenz und sämtliche gemäss Section 7 hinzugefügten Einschränkungen auf den Sourcecode anwendbar sind
+alle Hinweise auf den Ausschluss von Haftung und Gewährleistung unverändert lassen
+und allen Empfängern gemeinsam mit dem Programm ein Exemplar der vorliegenden Lizenz zukommen lassen.
+Sie dürfen für jede übertragene Kopie ein Entgelt in beliebiger Höhe – oder gar kein Entgelt – verlangen und Sie dürfen Kundendienst- oder Garantieleistungen gegen Entgelt anbieten.
+
+Section 5:	Übertragung modifizierter Sourcecodeversionen (Section 2 GPLv2)
+Sie dürfen ein auf dem lizenzierten Programm basierendes Werk oder die nötigen Modifikationen, um es aus dem Programm zu generieren, kopieren und gemäss den Bestimmungen von Section 4 in Form von Sourcecode übertragen, vorausgesetzt, dass Sie zusätzlich alle im Folgenden genannten Bedingungen erfüllen:
+Das veränderte Werk muss klar erkennbare Hinweise enthalten, dass Sie es modifiziert haben, und an welchem Datum die Modifikation erfolgte.
+Das veränderte Werk muss klar erkennbare Hinweise enthalten, dass es unter der vorliegenden Lizenz – einschliesslich gemäss Section 7 hinzugefügter Bedingungen – veröffentlicht wird. Diese Anforderung modifiziert die Anforderung gemäss Section 4, ‘alle Hinweise unverändert zu lassen’.
+Sie müssen das Gesamtwerk als Ganzes gemäss der vorliegenden Lizenz an jeden lizenzieren, der in den Besitz einer Kopie gelangt. Die vorliegende Lizenz – einschliesslich allfälliger zusätzlicher Bedingungen gemäss Section 7 – gilt daher für das Werk als Ganzes und alle seine Teile, unabhängig davon, wie diese paketiert werden. Die vorliegende Lizenz erteilt keine Erlaubnis, das Werk in irgendeiner anderen Weise zu lizenzieren, setzt aber eine derartige Erlaubnis nicht ausser Kraft, wenn Sie diese gesondert erhalten haben.
+Wenn das Werk über interaktive Benutzerschnittstellen verfügt, müssen diese jeweils korrekte rechtliche Hinweise anzeigen. Wenn jedoch das ursprüngliche Programm interaktive Benutzerschnittstellen hat, die keine angemessenen rechtlichen Hinweise anzeigen, braucht Ihr Werk nicht dafür zu sorgen, dass sie dies tun.
+Die Zusammenstellung eines von der vorliegenden Lizenz umfassten Werks mit separaten unabhängigen Werken auf einem Speicher- oder Verbreitungsmedium wird als ‘Aggregat’ bezeichnet, wenn
+die separaten Werke ihrer Natur nach nicht Erweiterungen des von der vorliegenden Lizenz umfassten Werks sind
+und mit ihm nicht in einer Weise kombiniert sind, um ein grösseres Programm zu bilden
+und wenn die Zusammenstellung und das daran bestehende Urheberrecht nicht dazu verwendet werden, den Zugriff oder die Rechte der Benutzer der Zusammenstellung weiter einzuschränken, als dies die einzelnen Werke erlauben.
+Die Aufnahme des von der vorliegenden Lizenz umfassten Werks in ein Aggregat führt nicht dazu, dass die vorliegende Lizenz auf die anderen Teile des Aggregats wirkt.
+
+Section 6:	Übertragung in Nicht-Sourcecode-Form (Section 3 GPLv2)
+Sie dürfen ein von der vorliegenden Lizenz umfasstes Werk in Form von Objectcode unter den Bedingungen der Section 4 und 5 kopieren und übertragen – vorausgesetzt, dass Sie ausserdem den maschinenlesbaren entsprechenden Sourcecode unter den Bedingungen der vorliegenden Lizenz auf eine der folgenden Weisen zur Verfügung stellen:
+Sie übertragen den Objectcode in einem physischen Produkt (darunter fallen auch physische Speichermedien) gemeinsam mit dem entsprechenden Sourcecode, der sich dauerhaft auf einem beständigen Medium befindet, welches üblicherweise für den Austausch von Software verwendet wird.
+Sie übertragen den Objectcode in einem physischen Produkt (darunter fallen auch physische Speichermedien) gemeinsam mit einem schriftlichen Angebot. Dieses muss so lange gültig sein, wie Sie Ersatzteile und Kundendienst für dieses Produkt anbieten – mindestens aber drei Jahre lang. Gemäss dem Angebot müssen Sie jedem, der im Besitz des Objectcodes ist, entweder
+eine Kopie des entsprechenden Sourcecodes der gesamten Software, die in dem Produkt enthalten und von der vorliegenden Lizenz umfasst ist, zur Verfügung stellen (die Kopie muss auf einem beständigen Medium, das üblicherweise für den Austausch von Software verwendet wird, und höchstens zu den für die Übertragung üblicherweise anfallenden Kosten erfolgen) oder
+kostenlosen Zugriff auf den entsprechenden Sourcecode auf einem Netzwerk-Server geben.
+Sie übertragen Kopien des Objectcodes gemeinsam mit einer Kopie des schriftlichen Angebots, den entsprechenden Sourcecode zur Verfügung zu stellen. Diese Alternative ist nur für gelegentliche, nicht-kommerzielle Übertragung zulässig und nur, wenn Sie selbst den Objectcode mit einem Angebot entsprechend der vorliegenden Section erhalten haben.
+Sie übertragen den Objectcode dadurch, dass Sie Zugriff auf einen entsprechenden Speicherort gewähren und bieten dort zugleich kostenlosen Zugriff auf den entsprechenden Sourcecode. Sie müssen die Empfänger nicht dazu verpflichten, den entsprechenden Sourcecode gleichzeitig mit dem Objectcode zu kopieren. Wenn es sich beim Speicherort um einen Netzwerk-Server handelt, darf sich der entsprechende Sourcecode auf einem anderen (von Ihnen oder von einem Dritten betriebenen) Server befinden, der gleichwertige Kopiermöglichkeiten bietet. Voraussetzung dafür ist, dass Sie dem Objectcode klare Anleitungen beilegen, wo der entsprechende Sourcecode zu finden ist. Unabhängig davon, welcher Netzwerk-Server den entsprechenden Sourcecode beherbergt, bleiben Sie dafür verantwortlich, dass dieser lange genug bereitgestellt wird, um den vorliegenden Bedingungen zu genügen.
+Sie übertragen den Objectcode über ein Peer-To-Peer-Netzwerk. Voraussetzung dafür ist, dass Sie die anderen Teilnehmer darüber informieren, wo der Objectcode und der entsprechende Sourcecode des Werks – entsprechend den Bedingungen von Section 6 lit. d öffentlich und kostenfrei – angeboten werden.
+Ein abtrennbarer Teil des Objectcodes, dessen Sourcecode von dem entsprechenden Sourcecode als Systembibliothek abgetrennt worden ist, braucht bei der Übertragung des Werks als Objectcode nicht mit einbezogen zu werden.
+Ein ‘Benutzerprodukt’ ist entweder
+ein ‘Endbenutzerprodukt’, womit ein materieller persönlicher Gegenstand gemeint ist, der normalerweise für den persönlichen oder familiären Gebrauch oder im Haushalt eingesetzt wird, oder
+alles, was für den Einbau in eine Wohnung hin konzipiert oder dafür verkauft wird.
+Bei der Beurteilung der Frage, ob ein Produkt ein Endbenutzerprodukt ist, sollen Zweifelsfälle als erfasst gelten. Wenn ein spezifischer Anwender ein spezifisches Produkt erhält, bezeichnet ‘normalerweise einsetzen’ eine typische oder übliche Anwendung dieser Produktart, unabhängig vom Status des spezifischen Anwenders oder der Art und Weise, wie dieser das betreffende Produkt tatsächlich einsetzt oder welcher Einsatz von ihm erwartet wird. Ein Produkt gilt als Endbenutzerprodukt unabhängig davon, ob es substantielle kommerzielle, industrielle oder nicht-endbenutzerspezifische Bedeutung hat – es sei denn, dass dieser Nutzen das einzige massgebliche Anwendungsgebiet des Produkts darstellt.
+Mit ‘Installationsinformationen’ für ein Benutzerprodukt sind jegliche Methoden, Prozeduren, Berechtigungsschlüssel oder andere Informationen gemeint, die notwendig sind, um Versionen eines unter der vorliegenden Lizenz stehenden Werks, die aus einer modifizierten Version des entsprechenden Sourcecodes hervorgegangen sind, auf dem Produkt zu installieren und auszuführen. Die Informationen müssen ein Weiterfunktionieren des modifizierten Objectcodes gewährleisten.
+Wenn Sie Objectcode gemäss dieser Section in einem Benutzerprodukt oder zusammen mit einem solchen übertragen und das Recht auf den Besitz und die Benutzung dieses Produkts dauerhaft auf den Empfänger übergeht (unabhängig davon, wie diese Transaktion rechtlich einzuordnen ist), müssen dem mit zu übertragenden entsprechenden Sourcecode die Installationsinformationen beiliegen. Diese Anforderung gilt jedoch nicht, wenn weder Sie noch irgendeine Drittpartei die Möglichkeit behält, modifizierten Objectcode auf dem Benutzerprodukt zu installieren (z.B. wenn das Werk in einem nicht wiederbeschreibbaren Datenspeicher installiert wurde).
+Die Pflicht, Installationsinformationen bereitzustellen, führt nicht zu einer Verpflichtung, weiterhin Kundendienst, Garantien oder Updates für ein Werk bereitzustellen, das vom Empfänger modifiziert oder installiert worden ist, oder für das Benutzerprodukt, in dem das Werk modifiziert oder installiert worden ist. Der Zugriff auf ein Computer-Netzwerk darf verweigert werden, wenn die Modifikation selbst die Funktion des Netzwerks in erheblicher Weise gefährdet oder wenn sie die Regeln und Protokolle für die Kommunikation über das Netzwerk verletzt.
+Der entsprechende Sourcecode und die Installationsinformationen, die gemäss der vorliegenden Section übertragen werden, müssen in einem öffentlich dokumentierten Format vorliegen (für das eine Implementation in Form von Sourcecode öffentlich zugänglich ist) und diese dürfen keine speziellen Passwörter oder Schlüssel für das Entpacken, Lesen oder Kopieren erfordern.
+
+Section 7:	Zusätzliche Bedingungen (neu)
+‘Zusätzliche Erlaubnisse’ ergänzen die Bestimmungen der vorliegenden Lizenz, indem sie Ausnahmen von einer oder mehreren Auflagen zulassen. Zusätzliche Erlaubnisse zur Anwendung auf das gesamte Programm sollen – soweit dies nach dem anwendbaren Recht zulässig ist – so betrachtet werden, als wären sie in der vorliegenden Lizenz enthalten. Wenn zusätzliche Erlaubnisse nur für einen Teil des Programms gelten, darf dieser Teil separat unter den zusätzlichen Erlaubnissen verwendet werden. Die übrigen Programmteile unterliegen in diesem Fall jedoch weiterhin der vorliegenden Lizenz ohne die zusätzlichen Erlaubnisse.
+Wenn Sie eine Kopie des von der Lizenz umfassten Werks übertragen, können Sie die zusätzlichen Erlaubnisse vom betreffenden Werk oder einem Teil davon entfernen (es kann vorgesehen werden, dass zusätzliche Erlaubnisse im Fall von Modifikationen des Werks entfernt werden müssen). Sie können zusätzliche Erlaubnisse an Material gewähren, das Sie zu einem von der Lizenz umfassten Werk hinzufügen, wenn Sie über die entsprechenden Urheberrechte an diesem Material verfügen.
+Sie dürfen für Material, das Sie einem der vorliegenden Lizenz umfassten Werk hinzufügen – sofern Sie durch die Urheberrechtsinhaber dieses Materials autorisiert sind – die Bedingungen der vorliegenden Lizenz um folgende Regelungen ergänzen:
+einen Gewährleistungsausschluss oder Haftungsbegrenzung abweichend von Section 15 und 16 der vorliegenden Lizenz, oder
+eine Verpflichtung zur Beibehaltung rechtlicher Hinweise oder Urhebernennungen im betreffenden Material selbst oder in den von den betreffenden Werken angezeigten rechtlichen Hinweisen, oder
+ein Verbot irreführender Angaben zur Herkunft des Materials oder die Verpflichtung, modifizierte Versionen des Materials auf angemessene Weise zu kennzeichnen, oder
+eine Beschränkung der Verwendung der Namen von Lizenzgebern oder Autoren des Materials für Werbezwecke, oder
+ein Verbot der Benutzung von rechtlich geschützten Marken oder Herkunftsangaben, oder
+ein Verpflichtung der Freistellung des Lizenznehmers und der Autoren des Materials von Ansprüchen Dritten durch diejenige Person, welche die Software (oder modifizierte Versionen davon) mit zusätzlichen Garantien überträgt.
+Alle anderen hinzugefügten einschränkenden Bedingungen werden als ‘zusätzliche Einschränkungen’ im Sinne von Section 10 betrachtet. Wenn das Programm, wie Sie es erhalten haben, oder ein Teil davon der vorliegenden Lizenz untersteht, aber eine zusätzliche Einschränkung enthält, dürfen Sie die betreffende Bedingung entfernen. Wenn ein Lizenzdokument eine zusätzliche Einschränkung enthält, aber die Weitergabe unter der vorliegenden Lizenz erlaubt, dürfen Sie einem unter der vorliegenden Lizenz stehenden Werk Material hinzufügen, das den einschränkenden Bedingungen jenes Lizenzdokuments unterliegt, sofern diese bei der Weitergabe entfallen.
+Wenn Sie einem von der vorliegenden Lizenz umfassten Werk in Übereinstimmung mit dieser Section Bedingungen hinzufügen, müssen Sie in den betreffenden Sourcecode-Dateien eine Auflistung der zusätzlichen Bedingungen oder einen Hinweis darauf einfügen, wo die zusätzlichen Bedingungen zu finden sind.
+Zusätzliche Bedingungen – seien es Erlaubnisse oder Einschränkungen – dürfen in Form einer separaten schriftlichen Lizenz oder in Form von Ausnahmen festgelegt werden. Die in dieser Section enthaltenen Anforderungen gelten aber in jedem Fall.
+
+Section 8:	Kündigung (Section 4 GPLv2)
+Sie dürfen ein unter der vorliegenden Lizenz stehendes Werk nur verbreiten oder modifizieren, soweit es durch die vorliegende Lizenz ausdrücklich gestattet ist. Jeder anderweitige Versuch der Verbreitung oder Modifizierung ist rechtswidrig und beendet automatisch Ihre Rechte unter der vorliegenden Lizenz (einschliesslich aller Patentlizenzen gemäss Section 11 Abs. 3).
+Wenn Sie jedoch alle Verletzungen der vorliegenden Lizenz beenden, wird Ihre Lizenz durch jeden einzelnen Urheberrechtsinhaber wiederhergestellt, und zwar
+vorübergehend, solange der Rechtsinhaber Ihre Lizenz nicht ausdrücklich und endgültig kündigt, und
+dauerhaft, sofern es der Rechtsinhaber versäumt hat, Sie innerhalb von 60 Tagen seit der Einstellung der Verletzung in adäquater Weise auf die Lizenzverletzung hinzuweisen.
+Darüberhinaus wird Ihre Lizenz durch den jeweiligen Rechtsinhaber permanent wiederhergestellt, wenn Sie der Rechtsinhaber zwar auf adäquate Weise auf die Verletzung hingewiesen hat, dies aber das erste Mal ist, dass Sie auf eine Verletzung der vorliegenden Lizenz für irgendein Werk des betreffenden Rechtsinhabers hingewiesen wurden und Sie die Verletzung innerhalb von 30 Tagen nach dem Erhalt des Hinweises eingestellt haben.
+Die Beendigung Ihrer Rechte unter der vorliegenden Lizenz beendet nicht allfällige Lizenzen Dritter, die von Ihnen Kopien oder Rechte unter der vorliegenden Lizenz erhalten haben. Solange Ihre Rechte beendet und nicht dauerhaft wiederhergestellt worden sind, sind Sie nicht berechtigt, neue Lizenzen für dasselbe Material gemäss Section 10 zu erhalten.
+
+Section 9:	Der Besitz von Kopien setzt keine Annahme der Lizenz voraus (Section 5 GPLv2)
+Um eine Kopie des Programms auszuführen ist es nicht erforderlich, dass Sie die vorliegende Lizenz annehmen. Eine nebenbei stattfindende Verbreitung eines von der vorliegenden Lizenz umfassten Werks, welche beim Download im Rahmen einer Peer-To-Peer-Datenübertragung stattfindet, erfordert ebenfalls keine Annahme der vorliegenden Lizenz. Jedoch gibt Ihnen nichts ausser der vorliegenden Lizenz die Erlaubnis, von der vorliegenden Lizenz umfasste Werke zu verbreiten oder zu verändern. Solche Handlungen verstossen gegen das Urheberrecht, wenn Sie die vorliegende Lizenz nicht anerkennen. Indem Sie ein von der vorliegenden Lizenz umfasstes Werk verändern oder verbreiten, erklären Sie Ihr Einverständnis mit der vorliegenden Lizenz.
+
+Section 10:	Automatische Lizenzierung nachgeordneter Anwender (Section 6 GPLv2)
+Jedes Mal, wenn Sie ein von der vorliegenden Lizenz umfasstes Werk übertragen, erhält der Empfänger automatisch vom ursprünglichen Lizenzgeber die Erlaubnis, das Werk entsprechend der vorliegenden Lizenz auszuführen, zu verändern und zu verbreiten. Sie sind nicht dafür verantwortlich, die Einhaltung der vorliegenden Lizenz seitens Dritter durchzusetzen.
+Unter ‘Unternehmensrechtsnachfolge’ werden sowohl Transaktionen verstanden, bei denen die Kontrolle über eine Organisation oder deren Aktiven übertragen werden, als auch Spaltungen und Fusionen von Organisationen. Wenn die Verbreitung eines von der vorliegenden Lizenz umfassten Werks durch eine solche Transaktion erfolgt, erhält jeder an der Transaktion Beteiligte, der eine Kopie des Werks erhält, zugleich eine entsprechende Lizenz an dem Werk. Zudem hat er gegenüber dem Rechtsvorgänger Anspruch auf Verschaffung des entsprechenden Sourcecodes, wenn dieser ihn hat oder mit vertretbarem Aufwand beschaffen kann.
+Sie dürfen keine zusätzlichen Einschränkungen in Bezug auf die Ausübung der unter der vorliegenden Lizenz gewährten oder zugesicherten Rechte vornehmen. Beispielsweise dürfen Sie keine Lizenzgebühr oder sonstige Gebühr für die Ausübung der unter der vorliegenden Lizenz gewährten Rechte verlangen, und Sie dürfen keine Rechtsstreitigkeit beginnen (auch keine Verrechnungs- oder Gegenansprüche in einem Gerichtsverfahren geltend machen), indem Sie unterstellen, dass irgendein Patentanspruch durch Herstellung, Anwendung, Verkauf, Verkaufsangebot oder Import des Programms oder irgendeines Teils davon verletzt wurde.
+
+Section 11:	Patente (neu)
+Ein ‘Contributor’ (Beitragender) ist ein Urheberrechtsinhaber, der die Benutzung des Programms oder eines darauf basierenden Werks unter der vorliegenden Lizenz erlaubt. Das auf diese Weise lizenzierte Werk bezeichnen wir als ‘Contributor-Version’.
+Die ‘wesentlichen Patentansprüche’ eines Contributors sind diejenigen, welche der Contributor besitzt oder kontrolliert – sei es dass er sie bereits erworben hat oder eine Anwartschaft darauf besitzt – welche durch irgendeine gemäss der vorliegenden Lizenz erlaubte Handlung des Erzeugens, Ausführens oder Verkaufens seiner Contributor-Version verletzt würden. Hingegen schliesst dies Patentansprüche nicht mit ein, welche erst als Konsequenz einer weiteren Modifizierung der Contributor-Version entstünden. Im Sinne dieser Definition schliesst ‘Kontrolle’ das Recht mit ein, Unterlizenzen für ein Patent auf eine Weise zu erteilen, welche mit den Erfordernissen der vorliegenden Lizenz vereinbar sind.
+Jeder Contributor gewährt Ihnen eine nicht-exklusive, weltweite und gebührenfreie Patentlizenz gemäss seinen wesentlichen Patentansprüchen, den Inhalt seiner Contributor-Version zu erzeugen, zu verkaufen, zum Verkauf anzubieten, zu importieren, auszuführen, zu modifizieren und zu verbreiten.
+In den folgenden drei Absätzen ist eine ‘Patentlizenz’ jegliche ausdrückliche Vereinbarung oder Verpflichtung, ein Patent nicht geltend zu machen (beispielsweise eine ausdrückliche Erlaubnis, ein Patent zu nutzen oder eine Zusicherung, bei Patentverletzung nicht zu klagen). Jemandem eine solche Patentlizenz zu ‘erteilen’, beinhaltet, das betreffende Patent nicht gegen ihn durchzusetzen.
+Wenn Sie ein von der vorliegenden Lizenz umfasstes Werk übertragen, das Ihres Wissens nach eine Patentlizenz voraussetzt, und wenn der entsprechende Sourcecode nicht für jedermann zum freien Kopieren unter den Bedingungen der vorliegenden Lizenz über einen öffentlich zugänglichen Netzwerk-Server oder andere leicht zugängliche Mittel zur Verfügung gestellt wird, dann müssen Sie entweder
+dafür sorgen, dass der entsprechende Sourcecode frei verfügbar gemacht wird, oder
+auf die patentrechtlichen Ansprüche für dieses Werk verzichten, oder
+in einer mit den Erfordernissen der vorliegenden Lizenz vereinbaren Weise bewirken, dass die Patentlizenz auf nachgeordnete Empfänger ausgedehnt wird.
+‘Ihres Wissens nach eine Patentlizenz voraussetzen’ bedeutet, dass Sie tatsächliches Wissen darüber haben, dass bei Fehlen einer entsprechenden Patentlizenz die Übertragung oder Benutzung des betreffenden Werks in einen bestimmten Staat ein oder mehrere konkrete Patente verletzen würden, deren Gültigkeit Ihnen glaubhaft erscheint.
+Wenn Sie im Zusammenhang mit einer Transaktion oder einer Vereinbarung ein von der vorliegenden Lizenz umfasstes Werk direkt oder indirekt verbreiten und Sie einzelnen Empfängern eine Patentlizenz gewähren, welche diesen das Benutzen, Verbreiten, Modifizieren und Übertragen einer Kopie des Werks gestattet, dann wird die von Ihnen eingeräumte Patentlizenz automatisch auf alle Empfänger des von der vorliegenden Lizenz umfassten Werks und der darauf basierenden Werke ausgedehnt.
+Eine Patentlizenz ist ‘diskriminierend’, wenn sie die unter der vorliegenden Lizenz gewährten Rechte nicht einschliesst oder wenn sie die Ausübung dieser Rechte verbietet oder einschränkt. Sie dürfen ein von der vorliegenden Lizenz umfasstes Werk nicht übertragen, wenn Sie einen Vertrag mit einem Softwareunternehmen geschlossen haben, wonach dieses für einzelne Werkübertragungen von Ihnen Vergütungen erhält und dafür denjenigen eine diskriminierende Patentlizenz einräumt, welche das Werk von Ihnen erhalten
+in Verbindung mit von Ihnen übertragenen Kopien des Werks (oder Kopien dieser Kopien) oder
+in Verbindung mit spezifischen Produkten oder Zusammenstellungen, die das Werk enthalten – es sei denn, Sie sind in diesen Vertrag vor dem 28. März 2007 eingetreten oder die Patentlizenz wurde vor diesem Datum erteilt.
+Nichts in der vorliegenden Lizenz soll in einer Weise ausgelegt werden, welche Implied Licenses oder sonstige Abwehransprüche ausschliessen oder begrenzen würde, die Ihnen gemäss dem anwendbaren Patentrecht zusteht.
+
+Section 12:	Keine Preisgabe der Freiheit Dritter (Section 7 GPLv2)
+Sollten Ihnen durch Gerichtsentscheide, Vergleiche etc. Bedingungen auferlegt werden, welche den Bedingungen der vorliegenden Lizenz widersprechen, so befreien diese Umstände Sie nicht von der Einhaltung der vorliegenden Lizenz. Wenn es Ihnen nicht möglich ist, ein von der vorliegenden Lizenz umfasstes Werk unter gleichzeitiger Beachtung der Bedingungen der vorliegenden Lizenz und Ihrer anderweitigen Verpflichtungen zu übertragen, dann dürfen Sie das Programm überhaupt nicht übertragen. Wenn Sie z.B. Bedingungen akzeptiert haben, die Sie dazu verpflichten, von den Empfängern des Werks eine Gebühr für zukünftige Übertragungen einzufordern, müssen Sie auf weitere Übertragung ganz verzichten.
+
+Section 13:	Netzwerkgebrauch und Gebrauch mit der GNU GPL
+Wenn Sie das Programm modifizieren, müssen Sie – ungeachtet anderer Regelungen der vorliegenden Lizenz – allen Nutzern, welche über ein Computernetzwerk interaktiv darauf zugreifen, die Möglichkeit geben, den entsprechenden Sourcecode der modifizierten Version zu erhalten. Dieser muss unentgeltlich auf einem Netzwerkserver oder auf gebräuchlichen Datenträgern zur Verfügung gestellt werden. Der entsprechende Sourcecode muss auch den entsprechenden Sourcecode von allen unter der GNU GPL Version 3 stehenden Werken umfassen, welche gemäss der nachfolgenden Bestimmung einbezogen wurden.
+Ungeachtet anderer Regelungen der vorliegenden Lizenz ist es Ihnen gestattet, ein von der vorliegenden Lizenz umfasstes Werk mit einem Werk, das unter Version 3 der GNU GPL steht, zu verbinden (link) oder zu kombinieren und die Kombination weiter zu übertragen. Die Bedingungen der vorliegenden Lizenz bleiben auf den von ihr umfassten Teil des Werks anwendbar, aber auf das kombinierte Werk ist Version 3 der GNU GPL anwendbar.
+
+Section 14:	Überarbeitungen der vorliegenden Lizenz (Section 9 GPLv2)
+Die Free Software Foundation kann von Zeit zu Zeit überarbeitete und / oder neue Versionen der General Public License veröffentlichen. Solche neuen Versionen werden den Grundprinzipien der gegenwärtigen entsprechen, können aber im Detail abweichen, um neuen Problemen und Anforderungen gerecht zu werden.
+Jede Version der vorliegenden Lizenz hat eine eindeutige Versionsnummer. Wenn in einem Werk angegeben wird, dass es einer bestimmten Version ‘oder jeder späteren Version’ (’or any later version‘) dieser Lizenz unterliegt, so haben Sie die Wahl, entweder den Bestimmungen der genannten Version zu folgen oder denen jeder beliebigen späteren Version, die von der Free Software Foundation veröffentlicht wurde. Wenn das Programm keine Versionsnummer angibt, können Sie jede beliebige Version wählen, die von der Free Software Foundation veröffentlicht wurde.
+Falls das Programm vorsieht, dass ein Bevollmächtigter entscheiden kann, welche zukünftigen Versionen der GNU General Public License verwendet werden dürfen, so berechtigt Sie die öffentliche Stellungnahme des Bevollmächtigen, eine bestimmte Version anzunehmen, dauerhaft, diese Version für das Programm zu wählen.
+Spätere Lizenzversionen erteilen möglicherweise zusätzliche oder andere Erlaubnisse. Indessen hat Ihr Entscheid, einer späteren Version zu folgen, nicht zur Folge, dass einem Autoren oder Urheberrechtsinhaber zusätzliche Verpflichtungen auferlegt werden.
+
+Section 15:	Gewährleistungsausschluss (Section 10 GPLv2)
+Es besteht – soweit gesetzlich zulässig – keinerlei Gewährleistung für unter der vorliegenden Lizenz stehende Werke. Sofern nicht anderweitig schriftlich erklärt, stellen die Urheberrechtsinhaber und / oder Dritte das Programm so zur Verfügung, ‘wie es ist’, ohne irgendeine Gewährleistung, weder ausdrücklich noch implizit. Insbesondere besteht keine Gewährleistung der Marktreife oder der Verwendbarkeit für einen bestimmten Zweck. Das volle Risiko bezüglich Qualität und Leistungsfähigkeit des Programms liegt bei Ihnen. Sollte sich das Programm als fehlerhaft herausstellen, liegen die Kosten für notwendigen Service, Reparatur oder Korrektur bei Ihnen.
+
+Section 16:	Haftungsbegrenzung (Section 11 GPLv2)
+In keinem Fall – ausser wenn dies durch zwingendes Recht gefordert oder schriftlich zugesichert wurde – haftet irgendein Urheberrechtsinhaber oder irgendein Dritter, der das Programm gemäss den Bedingungen der vorliegenden Lizenz modifiziert oder übertragen hat, Ihnen gegenüber für irgendwelche Schäden. Eine Haftung ist insbesondere ausgeschlossen für direkte und indirekte Schäden, für Schäden durch Nebenwirkungen und Folgeschäden, die aus der Benutzung des Programms oder seiner Unbenutzbarkeit folgen (insbesondere Datenverluste, fehlerhafte Datenverarbeitung oder Kompatibilitätsprobleme). Der Haftungsausschluss gilt selbst dann, wenn ein Urheberrechtsinhaber oder Dritter über die Möglichkeit solcher Schäden unterrichtet worden war.
+
+Section 17:	Interpretation von Section 15 und 16 (Section 12 GPLv2)
+Sollten der in den vorliegenden Lizenzbestimmungen enthaltene Gewährleistungsausschluss oder die Haftungsbegrenzung gemäss dem anwendbaren Recht unwirksam sein, so sollen die zuständigen Gerichte eine Regelung anwenden, welche der vollständigen Aufhebung jeglicher zivilen Haftung in Zusammenhang mit dem Programm am nächsten kommt – es sei denn, dem Programm lag eine entgeltliche Garantieerklärung oder Haftungsübernahme bei
+
+

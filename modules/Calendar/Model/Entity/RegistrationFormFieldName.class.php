@@ -70,7 +70,7 @@ class RegistrationFormFieldName extends \Cx\Model\Base\EntityBase {
     protected $default;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\RegistrationFormField
+     * @var \Cx\Modules\Calendar\Model\Entity\RegistrationFormField
      */
     protected $registrationFormField;
 
@@ -178,7 +178,7 @@ class RegistrationFormFieldName extends \Cx\Model\Base\EntityBase {
     /**
      * Set registrationFormField
      *
-     * @param Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
      */
     public function setRegistrationFormField(\Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField)
     {
@@ -188,7 +188,7 @@ class RegistrationFormFieldName extends \Cx\Model\Base\EntityBase {
     /**
      * Get registrationFormField
      *
-     * @return Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
+     * @return \Cx\Modules\Calendar\Model\Entity\RegistrationFormField $registrationFormField
      */
     public function getRegistrationFormField()
     {

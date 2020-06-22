@@ -16,11 +16,20 @@
     RewriteCond %{REQUEST_URI} !\.thumb_large\.[^\/]*$
     RewriteRule . - [F]
 
+    # Check if virtual language directory had been stripped off of request.
+    # If so, do check if the file does actually exists.
+    # If the file does not exists, do re-add the virtual language directory.
+    RewriteCond %{ENV:REDIRECT_LOCALE} !^$
+    RewriteCond %{REQUEST_URI} ^/(core|core_modules|lib|modules|feed|media|images|themes)/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule .* %{ENV:REDIRECT_LOCALE}%{REQUEST_URI} [L,E=LOCALE:1]
+
     # Strip virtual language directory for MEDIA RESSOURCES, CONTENT DATA and THEME
     # IMPORTANT: When running Contrexx in a subdirectory (relativ to the webserver's DocumentRoot)
     #            then you'll have to comment-out the following ruleset
+    RewriteCond %{ENV:REDIRECT_LOCALE} ^$
     RewriteCond %{REQUEST_URI} ^/[a-z]{1,2}(?:-[A-Za-z]{2,4})?/(core|core_modules|lib|modules|feed|media|images|themes)/
-    RewriteRule ^[a-z]{1,2}(?:-[A-Za-z]{2,4})?\/(.*)$ /$1 [L]
+    RewriteRule ^([a-z]{1,2}(?:-[A-Za-z]{2,4})?)\/(.*)$ /$2 [L,E=LOCALE:$1]
 
     # Deny direct access to directories containing sensitive data
     RewriteCond %{ENV:REDIRECT_END} !1
@@ -38,7 +47,7 @@
 
     # MultiSite: Map requests to CONTENT DATA of a Website
     RewriteCond %{ENV:REDIRECT_END} !1
-    RewriteCond %{REQUEST_URI} ^/(feed\/|media\/|images\/|tmp\/public\/|robots\.txt|sitemap_[a-z]{1,2}(?:-[A-Za-z]{2,4})?\.xml)
+    RewriteCond %{REQUEST_URI} ^/(feed\/|media\/|images\/|tmp\/public\/|robots\.txt|sitemap(?:_[a-z]{1,2}(?:-[A-Za-z]{2,4})?)?\.xml)
     RewriteRule (.*) ${websiteDomainContentMap:%{HTTP_HOST}|}/$1 [L,QSA,E=END:1]
 
     # MultiSite: Try to map the request of a webdesign template file to the
@@ -63,8 +72,7 @@
     RewriteCond %{REQUEST_FILENAME}/index.php -f
     RewriteRule   .  %{REQUEST_URI}/index.php [L,QSA]
 
-    # Redirect all requests to non-existing files to Contrexx,
-    # except for media resources
+    # Redirect all requests to non-existing files to Contrexx
     RewriteCond   %{REQUEST_FILENAME}  !-f
     RewriteRule   .  index.php?__cap=%{REQUEST_URI} [L,QSA]
 
@@ -142,6 +150,11 @@
         ExpiresByType text/css "access plus 1 month"
         # JavaScript
         ExpiresByType application/javascript "access plus 1 year"
+
+        # Forces browser caches to verify ETag
+        <IfModule mod_headers.c>
+            Header merge Cache-Control no-cache
+        </IfModule>
 
         # Uncomment & install the following code into the virtual
         # host configuration file.

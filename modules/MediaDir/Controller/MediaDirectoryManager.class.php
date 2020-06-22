@@ -369,7 +369,6 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
 
 
         //show categories
-        $objCategories = new MediaDirectoryCategory(null, null, 1, $this->moduleName);
         $objCategories->listCategories($this->_objTpl, 1, null);
 
         $this->_objTpl->setVariable(array(
@@ -400,7 +399,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
         $intEntryDourationStart = 0;
         $strOnSubmit = '';
 
-        if(!empty($_GET['id'])) {
+        if(!empty($_GET['id']) || !empty($_POST['entryId'])) {
             \Permission::checkAccess(MediaDirectoryAccessIDs::ModifyEntry, 'static');
             $pageTitle = $_ARRAYLANG['TXT_MEDIADIR_ENTRY']. " ".$_ARRAYLANG['TXT_MEDIADIR_EDIT'];
             $intEntryId = intval($_GET['id']);
@@ -422,6 +421,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
 
         $intCountForms = count($arrActiveForms);
 
+        $objEntry = null;
         if($intCountForms > 0) {
             if(intval($intEntryId) == 0 && (empty($_POST['selectedFormId']) && empty($_POST['formId'])) && $intCountForms > 1) {
                 $intFormId = null;
@@ -523,64 +523,13 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $userId  = $objFWUser->objUser->getId();
                 }
 
+                // parse owner
+                \FWUser::getUserLiveSearch();
                 $this->_objTpl->setVariable(array(
                     'TXT_'.$this->moduleLangVar.'_OWNER' => $_ARRAYLANG['TXT_MEDIADIR_OWNER'],
                     $this->moduleLangVar.'_OWNER_ROW'    => $ownerRowClass,
                     $this->moduleLangVar.'_OWNER_ID'     => $userId,
                 ));
-
-                \FWUser::getUserLiveSearch();
-
-                if ($intEntryId != 0) {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-
-                    //parse contact data
-                    $objUser     = $objFWUser->objUser;
-                    $intUserId   = intval($objUser->getId());
-                    $strUserMail = '<a href="mailto:'.contrexx_raw2xhtml($objUser->getEmail()).'">'.contrexx_raw2xhtml($objUser->getEmail()).'</a>';
-                    $intUserLang = intval($objUser->getFrontendLanguage());
-
-                    if ($objUser = $objUser->getUser($id = $intUserId)) {
-                        //get lang
-                        foreach ($this->arrFrontendLanguages as $intKey => $arrLang) {
-                                if($arrLang['id'] == $intUserLang) {
-                                        $strUserLang = $arrLang['name'];
-                                }
-                        }
-
-                        //get country
-                        $arrCountry = \Cx\Core\Country\Controller\Country::getById(intval($objUser->getProfileAttribute('country')));
-                        $strCountry = $arrCountry['name'];
-
-                        //get title
-                        $objTitle = $objDatabase->Execute("SELECT `title` FROM ".DBPREFIX."access_user_title WHERE id = '".intval($objUser->getProfileAttribute('title'))."' LIMIT 1");
-                        $strTitle = $objTitle->fields['title'];
-
-                        $this->_objTpl->setVariable(array(
-                            'TXT_'.$this->moduleLangVar.'_CONTACT_DATA' => "Kontaktangaben",
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_TITLE' => contrexx_raw2xhtml($strTitle),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_FIRSTNAME' => contrexx_raw2xhtml($objUser->getProfileAttribute('firstname')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_LASTNAME' => contrexx_raw2xhtml($objUser->getProfileAttribute('lastname')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_COMPANY' => contrexx_raw2xhtml($objUser->getProfileAttribute('company')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_ADRESS' => contrexx_raw2xhtml($objUser->getProfileAttribute('address')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_CITY' => contrexx_raw2xhtml($objUser->getProfileAttribute('city')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_ZIP' => contrexx_raw2xhtml($objUser->getProfileAttribute('zip')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_COUNTRY' => contrexx_raw2xhtml($strCountry),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_PHONE' => contrexx_raw2xhtml($objUser->getProfileAttribute('phone_office')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_FAX' => contrexx_raw2xhtml($objUser->getProfileAttribute('phone_fax')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_WEBSITE' => '<a href="'.contrexx_raw2xhtml($objUser->getProfileAttribute('website')).'" target="_blank">'.contrexx_raw2xhtml($objUser->getProfileAttribute('website')).'</a>',
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_MAIL' => $strUserMail,
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_LANG' => $strUserLang,
-                        ));
-                    }
-
-                    $this->_objTpl->parse($this->moduleNameLC.'ContactData');
-                } else {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-                    $this->_objTpl->hideBlock($this->moduleNameLC.'ContactData');
-                }
 
                 //get display duration  data
                 switch($this->arrSettings['settingsEntryDisplaydurationValueType']) {
@@ -604,7 +553,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 if($intEntryId != 0) {
                     if(intval($objEntry->arrEntries[$intEntryId]['entryDurationType']) == 1) {
                         $intEntryDourationAlways = 'selected="selected"';
-                        $intEntryDourationStart = date("d.m.Y", mktime());
+                        $intEntryDourationStart = date("d.m.Y", time());
                         $intEntryDourationEnd = date("d.m.Y", mktime(0,0,0,date("m")+$intDiffMonth,date("d")+$intDiffDay,date("Y")+$intDiffYear));
                     } else {
                         $intEntryDourationPeriod = 'selected="selected"';
@@ -626,7 +575,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                         $intEntryDourationShowPeriod = 'inline';
                     }
 
-                    $intEntryDourationStart = date("d.m.Y", mktime());
+                    $intEntryDourationStart = date("d.m.Y", time());
                     $intEntryDourationEnd = date("d.m.Y", mktime(0,0,0,date("m")+$intDiffMonth,date("d")+$intDiffDay,date("Y")+$intDiffYear));
                 }
 
@@ -662,6 +611,26 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
 
                 //parse blocks
                 $this->_objTpl->hideBlock($this->moduleNameLC.'FormList');
+
+                if ($objForms->arrForms[$intFormId]['use_associated_entries']) {
+                    \JS::activate('chosen-sortable');
+                    if (!$objEntry) {
+                        $objEntry = new MediaDirectoryEntry($this->moduleName);
+                    }
+                    $this->_objTpl->setVariable(array(
+                        'TXT_' . $this->moduleLangVar . '_ASSOCIATED_ENTRIES' =>
+                            $_ARRAYLANG['TXT_MEDIADIR_ASSOCIATED_ENTRIES'],
+                        'TXT_' . $this->moduleLangVar . '_PLEASE_CHOOSE' =>
+                            $_ARRAYLANG['TXT_MEDIADIR_PLEASE_CHOOSE'],
+                        'TXT_' . $this->moduleLangVar . '_SELECT_NO_MATCH' =>
+                            $_ARRAYLANG['TXT_MEDIADIR_SELECT_NO_MATCH'],
+                        'TXT_' . $this->moduleLangVar . '_ASSOCIATED_ENTRIES_INFO' =>
+                            $_ARRAYLANG['TXT_MEDIADIR_ASSOCIATED_ENTRIES_INFO'],
+                        $this->moduleLangVar . '_ASSOCIATED_ENTRIES_OPTIONS' =>
+                            $objEntry->getAssociatedEntriesOptions(
+                                $intFormId, $intEntryId),
+                    ));
+                }
             }
 
             //parse global variables
@@ -673,7 +642,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 $this->moduleLangVar.'_JAVASCRIPT' =>  $this->getJavascript(),
                 $this->moduleLangVar.'_FORM_ONSUBMIT' =>  $strOnSubmit,
                 'TXT_'.$this->moduleLangVar.'_PLEASE_CHECK_INPUT' =>  $_ARRAYLANG['TXT_MEDIADIR_PLEASE_CHECK_INPUT'],
-                $this->moduleLangVar.'_DEFAULT_LANG_ID' =>  FRONTEND_LANG_ID,
+                $this->moduleLangVar.'_DEFAULT_LANG_ID' =>  static::getOutputLocale()->getId(),
                 'TXT_'.$this->moduleLangVar.'_SPEZ_FIELDS' => $_ARRAYLANG['TXT_MEDIADIR_SPEZ_FIELDS'],
                 'TXT_'.$this->moduleLangVar.'_DISPLAYDURATION' =>  $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION'],
                 'TXT_'.$this->moduleLangVar.'_DISPLAYDURATION_ALWAYS' =>  $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'],
@@ -724,6 +693,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 } else {
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_CATEGORY']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
+            }
+            if ($status) {
+                return $this->overview();
             }
         }
 
@@ -807,6 +779,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_META_DESCRIPTION' =>  $_CORELANG['TXT_META_DESCRIPTION'],
             'TXT_'.$this->moduleLangVar.'_PICTURE' =>  $_CORELANG['TXT_IMAGE'],
             'TXT_'.$this->moduleLangVar.'_SHOW_SUBCATEGORIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBCATEGORIES'],
+            'TXT_'.$this->moduleLangVar.'_SHOW_SUBCATEGORIES_INFO' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBCATEGORIES_INFO'],
             'TXT_'.$this->moduleLangVar.'_SHOW_ENTRIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_ENTRIES'],
             'TXT_'.$this->moduleLangVar.'_VISIBLE' =>  $_CORELANG['TXT_VISIBLE'],
             'TXT_'.$this->moduleLangVar.'_CATEGORY' =>  $_ARRAYLANG['TXT_MEDIADIR_CATEGORY'],
@@ -817,13 +790,13 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_NEW_CATEGORY' =>  "--- ".$_ARRAYLANG['TXT_MEDIADIR_NEW_CATEGORY']." ---",
             'TXT_'.$this->moduleLangVar.'_VISIBLE_CATEGORY_INFO' =>  $_ARRAYLANG['TXT_MEDIADIR_VISIBLE_CATEGORY_INFO'],
             $this->moduleLangVar.'_CATEGORIES_DROPDOWN_OPTIONS' => $catDropdown,
-            $this->moduleLangVar.'_CATEGORY_DEFAULT_LANG_ID' => FRONTEND_LANG_ID,
+            $this->moduleLangVar.'_CATEGORY_DEFAULT_LANG_ID' => static::getOutputLocale()->getId(),
             'TXT_'.$this->moduleLangVar.'_BASIC_DATA' => $_ARRAYLANG['TXT_MEDIADIR_BASIC_DATA'],
             'TXT_'.$this->moduleLangVar.'_CATEGORY_DETAILS' => $_ARRAYLANG['TXT_MEDIADIR_CATEGORY_DETAILS'],
             $this->moduleLangVar.'_CATEGORY_IMAGE_BROWSE' => $this->getMediaBrowserButton(
                 $_ARRAYLANG['TXT_BROWSE'],
                 array(
-                    'data-cx-mb-views' => 'filebrowser',
+                    'views' => 'filebrowser',
                     'type' => 'button',
                     'data-input-id' => 'categoryImage2'
                 ),
@@ -952,6 +925,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_LEVEL']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
             }
+            if ($status) {
+                return $this->overview();
+            }
         }
 
         //load level dat
@@ -1052,13 +1028,13 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_SUBMIT' =>  $_ARRAYLANG['TXT_'.$this->moduleLangVar.'_SUBMIT'],
             'TXT_'.$this->moduleLangVar.'_NEW_LEVEL' =>  "--- ".$_ARRAYLANG['TXT_MEDIADIR_NEW_LEVEL']." ---",
             'TXT_'.$this->moduleLangVar.'_VISIBLE_LEVEL_INFO' =>  $_ARRAYLANG['TXT_MEDIADIR_VISIBLE_LEVEL_INFO'],
-            $this->moduleLangVar.'_LEVEL_DEFAULT_LANG_ID' => FRONTEND_LANG_ID,
+            $this->moduleLangVar.'_LEVEL_DEFAULT_LANG_ID' => static::getOutputLocale()->getId(),
             'TXT_'.$this->moduleLangVar.'_BASIC_DATA' => $_ARRAYLANG['TXT_MEDIADIR_BASIC_DATA'],
             'TXT_'.$this->moduleLangVar.'_LEVEL_DETAILS' => $_ARRAYLANG['TXT_MEDIADIR_LEVEL_DETAILS'],
             $this->moduleLangVar.'_LEVEL_IMAGE_BROWSE' => $this->getMediaBrowserButton(
                 $_ARRAYLANG['TXT_BROWSE'],
                 array(
-                    'data-cx-mb-views' => 'filebrowser',
+                    'views' => 'filebrowser',
                     'type' => 'button',
                     'data-input-id' => 'levelImage2'
                 ),
@@ -1097,7 +1073,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 $this->moduleLangVar.'_LEVEL_LANG_ID' => $arrLang['id'],
                 $this->moduleLangVar.'_LEVEL_NAME' => $strLevelName,
                 $this->moduleLangVar.'_LEVELS_DROPDOWN_OPTIONS' => $levelDropdown,
-                $this->moduleLangVar.'_LEVEL_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg("levelDescription[{$arrLang['id']}]", $strLevelDescription),
+                $this->moduleLangVar.'_LEVEL_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg("levelDescription[{$arrLang['id']}]", contrexx_raw2xhtml($strLevelDescription)),
                 $this->moduleLangVar.'_LEVEL_META_DESCRIPTION' => $levelMetaDescription,
                 $this->moduleLangVar.'_LEVEL_BLOCK_DISPLAY' => $first ? 'display:block;' : 'display:none;'
             ));
@@ -1422,7 +1398,12 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $objExport = new MediaDirectoryExport($this->moduleName);
                     switch ($_POST['step']) {
                         case 'exportCSV':
-                            $strStatus = $objExport->exportCSV(intval($_POST['interfacesExportForm']), $_POST['interfacesExportSelectedCategories'], $_POST['interfacesExportSelectedLevels'], intval($_POST['interfacesExportMask']));
+                            $strStatus = $objExport->exportCSV(
+                                isset($_POST['interfacesExportForm']) ? contrexx_input2int($_POST['interfacesExportForm']) : 0,
+                                isset($_POST['interfacesExportSelectedCategories']) ? contrexx_input2int($_POST['interfacesExportSelectedCategories']) : array(),
+                                isset($_POST['interfacesExportSelectedLevels']) ? contrexx_input2int($_POST['interfacesExportSelectedLevels']) : array(),
+                                isset($_POST['interfacesExportMask']) ? contrexx_input2int($_POST['interfacesExportMask']) : 0
+                            );
                             break;
                     }
             }

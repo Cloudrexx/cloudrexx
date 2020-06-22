@@ -26,14 +26,24 @@
  */
 
 header("content-type: application/javascript");
-if (strpos(dirname(__FILE__), 'customizing') === false) {
-    $contrexx_path = dirname(dirname(dirname(__FILE__)));
-} else {
+
+// detect system location
+$depth = 3;
+if (strpos(__FILE__, 'customizing/') !== false) {
     // this files resides within the customizing directory, therefore we'll have to strip
     // out one directory more than usually
-    $contrexx_path = dirname(dirname(dirname(dirname(__FILE__))));
+    $depth++;
 }
+if (strpos(__FILE__, 'codeBases/') !== false) {
+    // this files resides in a codeBase directory, therefore we'll have to strip
+    // out two directory more than usually
+    $depth += 2;
+}
+$contrexx_path = dirname(__FILE__, $depth);
 
+/**
+ * @ignore
+ */
 require_once($contrexx_path . '/core/Core/init.php');
 $cx = init('minimal');
 
@@ -47,18 +57,30 @@ $domainRepository = new \Cx\Core\Net\Model\Repository\DomainRepository();
 $mainDomain = $domainRepository->getMainDomain()->getName();
 
 //find the right css files and put it into the wysiwyg
-$em = $cx->getDb()->getEntityManager();
-$componentRepo = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
-$wysiwyg = $componentRepo->findOneBy(array('name'=>'Wysiwyg'));
-$pageRepo   = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+$wysiwyg= $cx->getComponent('Wysiwyg');
 \Cx\Core\Setting\Controller\Setting::init('Wysiwyg', 'config', 'Yaml');
 
 $skinId = 0;
 if (!empty($pageId) && $pageId != 'new') {
+    $em = $cx->getDb()->getEntityManager();
+    $pageRepo   = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
     $skinId = $pageRepo->find($pageId)->getSkin();
 }
 
 $ymlOption = $wysiwyg->getCustomCSSVariables($skinId);
+
+// load language data
+$lang = 0;
+if (!empty($_GET['locale'])) {
+    $locale = $_GET['locale'];
+    $lang = \FWLanguage::getLanguageIdByCode($locale);
+}
+$_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData(
+    'Wysiwyg',
+    false,
+    $lang
+);
+
 ?>
 //if the wysiwyg css not defined in the session, then load the css variables and put it into the session
 if(!cx.variables.get('css', 'wysiwyg')) {
@@ -71,10 +93,12 @@ CKEDITOR.scriptLoader.load( '<?php echo $cx->getCodeBaseCoreModuleWebPath().'/Me
 CKEDITOR.scriptLoader.load( '<?php echo $cx->getCodeBaseCoreWebPath().'/Wysiwyg/View/Script/ImagePasteCkeditorPlugin.js'; ?>' );
 CKEDITOR.editorConfig = function( config )
 {
-    config.skin = 'moono';
+    config.skin = 'moono-lisa';
 
     config.height = 307;
     config.uiColor = '#ececec';
+
+    <?php if (!empty($_GET['locale'])) echo "config.language = '" . preg_replace('/[^a-z]/', '', $_GET['locale']) . "';";?>
 
     config.forcePasteAsPlainText = false;
     config.enterMode = CKEDITOR.ENTER_BR;
@@ -94,7 +118,7 @@ CKEDITOR.editorConfig = function( config )
 
     config.tabSpaces = 4;
     config.baseHref = '<?php echo \Cx\Core\Routing\Url::fromCapturedRequest('', $cx->getWebsiteOffsetPath(), array())->toString(); ?>';
-    config.templates_files = [ '<?php echo $defaultTemplateFilePath; ?>' ];
+    config.templates_files = [ '' ];
     config.templates_replaceContent = <?php echo \Cx\Core\Setting\Controller\Setting::getValue('replaceActualContents','Wysiwyg')? 'true' : 'false' ?>;
 
     config.toolbar_Full = config.toolbar_Small = <?php echo $wysiwyg->getToolbar() ?>;
@@ -104,7 +128,9 @@ CKEDITOR.editorConfig = function( config )
     config.toolbar_FrontendEditingContent = <?php echo $wysiwyg->getToolbar('frontendEditingContent') ?>;
 
     config.toolbar_FrontendEditingTitle = <?php echo $wysiwyg->getToolbar('frontendEditingTitle') ?>;
-    config.extraPlugins = 'codemirror';
+
+    // Allow div's within a's
+    CKEDITOR.dtd['a']['div'] = 1;
 
     //Set the CSS Stuff
     config.contentsCss = cx.variables.get('css', 'wysiwyg');
@@ -116,29 +142,41 @@ CKEDITOR.editorConfig = function( config )
     ) {
         <?php echo $wysiwyg->getRemovedButtons(); ?>;
     }
+
+    // load custom config from Wysiwyg.yml of webdesign template 
+    <?php
+        try {
+            echo $wysiwyg->getCustomWysiwygEditorConfig($skinId, 1) . "\n";
+        } catch (\Throwable $t) {
+            \DBG::msg($t->getMessage());
+        }
+    ?>
 };
 
 //loading the templates
 CKEDITOR.on('instanceReady',function(){
-    var loadingTemplates = <?php echo $wysiwyg->getWysiwygTempaltes();?>;
+    var loadingTemplates = <?php
+        try {
+            echo $wysiwyg->getWysiwygTemplates($skinId);
+        } catch (\Throwable $t) {
+            \DBG::msg($t->getMessage());
+        }
+    ?>;
     for(var instanceName in CKEDITOR.instances) {
-        //console.log( CKEDITOR.instances[instanceName] );
         loadingTemplates.button = CKEDITOR.instances[instanceName].getCommand("templates") //Reference to Template-Button
 
         // Define Standard-Path
-        //var path = CKEDITOR.plugins.getPath('templates')
-        //var defaultPath = path.split("lib/ckeditor/")[0]+"customizing/lib/ckeditor"+path.split("lib/ckeditor")[1]+"templates/"
-        //var defaultPath = path.split("lib/ckeditor")[0] //Path to Templates-Folder
-        //var defaultPath = "/"
         loadingTemplates.load = (function(){
-            //this.defaultPath = defaultPath;
             if (typeof this.button != 'undefined') {
                 this.button.setState(CKEDITOR.TRISTATE_DISABLED) // Disable "Template"-Button
             }
             for(var i=0;i<this.length;i++){
                 (function(item){
                     CKEDITOR.addTemplates('default',{
-                        imagesPath: "../../",//CKEDITOR.getUrl(defaultPath),
+                        // CKeditor does not accept an empty imagesPath
+                        // therefore, we have to perform a virtual traversal
+                        // using a random folder path
+                        imagesPath: cx.variables.get('basePath', 'contrexx') + 'random/..',
                         templates: this
                     });
                 }).bind(this)(this[i])
@@ -150,7 +188,7 @@ CKEDITOR.on('instanceReady',function(){
     }
 
     var translations = cx.variables.get('toolbarTranslations', 'toolbarConfigurator');
-    if (translations && cx.variables.get('language') == 'de') {
+    if (translations) {
         cx.jQuery('div.toolbarModifier ul[data-type="table-body"] > li[data-type="group"] > ul > li[data-type="subgroup"] > p > span').each(
             function() {
                 if (translations.hasOwnProperty(cx.jQuery(this).text())) {
@@ -159,6 +197,75 @@ CKEDITOR.on('instanceReady',function(){
                 }
             }
         );
+    }
+});
+
+// add shadowbox functionality
+CKEDITOR.on('dialogDefinition', function (event) {
+    var editor = event.editor;
+    var dialogDefinition = event.data.definition;
+
+    // only add functionality to image dialog
+    if (event.data.name != 'image') {
+        return;
+    }
+
+    // add Shadowbox option to advanced tab
+    var advancedTab = dialogDefinition.getContents( 'advanced' );
+    if (advancedTab !== null) {
+        // add checkbox
+        advancedTab.add({
+            type: 'checkbox',
+            label: '<?php echo $_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_LABEL']; ?>',
+            id: 'txtdlgGenShadowbox',
+            onClick: function() {
+                shadowboxSrc = this.getDialog().getContentElement( 'advanced', 'txtdlgGenShadowboxSrc' ).getElement();
+                if (this.getValue()) {
+                    shadowboxSrc.setStyle('display', 'block');
+                    //if (!this.getDialog().getValueOf('advanced', 'txtdlgGenShadowboxSrc')) {
+                        var imageSrc = this.getDialog().getValueOf('info', 'txtUrl');
+                        var originalImage = imageSrc.replace(/\.thumb_([^.]+)\.(.{3,4})$/, '.$2').replace(/\.thumb$/,'')
+                        this.getDialog().setValueOf('advanced', 'txtdlgGenShadowboxSrc', originalImage);
+                    //}
+                } else {
+                    shadowboxSrc.setStyle('display', 'none');
+                }
+            },
+            setup : function( type, element ) {
+                //if ( type == LINK ) {}
+                imgRel = element.getAttribute('data-shadowbox');
+                if (!imgRel) {
+                    this.setValue(false);    
+                } else {
+                    this.setValue(true);
+                }
+            },
+            commit : function( type, element ) {
+                //if ( type == LINK ) {
+                if ( this.getValue()) {
+                    element.setAttribute('data-shadowbox', this.getDialog().getValueOf('advanced', 'txtdlgGenShadowboxSrc'));
+                } else {
+                    element.removeAttributes(['data-shadowbox']);
+                }
+            },
+        });
+        // add input field for shadowbox source 
+        advancedTab.add({
+            type: 'text',
+            label: '<?php echo $_ARRAYLANG['TXT_WYSIWYG_MODAL_OPTION_SRC']; ?>',
+            id: 'txtdlgGenShadowboxSrc',
+            style: 'display:none',
+            setup : function( type, element ) {
+                //if ( type == LINK ) {}
+                imgRel = element.getAttribute('data-shadowbox');
+                this.setValue(imgRel);
+                if (!imgRel) {
+                    this.getElement().setStyle('display', 'none');
+                } else {
+                    this.getElement().setStyle('display', 'block');
+                }
+            }
+        });
     }
 });
 
@@ -208,13 +315,21 @@ if (<?php
     });
 }
 
+// load custom code from Wysiwyg.yml of webdesign template 
+<?php
+    try {
+        echo $wysiwyg->getCustomWysiwygEditorJsCode($skinId) . "\n";
+    } catch (\Throwable $t) {
+        \DBG::msg($t->getMessage());
+    }
+?>
+
 //this script will not be executed at the first round (first wysiwyg call)
 cx.bind("loadingEnd", function(myArgs) {
     if(myArgs.hasOwnProperty('data')) {
         var data = myArgs['data'];
         if(data.hasOwnProperty('wysiwygCssReload') && (data.wysiwygCssReload).hasOwnProperty('css')) {
             for(var instanceName in CKEDITOR.instances) {
-                //CKEDITOR.instances[instanceName].config.contentsCss =  data.wysiwygCssReload.css;
                 var is_same = (data.wysiwygCssReload.css).equals(cx.variables.get('css', 'wysiwyg')) && cx.variables.get('css', 'wysiwyg').every(function(element, index) {
                     return element === data.wysiwygCssReload.css[index];
                 });
@@ -225,9 +340,9 @@ cx.bind("loadingEnd", function(myArgs) {
                     cx.variables.set('bodyClass', data.wysiwygCssReload.bodyClass, 'wysiwyg')
                     cx.variables.set('bodyId', data.wysiwygCssReload.bodyId, 'wysiwyg')
                     var config = {
-                        customConfig: cx.variables.get('basePath', 'contrexx') + cx.variables.get('ckeditorconfigpath', 'contentmanager'),
+                        customConfig: cx.variables.get('ckeditorconfigpath', 'contentmanager'),
                         toolbar: 'Full',
-                        skin: 'moono'
+                        removePlugins: 'bbcode'
                     };
                     CKEDITOR.replace('page[content]', config);
                 }

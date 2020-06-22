@@ -154,7 +154,7 @@ $_ARRAYLANG['TXT_CALENDAR_EDIT'] = "bearbeiten";
 $_ARRAYLANG['TXT_CALENDAR_PAYMENT_METHOD'] = "Zahlungsmethode";
 $_ARRAYLANG['TXT_CALENDAR_PAYMENT_BILL'] = "Rechnung";
 $_ARRAYLANG['TXT_CALENDAR_PAYMENT_YELLOWPAY'] = "Yellowpay";
-$_ARRAYLANG['TXT_CALENDAR_AGB'] = "Ich akzeptiere die <a href=\"index.php?section=Agb\" target=\"_blank\">allgemeinen Geschäftsbedingungen</a>";
+$_ARRAYLANG['TXT_CALENDAR_AGB'] = "Ich akzeptiere die <a href=\"index.php?section=Agb\" target=\"_blank\">allgemeinen Geschäftsbedingungen</a> und die <a href=\"index.php?section=Privacy\" target=\"_blank\">Datenschutzerklärung</a>.";
 $_ARRAYLANG['TXT_CALENDAR_SAVE_IN_WAITLIST'] = "Anmeldungen werden in die Warteliste aufgenommen";
 $_ARRAYLANG['TXT_CALENDAR_SEPARATOR_NOTHING'] = "";
 $_ARRAYLANG['TXT_CALENDAR_SEPARATOR_SPACE'] = " ";

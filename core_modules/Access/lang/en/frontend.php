@@ -111,6 +111,8 @@ $_ARRAYLANG['TXT_ACCESS_NEWSLETTERS_SUBSCRIBE_COLON'] = "Folgende Newsletter abo
 
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS'] = "Das Passwort muss mindestens 6 Zeichen lang sein.";
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS_WITH_COMPLEXITY'] = "Das Passwort muss mindestens 6 Zeichen lang sein und mindestens einen Gross-, einen Kleinbuchstaben und eine Zahl enthalten.";
+$_ARRAYLANG['TXT_ACCESS_YES'] = "Yes";
+$_ARRAYLANG['TXT_ACCESS_NO'] = "No";
 
 $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_PROVIDER'] = "Provider";
 $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_STATE'] = "State";
@@ -136,3 +138,9 @@ $_ARRAYLANG['TXT_ACCESS_ADDITIONAL_DATA'] = 'Additional data';
 $_ARRAYLANG['TXT_ACCESS_ADDITIONAL_DATA_DESC'] = 'Additional data can be added after successful registration in your user profile';
 $_ARRAYLANG['TXT_ACCESS_NEWSLETTER_SUBSCRIPTION'] = 'Newsletter subscriptions';
 $_ARRAYLANG['TXT_ACCESS_TERMS'] = 'Terms';
+$_ARRAYLANG['TXT_ACCESS_REGISTERED_SINCE'] = "Registered since";
+$_ARRAYLANG['TXT_ACCESS_GROUPS'] = "Groups";
+$_ARRAYLANG['TXT_ACCESS_ATTRIBUTE'] = 'Attribute';
+$_ARRAYLANG['TXT_ACCESS_OLD_VALUE'] = 'Old value';
+$_ARRAYLANG['TXT_ACCESS_NEW_VALUE'] = 'New value';
+$_ARRAYLANG['TXT_ACCESS_VALUE'] = 'Value';

@@ -69,6 +69,17 @@ class MediaDirectoryInputfieldImage extends \Cx\Modules\MediaDir\Controller\Medi
         parent::__construct('.', $name);
         parent::getFrontendLanguages();
         parent::getSettings();
+
+        // register thumbnail formats
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $thumbnailFormats = $cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnails();
+        foreach ($thumbnailFormats as $thumbnailFormat) {
+            $placeholderSrc = 'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMBNAIL_FORMAT_';
+            $placeholderImg = 'MEDIADIR_INPUTFIELD_VALUE_THUMBNAIL_FORMAT_';
+            $format = strtoupper($thumbnailFormat['name']);
+            $this->arrPlaceholders[] = $placeholderSrc . $format;
+            $this->arrPlaceholders[] = $placeholderImg . $format;
+        }
     }
 
 
@@ -76,6 +87,8 @@ class MediaDirectoryInputfieldImage extends \Cx\Modules\MediaDir\Controller\Medi
 function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
         global $objDatabase, $_ARRAYLANG, $objInit;
+
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -96,7 +109,7 @@ function getInputfield($intView, $arrInputfield, $intEntryId=null)
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[FRONTEND_LANG_ID]) ? $arrValue[FRONTEND_LANG_ID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 } else {
                     $arrValue = null;
@@ -388,28 +401,40 @@ INPUT;
         return $this->imageWebPath.'images/'.$imageName;
     }
 
-
+    /**
+     * Create the thumbnail image file
+     *
+     * The given image path must be relative to the website root,
+     * but with a leading slash prepended.
+     * If the path represents a folder, or if the image file does not exist,
+     * this is a noop.
+     * @param   string  $strPathImage
+     * @return  void
+     */
     function createThumbnail($strPathImage)
     {
-        $arrImageInfo = getimagesize(\Env::get('cx')->getWebsitePath().$strPathImage);
-
-        if (   $arrImageInfo['mime'] == "image/gif"
-            || $arrImageInfo['mime'] == "image/jpeg"
-            || $arrImageInfo['mime'] == "image/jpg"
-            || $arrImageInfo['mime'] == "image/png") {
+        $path = \Env::get('cx')->getWebsitePath() . $strPathImage;
+        if (
+            empty($strPathImage) ||
+            !file_exists($path) ||
+            is_dir($path)
+        ) {
+            return;
+        }
+        $arrImageInfo = getimagesize($path);
+        if ($arrImageInfo['mime'] === 'image/gif'
+            || $arrImageInfo['mime'] === 'image/jpeg'
+            || $arrImageInfo['mime'] === 'image/jpg'
+            || $arrImageInfo['mime'] === 'image/png') {
             $objImage = new \ImageManager();
-
             $arrImageInfo = array_merge($arrImageInfo, pathinfo($strPathImage));
-
             $thumbWidth = intval($this->arrSettings['settingsThumbSize']);
             $thumbHeight = intval($thumbWidth / $arrImageInfo[0] * $arrImageInfo[1]);
-
-            $objImage->loadImage(\Env::get('cx')->getWebsitePath().$strPathImage);
+            $objImage->loadImage($path);
             $objImage->resizeImage($thumbWidth, $thumbHeight, 100);
-            $objImage->saveNewImage(\Env::get('cx')->getWebsitePath().$strPathImage . '.thumb', true);
+            $objImage->saveNewImage($path . '.thumb', true);
         }
     }
-
 
     function deleteContent($intEntryId, $intIputfieldId)
     {
@@ -451,8 +476,9 @@ INPUT;
         $imageHeight    = $arrImageInfo[1]+20;
         $arrImageInfo   = pathinfo($strValue);
         $strImageName    = $arrImageInfo['basename'];
+        $imagePath      = $arrImageInfo['dirname'];
 
-        return array(
+        $data = array(
             'TXT_MEDIADIR_INPUTFIELD_NAME' => htmlspecialchars(
                 $arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET),
             'MEDIADIR_INPUTFIELD_VALUE' =>
@@ -477,6 +503,27 @@ INPUT;
                 ' title="'.$arrInputfield['name'][0].'"'.
                 ' alt="'.$arrInputfield['name'][0].'" />',
         );
+
+        // fetch thumbnails
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $thumbnailFormats = $cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnails();
+        $thumbnails = $this->cx->getMediaSourceManager()->getThumbnailGenerator()->getThumbnailsFromFile($imagePath, $strImageName, true);
+        foreach ($thumbnailFormats as $thumbnailFormat) {
+            if (!isset($thumbnails[$thumbnailFormat['size']])) {
+                continue;
+            }
+            $format = strtoupper($thumbnailFormat['name']);
+            $thumbnail = $thumbnails[$thumbnailFormat['size']];
+            $placeholderSrc = 'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMBNAIL_FORMAT_';
+            $placeholderImg = 'MEDIADIR_INPUTFIELD_VALUE_THUMBNAIL_FORMAT_';
+            $data[$placeholderSrc . $format] = $thumbnail;
+            $data[$placeholderImg . $format] = 
+                '<img src="'.$thumbnail.'"'.
+                ' title="'.$arrInputfield['name'][0].'"'.
+                ' alt="'.$arrInputfield['name'][0].'" />';
+        }
+
+        return $data;
     }
 
     function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
@@ -484,11 +531,12 @@ INPUT;
 
         $intId = intval($arrInputfield['id']);
         $intEntryDefaultLang = $objDatabase->getOne("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
+        $langId = static::getOutputLocale()->getId();
 
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            $intLangId = in_array(FRONTEND_LANG_ID, $arrTranslationStatus) ? FRONTEND_LANG_ID : contrexx_input2int($intEntryDefaultLang);
+            $intLangId = in_array($langId, $arrTranslationStatus) ? $langId : contrexx_input2int($intEntryDefaultLang);
         } else {
-            $intLangId = FRONTEND_LANG_ID;
+            $intLangId = $langId;
         }
         $objResult = $objDatabase->Execute("
             SELECT `value`

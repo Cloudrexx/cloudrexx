@@ -106,8 +106,6 @@ class Order
     protected $country_id = 0;
     protected $phone = '';
     protected $ip = '';
-    protected $host = '';
-    protected $browser = '';
     protected $note = '';
     protected $date_time = '0000-00-00 00:00:00';
     protected $modified_on = '0000-00-00 00:00:00';
@@ -796,48 +794,6 @@ class Order
     }
 
     /**
-     * Returns the host name
-     *
-     * Optionally sets the value first if the parameter value is a non-empty
-     * string.
-     * Note that the value is not verified other than that.
-     * This value is the empty string unless it has been set before.
-     * @param   string  $host   The optional host name
-     * @return  string          The host name
-     */
-    function host($host=null)
-    {
-        if (isset($host)) {
-            $host = trim(strip_tags($host));
-            if ($host != '') {
-                $this->host = $host;
-            }
-        }
-        return $this->host;
-    }
-
-    /**
-     * Returns the browser identification
-     *
-     * Optionally sets the value first if the parameter value is a non-empty
-     * string.
-     * Note that the value is not verified other than that.
-     * This value is the empty string unless it has been set before.
-     * @param   string  $browser    The optional browser identification
-     * @return  string              The browser identification
-     */
-    function browser($browser=null)
-    {
-        if (isset($browser)) {
-            $browser = trim(strip_tags($browser));
-            if ($browser != '') {
-                $this->browser = $browser;
-            }
-        }
-        return $this->browser;
-    }
-
-    /**
      * Returns the order note
      *
      * Optionally sets the value first if the parameter value is a non-empty
@@ -958,7 +914,7 @@ class Order
                    `billing_email`,
                    `gender`, `company`, `firstname`, `lastname`,
                    `address`, `city`, `zip`, `country_id`, `phone`,
-                   `ip`, `host`, `browser`,
+                   `ip`,
                    `note`,
                    `date_time`, `modified_on`, `modified_by`
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_orders`
@@ -1005,8 +961,6 @@ class Order
         $objOrder->billing_fax($objResult->fields['billing_fax']);
         $objOrder->billing_email($objResult->fields['billing_email']);
         $objOrder->ip($objResult->fields['ip']);
-        $objOrder->host($objResult->fields['host']);
-        $objOrder->browser($objResult->fields['browser']);
         $objOrder->note($objResult->fields['note']);
         $objOrder->date_time($objResult->fields['date_time']);
         $objOrder->modified_on($objResult->fields['modified_on']);
@@ -1041,8 +995,8 @@ class Order
                 `date_time`, `status`,
                 `payment_id`, `payment_amount`,
                 `vat_amount`,
-                `ip`, `host`, `lang_id`,
-                `browser`, `note`,".
+                `ip`, `lang_id`,
+                `note`,".
 // 20111017 Added billing address
                 "
                 `billing_gender`,
@@ -1069,9 +1023,7 @@ class Order
                 $this->payment_id, $this->payment_amount,
                 $this->vat_amount,
                 '".addslashes($this->ip)."',
-                '".addslashes($this->host)."',
                 $this->lang_id,
-                '".addslashes($this->browser)."',
                 '".addslashes($this->note)."',".
 // 20111017 Added billing address
                 "
@@ -1811,7 +1763,7 @@ class Order
             'SHOP_ZIP' => $objOrder->billing_zip(),
             'SHOP_CITY' => $objOrder->billing_city(),
             'SHOP_COUNTRY' => ($edit
-                ? \Cx\Core\Country\Controller\Country::getMenu('billing_country_id', $objOrder->billing_country_id())
+                ? \Cx\Core\Country\Controller\Country::getMenu('billing_country_id', $objOrder->billing_country_id(), false)
                 : \Cx\Core\Country\Controller\Country::getNameById($objOrder->billing_country_id())),
             'SHOP_PHONE' => $objOrder->billing_phone(),
             'SHOP_FAX' => $objOrder->billing_fax(),
@@ -1825,8 +1777,10 @@ class Order
             'SHOP_SHIP_ADDRESS' => $objOrder->address(),
             'SHOP_SHIP_ZIP' => $objOrder->zip(),
             'SHOP_SHIP_CITY' => $objOrder->city(),
+            // in order edit section, we do allow the selection of non-supported
+            // shipment countries as no further logic depends on it
             'SHOP_SHIP_COUNTRY' => ($edit
-                ? \Cx\Core\Country\Controller\Country::getMenu('shipCountry', $objOrder->country_id())
+                ? \Cx\Core\Country\Controller\Country::getMenu('shipCountry', $objOrder->country_id(), false)
                 : \Cx\Core\Country\Controller\Country::getNameById($objOrder->country_id())),
             'SHOP_SHIP_PHONE' => $objOrder->phone(),
             'SHOP_PAYMENTTYPE' => Payment::getProperty($objOrder->payment_id(), 'name'),
@@ -1843,15 +1797,8 @@ class Order
                       $objOrder->ip().'" title="'.$_ARRAYLANG['TXT_SHOW_DETAILS'].'">'.
                       $objOrder->ip().'</a>'
                     : '&nbsp;'),
-                'SHOP_CUSTOMER_HOST' => ($objOrder->host()
-                    ? '<a href="index.php?cmd=NetTools&amp;tpl=whois&amp;address='.
-                      $objOrder->host().'" title="'.$_ARRAYLANG['TXT_SHOW_DETAILS'].'">'.
-                      $objOrder->host().'</a>'
-                    : '&nbsp;'),
                 'SHOP_CUSTOMER_LANG' => \FWLanguage::getLanguageParameter(
                     $objOrder->lang_id(), 'name'),
-                'SHOP_CUSTOMER_BROWSER' => ($objOrder->browser()
-                    ? $objOrder->browser() : '&nbsp;'),
                 'SHOP_LAST_MODIFIED' =>
                     (   $objOrder->modified_on()
                      && $objOrder->modified_on() != '0000-00-00 00:00:00'
@@ -2240,8 +2187,6 @@ class Order
             'country_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null, 'renamefrom' => 'ship_country_id'),
             'phone' => array('type' => 'VARCHAR(20)', 'notnull' => false, 'default' => null, 'renamefrom' => 'ship_phone'),
             'ip' => array('type' => 'VARCHAR(50)', 'default' => '', 'renamefrom' => 'customer_ip'),
-            'host' => array('type' => 'VARCHAR(100)', 'default' => '', 'renamefrom' => 'customer_host'),
-            'browser' => array('type' => 'VARCHAR(255)', 'default' => '', 'renamefrom' => 'customer_browser'),
             'note' => array('type' => 'TEXT', 'default' => '', 'renamefrom' => 'customer_note'),
             'date_time' => array('type' => 'TIMESTAMP', 'default' => '0000-00-00 00:00:00', 'renamefrom' => 'order_date'),
             'modified_on' => array('type' => 'TIMESTAMP', 'default' => null, 'notnull' => false, 'renamefrom' => 'last_modified'),

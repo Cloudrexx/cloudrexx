@@ -40,7 +40,7 @@ function deleteOrder(OrderID)
   <table summary="" border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
     <tbody>
       <tr>
-        <th colspan="10">{TXT_ORDERS}</th>
+        <th colspan="9">{TXT_ORDERS}</th>
       </tr>
       <tr class="row3" style="white-space:nowrap;">
         <td width="3%">&nbsp;&nbsp;<b>#</b></td>
@@ -51,7 +51,6 @@ function deleteOrder(OrderID)
         <td width="7%"><b>{TXT_EGOV_OVERVIEW_AMOUNT}</b></td>
         <td width="13%"><b>{TXT_EGOV_OVERVIEW_RESERVATION_DATE}</b></td>
         <td width="13%"><b>{TXT_DATE}</b></td>
-        <td width="7%"><b>{TXT_IP_ADDRESS}</b></td>
         <td width="10%" style="text-align:right;"><b>{TXT_FUNCTIONS}</b></td>
       </tr>
       <!-- BEGIN orders_row -->
@@ -64,7 +63,6 @@ function deleteOrder(OrderID)
             <td>{EGOV_ORDER_AMOUNT}</td>
             <td>{EGOV_ORDER_RESERVATION_DATE}</td>
             <td><a href="index.php?cmd=Egov&amp;act=order_edit&amp;id={ORDER_ID}" target="_self">{ORDER_DATE}</a></td>
-        <td>{ORDER_IP}</td>
           <td style="text-align:right;" nowrap="nowrap">
             <a href="index.php?cmd=Egov&amp;act=order_edit&amp;id={ORDER_ID}" target="_self" title="{TXT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_EDIT}" title="{TXT_EDIT}" /></a>
             <a href="javascript:deleteOrder({ORDER_ID});" target="_self" title="{TXT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE}" title="{TXT_DELETE}" /></a>

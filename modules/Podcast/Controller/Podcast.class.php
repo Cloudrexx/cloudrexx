@@ -187,6 +187,7 @@ EOF;
             $pos = isset($_GET['pos']) ? intval($_GET['pos']) : 0;
             $arrMedia = $this->_getMedia($categories, true, $_CONFIG['corePagingLimit'], $pos);
             if (count($arrMedia) > 0) {
+                $i = 0;
                 foreach ($arrMedia as $mediumId => $arrMedium) {
                     $this->_objTpl->setVariable(array(
                         'PODCAST_MEDIUM_ROW'                => $i%2==0 ? 'row1' : 'row2',
@@ -235,4 +236,4 @@ EOF;
     }
 
 }
-?>
+

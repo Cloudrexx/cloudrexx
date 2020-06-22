@@ -77,12 +77,12 @@ class Host extends \Cx\Model\Base\EntityBase
     protected $urlTemplate;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\HostEntity
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $hostEntities;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\Change
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $changes;
 
@@ -90,6 +90,11 @@ class Host extends \Cx\Model\Base\EntityBase
      * @var integer $state
      */
     protected $state;
+
+    /**
+     * @var \DateTime $lastUpdate
+     */
+    protected $lastUpdate;
     
     /**
      * @var string Default template for URI
@@ -221,7 +226,7 @@ class Host extends \Cx\Model\Base\EntityBase
     /**
      * Add hostEntity
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntity
+     * @param \Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntity
      */
     public function addHostEntity(\Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntity)
     {
@@ -229,9 +234,19 @@ class Host extends \Cx\Model\Base\EntityBase
     }
 
     /**
+     * Remove hostEntities
+     *
+     * @param \Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntities
+     */
+    public function removeHostEntity(\Cx\Core_Modules\Sync\Model\Entity\HostEntity $hostEntities)
+    {
+        $this->hostEntities->removeElement($hostEntities);
+    }
+
+    /**
      * Get hostEntities
      *
-     * @return Doctrine\Common\Collections\Collection $hostEntities
+     * @return \Doctrine\Common\Collections\Collection $hostEntities
      */
     public function getHostEntities()
     {
@@ -251,7 +266,7 @@ class Host extends \Cx\Model\Base\EntityBase
     /**
      * Add Change
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\Change $change
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Change $change
      */
     public function addChange(\Cx\Core_Modules\Sync\Model\Entity\Change $change)
     {
@@ -281,7 +296,7 @@ class Host extends \Cx\Model\Base\EntityBase
     /**
      * Remove Change
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\Change $change
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Change $change
      */
     public function removeChange($change)
     {
@@ -296,6 +311,9 @@ class Host extends \Cx\Model\Base\EntityBase
     public function setState($state)
     {
         $this->state = $state;
+        $this->setLastUpdate(
+            $this->getComponent('DateTime')->createDateTimeForDb()
+        );
     }
 
     /**
@@ -305,7 +323,33 @@ class Host extends \Cx\Model\Base\EntityBase
      */
     public function getState()
     {
+        if (
+            $this->state == 1 &&
+            $this->getLastUpdate() < $this->getComponent(
+                'DateTime'
+            )->createDateTimeForDb('5 minutes ago')
+        ) {
+            $this->state = 0;
+        }
         return $this->state;
+    }
+
+    /**
+     * Set lastUpdated
+     *
+     * @param \DateTime $lastUpdated
+     */
+    public function setLastUpdate($lastUpdate) {
+        $this->lastUpdate = $lastUpdate;
+    }
+
+    /**
+     * Get lastUpdated
+     *
+     * @return \DateTime $lastUpdated
+     */
+    public function getLastUpdate() {
+        return $this->lastUpdate;
     }
     
     /**
@@ -336,7 +380,7 @@ class Host extends \Cx\Model\Base\EntityBase
         }
         
         $handle = false;
-        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false, $this->getHost()) as $hostEntity) {
             if ($hostEntity['host'] != $this) {
                 continue;
             }
@@ -404,33 +448,42 @@ class Host extends \Cx\Model\Base\EntityBase
         $refUrl = \Cx\Core\Routing\Url::fromDocumentRoot();
         $refUrl->setMode('backend');
         $request->setHeader('Referrer', $refUrl->toString());
+        $request->setHeader('connection', 'close');
         $request->setBody(http_build_query($content, null, '&'));
         $request->setConfig(array(
             'follow_redirects' => true,
             'strict_redirects' => true,
         ));
         
+        echo 'Pushing to ' . $url . ' with method ' . $method . ', body is: ' . http_build_query($content) . "\n";
         $response = $request->send();
         var_dump($response->getStatus());
-        echo 'Pushed to ' . $url . ' with method ' . $method . ', body was: ' . http_build_query($content) . "\n";
         echo '<pre>' . $response->getBody() . "</pre>\n\n";
         
         return $response->getStatus() == 200;
     }
     
     public function isLocked() {
-        $em = $this->cx->getDb()->getEntityManager();
-        $hostRepo = $em->getRepository(get_class($this));
-        $me = $hostRepo->find($this->getId());
-        $this->state = $me->getState();
-        return $this->state == 1;
+        $result = $this->cx->getDb()->getAdoDb()->Execute(
+            'SELECT state FROM '.DBPREFIX.'core_module_sync_host WHERE id = '.$this->getId()
+        );
+        if ($result === false || $result->EOF) {
+            return true;
+        }
+        $this->setState($result->fields['state']);
+
+        //$em = $this->cx->getDb()->getEntityManager();
+        //$hostRepo = $em->getRepository(get_class($this));
+        //$me = $hostRepo->find($this->getId());
+        //$this->setState($me->getState());
+        return $this->getState() == 1;
     }
     
     public function lock() {
         if ($this->isLocked()) {
             return false;
         }
-        $this->state = 1;
+        $this->setState(1);
         $em = $this->cx->getDb()->getEntityManager();
         $em->persist($this);
         $em->flush();
@@ -438,14 +491,14 @@ class Host extends \Cx\Model\Base\EntityBase
     }
     
     public function removeLock() {
-        $this->state = 0;
+        $this->setState(0);
         $em = $this->cx->getDb()->getEntityManager();
         $em->persist($this);
         $em->flush();
     }
     
     public function disable() {
-        $this->state = 2;
+        $this->setState(2);
         $em = $this->cx->getDb()->getEntityManager();
         $em->persist($this);
         $em->flush();

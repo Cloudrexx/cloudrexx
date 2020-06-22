@@ -173,7 +173,7 @@ abstract class OAuth implements OAuthInterface
             if ($registrationRedirectNeeded) {
                 // start session if no session is open
                 $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-                $sessionObj = $cx->getComponent('Session')->getSession();
+                $cx->getComponent('Session')->getSession();
 
                 // write the user id to session so we can pre-fill the sign up form
                 $_SESSION['user_id'] = $objUser->getId();

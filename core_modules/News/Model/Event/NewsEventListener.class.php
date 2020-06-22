@@ -68,7 +68,6 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
         $search = current($eventArgs);
         $term_db = contrexx_raw2db($search->getTerm());
         $newsLib = new \Cx\Core_Modules\News\Controller\NewsLibrary();
-        $newsLib->getSettings();
         $query = '
             SELECT
                 `id`,
@@ -111,9 +110,14 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                                         FRONTEND_LANG_ID,
                                         array('newsid' => $newsId)
                                   );
-                $pageUrlResult  = $objUrl->toString();
+                $pageUrlResult  = (string) $objUrl;
             } else {
-                $pageUrlResult = $searchData['redirect'];
+                $pageUrlResult = preg_replace(
+                    '/\\[\\[([A-Z0-9_-]+)\\]\\]/',
+                    '{\\1}',
+                    $searchData['redirect']
+                );
+                \LinkGenerator::parseTemplate($pageUrlResult);
             }
             return $pageUrlResult;
         };

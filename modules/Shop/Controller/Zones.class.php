@@ -60,7 +60,7 @@ class Zones
      * Zone-Country relation
      * @var   array
      */
-    private static $arrRelation = null;
+    private static $arrRelation = array();
 
 
     /**
@@ -129,21 +129,24 @@ class Zones
     {
         global $objDatabase;
 
-        if (is_null(self::$arrRelation)) {
+        if (empty(static::$arrRelation)) {
 //DBG::log("Zones::getCountryRelationArray(): init()ialising");
             $query = "
                 SELECT zone_id, country_id
                   FROM ".DBPREFIX."module_shop".MODULE_INDEX."_rel_countries";
             $objResult = $objDatabase->Execute($query);
             if (!$objResult) return false;
-            self::$arrRelation = array();
+            static::$arrRelation = array();
             while (!$objResult->EOF) {
-                self::$arrRelation[$objResult->fields['zone_id']][] =
+                if (!isset(static::$arrRelation[$objResult->fields['zone_id']])) {
+                    static::$arrRelation[$objResult->fields['zone_id']] = array();
+                }
+                static::$arrRelation[$objResult->fields['zone_id']][] =
                     $objResult->fields['country_id'];
                 $objResult->MoveNext();
             }
         }
-        return self::$arrRelation;
+        return static::$arrRelation;
     }
 
 
@@ -243,10 +246,7 @@ class Zones
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_zones
              WHERE id=$zone_id");
         if (!$objResult) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_zones");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_countries");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_payment");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper");
+
         return true;
     }
 
@@ -309,6 +309,8 @@ class Zones
                 ? array() : $_POST['selected_countries'][$zone_id]);
             sort($arrCountryId);
             $arrCountryId_old = self::getCountryRelationArray();
+            // reset loaded relation
+            static::$arrRelation = array();
 //DBG::log("Zones::updateZones(): Zones: ".var_export($arrCountryId_old, true));
             $arrCountryId_old = (empty($arrCountryId_old[$zone_id])
                 ? array() : $arrCountryId_old[$zone_id]);

@@ -63,7 +63,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     private $homepage;
 
     /**
-     * @var Cx\Core\User\Model\Entity\User
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $user;
 
@@ -77,11 +77,16 @@ class Group extends \Cx\Model\Base\EntityBase {
      */
     private $accessId;
 
+    /**
+     * @var 
+     */
+    protected $toolbar;
+
     public function __construct()
     {
         $this->user = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->accessId2 = new \Doctrine\Common\Collections\ArrayCollection();
-    $this->accessId = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->accessId2 = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->accessId = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -197,7 +202,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Add user
      *
-     * @param Cx\Core\User\Model\Entity\User $user
+     * @param \Cx\Core\User\Model\Entity\User $user
      */
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
@@ -216,7 +221,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return Doctrine\Common\Collections\Collection $user
+     * @return \Doctrine\Common\Collections\Collection $user
      */
     public function getUser()
     {
@@ -261,5 +266,25 @@ class Group extends \Cx\Model\Base\EntityBase {
     public function getAccessId()
     {
         return $this->accessId;
+    }
+
+    /**
+     * Set toolbar
+     *
+     * @param string $toolbar
+     */
+    public function setToolbar($toolbar)
+    {
+        $this->toolbar = $toolbar;
+    }
+
+    /**
+     * Get toolbar
+     *
+     * @return string $toolbar
+     */
+    public function getToolbar()
+    {
+        return $this->toolbar;
     }
 }

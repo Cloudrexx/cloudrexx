@@ -158,7 +158,7 @@ class ModuleChecker {
             $arrCmActiveModules = array();
             $arrCmInstalledModules = array();
             $qb = $this->em->createQueryBuilder();
-            $qb->add('select', 'p')
+            $qb->add('select', 'p.module, p.active')
                 ->add('from', 'Cx\Core\ContentManager\Model\Entity\Page p')
                 ->add('where',
                     // TODO: what is the proper syntax for non-empty values?
@@ -167,9 +167,9 @@ class ModuleChecker {
                 );
             $pages = $qb->getQuery()->getResult();
             foreach ($pages as $page) {
-                $arrCmInstalledModules[] = $page->getModule();
-                if ($page->isActive()) {
-                    $arrCmActiveModules[] = $page->getModule();
+                $arrCmInstalledModules[] = $page['module'];
+                if ($page['active']) {
+                    $arrCmActiveModules[] = $page['module'];
                 }
             }
 

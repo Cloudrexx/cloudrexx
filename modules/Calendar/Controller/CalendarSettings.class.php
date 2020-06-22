@@ -462,11 +462,13 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_TITLE'                    =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_TITLE'],
             'TXT_'.$this->moduleLangVar.'_START_DATE'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_START_DATE'],
             'TXT_'.$this->moduleLangVar.'_END_DATE'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_END_DATE'],
+            'TXT_'.$this->moduleLangVar.'_LINK_ATTACHMENT'          =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_ATTACHMENT'],
             'TXT_'.$this->moduleLangVar.'_LINK_EVENT'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_EVENT'],
             'TXT_'.$this->moduleLangVar.'_LINK_REGISTRATION'        =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_REGISTRATION'],
             'TXT_'.$this->moduleLangVar.'_USERNAME'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_USERNAME'],
             'TXT_'.$this->moduleLangVar.'_FIRSTNAME'                =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_FIRSTNAME'],
             'TXT_'.$this->moduleLangVar.'_LASTNAME'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LASTNAME'],
+            'TXT_'.$this->moduleLangVar.'_SALUTATION'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_SALUTATION'],
             'TXT_'.$this->moduleLangVar.'_URL'                      =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_URL'],
             'TXT_'.$this->moduleLangVar.'_DATE'                     =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_DATE'],
             'TXT_'.$this->moduleLangVar.'_REGISTRATION_TYPE'        =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_REGISTRATION_TYPE'],
@@ -497,7 +499,7 @@ class CalendarSettings extends CalendarLibrary
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_TEMPLATE_ACTION'          =>  $action,
             $this->moduleLangVar.'_TEMPLATE_LANG'            =>  $lang,
-            $this->moduleLangVar.'_TEMPLATE_CONTENT_HTML'    =>  new \Cx\Core\Wysiwyg\Wysiwyg('content_html', $objMail->content_html, 'fullpage'),
+            $this->moduleLangVar.'_TEMPLATE_CONTENT_HTML'    =>  new \Cx\Core\Wysiwyg\Wysiwyg('content_html', contrexx_raw2xhtml($objMail->content_html), 'fullpage'),
         ));
     }
 

@@ -584,8 +584,11 @@ class ShopManager extends ShopLibrary
                     ++$errorLines;
                 }
             }
-            // Fix picture field and create thumbnails
-            Products::makeThumbnailsById($arrId);
+            // Fix picture field and create thumbnails in case the import
+            // contains images
+            if (in_array('pictures', $arrProductFieldName)) {
+                Products::makeThumbnailsById($arrId);
+            }
             if ($importedLines) {
                 \Message::ok($_ARRAYLANG['TXT_SHOP_IMPORT_SUCCESSFULLY_IMPORTED_PRODUCTS'].
                     ': '.$importedLines);
@@ -1685,6 +1688,7 @@ if ($test === NULL) {
         $flagEditTabActive = false;
         $parent_id = 0;
         $name = '';
+        $short = '';
         $desc = '';
         $active = true;
         $virtual = false;
@@ -1697,6 +1701,7 @@ if ($test === NULL) {
             if ($objCategory) {
                 $parent_id = $objCategory->parent_id();
                 $name = contrexx_raw2xhtml($objCategory->name());
+                $short = $objCategory->shortDescription();
                 $desc = $objCategory->description();
                 $active = $objCategory->active();
                 $virtual = $objCategory->virtual();
@@ -1732,6 +1737,7 @@ if ($test === NULL) {
                 ($virtual ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_CATEGORY_ACTIVE_CHECKED' =>
                 ($active ? \Html::ATTRIBUTE_CHECKED : ''),
+            'SHOP_CATEGORY_SHORT_DESCRIPTION' => $short,
             'SHOP_CATEGORY_DESCRIPTION' => $desc,
             'SHOP_CATEGORY_EDIT_ACTIVE' => ($flagEditTabActive ? 'active' : ''),
             'SHOP_CATEGORY_EDIT_DISPLAY' => ($flagEditTabActive ? 'block' : 'none'),
@@ -1749,8 +1755,8 @@ if ($test === NULL) {
         // mediabrowser
         $mediaBrowserOptions = array(
             'type'                      => 'button',
-            'data-cx-mb-startmediatype' => 'shop',
-            'data-cx-mb-views'          => 'filebrowser',
+            'startmediatype'            => 'shop',
+            'views'                     => 'filebrowser',
             'id'                        => 'media_browser_shop',
             'style'                     => 'display:none'
         );
@@ -1830,6 +1836,7 @@ if ($test === NULL) {
         $virtual = isset($_POST['virtual']);
         $parentid = intval($_POST['parent_id']);
         $picture = contrexx_input2raw($_POST['image_href']);
+        $short = contrexx_input2raw($_POST['short']);
         $long = contrexx_input2raw($_POST['desc']);
         $objCategory = null;
         if ($category_id > 0) {
@@ -1843,12 +1850,13 @@ if ($test === NULL) {
             // If the values are identical, leave the parent ID alone!
             if ($category_id != $parentid) $objCategory->parent_id($parentid);
             $objCategory->name($name);
+            $objCategory->shortDescription($short);
             $objCategory->description($long);
             $objCategory->active($active);
         } else {
             // Add new ShopCategory
             $objCategory = new ShopCategory(
-                $name, $long, $parentid, $active, 0);
+                $name, $short, $long, $parentid, $active, 0);
         }
         // Ignore the picture if it's the default image!
         // Storing it would be pointless, and we should
@@ -1953,12 +1961,15 @@ if ($test === NULL) {
 
         $arrCategoryId = array();
         $deleted = false;
+        $deleteProducts = false;
         if (empty($category_id)) {
             if (!empty($_GET['delete_category_id'])) {
                 array_push($arrCategoryId, $_GET['delete_category_id']);
+                $deleteProducts = !empty($_GET['delete_products']);
             } elseif (!empty($_POST['selected_category_id'])
                    && is_array($_POST['selected_category_id'])) {
                 $arrCategoryId = $_POST['selected_category_id'];
+                $deleteProducts = !empty($_POST['delete_products']);
             }
         } else {
             array_push($arrCategoryId, $category_id);
@@ -1988,23 +1999,46 @@ if ($test === NULL) {
 //DBG::log("delete_categories($category_id): Products in $category_id: ".var_export($arrProducts, true));
             // Delete the products in the category
             foreach ($arrProducts as $objProduct) {
-                // Check whether there are orders with this Product ID
-                $product_id = $objProduct->id();
-                $query = "
-                    SELECT 1
-                      FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
-                     WHERE product_id=$product_id";
-                $objResult = $objDatabase->Execute($query);
-                if (!$objResult || $objResult->RecordCount()) {
-                    \Message::error(
-                        $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
-                        "&nbsp;(".
-                        sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
-                            $category_id).")");
-                    continue 2;
+                // delete products of category in case the user requested
+                // to do so
+                if ($deleteProducts) {
+                    // Check whether there are orders with this Product ID
+                    $product_id = $objProduct->id();
+                    $query = "
+                        SELECT 1
+                          FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
+                         WHERE product_id=$product_id";
+                    $objResult = $objDatabase->Execute($query);
+                    if (!$objResult || $objResult->RecordCount()) {
+                        \Message::error(
+                            $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
+                            "&nbsp;(".
+                            sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
+                                $category_id).")");
+                        continue 2;
+                    }
+                } else {
+                    // remove product from category
+
+                    $categoryIdsOfProduct = array_flip(
+                        preg_split('/\s*,\s*/',
+                            $objProduct->category_id(), null,
+                            PREG_SPLIT_NO_EMPTY
+                        )
+                    );
+                    unset($categoryIdsOfProduct[$category_id]);
+                    $objProduct->category_id(
+                        join(',', array_keys($categoryIdsOfProduct))
+                    );
+                    if (!$objProduct->store()) {
+                        return false;
+                    }
                 }
             }
-            if (Products::deleteByShopCategory($category_id) === false) {
+            if (
+                $deleteProducts &&
+                Products::deleteByShopCategory($category_id) === false
+            ) {
                 \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
                     "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
                 continue;
@@ -2019,12 +2053,13 @@ if ($test === NULL) {
             }
             $deleted = true;
         }
-        if ($deleted) {
-            $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_categories");
-            $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_products");
+        if (!$deleted) {
+            return null;
+        }
+        if ($deleteProducts) {
             return \Message::ok($_ARRAYLANG['TXT_DELETED_CATEGORY_AND_PRODUCTS']);
         }
-        return null;
+        return \Message::ok($_ARRAYLANG['TXT_SHOP_DELETED_CATEGORIES']);
     }
 
 
@@ -2147,8 +2182,8 @@ if ($test === NULL) {
         // media browser
         $mediaBrowserOptions = array(
             'type'                      => 'button',
-            'data-cx-mb-startmediatype' => 'shop',
-            'data-cx-mb-views'          => 'filebrowser',
+            'startmediatype'            => 'shop',
+            'views'                     => 'filebrowser',
             'id'                        => 'media_browser_shop',
             'style'                     => 'display:none'
         );
@@ -2237,7 +2272,7 @@ if ($test === NULL) {
             'SHOP_STOCK_VISIBILITY' => ($objProduct->stock_visible()
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                Manufacturer::getMenuoptions($objProduct->manufacturer_id()),
+                Manufacturer::getMenuoptions($objProduct->manufacturer_id(), true),
             'SHOP_PICTURE1_IMG_SRC' =>
                 (   !empty($arrImages[1]['img'])
                  && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
@@ -2277,6 +2312,7 @@ if ($test === NULL) {
             'SHOP_DISTRIBUTION_MENU' => Distribution::getDistributionMenu(
                 $objProduct->distribution(), 'distribution',
                 'distributionChanged();', 'style="width: 220px"'),
+            'SHOP_DISTRIBUTION_DESC' => Distribution::getDistributionDescription(),
             'SHOP_WEIGHT' => ($distribution == 'delivery'
                 ? Weight::getWeightString($objProduct->weight()) : '0 g'),
             // User group menu, returns 'userGroupId'
@@ -2899,12 +2935,6 @@ if ($test === NULL) {
             'SHOP_PHONE' => $objCustomer->phone(),
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
-// OBSOLETE
-//            'SHOP_CCNUMBER' => $objCustomer->getCcNumber(),
-//            'SHOP_CCDATE' => $objCustomer->getCcDate(),
-//            'SHOP_CCNAME' => $objCustomer->getCcName(),
-//            'SHOP_CVC_CODE' => $objCustomer->getCcCode(),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
@@ -2913,6 +2943,13 @@ if ($test === NULL) {
             'SHOP_DISCOUNT_GROUP_CUSTOMER' => Discount::getCustomerGroupName(
                 $objCustomer->group_id()),
         ));
+        $birthday = $objCustomer->getProfileAttribute('birthday');
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
 // TODO: TEST
         $count = NULL;
         $orders = Orders::getArray($count, NULL, array('customer_id' => $objCustomer->id()), \Paging::getPosition(),
@@ -3031,13 +3068,12 @@ if ($test === NULL) {
             'SHOP_EMAIL' => $email,
             'SHOP_PHONE' => $phone,
             'SHOP_FAX' => $fax,
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_USERNAME' => $username,
             'SHOP_PASSWORD' => $password,
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
                 Discount::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
@@ -3046,6 +3082,19 @@ if ($test === NULL) {
                 Customers::getActiveMenuoptions($active),
             'SHOP_LANG_ID_MENUOPTIONS' => \FWLanguage::getMenuoptions($lang_id),
         ));
+        $birthday = 0;
+        if ($objCustomer) {
+            $birthday = $objCustomer->getProfileAttribute('birthday');
+        }
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
+        \JS::registerCode(
+            'cx.ready(function(){cx.jQuery(".datepicker-field").datepicker({dateFormat: "dd.mm.yy"});});'
+        );
         return true;
     }
 
@@ -3109,7 +3158,7 @@ if ($test === NULL) {
             $password = \User::make_password();
         }
         if ($password != '') {
-            $objCustomer->password($password);
+            $objCustomer->setPassword($password);
         }
         $objCustomer->setFrontendLanguage($lang_id);
         if (!$objCustomer->store()) {
@@ -3687,7 +3736,7 @@ if ($test === NULL) {
     static function sendProcessedMail($order_id)
     {
         $arrSubstitution =
-              Orders::getSubstitutionArray($order_id)
+              Orders::getSubstitutionArray($order_id, false, false)
             + self::getSubstitutionArray();
         $lang_id = $arrSubstitution['LANG_ID'];
         // Select template for: "Your order has been processed"
@@ -3777,6 +3826,20 @@ if ($test === NULL) {
             ));
         }
         self::$objTemplate->parse('discountName');
+        self::$objTemplate->setCurrentBlock('discountType');
+        self::$objTemplate->setVariable(array(
+            'SHOP_DISCOUNT_GROUP_TYPE_OPTIONS' =>
+            \Html::getRadioGroup(
+                'discountGroupType',
+                array(
+                    $_ARRAYLANG['TXT_YES'],
+                    $_ARRAYLANG['TXT_NO']
+                ),
+                Discount::isDiscountCumulative($id)
+            )
+        ));
+        self::$objTemplate->touchBlock('discountType');
+        self::$objTemplate->parse('discountType');
         self::$objTemplate->setCurrentBlock('discountRate');
         if (isset($arrDiscountRates)) {
             $arrDiscountRates = array_reverse($arrDiscountRates, true);
@@ -3813,13 +3876,14 @@ if ($test === NULL) {
     {
         if (!isset($_POST['discountId'])) return true;
         $discountId = intval($_POST['discountId']);
+        $discountGroupType = contrexx_input2int($_POST['discountGroupType']);
         $discountGroupName = contrexx_input2raw($_POST['discountGroupName']);
         $discountGroupUnit = contrexx_input2raw($_POST['discountGroupUnit']);
         $arrDiscountCount = contrexx_input2int($_POST['discountCount']);
         $arrDiscountRate = contrexx_input2float($_POST['discountRate']);
         return Discount::storeDiscountCount(
-            $discountId, $discountGroupName, $discountGroupUnit,
-            $arrDiscountCount, $arrDiscountRate
+            $discountId, $discountGroupType, $discountGroupName,
+            $discountGroupUnit, $arrDiscountCount, $arrDiscountRate
         );
     }
 

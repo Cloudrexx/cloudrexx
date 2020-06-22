@@ -55,6 +55,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     protected $messages = '';
     protected $reminders = array(3, 14);
     protected $db;
+
+    protected static $protocolOfServer = '';
+
     /*
      * Constructor
      */
@@ -87,17 +90,21 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     public function getCommandDescription($command, $short = false) {
-        switch ($command) {
-            case 'MultiSite':
-                return 'Load MultiSite GUI forms (sign-up / Customer Panel / etc.)';
+        if ($command != 'MultiSite') {
+            return '';
         }
-    }
+        if ($short) {
+            return 'Allows the management of the MultiSite manager/service server';
+        }
+        return "MultiSite <section>
+\tLoad MultiSite GUI forms of <section> (Signup / Login / Subscription / etc.)
 
-    /**
-     * {@inheritdoc}
-     */
-    public function postComponentLoad() {
-         self::errorHandler();
+MultiSite pass <website> [sudo] <command> [<arguments>]
+\tExecute <command> on website <website> 
+\tIf sudo is specified, then the command <command> will be executed even if the website is not online.
+
+MultiSite Cache flush [<pattern>] [-v] [--exec]
+\tFlush memcached cache by optional <pattern>";
     }
 
     public function executeCommand($command, $arguments, $dataArguments = array())
@@ -129,26 +136,28 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             return;
         }
 
-        // define frontend language
-// TODO: implement multilanguage support for API command
-        if (!defined('FRONTEND_LANG_ID')) {
-            define('FRONTEND_LANG_ID', 1);
+        if ($subcommand != 'Cache') {
+            // define frontend language
+    // TODO: implement multilanguage support for API command
+            if (!defined('FRONTEND_LANG_ID')) {
+                define('FRONTEND_LANG_ID', 1);
+            }
+
+            // load language data of MultiSite component
+            JsonMultiSiteController::loadLanguageData();
+
+            // load application template
+            $page = new \Cx\Core\ContentManager\Model\Entity\Page();
+            $page->setVirtual(true);
+            $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
+            $page->setCmd($pageCmd);
+            $page->setModule('MultiSite');
+            $pageContent = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page, null, \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB, false);
+            \LinkGenerator::parseTemplate($pageContent, true, new \Cx\Core\Net\Model\Entity\Domain(\Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
+            $objTemplate = new \Cx\Core\Html\Sigma();
+            $objTemplate->setTemplate($pageContent);
+            $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
         }
-
-        // load language data of MultiSite component
-        JsonMultiSiteController::loadLanguageData();
-
-        // load application template
-        $page = new \Cx\Core\ContentManager\Model\Entity\Page();
-        $page->setVirtual(true);
-        $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
-        $page->setCmd($pageCmd);
-        $page->setModule('MultiSite');
-        $pageContent = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page);
-        \LinkGenerator::parseTemplate($pageContent, true, new \Cx\Core\Net\Model\Entity\Domain(\Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
-        $objTemplate = new \Cx\Core\Html\Sigma();
-        $objTemplate->setTemplate($pageContent);
-        $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
 
         switch ($command) {
             case 'MultiSite':
@@ -223,6 +232,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     
                     case 'exec':
                         echo $this->executeCommandExec($arguments);
+                        break;
+
+                    case 'Cache':
+                        echo $this->executeCommandCache($arguments);
                         break;
                     
                     default:
@@ -461,6 +474,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 ) {
                     continue;
                 }
+
                 if (empty($description)) {
                     if (   $websiteCollection instanceof \Cx\Core_Modules\MultiSite\Model\Entity\WebsiteCollection
                         && $websiteCollection->getWebsites()
@@ -618,7 +632,21 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         foreach ($products as $product) {
 // customizing: do not list Trial and Enterprise product
 // TODO: implement some sort of selective product selection in the multisite configuration
-            if (in_array($product->getName(), array('Free', 'Enterprise'))) {
+            if (
+                in_array(
+                    $product->getName(),
+                    array(
+                        'Free',
+                        'Solo',
+                        'Enterprise',
+                        'Partnerbeitrag',
+                        'EULA Standard',
+                        'EULA Enterprise',
+                        'EULA Non-Profit',
+                        'Generic App',
+                    )
+                )
+            ) {
                 continue;
             }
             $productName = contrexx_raw2xhtml($product->getName());
@@ -1400,6 +1428,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     
                     case 'Ssl':
                         $certificateName = $domainName;//isset($_POST['certificate_name']) ? contrexx_input2raw($_POST['certificate_name']) : '';
+
+                        $certificateData = isset($_POST['certificate']) ? contrexx_input2raw($_POST['certificate']) : '';
+                        if (
+                            !empty($certificateData) &&
+                            function_exists('openssl_x509_parse')
+                        ) {
+                            $certificateInfo = openssl_x509_parse($certificateData);
+                            $certificateIssuer = '';
+                            if (isset($certificateInfo['issuer']['O'])) {
+                                $certificateIssuer = $certificateInfo['issuer']['O'];
+                            }
+                            $certificateSubject = '';
+                            if (isset($certificateInfo['subject']['CN'])) {
+                                $certificateSubject = $certificateInfo['subject']['CN'];
+                            }
+                            $installDate = date('Y-m-d H:i:s');
+                            $certificateName = "$certificateIssuer - $certificateSubject / $installDate";
+                        }
                         $privateKey      = isset($_POST['private_key']) ? contrexx_input2raw($_POST['private_key']) : '';
                         if (empty($certificateName) || empty($privateKey)) {
                             return $this->parseJsonMessage($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SSL_FAILED'], false);
@@ -1410,7 +1456,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                             'domainName'      => $domainName,
                             'certificateName' => $certificateName,
                             'privateKey'      => $privateKey,
-                            'certificate'     => isset($_POST['certificate']) ? contrexx_input2raw($_POST['certificate']) : '',
+                            'certificate'     => $certificateData,
                             'caCertificate'   => isset($_POST['ca_certificate']) ? contrexx_input2raw($_POST['ca_certificate']) : ''
                         );
                         break;
@@ -1491,10 +1537,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         }
                     }
                     
-                    $spfText = 'v=spf1 mx a mx:' . $website->getBaseDn()->getName();
-                    if($mailServiceServerStatus){
-                        $spfText .= ' mx:' . $website->getMailDn()->getName();
-                    }
+                    // TODO: this should be put into a configuration option
+                    $spfText = 'v=spf1 include:spf.cloudrexx.com';
                     
                     $objTemplate->setVariable(array(
                         'TXT_MULTISITE_SPF_DOMAIN_INFO' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SPF_INFO'], $domainName),
@@ -1645,7 +1689,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
 
                 $successMsg = $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADMIN_USER_' . strtoupper($submitFormAction) . '_SUCCESS'];
-                $errorMsg = $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADMIN_USER_' . strtoupper($submitFormAction) . '_FAILED'];
+                $errorMsg   = $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADMIN_USER_' . strtoupper($submitFormAction) . '_FAILED'];
+                $params     = array();
                 switch ($submitFormAction) {
 
                     case 'Edit':
@@ -1663,8 +1708,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         $params['multisite_user_account_email']                     = $_POST['adminUser']['email'];
                         $params['multisite_user_account_password']                  = contrexx_input2raw($_POST['adminUser']['password']);
                         $params['multisite_user_account_password_confirmed']        = contrexx_input2raw($_POST['adminUser']['confirm_password']);
-                        $params['multisite_user_profile_attribute']['lastname']     = array(contrexx_input2raw($_POST['adminUser']['userProfile']['lastname']));
-                        $params['multisite_user_profile_attribute']['firstname']    = array(contrexx_input2raw($_POST['adminUser']['userProfile']['firstname']));
+                        $params['multisite_user_profile_attribute']                 = array(
+                            'lastname'  => array(contrexx_input2raw($_POST['adminUser']['userProfile']['lastname'])),
+                            'firstname' => array(contrexx_input2raw($_POST['adminUser']['userProfile']['firstname']))
+                        );
                         break;
                     case 'Delete':
                         $command = 'removeUser';
@@ -2105,6 +2152,110 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         echo PHP_EOL . str_repeat('#', 80) . PHP_EOL;
     }
 
+    public function executeCommandCache($arguments) {
+        global $_CONFIG;
+
+        if ($arguments[1] != 'flush') {
+            return;
+        }
+
+        $pattern = '';
+        if (!empty($arguments[2])) {
+            $pattern = $arguments[2];
+        }
+
+        $verbose = false;
+        if (in_array('-v', $arguments)) {
+            $verbose = true;
+        }
+
+        $dryRun = true;
+        if (in_array('--exec', $arguments)) {
+            $dryRun = false;
+        }
+
+        if (
+            !isset($_CONFIG['cacheDbStatus']) ||
+            $_CONFIG['cacheDbStatus'] != 'on'
+        ) {
+            return;
+        }
+
+        if (!isset($_CONFIG['cacheUserCache'])) {
+            return;
+        }
+
+        switch ($_CONFIG['cacheUserCache']) {
+            case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED:
+                // load stored memcached configuration
+
+                // workaround as h1 does not yet have the new cache config option
+                if (empty($_CONFIG['cacheUserCacheMemcachedConfig'])) {
+                    $_CONFIG['cacheUserCacheMemcachedConfig'] = $_CONFIG['cacheUserCacheMemcacheConfig'];
+                }
+
+                if (empty($_CONFIG['cacheUserCacheMemcachedConfig'])) {
+                    return;
+                }
+
+                $settings = json_decode($_CONFIG['cacheUserCacheMemcachedConfig'], true);
+                $ip = $settings['ip'];
+                $port = $settings['port'];
+
+                $memcachedConfiguration = array('ip' => $ip, 'port' => $port);
+
+                // verify that memcached is installed
+                if (!extension_loaded('memcached')) {
+                    dl('memcached');
+                    break;
+                }
+
+                // verify that memcached is loaded
+                if (!class_exists('\Memcached', false)) {
+                    break;
+                }
+
+                // connect to memcached server
+                $memcached = new \Memcached();
+                if (!@$memcached->addServer($memcachedConfiguration['ip'], $memcachedConfiguration['port'])) {
+                    break;
+                }
+
+                // flush cache
+                $keys = $memcached->getAllKeys();
+                $n = 0;
+                foreach ($keys as $key) {
+                    if (
+                        !empty($pattern) &&
+                        !preg_match('/' . $pattern . '/', $key)
+                    ) {
+                        continue;
+                    }
+
+                    if ($verbose) {
+                        echo "flush $key\n";
+                    }
+
+                    if (!$dryRun) {
+                        $memcached->delete($key);
+                    }
+                    $n++;
+                }
+
+                if ($dryRun) {
+                    echo 'Dry-run: nothing has been flushed yet' . "\n";
+                    echo $n . ' keys would have been dropped from Memcached' . "\n";
+                    echo 'Call command with argument --exec to perform the flush command' . "\n";
+                } else {
+                    echo $n . ' keys dropped from Memcached' . "\n";
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
     /**
      * Create new payment (handler Payrexx)
      * 
@@ -2295,13 +2446,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $websiteRepo = \Env::get('em')->getRepository('\Cx\Core_Modules\MultiSite\Model\Entity\Website');
             $website = $websiteRepo->findOneBy(array('name' => $websiteName));
             if (!\FWValidator::isEmpty($website)) {
-                return array('status' => 'success', 'message' => array('message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_SUCCESS'], 'websiteId' => $website->getId()), 'reload' => (isset($_GET['page_reload']) && $_GET['page_reload'] == 'reload_page' ? true : false));
+                return array(
+                    'status' => 'success',
+                    'message' => array(
+                        'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_SUCCESS'],
+                        'websiteId' => $website->getId()
+                    ),
+                    'reload' => (isset($_GET['page_reload']) && $_GET['page_reload'] == 'reload_page' ? true : false),
+                    'log'    => \DBG::getMemoryLogs(),
+                );
             }
             
-            return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_FAILED']);
+            return array(
+                'status' => 'error',
+                'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_FAILED'],
+                'log'    => \DBG::getMemoryLogs(),
+            );
         } catch (Exception $e) {
             \DBG::log("Failed to add website:" . $e->getMessage());
-            return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_FAILED']);
+            return array(
+                'status' => 'error',
+                'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ADD_WEBSITE_FAILED'],
+                'log'    => \DBG::getMemoryLogs(),
+            );
         }
     }
     
@@ -3127,7 +3294,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
     
     public function preInit(\Cx\Core\Core\Controller\Cx $cx) {
-        global $_CONFIG;
+        global $_CONFIG, $argv;
 
         /**
          * This gives us the list of classes that are not loaded from codebase
@@ -3228,14 +3395,38 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     break;
                 }
 
+                // Ignore the website's state if the sudo command is being
+                // executed.
+                // Otherwise the command will only be executed if the website
+                // is currently online.
+                if (
+                    $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_COMMAND &&
+                    php_sapi_name() == 'cli' &&
+                    count($argv) >= 3 &&
+                    $argv[1] == 'sudo'
+                ) {
+                    array_splice($argv, 1, 1);
+                    if ($argv[1] == 'Cache') {
+                        // disable the user cache to ensure the cache
+                        // command can be executed fail-safe
+                        $cacheDriver = new \Doctrine\Common\Cache\ArrayCache();
+                        $cx->getComponent('Cache')->setCacheDriver($cacheDriver);
+                    }
+                    break;
+                }
+
                 // deploy website when in online-state and request is a regular http request
                 if (\Cx\Core\Setting\Controller\Setting::getValue('websiteState','MultiSite') == \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE) {
                     break;
                 }
 
-// TODO: this offline mode has been caused by the MultiSite Manager -> Therefore, we should not return the Website's custom offline page.
-//       Instead we shall show the Cloudrexx offline page
-                throw new \Exception('Website is currently not online');
+                // show website offline message
+                \header($_SERVER['SERVER_PROTOCOL'] . ' 503 Service Unavailable');
+                // remove CSRF token
+                output_reset_rewrite_vars();
+                echo file_get_contents($this->getDirectory() . '/View/Template/Generic/offline.html');
+                \DBG::log('Website is currently not online');
+                throw new \Cx\Core\Core\Controller\InstanceException();
                 break;
 
             default:
@@ -3279,6 +3470,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Allow access to command-mode only through Manager domain (-> Main Domain) and Customer Panel domain
         // Other requests will be forwarded to the Marketing Website of MultiSite.
         if (   $cx->getMode() == $cx::MODE_COMMAND
+            && php_sapi_name() != 'cli'
             && $requestedDomainName != $managerDomain->getName()
             && $requestedDomainName != $customerPanelDomainName
         ) {
@@ -3325,7 +3517,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             && $requestedDomainName != $marketingWebsiteDomainName
             && $requestedDomainName != $customerPanelDomainName
         ) {
-            header('Location: '.$this->getApiProtocol().$marketingWebsiteDomainName, true, 301);
+            // This is a hacky workaround to make the webmail link from Plesk work.
+            // Unfortunately, the webmail link in the Plesk panel can't be customized.
+            if (preg_match('/^webmail.[^.]+.mail.cloudrexx.com$/', $requestedDomainName)) {
+                header('Location: https://webmail.cloudrexx.com?_user=' . $_GET['_user'], true, 301);
+                exit;
+            }
+            // Redirect by 302 as the request might have been targeted a
+            // customer's website of which the DNS propagation did not
+            // yet complete. If we would redirect by 301, the browser
+            // would cache the redirect and then once the DNS
+            // propagation will be completed, the browser won't
+            // re-try to access the customer's website.
+            header('Location: '.$this->getApiProtocol().$marketingWebsiteDomainName, true, 302);
             exit;
         }
 
@@ -3355,6 +3559,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
         $website = $multiSiteRepo->findByDomain(\Cx\Core\Setting\Controller\Setting::getValue('websitePath','MultiSite').'/', $_SERVER['HTTP_HOST']);
         if ($website) {
+            // remember the configured API protocol for usage by the website
+            static::$protocolOfServer = $this->getApiProtocol();
+
+            // deploy website
             $this->deployWebsite($cx, $website);
             exit;
         }
@@ -3377,6 +3585,18 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // accessable throuth the backend in case its Website Service Server
         // has activated the maintenance-mode.
         $cx->checkSystemState(true);
+
+        // Ensure the current CX instance is the first one (-> Service Server).
+        // This shall prevent an infinite loading loop in case the requested
+        // website is still in its initialization (setup) phase in which
+        // case the website does not yet have a configuration.php file.
+        // The latter would cause to re-load the Service Server again (as
+        // fallback). As every new initialization does increment the ID
+        // of the CX instance, we can identify such a load loop by an ID
+        // higher then 1
+        if ($cx->getId() > 1) {
+            throw new \Cx\Core\Core\Controller\InstanceException();
+        }
 
         $configFile = \Cx\Core\Setting\Controller\Setting::getValue('websitePath','MultiSite').'/'.$website->getName().'/config/configuration.php';
         $requestInfo =    isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'JsonData'
@@ -3449,6 +3669,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return string $protocolUrl
      */
     public static function getApiProtocol() {
+        $protocolUrl = '';
         switch (\Cx\Core\Setting\Controller\Setting::getValue('multiSiteProtocol','MultiSite')) {
             case 'http':
                 $protocolUrl = 'http://';
@@ -3457,12 +3678,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $protocolUrl = 'https://';
                 break;
             case 'mixed':
-// TODO: this is a workaround for Websites, as they are not aware of the related configuration option
             default:
-                return empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http://' : 'https://';
                 break;
         }
-        return $protocolUrl;
+
+        if (!empty($protocolUrl)) {
+            return $protocolUrl;
+        }
+
+        if (!empty(static::$protocolOfServer)) {
+            return static::$protocolOfServer;
+        }
+
+        return empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http://' : 'https://';
     }
     
     /**
@@ -3693,6 +3921,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             ));
             $objProfileAttribute->setType('text');
             $objProfileAttribute->setParent(0);
+            $objProfileAttribute->moveToEnd();
             if ($protection) {
                 $objProfileAttribute->setProtection(array());
             }
@@ -3717,7 +3946,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case ComponentController::MODE_WEBSITE:
                 $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
                 $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-                $users = $userRepo->findBy(array('isAdmin' => '1'));
+                $users = $userRepo->findBy(array('isAdmin' => '1', 'active' => '1'));
 
                 
                 foreach ($users as $user) {
@@ -3729,6 +3958,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
                 foreach ($groups as $group) {
                     foreach ($group->getUser() as $user) {
+                        if (!$user->getActive()) {
+                            continue;
+                        }
                         if (!array_key_exists($user->getId(), $adminUsers)) {
                             $adminUsers[$user->getId()] = $user;
                         }
@@ -3792,14 +4024,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $data['reload'] = $reload;
         
         if ($status) {
-            return $json->json(new \Cx\Lib\Net\Model\Entity\Response(array(
+            return $json->json(new \Cx\Core\Routing\Model\Entity\Response(array(
                 'status' => 'success',
                 'data'   => $data,
             )));
         }
 
         if (!$status) {
-            return $json->json(new \Cx\Lib\Net\Model\Entity\Response(array(
+            return $json->json(new \Cx\Core\Routing\Model\Entity\Response(array(
                 'status'  => 'error',
                 'message' => $message,
             )));

@@ -105,6 +105,8 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
     }
 
     public function preUpdate($eventArgs) {
+        // this method is used to propagate changes from the website to
+        // the manager/customer-panel
         global $_ARRAYLANG;
         
         \DBG::msg('MultiSite (AccessUserEventListener): preUpdate');
@@ -121,14 +123,32 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
                     
                     $websiteUserId = \Cx\Core\Setting\Controller\Setting::getValue('websiteUserId','MultiSite');
                     if ($websiteUserId == $objUser->getId() && !\Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::isIscRequest()) {
-                        if (!$objUser->isVerified()) {
+                        // only fetch user-data in case there had been any changes
+                        $params = self::fetchUserData($objUser, true);
+                        if (
+                            !empty($params) &&
+                            !$objUser->isVerified()
+                        ) {
+// TODO: add language variable
                             throw new \Exception('Diese Funktion ist noch nicht freigeschalten. Aus Sicherheitsgründen bitten wir Sie, Ihre Anmeldung &uuml;ber den im Willkommens-E-Mail hinterlegten Link zu best&auml;tigen. Anschliessend wird Ihnen diese Funktion zur Verf&uuml;gung stehen. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
                         }
 
-                        if (\FWUser::getFWUserObject()->objUser->isLoggedIn() && ($objUser->getId() != \FWUser::getFWUserObject()->objUser->getId())) {
+                        if (
+                            \FWUser::getFWUserObject()->objUser->isLoggedIn() &&
+                            $objUser->getId() != \FWUser::getFWUserObject()->objUser->getId()
+                        ) {
+// TODO: add language variable
                             throw new \Exception('Das Benutzerkonto des Websitebetreibers kann nicht ge&auml;ndert werden. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
                         }
                         
+                        // this check must be done after the two verifications
+                        // above, to ensure that the thrown exceptions above
+                        // will prevent the execution of any code that follows
+                        // the store event of the user afterwards
+                        if (empty($params)) {
+                            break;
+                        }
+
                         $objWebsiteOwner = \FWUser::getFWUserObject()->objUser->getUser($websiteUserId);
                         $newEmail = $objUser->getEmail();
                         $response = \Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::executeCommandOnMyServiceServer('executeOnManager', array('command' => 'isUniqueEmail', 'params' => array('currentEmail'=> $objWebsiteOwner->getEmail(),'newEmail' => $newEmail)));
@@ -138,20 +158,22 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
                             $mailLink          = '<a class="alert-link" href="mailto:'.$newEmail.'" target="_blank">'.$newEmail.'</a>';
                             throw new \Exception(sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_OWNER_EMAIL_UNIQUE_ERROR'], $mailLink, $customerPanelLink));
                         }
-                        
-                        $params = self::fetchUserData($objUser);
+
                         try {
                             $objJsonData = new \Cx\Core\Json\JsonData();
                             $resp = \Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::executeCommandOnMyServiceServer('executeOnManager', array('command' => 'updateUser', 'params' => $params));
-                            \DBG::log(var_export($resp->data, true));
+                            \DBG::dump($resp);
                             if ($resp->status == 'error' || $resp->data->status == 'error') {
                                 if (isset($resp->log)) {
                                     \DBG::appendLogs(array_map(function($logEntry) {return '(Website: './*$this->getName().*/') '.$logEntry;}, $resp->log));
                                 }
-                                throw new \Exception('Die Aktualisierung des Benutzerkontos hat leider nicht geklapt. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
+// TODO: add language variable
+                                throw new \Exception('Die Aktualisierung des Benutzerkontos hat leider nicht geklappt. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
                             }
                         } catch (\Exception $e) {
                             \DBG::msg($e->getMessage());
+// TODO: add language variable
+                            throw new \Exception('Die Aktualisierung des Benutzerkontos hat leider nicht geklappt. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
                         }
 // TODO: add language variable
                         //throw new \Exception('Das Benutzerkonto des Websitebetreibers kann nicht ge&auml;ndert werden. <a href="javascript:window.history.back()">Zur&uuml;ck</a>');
@@ -227,6 +249,8 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
     }
     
     public function postUpdate($eventArgs) {
+        // this event is used to propagate changes made on the
+        // manager/customer-panel to the associated websites
         \DBG::msg('MultiSite (AccessUserEventListener): postUpdate');
         
         $objUser = $eventArgs->getEntity();
@@ -256,12 +280,23 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
                     
                         if ($websiteServiceServer) {
                             \DBG::msg('Going to update user '.$objUser->getId().' on WebsiteServiceServer '.$websiteServiceServer->getLabel());
-                            \Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::executeCommandOnServiceServer('updateUser', $params, $websiteServiceServer);
+                            \Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::executeCommandOnServiceServer('updateUser', $params, $websiteServiceServer, array(), true);
                         }
                     }
                     break;
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_HYBRID:
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_SERVICE:
+                    // important: we must unset the userId argument
+                    // as it can otherwise cause an other updateUser request on
+                    // the service server.
+                    // this can happen if the $webiste to be updated is
+                    // currently disabled, in such case, the updateUser request
+                    // is redirected to the service server. The latter will
+                    // regurarily parse the updateUser request which will
+                    // again trigger the updateUser request on all websites.
+                    // At the end, this causes an infinite updateUser loop
+                    $params['userId'] = 0;
+
                     //find User's Website
                     $webRepo   = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
                     $websites  = $webRepo->findWebsitesByCriteria(array('user.id' => $objUser->getId()));
@@ -278,22 +313,124 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
         }
     }
 
-    public static function fetchUserData($objUser) {
+    /**
+     * Fetch data of an owner user in a pre-processed format,
+     * so that it can be used for passing to the JsonMultiSite::updateUser()
+     * API call.
+     *
+     * @param   \Cx\Core\User\Model\Entity\User|\User   $objUser The user to
+     *                      fetch the data from.
+     * @param   boolean $onlyOnChange   Whether to data shall only be returned
+     *                      if there had been a modification on the user.
+     * @return  array       Data of supplied user $objUser as array.
+     *                      If $onlyOneChange is set to TRUE, then an empty
+     *                      array is returned, in case the user $objUser
+     *                      has not been altered in the current event.
+     */
+    public static function fetchUserData($objUser, $onlyOnChange = false) {
         if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            // important: we do loose any local changes on $objUser here!
             $objFWUser = \FWUser::getFWUserObject();
             $objUser   = $objFWUser->objUser->getUser($objUser->getId());
+        }
+
+        \DBG::msg(__METHOD__. ': only on change: '.$onlyOnChange);
+        // check if the profile has been modified,
+        // if not, then the process shall be aborted
+        //
+        // note: additionally, we have to check if we're in the
+        // process of synchronizing the user's password (
+        // User::getHashedPassword()). If so, then we shall abort
+        // the process as well, as otherwise we would end up in an
+        // infinite loop
+        if (
+            $onlyOnChange &&
+            empty($objUser->getHashedPassword())
+        ) {
+            \DBG::msg(__METHOD__. ': only update on diff');
+            $originalUser = \FWUser::getFWUserObject()->objUser->getUser($objUser->getId(), true);
+            $originalUserData = $originalUser->toArray();
+
+            // fetch potentially modified user data
+            $userData = $objUser->toArray();
+
+            // clear last-activity of user profiles as this will
+            // always be different
+            $originalUserData['last_activity'] = null;
+            $userData['last_activity'] = null;
+
+            // clear last-auth of user profiles as this will
+            // always be different
+            $originalUserData['last_auth'] = null;
+            $userData['last_auth'] = null;
+
+            // ignore language changes,
+            // as the selected language is specific to each website
+            $originalUserData['frontend_lang_id'] = $userData['frontend_lang_id'];
+            $originalUserData['backend_lang_id'] = $userData['backend_lang_id'];
+
+            // ignore custom profile attributes
+            $objUser->objAttribute->first();
+            while (!$objUser->objAttribute->EOF) {
+                // diff core attributes
+                if ($objUser->objAttribute->isCoreAttribute()) {
+                    $objUser->objAttribute->next();
+                    continue;
+                }
+                // drop custom profile attribute data
+                if (isset($originalUserData['profile'][$objUser->objAttribute->getId()])) {
+                    unset($originalUserData['profile'][$objUser->objAttribute->getId()]);
+                }
+                if (isset($userData['profile'][$objUser->objAttribute->getId()])) {
+                    unset($userData['profile'][$objUser->objAttribute->getId()]);
+                }
+                $objUser->objAttribute->next();
+            }
+
+            // check if user has been modified
+            if ($userData == $originalUserData) {
+                \DBG::msg(__METHOD__. ': no diff');
+                return array();
+            }
+
+            \DBG::msg(__METHOD__. ': has diff');
+            \DBG::log('originalUserData:');
+            \DBG::dump($originalUserData);
+            \DBG::log('new userData:');
+            \DBG::dump($userData);
         }
 
         // Replace $objUser by a multisite user object.
         // This is required to have the method $objUser->getHashedPassword()
         // always return the hashed password of the user account.
-        $user = new \Cx\Core_Modules\MultiSite\Model\Entity\User();
+        if (
+            \Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite') ==
+            \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_WEBSITE &&
+            \Cx\Core\Setting\Controller\Setting::getValue('websiteState','MultiSite') ==
+            \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE
+        ) {
+            $user = new \Cx\Core_Modules\MultiSite\Model\Entity\User($objUser);
+        } else {
+            $user = new \Cx\Core_Modules\MultiSite\Model\Entity\User();
+        }
+        \DBG::msg(__METHOD__ . ': user is verified: '.$user->isVerified());
         $objUser = $user->getUser($objUser->getId());
 
         //get user's profile details
         $objUser->objAttribute->first();
         $arrUserDetails = array();
         while (!$objUser->objAttribute->EOF) {
+            // do not sync custom attributes
+            if (!$objUser->objAttribute->isCoreAttribute()) {
+                $objUser->objAttribute->next();
+                continue;
+            }
+            // do not sync title attribute, as its value is
+            // customizable and different on every website
+            if ($objUser->objAttribute->getId() == 'title') {
+                $objUser->objAttribute->next();
+                continue;
+            }
             $arrUserDetails[$objUser->objAttribute->getId()][] = $objUser->getProfileAttribute($objUser->objAttribute->getId());
             $objUser->objAttribute->next();
         }
@@ -319,6 +456,13 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
         if ($objUser->getId()) {
             $params['userId'] = $objUser->getId();
         }
+
+        // fix birthday (convert timestamp into date format)
+        if (!empty($params['multisite_user_profile_attribute']['birthday'][0])) {
+            $birthday = date(ASCMS_DATE_FORMAT_DATE, $params['multisite_user_profile_attribute']['birthday'][0]);
+            $params['multisite_user_profile_attribute']['birthday'][0] = $birthday;
+        }
+
         return $params;
     }
     
@@ -367,7 +511,7 @@ class AccessUserEventListener implements \Cx\Core\Event\Model\Entity\EventListen
         }
         return true;
     }
-    
+
     public function onEvent($eventName, array $eventArgs) {        
         $this->$eventName(current($eventArgs));
     }

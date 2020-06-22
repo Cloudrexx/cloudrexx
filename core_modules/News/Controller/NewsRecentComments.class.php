@@ -55,15 +55,21 @@ class NewsRecentComments extends \Cx\Core_Modules\News\Controller\NewsLibrary
     function __construct($pageContent)
     {
         parent::__construct();
-        $this->getSettings();
         $this->_pageContent = $pageContent;
         $this->_objTemplate = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTemplate);
     }
 
-    function getRecentNewsComments()
+    /**
+     * @todo This does not respect scheduled publishing!
+     */
+    function getRecentNewsComments($langId = 0)
     {
         global $objDatabase;
+
+        if (empty($langId)) {
+            $langId = \Env::get('init')->getDefaultFrontendLangId();
+        }
 
         $this->_objTemplate->setTemplate($this->_pageContent,true,true);
 
@@ -79,6 +85,8 @@ class NewsRecentComments extends \Cx\Core_Modules\News\Controller\NewsLibrary
             $_ARRAYLANG = \Env::get('init')->loadLanguageData('News');
             $commentsCount = (int) $this->arrSettings['recent_news_message_limit'];
 
+            // TODO: add permission access check
+            // only comments of articles the user has access to should be listed
             $query = "SELECT  `nComment`.`title`,
                               `nComment`.`date`,
                               `nComment`.`poster_name`,
@@ -94,7 +102,7 @@ class NewsRecentComments extends \Cx\Core_Modules\News\Controller\NewsLibrary
                         LEFT JOIN
                               `".DBPREFIX."module_news_locale` AS nLocale
                         ON
-                            `news`.id = `nLocale`.news_id AND `nLocale`.lang_id = ". FRONTEND_LANG_ID ."
+                            `news`.id = `nLocale`.news_id AND `nLocale`.lang_id = ". $langId ."
                         WHERE
                             `news`.status = 1
                         AND
@@ -138,6 +146,7 @@ class NewsRecentComments extends \Cx\Core_Modules\News\Controller\NewsLibrary
                    'NEWS_COMMENTS_LONG_DATE'    => date(ASCMS_DATE_FORMAT, $objResult->fields['date']),
                    'NEWS_COMMENTS_DATE'         => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
                    'NEWS_COMMENTS_TIME'         => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['date']),
+                   'NEWS_COMMENTS_TIMESTAMP'    => $objResult->fields['date'],
                    'NEWS_COMMENT_LINK'          => $newsLink,
                    'NEWS_COMMENT_URL'           => $newsUrl
                 ));

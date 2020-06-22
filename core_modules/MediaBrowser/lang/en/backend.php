@@ -29,14 +29,11 @@
  * This is the english language file for backend mode.
  * This file is included by Cloudrexx and all entries are set as placeholder
  * values for backend ACT template by SystemComponentBackendController
- *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Michael Ritter <michael.ritter@comvation.com>
  * @package     cloudrexx
- * @subpackage  modules_skeleton
+ * @subpackage  coremodule_mediabrowser
  */
-
-
 global $_ARRAYLANG;
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER'] = "MediaBrowser";
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION'] = "A filebrowser for all cloudrexx applications.";
@@ -74,15 +71,11 @@ $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_4'] = "Media Archive #4";
 $_ARRAYLANG['TXT_FILEBROWSER_FILES'] = "Files";
 $_ARRAYLANG['TXT_FILEBROWSER_WEBPAGES'] = "Webpages";
 $_ARRAYLANG['TXT_FILEBROWSER_PREVIEW'] = "Preview";
-$_ARRAYLANG['TXT_FILEBROWSER_BLOG'] = "Blog";
 $_ARRAYLANG['TXT_FILEBROWSER_PODCAST'] = "Podcast";
 $_ARRAYLANG['TXT_FILEBROWSER_UPLOAD_FILE_MULTI'] = "Upload file(s)";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIADIR'] = "Media Directory";
 $_ARRAYLANG['TXT_FILEBROWSER_DOWNLOADS'] = "Digital Asset Management";
-
-
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_NAME'] = "Directory name";
-
 $_ARRAYLANG['TXT_FILEBROWSER_START_FILE_UPLOADER'] = "or start File Uploader...";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_ACTIONS'] = "Actions";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_RENAME'] = "Rename";
@@ -96,7 +89,7 @@ $_ARRAYLANG['TXT_FILEBROWSER_CANCEL'] = "Cancel";
 $_ARRAYLANG['TXT_FILEBROWSER_ARE_YOU_SURE'] = "Are you sure?";
 $_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_MEDIUM_SIZE'] = "Medium thumnail (%spx width)";
 $_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_LARGE_SIZE'] = "Big thumbnail (%spx width)";
-$_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_THUMBNAIL_SIZE'] = "Thumnail (%spx width)";
+$_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_THUMBNAIL_SIZE'] = "Thumbnail (%spx width)";
 $_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_ORIGINAL_SIZE'] = "Original size";
 $_ARRAYLANG['TXT_FILEBROWSER_START_FILE_UPLOADER'] = "or start File Uploader...";
 $_ARRAYLANG['TXT_FILEBROWSER_CHOOSE_FILE'] = "Choose File";
@@ -115,3 +108,4 @@ $_ARRAYLANG['TXT_FILEBROWSER_LOGGED_OUT'] = "You are logged out. Please reload t
 $_ARRAYLANG['TXT_FILEBROWSER_ERROR_HAS_HAPPEND'] = "There has been an error.";
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_UP'] = "Back";
 $_ARRAYLANG['TXT_FILEBROWSER_NO_FILES_IN_DIRECTORY'] = "There are no files in this directory.";
+$_ARRAYLANG['TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'] = 'Search...';

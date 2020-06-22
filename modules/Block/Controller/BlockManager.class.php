@@ -949,7 +949,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
         $objJs->setVariable('categoryPagesUnselectedOptions', $jsonData->parse($blockCategoryPageSelects[1]), 'block');
         $objJs->setVariable('categoryPagesSelectedOptions', $jsonData->parse($blockCategoryPageSelects[0]), 'block');
 
-        $objJs->setVariable('ckeditorconfigpath', substr(\Env::get('ClassLoader')->getFilePath(ASCMS_CORE_PATH.'/Wysiwyg/ckeditor.config.js.php'), strlen(ASCMS_DOCUMENT_ROOT)+1), 'block');
+        $objJs->setVariable('ckeditorconfigpath', \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Wysiwyg')->getConfigPath(), 'block');
 
         // manually set Wysiwyg variables as the Ckeditor will be
         // loaded manually through JavaScript (and not properly through the

@@ -266,6 +266,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
     /**
      * {@inheritDoc}
      */
+    public function removeCategoryName(\Cx\Modules\Calendar\Model\Entity\CategoryName $categoryNames)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCategoryName', array($categoryNames));
+
+        return parent::removeCategoryName($categoryNames);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getCategoryNameByLangId($langId)
     {
 
@@ -294,6 +305,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'addEvent', array($event));
 
         return parent::addEvent($event);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeEvent(\Cx\Modules\Calendar\Model\Entity\Event $events)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeEvent', array($events));
+
+        return parent::removeEvent($events);
     }
 
     /**
@@ -360,6 +382,17 @@ class Category extends \Cx\Modules\Calendar\Model\Entity\Category implements \Do
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

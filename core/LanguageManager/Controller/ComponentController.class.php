@@ -185,6 +185,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 define('FRONTEND_LANG_ID', $_FRONTEND_LANGID);
                 define('BACKEND_LANG_ID', $_LANGID);
                 define('LANG_ID', $_LANGID);
+                $this->cx->getDb()->getTranslationListener()->setTranslatableLocale(
+                    \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID)
+                );
 
                 /**
                  * Core language data
@@ -241,6 +244,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             return;
         }
         $currentPage = $this->cx->getPage();
+
+        // check if current page has a different canonical-link
+        try {
+            // fetch set canonical-link
+            $link = $this->getComponent('ContentManager')->fetchAlreadySetCanonicalLink($this->cx->getResponse());
+            $canonicalLinkUrl = $link->getAttribute('href');
+            $currentPageUrl = \Cx\Core\Routing\Url::fromPage($currentPage)->toString();
+
+            // if the canonical-link of this request points to a different
+            // url than the currently requested url, we must not generate
+            // a hreflang-tag-list as this would otherwise confuse seo-bots
+            if ($canonicalLinkUrl != $currentPageUrl) {
+                return;
+            }
+        } catch (\Exception $e) {
+            // no Link header set -> page doesn't have a canonical-link
+            // -> hreflang-tags can be set without problem
+        }
+
         $listProtectedPages = \Cx\Core\Setting\Controller\Setting::getValue(
             'coreListProtectedPages',
             'Config'
@@ -300,11 +322,48 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
         $widgetController = $this->getComponent('Widget');
+
+        $listProtectedPages = \Cx\Core\Setting\Controller\Setting::getValue(
+            'coreListProtectedPages',
+            'Config'
+        ) == 'on';
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'locale_navbar',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+        );
+
+        if ($listProtectedPages) {
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+            );
+        }
+
+        $widgetController->registerWidget(
+            $widget
+        );
+
+        $widgetController->registerWidget(
+            new \Cx\Core_Modules\Widget\Model\Entity\FinalStringWidget(
+                $this,
+                'CHARSET',
+                CONTREXX_CHARSET
+            )
+        );
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'ACTIVE_LANGUAGE_NAME'
+        );
+        $widget->setEsiVariables(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_LOCALE
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
         $widgetNames      = array(
-            'CHARSET',
             'LANGUAGE_NAVBAR',
             'LANGUAGE_NAVBAR_SHORT',
-            'ACTIVE_LANGUAGE_NAME'
         );
 
         foreach (
@@ -317,9 +376,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $this,
                 $widgetName
             );
+            // THEME, CHANNEL are required to make the cache work with the url
+            // arguments ?preview, ?appview, ?printview and ?pdfview.
+            // PATH is required to make additional resolving within components
+            // work.
             $widget->setEsiVariable(
                 \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
-                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_PATH |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_QUERY
             );
             $widgetController->registerWidget(
                 $widget
@@ -336,8 +401,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         $activeLanguages = \FWLanguage::getActiveFrontendLanguages();
         foreach ($activeLanguages as $langData) {
-            $placeholders[] = 'LANG_CHANGE_' . str_replace('-', '_', strtoupper($langData['lang']));
-            $placeholders[] = 'LANG_SELECTED_' . str_replace('-', '_', strtoupper($langData['lang']));
+            $placeholders[] = 'LANG_CHANGE_' . str_replace(
+                '-',
+                '_',
+                strtoupper($langData['lang'])
+            );
+            $placeholders[] = 'LANG_SELECTED_' . str_replace(
+                '-',
+                '_',
+                strtoupper($langData['lang'])
+            );
         }
         return $placeholders;
     }

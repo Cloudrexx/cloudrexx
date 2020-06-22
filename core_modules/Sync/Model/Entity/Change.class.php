@@ -62,9 +62,9 @@ class Change extends \Cx\Model\Base\EntityBase {
     protected $originSync;
     
     /**
-     * @var array
+     * @var \Doctrine\Common\Collections\Collection
      */
-    protected $hosts = array();
+    protected $hosts;
     
     /**
      * @var string One of "delete", "put", "post"
@@ -117,6 +117,7 @@ class Change extends \Cx\Model\Base\EntityBase {
         } else {
             $this->entity = $entityOrContents;
         }
+        $this->hosts = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**

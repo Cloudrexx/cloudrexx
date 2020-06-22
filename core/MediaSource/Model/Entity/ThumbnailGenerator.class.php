@@ -191,10 +191,13 @@ class ThumbnailGenerator extends EntityBase
      * @param string  $path     Directory path to the file
      * @param string  $filename Name of the file
      * @param boolean $create   TRUE|FALSE when True it creates thumbnail if thumbnail not exists
+     * @param boolean $rebuild  Set to TRUE to re-create all thumbnails of
+     *                          image. Only works if argument $create is set
+     *                          to TRUE.
      *
      * @return array thumbnail name array
      */
-    public function getThumbnailsFromFile($path, $filename, $create = false)
+    public function getThumbnailsFromFile($path, $filename, $create = false, $rebuild = false)
     {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
         $filename  = pathinfo($filename, PATHINFO_FILENAME);
@@ -215,7 +218,7 @@ class ThumbnailGenerator extends EntityBase
             );
         }
         if ($create && file_exists($websitepath . str_replace($websitepath, '', rtrim($path, '/')) . '/' . $filename . '.' . $extension)) {
-            $this->createThumbnailFromPath(rtrim($path, '/') . '/' . $filename . '.' . $extension);
+            $this->createThumbnailFromPath(rtrim($path, '/') . '/' . $filename . '.' . $extension, $rebuild);
         }
         return $thumbnails;
     }

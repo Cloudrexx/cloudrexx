@@ -2,69 +2,114 @@
 <script type="text/javascript">
 // <![CDATA[
     function newsletterUpdate(){
-        if(document.adduser.sender_email.value=="" || document.adduser.sender_name.value=="" || document.adduser.return_path.value=="" || document.adduser.mails_per_run.value==""){
+        if (
+            document.adduser.sender_email.value == "" ||
+            document.adduser.sender_name.value == "" ||
+            document.adduser.return_path.value == "" ||
+            document.adduser.mails_per_run.value == ""
+        ) {
             alert('{TXT_FILL_OUT_ALL_REQUIRED_FIELDS}');
             return false
-        }else{
+        } else {
+            if (
+                cx.jQuery("input[name=statistics_drop]").data("old-val") !=
+                cx.jQuery("input[name=statistics]:checked").val() &&
+                cx.jQuery("input[name=statistics]:checked").val() == 0
+            ) {
+                if (confirm("{TXT_NEWSLETTER_STATISTICS_DROP}")) {
+                    cx.jQuery("input[name=statistics_drop]").val("1");
+                }
+            }
             return true
         }
     }
+    cx.jQuery(document).ready(function() {
+        jQuery("input[name=statistics_drop]").data(
+            "old-val",
+            cx.jQuery("input[name=statistics]:checked").val()
+        );
+    });
 // ]]>
 </script>
-<table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
-  <tr>
-    <th>{TXT_TITLE}</th>
-  </tr>
-</table>
 <form name="adduser" action="index.php?cmd=Newsletter&amp;act=Settings" method="post" onsubmit="return newsletterUpdate()">
 <input type="hidden" name="update" value="1" />
 <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
-  <tr class="row2">
-    <td width="20%">{TXT_SENDER} E-Mail</td>
-    <td width="80%"><input type="text" name="sender_email" size="40" maxlength="255" value="{SENDERMAIL_VALUE}" /></td>
+  <tr>
+    <th colspan="2">{TXT_NEWSLETTER_GENERAL}</th>
   </tr>
-  <tr class="row1">
-    <td width="20%">{TXT_SENDER} {TXT_LASTNAME}</td>
-    <td width="80%"><input type="text" name="sender_name" size="40" maxlength="255" value="{SENDERNAME_VALUE}" /></td>
-  </tr>
-  <tr class="row2">
-    <td width="20%">{TXT_NEWSLETTER_REPLY_EMAIL} (Return-Path)</td>
-    <td width="80%"><input type="text" name="return_path" size="40" maxlength="255" value="{RETURNPATH_VALUE}" /></td>
-  </tr>
-  <tr class="row1">
-    <td width="20%">{TXT_SEND_LIMIT}</td>
-    <td width="80%"><input type="text" name="mails_per_run" size="40" maxlength="255" value="{MAILSPERRUN_VALUE}" /></td>
-  </tr>
-<!--<tr class="row2">
-    <td width="20%">{TXT_BCC} (E-Mail)</td>
-    <td width="80%"><input type="text" name="bcc_mail" size="40" maxlength="200" value="{BCC_VALUE}" /></td>
-  </tr>-->
-
   <tr class="row2">
     <td width="20%">{TXT_NEWSLETTER_OVERVIEW_ENTRIES}</td>
     <td width="80%"><input type="text" name="overview_entries" size="40" maxlength="255" value="{OVERVIEW_ENTRIES_VALUE}" /></td>
   </tr>
-  <tr class="row1">
-    <td width="20%">{TXT_TEST_MAIL} (E-Mail)</td>
-    <td width="80%"><input type="text" name="test_mail" size="40" maxlength="255" value="{TEST_MAIL_VALUE}" /></td>
+</table>
+<br />
+<table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
+  <tr>
+    <th colspan="2">{TXT_NEWSLETTER_EMAIL_CAMPAIGNS}</th>
+  </tr>
+  <tr class="row3">
+    <td colspan="2">{TXT_NEWSLETTER_DEFAULTS_FOR_EMAIL_CAMPAIGNS}</td>
   </tr>
   <tr class="row2">
-    <td width="20%">{TXT_BREAK_AFTER}</td>
-    <td width="80%"><input type="text" name="text_break_after" size="40" maxlength="255" value="{BREAK_AFTER_VALUE}" /></td>
+    <td width="20%">{TXT_NEWSLETTER_SENDER} ({TXT_NEWSLETTER_EMAIL})</td>
+    <td width="80%"><input type="text" name="sender_email" size="40" maxlength="255" value="{SENDERMAIL_VALUE}" /></td>
   </tr>
   <tr class="row1">
-    <td style="vertical-align:top;">{TXT_NEWSLETTER_TASK_REJECTED_EMAIL}</td>
-    <td>
-      <input type="radio" name="newsletter_rejected_mail_task" value="ignore" id="newsletter_rejected_mail_task_ignore" {NEWSLETTER_REJECTED_MAIL_IGNORE} /><label for="newsletter_rejected_mail_task_ignore">{TXT_NEWSLETTER_DO_NOTING}</label><br />
-      <input type="radio" name="newsletter_rejected_mail_task" value="deactivate" id="newsletter_rejected_mail_task_deactivate" {NEWSLETTER_REJECTED_MAIL_DEACTIVATE} /><label for="newsletter_rejected_mail_task_deactivate">{TXT_NEWSLETTER_DEACTIVATE_EMAIL}</label><br />
-      <input type="radio" name="newsletter_rejected_mail_task" value="delete" id="newsletter_rejected_mail_task_delete" {NEWSLETTER_REJECTED_MAIL_DELETE} /><label for="newsletter_rejected_mail_task_delete">{TXT_NEWSLETTER_DELETE_EMAIL_ADDRESS}</label><br />
-      <input type="radio" name="newsletter_rejected_mail_task" value="inform" id="newsletter_rejected_mail_task_inform" {NEWSLETTER_REJECTED_MAIL_INFORM} /><label for="newsletter_rejected_mail_task_inform">{TXT_NEWSLETTER_INFORM_ADMIN}</label>
-      <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ADMIN_INFORM}</span>
+    <td>{TXT_NEWSLETTER_SENDER} ({TXT_NEWSLETTER_NAME})</td>
+    <td><input type="text" name="sender_name" size="40" maxlength="255" value="{SENDERNAME_VALUE}" /></td>
+  </tr>
+  <tr class="row2">
+    <td>{TXT_NEWSLETTER_REPLY_ADDRESS} (Reply)</td>
+    <td><input type="text" name="return_path" size="40" maxlength="255" value="{RETURNPATH_VALUE}" /></td>
+  </tr>
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+  <tr class="row3">
+    <td colspan="2">{TXT_NEWSLETTER_LISTS}</td>
+  </tr>
+  <tr class="row1">
+    <td width="20%" valign="top">{TXT_NEWSLETTER_DELIVER_USER_RECIPIENTS}</td>
+    <td width="80%">
+        <label>
+            <input type="radio" name="deliver-user-recipients" value="1" {NEWSLETTER_DELIVER_USER_RECIPIENTS_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
+        </label>
+        <label>
+            <input type="radio" name="deliver-user-recipients" value="0" {NEWSLETTER_DELIVER_USER_RECIPIENTS_OFF} />{TXT_NEWSLETTER_NOTIFICATION_DEACTIVATE}
+        </label>
     </td>
   </tr>
   <tr class="row1">
-    <td valign="top">{TXT_NEWSLETTER_SEND_BY_SUBSCRIBE}</td>
-    <td>
+    <td width="20%" valign="top">{TXT_NEWSLETTER_DELIVER_CRM_RECIPIENTS}</td>
+    <td width="80%">
+        <label>
+            <input type="radio" name="deliver-crm-recipients" value="1" {NEWSLETTER_DELIVER_CRM_RECIPIENTS_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
+        </label>
+        <label>
+            <input type="radio" name="deliver-crm-recipients" value="0" {NEWSLETTER_DELIVER_CRM_RECIPIENTS_OFF} />{TXT_NEWSLETTER_NOTIFICATION_DEACTIVATE}
+        </label>
+    </td>
+  </tr>
+  <tr class="row1">
+    <td width="20%" valign="top">{TXT_NEWSLETTER_USE_CRM_FILTER}</td>
+    <td width="80%">
+        <label>
+            <input type="radio" name="use-crm-filter" value="1" {NEWSLETTER_USE_CRM_FILTER_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
+        </label>
+        <label>
+            <input type="radio" name="use-crm-filter" value="0" {NEWSLETTER_USE_CRM_FILTER_OFF} />{TXT_NEWSLETTER_NOTIFICATION_DEACTIVATE}
+        </label>
+    </td>
+  </tr>
+</table>
+<br />
+<table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
+  <tr>
+    <th colspan="2">{TXT_NEWSLETTER_RECIPIENTS}</th>
+  </tr>
+  <tr class="row1">
+    <td width="20%" valign="top">{TXT_NEWSLETTER_SEND_BY_SUBSCRIBE}</td>
+    <td width="80%">
         <label>
             <input type="radio" name="mailSendSubscribe" value="1" {NEWSLETTER_SEND_BY_SUBSCRIBE_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
         </label>
@@ -75,7 +120,7 @@
   </tr>
   <tr class="row2">
     <td valign="top">{TXT_NEWSLETTER_SEND_BY_UNSUBSCRIBE}</td>
-    <td >
+    <td>
         <label>
              <input type="radio" name="mailSendUnsubscribe" value="1" {NEWSLETTER_SEND_BY_UNSUBSCRIBE_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
         </label>
@@ -95,7 +140,47 @@
         </label>
     </td>
   </tr>
-
+  <tr class="row2">
+    <td>{TXT_NEWSLETTER_CONFIRM_LINK_HOUR}</td>
+    <td><input type="text" name="confirmLinkHour" size="40" maxlength="255" value="{NEWSLETTER_CONFIRM_LINK_HOUR_VALUE}" /></td>
+  </tr>
+</table>
+<br />
+<table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
+  <tr>
+    <th colspan="2">{TXT_DISPATCH_SETINGS}</th>
+  </tr>
+  <tr class="row1">
+    <td width="20%">{TXT_SEND_LIMIT}</td>
+    <td width="80%"><input type="text" name="mails_per_run" size="40" maxlength="255" value="{MAILSPERRUN_VALUE}" /></td>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_TEST_MAIL} (E-Mail)</td>
+    <td><input type="text" name="test_mail" size="40" maxlength="255" value="{TEST_MAIL_VALUE}" /></td>
+  </tr>
+  <tr class="row1">
+    <td style="vertical-align:top;">{TXT_NEWSLETTER_TASK_REJECTED_EMAIL}</td>
+    <td>
+      <input type="radio" name="newsletter_rejected_mail_task" value="ignore" id="newsletter_rejected_mail_task_ignore" {NEWSLETTER_REJECTED_MAIL_IGNORE} /><label for="newsletter_rejected_mail_task_ignore">{TXT_NEWSLETTER_DO_NOTING}</label><br />
+      <input type="radio" name="newsletter_rejected_mail_task" value="deactivate" id="newsletter_rejected_mail_task_deactivate" {NEWSLETTER_REJECTED_MAIL_DEACTIVATE} /><label for="newsletter_rejected_mail_task_deactivate">{TXT_NEWSLETTER_DEACTIVATE_EMAIL}</label><br />
+      <input type="radio" name="newsletter_rejected_mail_task" value="delete" id="newsletter_rejected_mail_task_delete" {NEWSLETTER_REJECTED_MAIL_DELETE} /><label for="newsletter_rejected_mail_task_delete">{TXT_NEWSLETTER_DELETE_EMAIL_ADDRESS}</label><br />
+      <input type="radio" name="newsletter_rejected_mail_task" value="inform" id="newsletter_rejected_mail_task_inform" {NEWSLETTER_REJECTED_MAIL_INFORM} /><label for="newsletter_rejected_mail_task_inform">{TXT_NEWSLETTER_INFORM_ADMIN}</label>
+      <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ADMIN_INFORM}</span>
+    </td>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_NEWSLETTER_STATISTICS}</td>
+    <td>
+        <label>
+             <input type="radio" name="statistics" value="1" {NEWSLETTER_STATISTICS_ON} />{TXT_NEWSLETTER_NOTIFICATION_ACTIVATE}
+        </label>
+        <label>
+            <input type="radio" name="statistics" value="0" {NEWSLETTER_STATISTICS_OFF} />{TXT_NEWSLETTER_NOTIFICATION_DEACTIVATE}
+        </label>
+      <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_STATISTICS_TOOLTIP}</span>
+      <input type="hidden" name="statistics_drop" value="0" />
+    </td>
+  </tr>
 </table>
 <br />
 <input type="submit" value="{TXT_SAVE}" />

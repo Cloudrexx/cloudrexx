@@ -52,6 +52,16 @@ use Cx\Core\MediaSource\Model\Entity\MediaSource;
  */
 class MediaEventListener extends DefaultEventListener
 {
+    /**
+     * Global search event listener
+     * Appends the Media search results to the search object
+     *
+     * @param array $search \Cx\Core_Modules\Search\Controller\Search
+     */
+    public function SearchFindContent($search) {
+        $result   = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($this->getComponent('Media')->getMediaForSearchComponent($search->getTerm()));
+        $search->appendResult($result);
+    }
 
     /**
      * @param MediaSourceManager $mediaBrowserConfiguration

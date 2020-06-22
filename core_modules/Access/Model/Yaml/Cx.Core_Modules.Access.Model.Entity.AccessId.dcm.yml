@@ -6,50 +6,50 @@ Cx\Core_Modules\Access\Model\Entity\AccessId:
       id: true
       type: integer
       generator:
-        strategy: AUTO
+        strategy: auto
     entity_class_name:
       type: string
-      nullable: true
+      nullable: false
     entity_class_id:
       type: string
-      nullable: true
-  oneToMany:
-    contrexxAccessUserAttribute:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      mappedBy: accessId
-    coreAttribute:
-      targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
-      mappedBy: accessId
-    contrexxAccessUserAttributeRead:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      mappedBy: readAccessId
-    coreAttributeRead:
-      targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
-      mappedBy: readAccessId
-  manyToMany:
-    group2:
-      targetEntity: Cx\Core\User\Model\Entity\Group
-      inversedBy: accessId2
-      joinTable:
-        name: access_group_dynamic_ids
-        joinColumns:
-          access_id:
-            referencedColumnName: id
-            nullable: false
-        inverseJoinColumns:
-          group_id:
-            referencedColumnName: group_id
-            nullable: false
-    group:
-      targetEntity: Cx\Core\User\Model\Entity\Group
-      inversedBy: accessId
-      joinTable:
-        name: access_group_static_ids
-        joinColumns:
-          access_id:
-            referencedColumnName: id
-            nullable: false
-        inverseJoinColumns:
-          group_id:
-            referencedColumnName: group_id
-            nullable: false
+      nullable: false
+#  oneToMany:
+#    contrexxAccessUserAttribute:
+#      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+#      mappedBy: accessId
+#    coreAttribute:
+#      targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
+#      mappedBy: accessId
+#    contrexxAccessUserAttributeRead:
+#      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+#      mappedBy: readAccessId
+#    coreAttributeRead:
+#      targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
+#      mappedBy: readAccessId
+#  manyToMany:
+#    group2:
+#      targetEntity: Cx\Core\User\Model\Entity\Group
+#      inversedBy: accessId2
+#      joinTable:
+#        name: access_group_dynamic_ids
+#        joinColumns:
+#          access_id:
+#            referencedColumnName: id
+#            nullable: false
+#        inverseJoinColumns:
+#          group_id:
+#            referencedColumnName: group_id
+#            nullable: false
+#    group:
+#      targetEntity: Cx\Core\User\Model\Entity\Group
+#      inversedBy: accessId
+#      joinTable:
+#        name: access_group_static_ids
+#        joinColumns:
+#          access_id:
+#            referencedColumnName: id
+#            nullable: false
+#        inverseJoinColumns:
+#          group_id:
+#            referencedColumnName: group_id
+#            nullable: false

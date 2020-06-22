@@ -57,7 +57,6 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "Newsmeldungen";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "Newsmeldung";
 $_ARRAYLANG['TXT_HYPERLINKS'] = "Hyperlinks";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "Externe Quellen";
-$_ARRAYLANG['TXT_LINK'] = "Link";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "Newsinhalt";
 $_ARRAYLANG['TXT_STORE'] = "Speichern";
 $_ARRAYLANG['TXT_PUBLISHING'] = "Veröffentlichen";

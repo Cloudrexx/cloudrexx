@@ -115,7 +115,7 @@ class googleWeather
         $location = urldecode($location);
         $replace = array('' => '&Auml;', '' => '&Ouml;', '' => '&Uuml;', '' => '&auml;', '' => '&ouml;', '' => '&uuml;');
 
-        while (list($key, $val) = each($replace)) {
+        foreach ($replace as $key => $val) {
             $location = str_replace($key, $val, $location);
         }
 

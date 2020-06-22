@@ -274,9 +274,6 @@ class Recommend extends RecommendLibrary
             $objMail->Body = $body;
             $objMail->AddAddress($receivermail);
             $objMail->Send();
-            $objMail->ClearAddresses();
-            $objMail->AddAddress($_CONFIG['contactFormEmail']);
-            $objMail->Send();
 
             $this->_objTpl->setVariable('RECOM_STATUS', $_ARRAYLANG['TXT_SENT_OK']);
             $this->_objTpl->parse();

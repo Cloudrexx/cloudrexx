@@ -55,6 +55,9 @@ class CronController extends \Cx\Core\Core\Model\Entity\Controller {
             $criterias = array();
             foreach ($cronMailCriterias as $cronMailCriteria) {
                 list($tableAlias, $attribute) = explode('.', $cronMailCriteria->getAttribute());
+                if (!isset($criterias[$tableAlias])) {
+                    $criterias[$tableAlias] = array();
+                }
                 $criterias[$tableAlias][$attribute] = $cronMailCriteria->getCriteria();
             }
             

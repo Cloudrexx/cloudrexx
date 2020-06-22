@@ -693,127 +693,132 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         } else {
             $websites = \Env::get('em')->getRepository('\Cx\Core_Modules\MultiSite\Model\Entity\Website')->findAll();
         }
-        $view = new \Cx\Core\Html\Controller\ViewGenerator($websites, array(
-            'header' => 'Websites',
-            'functions' => array(
-                'edit' => in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID)),
-                'delete' => in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID)),
-                'sorting' => true,
-                'paging' => true,       // cannot be turned off yet
-                'filtering' => false,   // this does not exist yet
-                'actions' => function($rowData) {
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions = \Cx\Core_Modules\MultiSite\Controller\BackendController::executeSql($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::showLicense($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, false);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $domainRepo = \Env::get('em')->getRepository('Cx\Core\Net\Model\Entity\Domain');
-                                    $domain     = $domainRepo->findOneBy(array('name' => \Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
-                                    if ($domain) {
-                                        $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, true);
+        $view = new \Cx\Core\Html\Controller\ViewGenerator(
+            $websites,
+            array(
+                'Cx\Core_Modules\MultiSite\Model\Entity\Website' => array(
+                    'header' => 'Websites',
+                    'functions' => array(
+                        'edit' => in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID)),
+                        'delete' => in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID)),
+                        'sorting' => true,
+                        'paging' => true,       // cannot be turned off yet
+                        'filtering' => false,   // this does not exist yet
+                        'actions' => function($rowData) {
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $actions = \Cx\Core_Modules\MultiSite\Controller\BackendController::executeSql($rowData, false);
+                                        }
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::showLicense($rowData, false);
+                                        }
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, false);
+                                        }
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $domainRepo = \Env::get('em')->getRepository('Cx\Core\Net\Model\Entity\Domain');
+                                            $domain     = $domainRepo->findOneBy(array('name' => \Cx\Core\Setting\Controller\Setting::getValue('customerPanelDomain','MultiSite')));
+                                            if ($domain) {
+                                                $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::remoteLogin($rowData, true);
+                                            }
+                                        }
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::websiteBackup($rowData);
+                                        }
+                                        if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                            $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::multiSiteConfig($rowData, false);
+                                        }
+                                        return $actions;
                                     }
+                    ),
+                    'fields' => array(
+                        'id' => array('header' => 'ID'),
+                        'name' => array(
+                            'header' => 'TXT_MULTISITE_SITE_ADDRESS',
+                            'readonly' => true,
+                            'table' => array(
+                                'parse' => function($value) {
+                                    $websiteUrl = '<a href="'.ComponentController::getApiProtocol() . $value . '.' . \Cx\Core\Setting\Controller\Setting::getValue('multiSiteDomain','MultiSite').'" target="_blank">' . $value . '</a>';
+                                    return $websiteUrl;
+                                },
+                            ),
+                        ),
+                        'status' => array('header' => 'Status',
+                            'table' => array(
+                                'parse' => function($value, $arrData) {
+                                    // changing a Website's status must only be allowed from within the MANAGER (or HYBRID)
+                                    if (!in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
+                                        return $value;
+                                    }
+                                    $stateOnline = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE;
+                                    $stateOffline = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_OFFLINE;
+                                    $stateDisable = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_DISABLED;
+                                    $stateOnlineSelected = ($value == $stateOnline) ? 'selected' : '';
+                                    $stateOfflineSelected = ($value == $stateOffline) ? 'selected' : '';
+                                    $stateDisableSelected = ($value == $stateDisable) ? 'selected' : '';
+                                    if ($value == $stateOnline || $value == $stateOffline || $value == $stateDisable) {
+                                        $dropDownDisplay = '<select class="changeWebsiteStatus" data-websiteDetails= "'.$arrData['id'].'-'.$arrData['name'].'">'
+                                                . '<option value = ' . $stateOnline . ' ' . $stateOnlineSelected . '>' . $stateOnline . '</option>'
+                                                . '<option value = ' . $stateOffline . ' ' . $stateOfflineSelected . '>' . $stateOffline . '</option>'
+                                                . '<option value = ' . $stateDisable . ' ' . $stateDisableSelected . '>' . $stateDisable . '</option>';
+                                        return $dropDownDisplay;
+                                    } else {
+                                        return $value;
+                                    }
+                                },
+                            )),
+                        'language' => array('showOverview' => false),
+                        'websiteServiceServerId' => array(
+                            'header' => 'Website Service Server',
+                            'table' => array(
+                                'parse' => function($value) {
+                                    try {
+                                        $websiteServiceServer = ComponentController::getServiceServerByCriteria(array('id' => $value));
+                                        if ($websiteServiceServer) {
+                                            return contrexx_raw2xhtml($websiteServiceServer->getLabel().' ('.$websiteServiceServer->getHostname()).')';
+                                        }
+                                    } catch (\Exception $e) {}
+                                    return 'Managed by this system';
+                                },
+                            ),
+                        ),
+                        'ipAddress' => array('header' => 'IP Address'),
+                        'owner' => array(
+                            'header' => 'Owner',
+                            'table' => array(
+                                'parse' => function($user) {
+                                    return \FWUser::getParsedUserLink($user);
+                                },
+                            ),
+                        ),
+                        'themeId' => array(
+                            'showOverview' => false
+                            ),
+                        'ftpUser' => array(
+                            'header' => 'FTP User'
+                            ),
+                        'websiteServiceServer' => array(
+                            'showOverview' => false
+                            ),
+                        'domains' => array(
+                            'header' => 'Domains',
+                            'table'  => array(
+                                'parse' => function ($value,$arrayData) {
+                                    return $this->getWebsiteDomains($arrayData['id']);
                                 }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::websiteBackup($rowData);
-                                }
-                                if (in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                    $actions .= \Cx\Core_Modules\MultiSite\Controller\BackendController::multiSiteConfig($rowData, false);
-                                }
-                                return $actions;
-                            }
-            ),
-            'fields' => array(
-                'id' => array('header' => 'ID'),
-                'name' => array(
-                    'header' => 'TXT_MULTISITE_SITE_ADDRESS',
-                    'readonly' => true,
-                    'table' => array(
-                        'parse' => function($value) {
-                            $websiteUrl = '<a href="'.ComponentController::getApiProtocol() . $value . '.' . \Cx\Core\Setting\Controller\Setting::getValue('multiSiteDomain','MultiSite').'" target="_blank">' . $value . '</a>';
-                            return $websiteUrl;
-                        },
+                            )
+                        ),
+                        'secretKey' => array(
+                            'readonly'      => true,
+                            'showOverview'  => false,
+                        ),
+                        'installationId' => array(
+                            'readonly'      => true,
+                            'showOverview'  => false,
+                        ),
                     ),
-                ),
-                'status' => array('header' => 'Status',
-                    'table' => array(
-                        'parse' => function($value, $arrData) {
-                            // changing a Website's status must only be allowed from within the MANAGER (or HYBRID)
-                            if (!in_array(\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite'), array(ComponentController::MODE_MANAGER, ComponentController::MODE_HYBRID))) {
-                                return $value;
-                            }
-                            $stateOnline = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE;
-                            $stateOffline = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_OFFLINE;
-                            $stateDisable = \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_DISABLED;
-                            $stateOnlineSelected = ($value == $stateOnline) ? 'selected' : '';
-                            $stateOfflineSelected = ($value == $stateOffline) ? 'selected' : '';
-                            $stateDisableSelected = ($value == $stateDisable) ? 'selected' : '';
-                            if ($value == $stateOnline || $value == $stateOffline || $value == $stateDisable) {
-                                $dropDownDisplay = '<select class="changeWebsiteStatus" data-websiteDetails= "'.$arrData['id'].'-'.$arrData['name'].'">'
-                                        . '<option value = ' . $stateOnline . ' ' . $stateOnlineSelected . '>' . $stateOnline . '</option>'
-                                        . '<option value = ' . $stateOffline . ' ' . $stateOfflineSelected . '>' . $stateOffline . '</option>'
-                                        . '<option value = ' . $stateDisable . ' ' . $stateDisableSelected . '>' . $stateDisable . '</option>';
-                                return $dropDownDisplay;
-                            } else {
-                                return $value;
-                            }
-                        },
-                    )),
-                'language' => array('showOverview' => false),
-                'websiteServiceServerId' => array(
-                    'header' => 'Website Service Server',
-                    'table' => array(
-                        'parse' => function($value) {
-                            try {
-                                $websiteServiceServer = ComponentController::getServiceServerByCriteria(array('id' => $value));
-                                if ($websiteServiceServer) {
-                                    return contrexx_raw2xhtml($websiteServiceServer->getLabel().' ('.$websiteServiceServer->getHostname()).')';
-                                }
-                            } catch (\Exception $e) {}
-                            return 'Managed by this system';
-                        },
-                    ),
-                ),
-                'ipAddress' => array('header' => 'IP Address'),
-                'owner' => array(
-                    'header' => 'Owner',
-                    'table' => array(
-                        'parse' => function($user) {
-                            return \FWUser::getParsedUserLink($user);
-                        },
-                    ),
-                ),
-                'themeId' => array(
-                    'showOverview' => false
-                    ),
-                'ftpUser' => array(
-                    'header' => 'FTP User'
-                    ),
-                'websiteServiceServer' => array(
-                    'showOverview' => false
-                    ),
-                'domains' => array(
-                    'header' => 'Domains',
-                    'table'  => array(
-                        'parse' => function ($value,$arrayData) {
-                            return $this->getWebsiteDomains($arrayData['id']);
-                        }
-                    )
-                ),
-                'secretKey' => array(
-                    'readonly'      => true,
-                    'showOverview'  => false,
-                ),
-                'installationId' => array(
-                    'readonly'      => true,
-                    'showOverview'  => false,
-                ),
-            ),
-        ));
+                )
+            )
+        );
         $template->setVariable(array('SEARCH' => $_ARRAYLANG['TXT_MULTISITE_SEARCH'],
                                      'FILTER' => $_ARRAYLANG['TXT_MULTISITE_FILTER'],
                                      'SEARCH_TERM' => $_ARRAYLANG['TXT_MULTISITE_ENTER_SEARCH_TERM'],

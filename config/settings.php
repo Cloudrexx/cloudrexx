@@ -97,7 +97,6 @@ $_CONFIG['installationId']                = "OpenSourceId4ddd08c0115f967d5ca40af
 * Component
 * -------------------------------------------------------------------------
 */
-$_CONFIG['bannerStatus']                  = 0;
 $_CONFIG['spamKeywords']                  = "sex, viagra";
 $_CONFIG['newsTeasersStatus']             = 1;
 $_CONFIG['feedNewsMLStatus']              = 0;
@@ -169,6 +168,7 @@ $_CONFIG['cacheProxyCacheConfig']         = "{\"ip\":\"127.0.0.1\",\"port\":\"80
 $_CONFIG['cacheSsiProcessorConfig']       = "{\"ip\":\"127.0.0.1\",\"port\":\"8080\"}";
 $_CONFIG['internalSsiCache']              = "off";
 $_CONFIG['cacheUserCacheMemcacheConfig']  = "{\"ip\":\"127.0.0.1\",\"port\":11211}";
+$_CONFIG['cacheUserCacheMemcachedConfig'] = "{\"ip\":\"127.0.0.1\",\"port\":11211}";
 
 /**
 * -------------------------------------------------------------------------

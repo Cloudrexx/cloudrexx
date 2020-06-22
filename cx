@@ -1,2 +1,2097 @@
+@GOTO WIN \
+2>/dev/null
 #!/bin/bash
-php index.php $@
+# vim: syn=sh
+
+# detect OS of host system
+function get_host_os_type {
+    case "$(uname -s)" in
+        Linux*)
+            echo "Linux"
+            ;;
+
+        Darwin*)
+            echo "Darwin"
+            ;;
+
+        CYGWIN*)
+            echo "Cygwin"
+            ;;
+
+        MINGW*)
+            echo "MinGw"
+            ;;
+
+        *)
+            echo "UNKNOWN"
+    esac
+}
+
+# detect host OS
+HOST_OS=$(get_host_os_type)
+
+# whether docker runs as nativ app or is virtualized with virtualbox
+NATIVE_DOCKER=true
+
+# perform host OS specific initialization
+case "$HOST_OS" in
+    Darwin)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -f '%g' /var/run/docker.sock)
+        # check if 'Docker Desktop on Mac' or 'Docker Toolbox' is installed
+        if [[ -z "$(docker info --format '{{.OperatingSystem}}' | grep 'Docker Desktop')" ]]; then
+            # 'Docker Toolbox' is installed
+            # this means that docker is installed through a virutal machine
+            NATIVE_DOCKER=false
+        fi
+        ;;
+
+    Linux)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -c '%g' /var/run/docker.sock)
+        ;;
+
+    *)
+        echo "Your system ($HOST_OS) is not supported. Abort..."
+        exit 1
+        ;;
+esac
+
+# Wrapper for bash 3
+if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
+    # will be used to mount the global cx into the wrapper container
+    GLOBAL_CX_MOUNT=""
+
+    # check if we're using the global cx (instead of a local one)
+    PATH_OF_CALLING_CX="$(dirname $(realpath $0))"
+    if [[ "$PATH_OF_CALLING_CX" != "$(pwd)" ]]; then
+        # we're using the global cx
+        if [[ ! $NATIVE_DOCKER ]]; then
+            echo "The usage of a global cx is not supported on your system."
+            exit 1
+        fi
+
+        # install copy of global cx in temp
+        TEMPCX=$(basename $0)
+        TMPFILE=$(mktemp -q /tmp/${TEMPCX}.XXXXXX)
+        TMPNAME=$(basename $TMPFILE)
+        if [ $? -ne 0 ]; then
+            echo "$0: Can't create temp file, exiting..."
+            exit 1
+        fi
+        cp $0 $TMPFILE
+        chmod +x $TMPFILE
+
+        # run cx in wrapper container from its /tmp directory
+        CX_PATH="/tmp/cx"
+        GLOBAL_CX_MOUNT="-v $TMPFILE:$CX_PATH"
+    else
+        # path to local cx
+        CX_PATH="./cx"
+    fi
+
+    command="cd /root && $CX_PATH --proxy-host-dir='$(pwd -P)' $@"
+    # Special case: user wants to start interactive shell to wrapper container
+    if [[ "$@" == "env shell --wrapper" ]]; then
+        command="cd /root && bash"
+    fi
+
+    # Pass everything through our wrapper
+    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock $GLOBAL_CX_MOUNT cloudrexx/ubuntu bash -c "$command"
+
+    # remove temp copy of cx
+    if [[ -n "$GLOBAL_CX_MOUNT" ]]; then
+        rm $TMPFILE
+    fi
+
+    exit 0
+fi
+
+# URL to download this script from
+DOWNLOAD_URL="https://raw.githubusercontent.com/Cloudrexx/cloudrexx/master/cx"
+# current command, sub-command, sub-sub-command, etc.:
+COMMANDS=()
+# list of arguments, including default values
+declare -A ARGUMENTS
+# list of arguments set by user:
+declare -A FORCED_ARGUMENTS
+# list of default environment configs:
+declare -A DEFAULT_CONFIG
+# this env's config:
+declare -A CONFIG
+# list of commands which are handled completely within this script:
+INTERNAL_COMMANDS=("envs" "env" "debug")
+# proxy image
+PROXY_IMAGE="cloudrexx/web:proxy"
+# temp files:
+declare -A TEMP_FILES
+trap clean_temp_files EXIT
+function clean_temp_files {
+    for tempfile in "${!TEMP_FILES[@]}"; do
+        rm -f "${TEMP_FILES[$tempfile]}"
+    done
+}
+
+#######################
+# Input param cleanup #
+#######################
+
+# default values
+DEFAULT_CONFIG=(
+    ["port"]=80
+    ["hostname"]=""
+    ["php-version"]=""
+    ["db-image"]="mariadb:10.1"
+    ["php-image"]="cloudrexx/web:PHP<php-version>-with-mysql"
+    ["db-name"]="dev"
+    ["db-pass"]="123456"
+    ["db-user"]="root"
+    ["db-host"]="db"
+)
+ARGUMENTS=(
+    ["port"]=80
+    ["ssl-port"]=443
+    ["php-image"]="cloudrexx/web:PHP<php-version>-with-mysql"
+    ["db-image"]="mariadb:10.1"
+    ["source-repo"]="https://github.com/Cloudrexx/cloudrexx.git"
+    ["source-branch"]="master"
+    ["scripts-repo"]="https://github.com/Cloudrexx/scripts.git"
+    ["scripts-branch"]="master"
+    ["root-domain"]="lvh.me"
+)
+
+# iterate over all arguments to separate commands and arguments
+for arg in "$@"
+do
+    if [[ "$arg" == --* ]]; then
+        arg="${arg:2:${#arg}-2}"
+        if [[ "$arg" = *=* ]]; then
+            IFS='='; read -r key value <<< "$arg"
+            ARGUMENTS[$key]=$value
+            FORCED_ARGUMENTS[$key]=$value
+        else
+            ARGUMENTS[$arg]=true
+        fi
+    else
+        COMMANDS+=("$arg")
+    fi
+done
+
+##################
+# "help" command #
+##################
+function cmd_help {
+    case "$1" in
+        envs)
+            case "$2" in
+                up)
+                    echo "Starts the multi-vhost environment.
+
+Synopsis:
+    ./cx envs up [<options>]
+
+Available options are:
+    --certs-dir=<dir>   Directory to get SSL certificates from.
+    --ssl-port=<port>   Port for HTTPS connections. Defaults to 443.
+    --port=<port>       Port on which the vhosts are available."
+                    ;;
+                down)
+                    echo "Stops the multi-vhost environment.
+
+Synopsis:
+    ./cx envs down"
+                    ;;
+                restart)
+                    echo "Restarts the multi-vhost environment.
+
+Synopsis:
+    ./cx envs restart"
+                    ;;
+                status)
+                    echo "Shows the status of the multi-vhost environment.
+
+Synopsis:
+    ./cx envs status"
+                    ;;
+                info)
+                    echo "Shows the status of all vhosts' containers.
+
+Synopsis:
+    ./cx envs info"
+                    ;;
+                debug)
+                    echo "Shows the logs of the nginx proxy.
+
+Synopsis:
+    ./cx envs debug"
+                    ;;
+                list)
+                    echo "Shows a list of all attached environments.
+
+Synopsis:
+    ./cx envs list [<options>]
+
+Available options are:
+    --dir=<directory>   Shows the name of the environment(s) tied to a directory.
+    --all               Also lists environments which are not attached to the proxy.
+    --real              Shows docker-compose's project name instead of environment's name"
+                    ;;
+                locate)
+                    echo "Shows the working directory of an environment.
+
+Synopsis:
+    ./cx envs locate <environment> [<options>]
+
+Available options are:
+    --real              Expects environment name to be docker-compose's project name"
+                    ;;
+                shell)
+                    echo "This command opens an interactive shell of the NGINX proxy docker container.
+
+Synopsis
+    ./cx envs shell"
+                    ;;
+                exec)
+                    echo "Executes the given subcommand for 'env' on each environment.
+
+Synopsis
+    ./cx envs exec <command> [<options>]
+
+Available options are:
+    --silent            Does not output current environment's name
+    --real              Shows environment name as docker-compose's project name"
+                    ;;
+                *)
+                    echo "This command manages the environment for multiple Cloudrexx installations on one host.
+
+Synopsis
+    ./cx envs <subcommand> [<options>]
+
+Available subcommands are:
+    up          Starts the docker containers
+    down        Stops the docker containers
+    restart     Restarts the docker containers
+    status      Tells whether the containers are running
+    info        Alias for 'status'
+    shell       Interactive shell of the proxy container
+    debug       Shows NGINX logs
+    list        Lists all environments that are up
+    locate      Show an environments working directory
+
+For more info about a subcommand type ./cx help envs <subcommand>";
+                    ;;
+            esac
+            ;;
+        env)
+            case "$2" in
+                init)
+                    echo "This command (re-)initializes a Cloudrexx installation and its environment.
+
+Basically it does the following:
+    - Checks out main source repository
+    - Checks out helper scripts repository
+    - Generates docker configuration (docker-compose.yml)
+    - Starts necessary docker containers
+    - Loads database
+
+Synopsis
+    ./cx env init [<options>]
+
+Available options are:
+    --yes                           Answer all questions with yes. Use with care!
+    --silent                        Do not output non-necessary messages
+    --scale=<int>                   Sets the number of PHP-Containers to spawn. Useful for testing.
+    --skip-source                   Skips GIT clone for source code repository
+    --source-repo=<repoUrl>         GIT-URL for the source code repository. Default is https://github.com/Cloudrexx/cloudrexx
+    --source-branch=<branchName>    GIT branch to check out of the source code repository. Default is master.
+    --skip-scripts                  Skips GIT clone for scripts repository
+    --scripts-dir=<dir>             Locale directory to use as scripts directory instead of cloning from GIT repository
+    --scripts-repo=<repoUrl>        GIT-URL for the scripts repository. Default is https://github.com/Cloudrexx/scripts
+    --scripts-branch=<branchName>   GIT branch to check out of the scripts repository. Default is master.
+    --skip-database                 Does not initialize database.
+
+In addition all options of ./cx env config can be used, see ./cx help env config."
+                    ;;
+                up)
+                    echo "This command starts the environment for your installation.
+
+Synopsis
+    ./cx env up"
+                    ;;
+                down)
+                    echo "This command stops the environment for your installation.
+
+Synopsis
+    ./cx env down [<options>]
+
+Available options are:
+    --purge     Drops docker volumes associated with this environment. WARNING: You may loose data!"
+                    ;;
+                restart)
+                    echo "This command restarts the environment for your installation.
+
+Synopsis
+    ./cx env restart"
+                    ;;
+                status)
+                    echo "This command shows if the environment for your installation is up and running.
+
+Synopsis
+    ./cx env status"
+                    ;;
+                info)
+                    echo "This command shows the status and configuration of the environment for your installation.
+
+Synopsis
+    ./cx env info"
+                    ;;
+                update)
+                    echo "This command updates your installation.
+
+Synopsis
+    ./cx env update [<options>]
+
+Available options are:
+    --yes               Answer all questions with yes. Use with care!
+    --silent            Do not output non-necessary messages
+    --db                If set without setting --git or --docker only database is updated, implies --force
+    --git               If set without setting --db or --docker only GIT is updated
+    --docker            If set without setting --db or --git only docker images are updated
+    --force             Forces reset of the database even if dump has not changed
+    --reset             Resets local GIT clone to origin's state
+    --drop-sessions     Skips restoring user sessions
+    --drop-users        Skips restoring users, implies --drop-sessions"
+                    ;;
+                config)
+                    echo "This command configures your installation.
+
+Default behavior:
+    - If configuration does not yet exist, use default values (or arguments, if set)
+    - If configuration exists, only change values in arguments
+The option --interactive forces the command to ask for each value
+
+Synopsis
+    ./cx env config [<options>]
+
+Available options are:
+    --show                          Displays current configuration and exits.
+    --yes                           Answer all questions with yes / default. Use with care!
+    --silent                        Do not output non-necessary messages
+    --interactive                   Ask for each value instead of using default behavior
+    --force-default                 Forces default (/automatic) configuration
+    --no-persist=[<containers>]     Disable persistance of a container. Currently the only value suppored for <containers> is: db
+    --db-host=<hostname>            Sets database host to <hostname>
+    --db-name=<dbname>              Sets database name to <dbname>
+    --db-user=<username>            Sets database user to <username>
+    --db-pass=<password>            Sets database password to <password>
+    --php-image=<dockerImageName>   Name of the docker image to use. Default is 'cloudrexx/web:PHP<php_version>-with-mysql'.
+    --db-image=<dockerImageName>    Name of the docker image to use. Default is 'mariadb'.
+    --php-version=<php-version>     Sets PHP version to <php-version> (example: 7.2), default is based on Cloudrexx version
+    --hostname=<hostname>           Sets installation hostname to <hostname>, defaults to parent directory name
+    --port=<port>                   Sets installation port to <port>, defaults to 80"
+                    ;;
+                shell)
+                    echo "This command opens an interactive shell of the PHP docker container for this environment.
+
+Synopsis
+    ./cx env shell [<options>]
+
+Available options are:
+    --root          Opens an interactive root shell on the web container
+    --wrapper       Opens an interactive shell of the  Windows wrapper container instead (Windows only)"
+                    ;;
+                exec)
+                    echo "Allows to execute code (Bash/SQL) on containers of this environment.
+
+Synopsis
+    ./cx env exec [<options>] <code>
+
+Available options are:
+    --root          Execute Bash as root
+    --sql           Execute SQL on database container instead of Bash on web container.
+    --sql-file      Execute SQL from a file on database container instead of Bash on web container."
+                    ;;
+                component)
+                    case "$3" in
+                        list)
+                            echo "Lists additional components.
+
+Synopsis
+    ./cx env component list <options>
+
+Available options are:
+    --directories   List the component's directories
+    --raw           Does not shiny-print the output"
+                            ;;
+                        add)
+                            echo "Adds an additional component.
+
+Synopsis
+    ./cx env component add <componentType> <componentName> <gitRepository> (<options>)
+
+Argument description:
+    componentType   One of 'core', 'core_module', 'module', 'theme', 'lib'
+    componentName   Name of the component
+    gitRepository   GIT remote URL
+    options         See options below
+
+Available options:
+    --skip-source   Assume GIT clone is already done. <gitRepository> is optional when using this option.
+    --skip-db       Assume database is already updated and component active."
+                            ;;
+                        remove)
+                            echo "Removes an additional component.
+
+Synopsis
+    ./cx env component remove <componentType> <componentName>
+
+Argument description:
+    componentType   One of 'core', 'core_module', 'module', 'theme', 'lib'
+    componentName   Name of the component"
+                            ;;
+                        update)
+                            echo "Updates an additional component. Add a Data.sql or a OldStructureWithTestData.sql and a Migration.sql file to the Data directory of your component.
+
+Synopsis
+    ./cx env component update <componentType> <componentName> (<options>)
+
+Argument description:
+    componentType   One of 'core', 'core_module', 'module', 'theme', 'lib'
+    componentName   Name of the component
+    options         See options below
+
+Available options:
+    --db            Reset component database
+    --git           Update/pull GIT repository"
+                            ;;
+                        *)
+                        echo "Manages additional components.
+
+Synopsis
+    ./cx env component <subcommand> <arguments>
+
+Available subcommands are:
+    list            Lists registered additional components
+    add             Adds an additional component
+    remove          Removes a registered component
+    update          Updates a registered component"
+                        ;;
+                    esac
+                    ;;
+                remote)
+                    case "$3" in
+                        set)
+                            echo "Links this installation to a remote site
+
+Synopsis
+    ./cx env remote set <remote> (--snapshot-repo=<repo_url>)
+
+Parameter explanations:
+    <remote>        Name of the remote site to use
+    <repo_url>      URL of the snapshot repository to use. <site> can be used as a placeholder for <remote> in the URL."
+                            ;;
+                        unset)
+                            echo "Removes link to a remote site
+
+Synopsis
+    ./cx env remote unset"
+                            ;;
+                        show)
+                            echo "Shows to which remote site this installation is linked
+
+Synopsis
+    ./cx env remote show"
+                            ;;
+                        pull)
+                            echo "Pulls and installs newest snapshot from linked remote site
+
+Synopsis
+    ./cx env remote pull <arguments>
+
+Available arguments:
+    (none yet, more to come)"
+                            ;;
+                        *)
+                            echo "Manages link to a remote site
+
+Synopsis
+    ./cx env remote <subcommand> <arguments>
+
+Available subcommands are:
+    set             Sets the remote to use
+    unset           Removes link to remote
+    show            Shows which remote is currently linked
+    pull            Pulls and installs newest snapshot from remote"
+                            ;;
+                    esac
+                    ;;
+                *)
+                    echo "This command manages a Cloudrexx installation and its environment.
+
+Synopsis
+    ./cx env <subcommand> [<options>]
+
+Available subcommands are:
+    init        (Re-)Initializes the environment
+    up          Starts the necessary docker containers
+    down        Stops the necessary docker containers
+    restart     Restarts the necessary docker containers
+    status      Checks if all necessary docker containers are running
+    info        Calls 'status' and prints environment information
+    update      Updates docker images and GIT and reloads database
+    config      Configures Cloudrexx (config/configuration.php)
+    shell       Interactive shell of the current environment's web container
+    component   Manages additional components
+    remote      Manages remote installations
+    exec        Executes code (Bash/SQL) for the current environment
+
+For more info about a subcommand type ./cx help env <subcommand>";
+                    ;;
+            esac
+            ;;
+        help)
+            echo "Shows this help"
+            ;;
+        debug)
+            echo "Shows debug output. By default it outputs the last fatal error.
+
+Synopsis
+    ./cx debug [<options>]
+
+Available options are:
+    --web               Shows the log of the web docker container (Apache)
+    --request           Shows the log of the last request
+    --stack             Shows the stack trace of the last failed request
+    --clear-usercache   Clears the user cache
+    --install-x-debug   Installs xDebug inside the web container
+    --follow            Follows the log"
+            ;;
+        *)
+            echo "Executes commands for Cloudrexx installations.
+
+Synopsis
+    ./cx <command> [<subcommand> [...]] [<cmd_options>] [<cmd_arguments>]
+
+The following commands are available:
+    envs        Manages development environments
+    env         Manages a development environment
+    help        Shows this help
+    debug       Returns the last fatal error"
+            REGEX="(\S+) - ?(.*)"
+            HELP_LIST="$(phpexec | grep $'^\t' 2> /dev/null)"
+            spacepad="            "
+            while read -r line; do
+                [[ "$line" =~ $REGEX ]]
+                echo "    ${BASH_REMATCH[1]}${spacepad:${#BASH_REMATCH[1]}}${BASH_REMATCH[2]}"
+            done <<< "$HELP_LIST"
+            echo "
+For more info about a command type ./cx help <command>"
+            ;;
+    esac
+}
+
+##################
+# "envs" command #
+##################
+function cmd_envs {
+    case "$1" in
+        up)
+            if ! isPortFree ${ARGUMENTS["port"]}; then
+                if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                    echo "TCP port ${ARGUMENTS["port"]} is in use. Stop any service running on this port and try again."
+                fi
+                exit 1
+            fi
+            local environments env_dirs
+            ARGUMENTS["real"]=true
+            ARGUMENTS["all"]=true
+            IFS=$'\n'
+            set -f
+            environments=($(cmd_envs list))
+            set +f
+            # TODO: Only list environments on the same port
+            if [ "${#environments[@]}" -gt "0" ]; then
+                if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                    echo "The following environments are up. Shall they be adopted?"
+                    for environment in "${environments[@]}"; do
+                        echo "    $environment"
+                    done
+                    read -p "Adopt environments? [Yn]? " -n 1 -r
+                    echo ""
+                fi
+                if [[ ${ARGUMENTS["yes"]} ]] || [[ "$REPLY" == "" ]] || [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                    for environment in "${environments[@]}"; do
+                        env_dirs+=($(cmd_envs locate "$environment"))
+                        ARGUMENTS["name"]=$environment
+                        cmd_env down
+                    done
+                else
+                    if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                        echo "Aborting"
+                    fi
+                    exit
+                fi
+            fi
+            dockerexec network create "<proxy-network>"
+            if [[ "${ARGUMENTS["certs-dir"]}" != "" ]]; then
+                dockerexec run --restart=always --name "<proxy-container>" --net "nginx-proxy" -d -p "${ARGUMENTS["port"]}:80" -p "${ARGUMENTS["ssl-port"]}":443 -v "${ARGUMENTS["certs-dir"]}":/etc/nginx/certs:ro -v /var/run/docker.sock:/tmp/docker.sock:ro "$PROXY_IMAGE"
+            else
+                dockerexec run --restart=always --name "<proxy-container>" --net "nginx-proxy" -d -p "${ARGUMENTS["port"]}:80" -v /var/run/docker.sock:/tmp/docker.sock:ro "$PROXY_IMAGE"
+            fi
+            for env_dir in "${env_dirs[@]}"; do
+                (
+                    cd "$env_dir"
+                    cmd_env config
+                    cmd_env up
+                )
+            done
+            ;;
+        down)
+            local environments env_dir
+            ARGUMENTS["real"]=true
+            IFS=$'\n'
+            set -f
+            environments=($(cmd_envs list))
+            set +f
+            if [ "${#environments[@]}" -gt "0" ]; then
+                if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                    echo "The following environments are still up. Shall they be shut down?"
+                    for environment in "${environments[@]}"; do
+                        echo "    $environment"
+                    done
+                    read -p "Shut environments down? [Yn]? " -n 1 -r
+                    echo ""
+                fi
+                if [[ ${ARGUMENTS["yes"]} ]] || [[ "$REPLY" == "" ]] || [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                    if [ "${#environments[@]}" -eq "1" ]; then
+                        ARGUMENTS["real"]=true
+                        env_dir=$(cmd_envs locate "${environments[0]}")
+                    fi
+                    for environment in "${environments[@]}"; do
+                        ARGUMENTS["name"]=$environment
+                        cmd_env down
+                    done
+                else
+                    if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                        echo "Aborting"
+                    fi
+                    exit
+                fi
+            fi
+            dockerexec stop "<proxy-container>"
+            dockerexec rm "<proxy-container>"
+            dockerexec network rm "<proxy-network>"
+            if [ "${#environments[@]}" -eq "1" ]; then
+                if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                    echo "Should the environment \"${environments[0]}\" be restarted as a standalone environment?"
+                    read -p "Reconfigure and start environment? [Yn]? " -n 1 -r
+                    echo ""
+                fi
+                if [[ ${ARGUMENTS["yes"]} ]] || [[ "$REPLY" == "" ]] || [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                    (
+                        cd "$env_dir"
+                        cmd_env config
+                        cmd_env up
+                    )
+                fi
+            fi
+            ;;
+        restart)
+            cmd_envs down
+            cmd_envs up
+            ;;
+        status)
+            dockerexec ps -f "name=<proxy-container>"
+            ;;
+        info)
+            dockerexec ps -f "name=<container-prefix>*"
+            ;;
+        debug)
+            dockerexec logs -f "<proxy-container>"
+            ;;
+        shell)
+            dockerexec exec -ti "<proxy-container>" bash
+            ;;
+        list)
+            local containerlist
+            if [[ "${ARGUMENTS["dir"]}" != "" ]]; then
+                containerlist=$(
+                    while read -r container; do
+                        if [[ "$container" == "" ]]; then
+                            :
+                        elif [[ "$(docker inspect "$container" | grep "${ARGUMENTS["dir"]}:")" != "" ]]; then
+                            echo "$container"
+                        fi
+                    done <<< "$(docker ps --format '{{.Names}}')"
+                )
+            elif [[ ${ARGUMENTS["all"]} ]]; then
+                containerlist=$(dockerexec ps -f "name=<container-prefix>" --format "{{.Names}}" | grep web)
+            else
+                containerlist=$(dockerexec ps -f "name=<container-prefix>" -f "network=<proxy-network>" --format "{{.Names}}" | grep web)
+            fi
+            if ! [[ ${ARGUMENTS["real"]} ]]; then
+                containerlist="${containerlist//"clxenv"/}"
+                containerlist="${containerlist//"${ARGUMENTS["root-domain"]//./}_web_1"/}"
+            fi
+            containerlist="${containerlist//"_web_1"/}"
+            if [[ "$containerlist" == "" ]]; then
+                return 1
+            fi
+            echo "$containerlist"
+            ;;
+        locate)
+            local mountline environment
+            environment=$2
+            if [[ ${ARGUMENTS["real"]} != true ]]; then
+                environment="clxenv$2${ARGUMENTS["root-domain"]//./}"
+            fi
+            mountline=$(docker inspect "${environment}_web_1" | grep ":/var/www/html:")
+            REGEX="\"([^:]+):"
+            [[ "$mountline" =~ $REGEX ]]
+            echo "${BASH_REMATCH[1]}"
+            ;;
+        exec)
+            ARGUMENTS["real"]=true
+            envs="$(cmd_envs list)"
+            if [[ "$envs" == "" ]]; then
+                echo "No env up"
+                return
+            fi
+            shift
+            # TODO: Allow interactive decision whether to execute command on this env
+            first=true
+            ORIG_ARGS=("${ORIG_ARGS[@]:2}")
+            while read env; do
+                if "$first"; then
+                    first=false
+                else
+                    echo ""
+                fi
+                prevPwd="$(pwd -P)"
+                cd "$(cmd_envs locate "$env")" || continue
+                if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                    echo "Execute env command for $env"
+                fi
+                ./cx env "${ORIG_ARGS[@]}"
+                cd "$prevPwd"
+            done <<< "$envs"
+            ;;
+        *)
+            (>&2 echo "No such subcommand")
+            ;;
+    esac
+}
+
+#################
+# "env" command #
+#################
+function cmd_env {
+    case "$1" in
+        init)
+            if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                echo "This will install Cloudrexx in the current directory ($(get_real_pwd))"
+                read -p "Continue [Yn]? " -n 1 -r
+                echo ""
+                if [[ "$REPLY" != "" ]] && ! [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                    return
+                fi
+            fi
+            if [[ ${ARGUMENTS["skip-source"]} != true || ${ARGUMENTS["skip-scripts"]} != true ]] && [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Checking out source and scripts repository"
+            fi
+            if [[ ${ARGUMENTS["skip-source"]} != true ]]; then
+                # We do not simply clone because ./cx already exists
+                git init -q
+                git remote add origin "${ARGUMENTS["source-repo"]}"
+                if [[ ${ARGUMENTS["silent"]} == true ]]; then
+                    git fetch --tags -q
+                else
+                    git fetch --tags
+                fi
+                git checkout -t -f "origin/${ARGUMENTS["source-branch"]}"
+                # assume ./tmp/* and ./config/* are unchanged
+                git ls-files -z tmp/ | xargs -0 git update-index --assume-unchanged
+                git ls-files -z config/ | xargs -0 git update-index --assume-unchanged
+            fi
+            if [[ ${ARGUMENTS["skip-scripts"]} != true ]]; then
+                if [[ ${ARGUMENTS["scripts-dir"]} != "" ]]; then
+                    ln -s "${ARGUMENTS["scripts-dir"]}" "_meta"
+                else
+                    if [[ ${ARGUMENTS["silent"]} == true ]]; then
+                        git clone -q "${ARGUMENTS["scripts-repo"]}" --branch="${ARGUMENTS["scripts-branch"]}" _meta
+                    else
+                        git clone "${ARGUMENTS["scripts-repo"]}" --branch="${ARGUMENTS["scripts-branch"]}" _meta
+                    fi
+                fi
+            fi
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Configuring the environment"
+            fi
+            ARGUMENTS["force-default"]=true && cmd_env config
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Loading docker containers"
+            fi
+            local result
+            result="$(cmd_env up)"
+            if [[ "$?" != "0" ]]; then
+                echo "$result"
+                echo "In order to retry, please run ./cx env init --skip-scripts --skip-source"
+                exit
+            fi
+            if [[ ${ARGUMENTS["skip-database"]} != true ]]; then
+                if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                    echo "Loading database"
+                fi
+                ARGUMENTS["db"]=true && ARGUMENTS["drop-users"]=true && cmd_env update
+            fi
+            ARGUMENTS["force-default"]=false && cmd_env config
+            echo "$result"
+            ;;
+        up)
+            get_config_array
+            if [[ ${CONFIG["is-vhost"]} != true ]]; then
+                if ! isPortFree "${CONFIG["port"]}"; then
+                    if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                        echo "TCP port ${CONFIG["port"]} is in use. Stop any service running on this port and try again."
+                    fi
+                    exit 1
+                fi
+            fi
+            ARGUMENTS["dir"]="$(get_real_pwd)"
+            envname="$(cmd_envs list)"
+            if [[ "$?" == "0" ]]; then
+                echo "There's already an environment up and running (\"$envname\") for this directory."
+                exit 2
+            fi
+            [ -d ./tmp/db ] || mkdir -p ./tmp/db
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                dockercomposeexec up -d
+                echo "Waiting for database server to come up..."
+            else
+                dockercomposeexec up -d &> /dev/null
+            fi
+            dockerexec exec "<db-container>" bash -c "while ! echo | mysql -u${CONFIG["db-user"]} -p${CONFIG["db-pass"]} &> /dev/null; do sleep 1; done"
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Applying configuration to new environment"
+            fi
+            # for version 5 or newer, we do want to reinitialize the base
+            # configuration to ensure any newly added setting options
+            # get properly initialized after a GIT update
+            if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+                # This makes only sense in case the db has been loaded yet (which
+                # is not the case when performing an init).
+                # We therefore check if the table contrexx_component does exist
+                mysql_create_tempfile
+                mysql_exec "SELECT 1 from \`${CONFIG["db-prefix"]}component\` LIMIT 1" &> /dev/null
+                if [[ $? == 0 ]]; then
+                    phpexec config --force
+                fi
+            fi
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Environment successfully initialized. It is available at http://${CONFIG["hostname"]}/"
+                if [[ ${CONFIG["is-vhost"]} == true ]]; then
+                    echo "phpMyAdmin is available at http://phpma.${CONFIG["hostname"]}/"
+                    echo "MailHog is available at http://mail.${CONFIG["hostname"]}/"
+                else
+                    echo "phpMyAdmin is available at http://${CONFIG["hostname"]}:8234/"
+                    echo "MailHog is available at http://${CONFIG["hostname"]}:8025/"
+                fi
+                if ! is_wrapper && ! which cx > /dev/null; then
+                    echo ""
+                    echo "cx could not be found in your path. Run the following command to add it:"
+                    echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
+                fi
+            fi
+            exit 0
+            ;;
+        down)
+            local environments
+            if [[ "${ARGUMENTS["name"]}" != "" ]]; then
+                environments=(${ARGUMENTS["name"]})
+            else
+                ARGUMENTS["dir"]="$(get_real_pwd)"
+                ARGUMENTS["real"]=true
+                IFS=$'\n'
+                set -f
+                environments=($(cmd_envs list))
+                set +f
+            fi
+            get_config_array
+            environments+=("clxenv$(getenvname)")
+            environments=($(tr ' ' '\n' <<< "${environments[@]}" | sort -u | tr '\n' ' '))
+            for environment in "${environments[@]}"; do
+                echo "Shutting down environment $environment"
+                if [[ "${ARGUMENTS["purge"]}" == true ]]; then
+                    docker-compose --project-name "$environment" down -v
+                else
+                    docker-compose --project-name "$environment" down
+                fi
+            done
+            ;;
+        restart)
+            cmd_env down
+            cmd_env up
+            ;;
+        status)
+            if [[ ${ARGUMENTS["q"]} == true ]]; then
+                exit $(test -n "$(dockercomposeexec ps -q)")
+            else
+                dockercomposeexec ps
+            fi
+            ;;
+        info)
+            cmd_env status
+            ARGUMENTS["show"]=true && cmd_env config
+            ;;
+        update)
+            STRUCTMD5=$(/usr/bin/md5sum installer/data/contrexx_dump_structure.sql)
+            DATAMD5=$(/usr/bin/md5sum installer/data/contrexx_dump_data.sql)
+            DB_UPDATE_NECESSARY=false
+            get_config_array
+            if [[ ${ARGUMENTS["db"]} != true && ${ARGUMENTS["docker"]} != true ]] || [[ ${ARGUMENTS["git"]} = true ]]; then
+                if [[ ${ARGUMENTS["reset"]} == true ]]; then
+                    if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                        echo "This will remove all local changes. Are you sure?"
+                        read -p "Continue [Ny]? " -n 1 -r
+                        echo ""
+                        if ! [[ "$REPLY" =~ ^[Yy]$ ]]; then
+                            return
+                        fi
+                    fi
+                    git fetch
+                    git reset --hard
+                    git clean -ffdx
+                    set_config_array
+                else
+                    git stash
+                    git pull
+                    git stash pop
+                fi
+                STRUCTMD5NEW=$(/usr/bin/md5sum installer/data/contrexx_dump_structure.sql)
+                DATAMD5NEW=$(/usr/bin/md5sum installer/data/contrexx_dump_data.sql)
+                if [[ "$STRUCTMD5NEW" != "$STRUCTMD5" || "$DATAMD5NEW" != "$DATAMD5" ]]; then
+                    DB_UPDATE_NECESSARY=true
+                else
+                    DB_UPDATE_NECESSARY=false
+                fi
+                (cd "_meta"; git stash && git pull && git stash pop)
+                cmd_env config
+            fi
+            if [[ ${ARGUMENTS["db"]} != true && ${ARGUMENTS["git"]} != true ]] || [[ ${ARGUMENTS["docker"]} = true ]]; then
+                dockercomposeexec pull
+                dockercomposeexec restart
+            fi
+            if [[ ${ARGUMENTS["git"]} = true || ${ARGUMENTS["docker"]} = true ]] && [[ ${ARGUMENTS["db"]} != true ]]; then
+                if [[ $DB_UPDATE_NECESSARY = true && ${ARGUMENTS["silent"]} != true ]]; then
+                    echo "DB update would be necessary, you may want to run ./cx env update --db"
+                fi
+                return
+            fi
+            if [[ ${ARGUMENTS["force"]} != true && ${ARGUMENTS["db"]} != true && $DB_UPDATE_NECESSARY != true && ${ARGUMENTS["silent"]} != true ]]; then
+                echo "DB update not necessary, run ./cx env update --db --force if you want to force db reload"
+                return
+            fi
+
+            # create login file
+            mysql_create_tempfile
+
+            if [[ ${ARGUMENTS["drop-users"]} != true ]]; then
+                TEMP_FILES["user-backup"]="$(mktemp)"
+                mysql_dump --no-create-info --skip-triggers "${CONFIG["db-name"]}" contrexx_access_users contrexx_access_user_profile > "${TEMP_FILES["user-backup"]}"
+                mysql_dump --no-create-info --skip-triggers -w 'attribute_id=0' "${CONFIG["db-name"]}" contrexx_access_user_attribute_value >> "${TEMP_FILES["user-backup"]}"
+                if [[ ${ARGUMENTS["drop-sessions"]} != true ]]; then
+                    TEMP_FILES["session-backup"]="$(mktemp)"
+                    mysql_dump --no-create-info --skip-triggers "${CONFIG["db-name"]}" contrexx_sessions > "${TEMP_FILES["session-backup"]}"
+                fi
+            fi
+            # empty database if exists
+# from https://stackoverflow.com/questions/12403662/how-to-remove-all-mysql-tables-from-the-command-line-without-drop-database-permi
+            mysql_exec "
+SET FOREIGN_KEY_CHECKS = 0;
+SET GROUP_CONCAT_MAX_LEN=32768;
+SET @tables = NULL;
+SELECT GROUP_CONCAT('\`', table_name, '\`') INTO @tables
+      FROM information_schema.tables
+        WHERE table_schema = (SELECT DATABASE()) AND table_name LIKE '${CONFIG["db-prefix"]}%';
+SELECT IFNULL(@tables,'dummy') INTO @tables;
+
+SET @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+PREPARE stmt FROM @tables;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+SET @views = NULL;
+SELECT GROUP_CONCAT('\`', TABLE_NAME, '\`') INTO @views
+      FROM information_schema.views
+        WHERE table_schema = (SELECT DATABASE()) AND table_name LIKE '${CONFIG["db-prefix"]}%';
+SELECT IFNULL(@views,'dummy') INTO @views;
+
+SET @views = CONCAT('DROP VIEW IF EXISTS ', @views);
+PREPARE stmt FROM @views;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+SET FOREIGN_KEY_CHECKS = 1;"
+            # create db if it does not exist
+            mysql_exec "CREATE DATABASE IF NOT EXISTS ${CONFIG["db-name"]} COLLATE utf8_unicode_ci"
+            # load db
+            mysql_load_named "DB structure" "installer/data/contrexx_dump_structure.sql"
+            mysql_load_named "DB dump" "installer/data/contrexx_dump_data.sql"
+            if [[ ${ARGUMENTS["drop-users"]} != true ]]; then
+                mysql_load_named "Restore users" "${TEMP_FILES["user-backup"]}"
+                if [[ ${ARGUMENTS["drop-sessions"]} != true ]]; then
+                    mysql_load_named "Restore sessions" "${TEMP_FILES["session-backup"]}"
+                fi
+            fi
+            mysql_drop_tempfile
+
+            cmd_env remote pull
+
+            mysql_create_tempfile
+            # TODO: Check if there's at least one admin, make the user's ID dynamic
+            EXISTING_CX_USER=$(mysql_exec "SELECT id FROM contrexx_access_users WHERE id = 1")
+            if [[ "$EXISTING_CX_USER" == "" ]]; then
+                if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                    echo "There is no user, will create a default user. Ok?"
+                    read -p "Continue [Yn]? " -n 1 -r
+                    echo ""
+                    if [[ "$REPLY" =~ ^[Nn]$ ]]; then
+                        mysql_drop_tempfile
+                        return
+                    fi
+                fi
+                # there is no user and we decided to create one
+                declare -A ClxCredentials
+                ClxCredentials["user"]=""
+                ClxCredentials["mail"]="info@example.org"
+                ClxCredentials["pass"]="123456"
+                if [[ ${ARGUMENTS["yes"]} != true ]]; then
+                    for key in "${!ClxCredentials[@]}"; do
+                        read -r -p "Enter Cloudrexx $key [${ClxCredentials[$key]}]: " newvalue
+                        if [[ "$newvalue" != "" ]]; then
+                            ClxCredentials[$key]="$newvalue"
+                        fi
+                    done
+                fi
+                mysql_exec "INSERT INTO contrexx_access_users (id, is_admin, username, password, regdate, expiration, validity, last_auth, last_activity, email, email_access, frontend_lang_id, backend_lang_id, active, profile_access, restore_key, restore_key_time, u2u_active, auth_token) VALUES (1,1,'${ClxCredentials["user"]}',MD5('${ClxCredentials["pass"]}'),0,0,0,0,0,'${ClxCredentials["mail"]}','nobody', 0,0,1,'members_only','',0,'0', '');INSERT INTO contrexx_access_user_profile (user_id, gender, title, firstname, lastname, company, address, city, zip, country, phone_office, phone_private, phone_mobile, phone_fax, birthday, website, profession, interests, signature, picture) VALUES (1,'gender_undefined',2,'CMS','System Benutzer','','','','',0,'','','','','','','','','','');"
+                if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                    echo "Created the user \"${ClxCredentials["user"]}\" with e-mail \"${ClxCredentials["mail"]}\" and password \"${ClxCredentials["pass"]}\""
+                fi
+            fi
+            mysql_drop_tempfile
+
+            while read -r line; do
+                if [[ "$line" == "" ]]; then
+                    continue
+                fi
+                IFS=" "
+                local component=( $line )
+                echo "Update ${component[0]} ${component[1]}"
+                cmd_env component update "${component[0]}" "${component[1]}"
+            done <<< $(ARGUMENTS["raw"]=true && cmd_env component list)
+            clearUsercache
+            ;;
+        config)
+            get_config_array
+            if [[ ${ARGUMENTS["show"]} = true ]]; then
+                OUTPUT="$(echo -e "KEY\tVALUE")"
+                OUTPUT+=$'\n'
+                for value in "${!CONFIG[@]}"; do
+                    OUTPUT+="$(echo -e "$value\t${CONFIG[$value]}")"
+                    OUTPUT+=$'\n'
+                done
+                echo "$OUTPUT" | column -t -s $'\t'
+                return
+            fi
+            declare -A CONFIG_OVERRIDE
+            if [ ${#CONFIG[@]} -eq 0 ] || [[ ${ARGUMENTS["force-default"]} == true ]] ; then
+                # load config, if its empty: load default config over it
+                for value in "${!ARGUMENTS[@]}"; do
+                    CONFIG_OVERRIDE[$value]=${ARGUMENTS[$value]}
+                done
+            fi
+            # load forced arguments over it
+            for value in "${!FORCED_ARGUMENTS[@]}"; do
+                CONFIG_OVERRIDE[$value]=${FORCED_ARGUMENTS[$value]}
+            done
+            # loop over CONFIG_OVERRIDE and override all 
+            for value in "${!CONFIG_OVERRIDE[@]}"; do
+                CONFIG[$value]=${CONFIG_OVERRIDE[$value]}
+            done
+            # if interactive: loop over all options and let the user decide
+            if [[ ${ARGUMENTS["interactive"]} = true ]]; then
+                # TODO: Only ask if argument is not in forced arguments
+                for value in "${!DEFAULT_CONFIG[@]}"; do
+                    read -r -p "Enter value for '$value' [${CONFIG[$value]}]: " newvalue
+                    if [[ "$newvalue" != "" ]]; then
+                        CONFIG[$value]=$newvalue
+                    fi
+                done
+            fi
+            set_config_array
+            ;;
+        shell)
+            if [[ ${ARGUMENTS["db"]} ]]; then
+                dockerexec exec -ti "<db-container>" sh -c "cd /tmp/import; /bin/bash"
+            else
+                if [[ ${ARGUMENTS["root"]} ]]; then
+                    dockerexec exec -ti "<web-container>" bash
+                else
+                    dockerexec exec -ti --user www-data "<web-container>" bash
+                fi
+            fi
+            ;;
+        exec)
+            shift
+            if [[ -p /dev/stdin ]]; then
+                input=$(cat -)
+            fi
+            if [[ ${ARGUMENTS["sql"]} ]]; then
+                get_config_array
+                mysql_create_tempfile
+                if read -r -t 0; then
+                    mysql_exec "$input"
+                else
+                    mysql_exec "$@"
+                fi
+                RES="$?"
+                mysql_drop_tempfile
+                return $RES
+            elif [[ ${ARGUMENTS["sql-file"]} ]]; then
+                get_config_array
+                mysql_create_tempfile
+                if read -r -t 0; then
+                    mysql_load "$input"
+                else
+                    mysql_load "$@"
+                fi
+                mysql_drop_tempfile
+            else
+                if read -r -t 0; then
+                    get_config_array
+                    if [[ ${ARGUMENTS["root"]} ]]; then
+                        echo "$input" | internal_dockerexec exec -i "<web-container>" bash -c "$@"
+                    else
+                        echo "$input" | internal_dockerexec exec -i --user www-data "<web-container>" bash -c "$@"
+                    fi
+                else
+                    if [[ ${ARGUMENTS["root"]} ]]; then
+                        dockerexec exec -ti "<web-container>" bash -c "$@"
+                    else
+                        if [ -t 0 ] ; then
+                            dockerexec exec -ti --user www-data "<web-container>" bash -c "$@"
+                        else
+                            dockerexec exec -i --user www-data "<web-container>" bash -c "$@"
+                        fi
+                    fi
+                fi
+            fi
+            ;;
+        component)
+            declare -A types
+            types[core]="core"
+            types[coremodule]="core_modules"
+            types[module]="modules"
+            types[lib]="lib"
+            types[theme]="themes"
+            declare -A typeComponents
+            for type in "${!types[@]}"; do
+                typeComponents[$type]="$(get_project_var "clx.project.component.$type")"
+            done
+            case "$2" in
+                list)
+                    local nl=$'\n'
+                    local output=""
+                    if [[ "${ARGUMENTS["raw"]}" != true ]]; then
+                        output+="TYPE,NAME,REPOSITORY$nl"
+                    fi
+                    IFS=,
+                    for type in "${!typeComponents[@]}"; do
+                        components=("${typeComponents[$type]}")
+                        for name in ${components[@]}; do
+                            if [[ "$name" == "" ]]; then
+                                continue
+                            fi
+                            local gitRemote="error"
+                            if [ -d "${types[$type]}/$name" ]; then
+                                local gitRemote=$(cd "${types[$type]}/$name"; git remote get-url origin)
+                            fi
+                            if [[ "${ARGUMENTS["directories"]}" == true ]]; then
+                                echo "${types[$type]}/$name"
+                            else
+                                output+="$type,$name,$gitRemote$nl"
+                            fi
+                        done
+                    done
+                    if [[ "${ARGUMENTS["directories"]}" != true ]]; then
+                        echo "$output" | column -t -s , 
+                    elif [[ "${ARGUMENTS["raw"]}" ]]; then
+                        echo "$output"
+                    fi
+                    ;;
+                add)
+                    local type="${COMMANDS[2]}"
+                    if [[ "${types[$type]}" == "" ]]; then
+                        echo "Unknown type"
+                        exit
+                    fi
+                    if [[ "${COMMANDS[3]}" == "" ]]; then
+                        echo "Component name must not be empty"
+                        exit
+                    fi
+                    local newList="${typeComponents[$type]}"
+                    if [[ "$newList" != "" ]]; then
+                        newList+=","
+                    fi
+                    newList+="${COMMANDS[3]}"
+                    set_project_var "clx.project.component.$type" "$newList"
+                    if [[ ${ARGUMENTS["skip-source"]} != true ]]; then
+                        git clone "${COMMANDS[4]}" "${types[$type]}/${COMMANDS[3]}"
+                    fi
+                    if [[ ${ARGUMENTS["skip-db"]} != true ]]; then
+                        cmd_env component update "$type" "${COMMANDS[3]}" --db
+                    fi
+                    ;;
+                remove)
+                    local type="$3"
+                    if [[ "$type" == "" ]] || ! [ "${types[$type]+foobar}" ]; then
+                        echo "Unknown type"
+                        exit
+                    fi
+                    IFS=,
+                    read -r -a components <<< "${typeComponents[$type]}"
+                    local component="$4"
+                    if [[ ! " ${components[@]} " =~ " $component " ]]; then
+                        echo "Unknown component"
+                        exit
+                    fi
+                    # TODO: This can lead to a result like "foo,,bar"
+                    components=( "${components[@]/$component}" )
+                    set_project_var "clx.project.component.$type" "${components[*]}"
+                    phpexec deactivate "$type" "$component"
+                    ;;
+                update)
+                    local type="$3"
+                    if [[ "$type" == "" ]] || ! [ "${types[$type]+foobar}" ]; then
+                        echo "Unknown type"
+                        exit
+                    fi
+                    IFS=,
+                    read -r -a components <<< "${typeComponents[$type]}"
+                    local component="$4"
+                    if [[ ! " ${components[@]} " =~ " $component " ]]; then
+                        echo "Unknown component"
+                        exit
+                    fi
+                    directory="${types[$type]}/$component"
+                    if [[ ${ARGUMENTS["git"]} = true || ${ARGUMENTS["db"]} != true ]]; then
+                        ( cd "$directory" && git stash && git pull && git stash pop )
+                    fi
+                    if [[ ${ARGUMENTS["db"]} = true || ${ARGUMENTS["git"]} != true ]]; then
+                        case "$type" in
+                            lib)
+                                exit
+                                ;;
+                            theme)
+                                get_config_array
+                                mysql_create_tempfile
+                                local theme=$(mysql_exec "SELECT \`id\` FROM \`contrexx_skins\` WHERE \`foldername\` = '$component'")
+                                if [[ "$theme" == "" ]]; then
+                                    mysql_exec "INSERT INTO \`contrexx_skins\` SET \`themesname\` = '$component', \`foldername\` = '$component', \`expert\` = 1";
+                                fi
+                                mysql_drop_tempfile
+                                ;;
+                            *)
+                                get_config_array
+                                mysql_create_tempfile
+                                TEMP_FILES["component_cleanup"]="$(mktemp)"
+                                echo "SET FOREIGN_KEY_CHECKS = 0;" > "${TEMP_FILES["component_cleanup"]}"
+                                mysql_exec "SELECT concat('DROP TABLE \`', TABLE_NAME, '\`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE 'contrexx_${type}_${component,,}%'" -N >> "${TEMP_FILES["component_cleanup"]}"
+                                mysql_load_named "Drop existing data" "${TEMP_FILES["component_cleanup"]}"
+                                if [ -f "$directory/Data/OldStructureWithTestData.sql" ] && [ -f "$directory/Data/Migration.sql" ]; then
+                                    mysql_load_named "Import old Data" "$directory/Data/OldStructureWithTestData.sql"
+                                    mysql_load_named "Executing migration" "$directory/Data/Migration.sql"
+                                fi
+                                phpexec activate "$type" "$component"
+                                if [ -f "$directory/Data/Data.sql" ]; then
+                                    mysql_load_named "Import data" "$directory/Data/Data.sql"
+                                fi
+                                mysql_drop_tempfile
+                                ;;
+                        esac
+                    fi
+                    ;;
+                *)
+                    (>&2 echo "No such subcommand")
+                    ;;
+            esac
+            ;;
+        remote)
+            local remoteInfo
+            IFS=,
+            remoteInfo=($(get_project_var "clx.project.remote"))
+            case "$2" in
+                set)
+                    local url="https://snapshots.cloudrexx.com/<site>/latest.zip"
+                    if [[ "$3" == "" ]]; then
+                        echo "Site name must not be empty"
+                        exit
+                    fi
+                    if [[ "${ARGUMENTS["snapshot-repo"]}" != "" ]]; then
+                        url="${ARGUMENTS["snapshot-repo"]}"
+                    fi
+                    local testUrl="${url//"<site>"/"$3"}"
+                    if ! echo "$testUrl" | wget -q --spider -i -; then
+                        echo "Invalid URL!"
+                        return
+                    fi
+                    set_project_var "clx.project.remote" "$3,$url"
+                    ;;
+                unset)
+                    set_project_var "clx.project.remote" ""
+                    ;;
+                show)
+                    local nl=$'\n'
+                    local output="SITE,REPO URL$nl${remoteInfo[*]}"
+                    echo "$output" | column -t -s , 
+                    ;;
+                pull)
+                    workdir=$(mktemp -d)
+                    # fetch package
+                    local url="${remoteInfo[1]}"
+                    url="${url//"<site>"/"${remoteInfo[0]}"}"
+                    if [[ "$url" == "" ]]; then
+                        return
+                    fi
+                    echo "$url" | wget -N -i - -O "./tmp/remote.zip"
+
+                    # unpack
+                    echo "Extracting package..."
+                    unzip "./tmp/remote.zip" -d "$workdir/backup" > /dev/null
+
+                    echo "Gathering data..."
+                    # drop existing
+                    get_config_array
+                    mysql_create_tempfile
+                    echo "SET FOREIGN_KEY_CHECKS = 0;" > "$workdir/update.sql"
+                    tablePrefixes=(
+                        "contrexx_access_"
+                        "contrexx_content_"
+                        "contrexx_log_entry"
+                        "contrexx_module\_"
+                        "contrexx_core_view_frontend"
+                    )
+                    for tablePrefix in "${tablePrefixes[@]}"; do
+                        mysql_exec "SELECT concat('TRUNCATE TABLE \`', TABLE_NAME, '\`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME LIKE '$tablePrefix%'" -N >> "$workdir/update.sql"
+                    done
+
+                    # filter
+                    for tablePrefix in "${tablePrefixes[@]}"; do
+                        grep "INSERT INTO \`$tablePrefix" "$workdir/backup/database/sql_dump.sql" | grep -v "contrexx_module_mediadir_" | grep -v "contrexx_module_calendar_" >> "$workdir/update.sql"
+                    done
+
+                    # import
+                    mysql_load_named "Executing DB update" "$workdir/update.sql"
+
+                    # copy files
+                    copyDirs=("feed" "images" "media")
+                    for copyDir in "${copyDirs[@]}"; do    
+                        cp -R "$workdir/backup/dataRepository/$copyDir/"* "./$copyDir/" 2>/dev/null
+                        echo "*" > "./$copyDir/.gititnore"
+                    done
+
+                    # clear cache
+                    phpexec Cache clear user
+                    phpexec Cache clear page
+                    phpexec Cache clear esi
+                    rm -R "$workdir"
+                    ;;
+                *)
+                    (>&2 echo "No such subcommand")
+                    ;;
+            esac
+            ;;
+        *)
+            (>&2 echo "No such subcommand")
+            ;;
+    esac
+}
+
+function set_project_var {
+    git config "$1" "$2"
+}
+
+function get_project_var {
+    git config "$1"
+}
+
+function get_config_array {
+    local CONFIG_FILE="config/configuration.php"
+    local SETTINGS_FILE="config/settings.php"
+    local COMPOSE_FILE="docker-compose.yml"
+    if ! [[ -f $CONFIG_FILE ]] || ! [[ -f $SETTINGS_FILE ]]; then
+        CONFIG=()
+        return
+    fi
+    CONFIG=(
+        ["db-host"]=""
+        ["db-name"]=""
+        ["db-user"]=""
+        ["db-pass"]=""
+        ["db-prefix"]=""
+        ["hostname"]=""
+        ["cms-version"]=$(REGEX="CONFIG\['coreCmsVersion'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $SETTINGS_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        ["port"]=""
+        ["php-version"]=""
+        ["php-image"]=""
+        ["db-image"]=""
+        ["is-vhost"]=""
+        ["no-persist"]=""
+    )
+    if [[ ${ARGUMENTS["force-default"]} != true ]]; then
+        CONFIG["db-host"]=$(REGEX="DBCONFIG\['host'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["db-name"]=$(REGEX="DBCONFIG\['database'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["db-user"]=$(REGEX="DBCONFIG\['user'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["db-pass"]=$(REGEX="DBCONFIG\['password'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["db-prefix"]=$(REGEX="DBCONFIG\['tablePrefix'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["hostname"]=$(REGEX="CONFIG\['domainUrl'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $SETTINGS_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
+        CONFIG["port"]=$(REGEX="CONFIG\['portFrontendHTTP'\]\ +=\ +([0-9]+);"; CFG=$(cat $SETTINGS_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[1]}")
+    fi
+
+    local proxy_present
+    proxy_present=$(internal_dockerexec ps -q -f "name=<proxy-container>")
+    if [[ "$proxy_present" == "" ]]; then
+        CONFIG["is-vhost"]=false
+    else
+        CONFIG["is-vhost"]=true
+    fi
+    if [ -f "docker-compose.yml" ]; then
+        CONFIG["db-image"]=$(REGEX="db:\s*image: \"([^\"]+)\""; CFG=$(cat $COMPOSE_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[1]}")
+        CONFIG["php-image"]=$(REGEX="web:\s*image: \"([^\"]+)\""; CFG=$(cat $COMPOSE_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[1]}")
+        CONFIG["php-version"]=$(REGEX="([0-9]+\.[0-9]+)"; [[ "${CONFIG["php-image"]}" =~ $REGEX ]] && echo "${BASH_REMATCH[1]}")
+        if [[ "${CONFIG["php-version"]}" != "" ]]; then
+            CONFIG["php-image"]=${CONFIG[php-image]//"${CONFIG["php-version"]}"/"<php-version>"}
+        fi
+        if [[ "$(cat $COMPOSE_FILE)" =~ "VIRTUAL_HOST" ]]; then
+            CONFIG["is-vhost"]=true
+        else
+            CONFIG["is-vhost"]=false
+        fi
+        if [[ "$(cat $COMPOSE_FILE)" =~ "db-data:" ]]; then
+            CONFIG["no-persist"]=""
+        else
+            CONFIG["no-persist"]="db"
+        fi
+    fi
+    if [[ "${CONFIG["hostname"]}" == "" || "${CONFIG["hostname"]}" == "localhost" ]]; then
+        local working_directory
+        working_directory=$(get_real_pwd)
+        working_directory=${working_directory//" "/""}
+        working_directory=${working_directory//"_"/""}
+        working_directory=${working_directory,,}
+        CONFIG["hostname"]="${working_directory##*/}.${ARGUMENTS["root-domain"]}"
+    fi
+    if [[ "${CONFIG["php-version"]}" == "" ]]; then
+        CONFIG["php-version"]="5.6"
+        if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+            CONFIG["php-version"]="7.2"
+        elif [[ "${CONFIG["cms-version"]:0:1}" -lt 3 ]]; then
+            CONFIG["php-version"]="5.3"
+        fi
+    fi
+    if [[ "${CONFIG["port"]}" == "" ]]; then
+        CONFIG["port"]=${DEFAULT_CONFIG["port"]}
+    fi
+    if [[ "${CONFIG["php-image"]}" == "" ]]; then
+        CONFIG["php-image"]=${DEFAULT_CONFIG["php-image"]}
+    fi
+    if [[ "${CONFIG["db-image"]}" == "" ]]; then
+        if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+            CONFIG["db-image"]=${DEFAULT_CONFIG["db-image"]}
+        else
+            CONFIG["db-image"]="mariadb:5"
+        fi
+    fi
+    if [[ "${CONFIG["db-host"]}" == "" ]]; then
+        CONFIG["db-host"]=${DEFAULT_CONFIG["db-host"]}
+    fi
+    if [[ "${CONFIG["db-name"]}" == "" ]]; then
+        CONFIG["db-name"]=${DEFAULT_CONFIG["db-name"]}
+    fi
+    if [[ "${CONFIG["db-user"]}" == "" ]]; then
+        CONFIG["db-user"]=${DEFAULT_CONFIG["db-user"]}
+        if [[ "${CONFIG["db-pass"]}" == "" ]]; then
+            CONFIG["db-pass"]=${DEFAULT_CONFIG["db-pass"]}
+        fi
+    fi
+}
+
+function set_config_array {
+    local proxy_present
+    proxy_present=$(internal_dockerexec ps -q -f "name=<proxy-container>")
+    if [[ "$proxy_present" == "" ]]; then
+        CONFIG["is-vhost"]=false
+    else
+        CONFIG["is-vhost"]=true
+    fi
+
+    # load config file
+    FILE_CONTENTS=$(cat config/configuration.php)
+    # replace db-host, db-name, db-user, db-pass
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((DBCONFIG\['host'\]\ +=\ +['\"])[^'\"]*(['\"];))" "${CONFIG["db-host"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((DBCONFIG\['database'\]\ +=\ +['\"])[^'\"]*(['\"];))" "${CONFIG["db-name"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((DBCONFIG\['user'\]\ +=\ +['\"])[^'\"]*(['\"];))" "${CONFIG["db-user"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((DBCONFIG\['password'\]\ +=\ +['\"])[^'\"]*(['\"];))" "${CONFIG["db-pass"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((define\('CONTREXX_INSTALLED', )false(\);))" "true")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((define\('CONTEXX_INSTALLED', )false(\);))" "true")
+    if [[ "${CONFIG["cms-version"]:0:1}" == "3" && "${CONFIG["cms-version"]:2:1}" == "0" ]] || [[ "${CONFIG["cms-version"]:0:1}" -lt 3 ]]; then
+        FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((PATHCONFIG\['ascms_root'\]\ +=\ +['\"])[^'\"]*(['\"];))" "/var/www/html")
+    else
+        FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((PATHCONFIG\['ascms_root'\]\ +=\ +['\"])[^'\"]*(['\"];))" "")
+    fi
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((PATHCONFIG\['ascms_root_offset'\]\ +=\ +['\"])[^'\"]*(['\"];))" "")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((FTPCONFIG\['is_activated'\]\ +=\ +)[^;]*(;))" "false")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((FTPCONFIG\['username'\]\ +=\ +['\"])[^'\"]*(['\"];))" "")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((FTPCONFIG\['password'\]\ +=\ +['\"])[^'\"]*(['\"];))" "")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((FTPCONFIG\['path'\]\ +=\ +['\"])[^'\"]*(['\"];))" "")
+    # save config file
+    echo "$FILE_CONTENTS" > config/configuration.php
+
+    # load settings
+    FILE_CONTENTS=$(cat config/settings.php)
+    # replace hostname, port
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((CONFIG\['portFrontendHTTP'\]\ +=\ +)[0-9]+(;))" "${CONFIG["port"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((CONFIG\['domainUrl'\]\ +=\ +['\"])[^'\"]*(['\"];))" "${CONFIG["hostname"]}")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((CONFIG\['forceDomainUrl'\]\ +=\ +['\"])[^'\"]*(['\"];))" "off")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((CONFIG\['forceProtocolFrontend'\]\ +=\ +['\"])[^'\"]*(['\"];))" "none")
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((CONFIG\['forceProtocolBackend'\]\ +=\ +['\"])[^'\"]*(['\"];))" "none")
+    # save settings
+    echo "$FILE_CONTENTS" > config/settings.php
+
+    # set correct rewritebase
+    FILE_CONTENTS=$(cat .htaccess)
+    FILE_CONTENTS=$(regex_replace "$FILE_CONTENTS" "((RewriteBase\s+/)[-_a-zA-Z0-9/]*())" "")
+    echo "$FILE_CONTENTS" > .htaccess
+
+    # load _meta/docker-compose.yml
+    FILE_CONTENTS=$(cat _meta/docker-compose.tpl)
+    # replace php-image with php-version internally
+    PHP_IMAGE=${CONFIG["php-image"]}
+    PHP_IMAGE=${PHP_IMAGE//"<php-version>"/${CONFIG["php-version"]}}
+    # replace hostname, php- and db-image
+    local working_directory
+    working_directory="."
+    if runs_as_proxy; then
+        working_directory="$(get_real_pwd)"
+    fi
+    FILE_CONTENTS=${FILE_CONTENTS//"<cd>"/"$working_directory"}
+    FILE_CONTENTS=${FILE_CONTENTS//"<hostname>"/${CONFIG["hostname"]}}
+    FILE_CONTENTS=${FILE_CONTENTS//"<php-image>"/$PHP_IMAGE}
+    FILE_CONTENTS=${FILE_CONTENTS//"<db-image>"/${CONFIG["db-image"]}}
+    FILE_CONTENTS=${FILE_CONTENTS//"<proxy-network>"/"nginx-proxy"}
+    FILE_CONTENTS=${FILE_CONTENTS//"<port>"/${CONFIG["port"]}}
+    # TODO: Find better way to replace all occurences
+    if [[ "${CONFIG["is-vhost"]}" == true ]]; then
+        FILE_CONTENTS=${FILE_CONTENTS//"<vhost>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</vhost>"/""}
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<novhost>[^<]*</novhost>())" "")
+    else
+        FILE_CONTENTS=${FILE_CONTENTS//"<novhost>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</novhost>"/""}
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<vhost>[^<]*</vhost>())" "")
+    fi
+    if [[ "${CONFIG["no-persist"]}" =~ "db" ]]; then
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<persistdb>[^<]*</persistdb>())" "")
+    else
+        FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
+    fi
+    # drop any non-parsed blocks & placeholders
+    FILE_CONTENTS=$(drop_all_blocks_form_template "$FILE_CONTENTS")
+    FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<[a-z0-9_-]+>())" "")
+    # save docker-compose.yml
+    echo "$FILE_CONTENTS" > docker-compose.yml
+    
+    if [ "$(dockerexec ps -q -f "name=<web-container>")" ]; then
+        if [[ ${ARGUMENTS["silent"]} != true ]]; then
+            echo "Applying configuration to running environment"
+        fi
+        if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+            phpexec config --force
+            if [[ ${ARGUMENTS["silent"]} != true ]]; then
+                echo "Configuring cache"
+            fi
+            # force local domain as main domain
+            phpexec Setting set Config -engine=Yaml -group=site mainDomainId 0 > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheEnabled on > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache internalSsiCache on > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheUserCache memcached > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheUserCacheMemcacheConfig "{\"ip\":\"usercache\",\"port\":\"11211\"}" > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheUserCacheMemcachedConfig "{\"ip\":\"usercache\",\"port\":\"11211\"}" > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheDbStatus on > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheOPCache zendopcache > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=cache cacheOpStatus on > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=site forceDomainUrl on > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=site forceProtocolFrontend http > /dev/null
+            phpexec Setting set Config -engine=Yaml -group=administrationArea forceProtocolBackend http > /dev/null
+        else
+            # disable force domain url and protocol
+            mysql_create_tempfile
+            mysql_exec "UPDATE \`contrexx_settings\` SET \`setvalue\` = 'off' WHERE \`setname\` = 'forceDomainUrl';
+UPDATE \`contrexx_settings\` SET \`setvalue\` = 'none' WHERE \`setname\` = 'forceProtocolFrontend';
+UPDATE \`contrexx_settings\` SET \`setvalue\` = 'none' WHERE \`setname\` = 'forceProtocolBackend';
+UPDATE \`contrexx_settings\` SET \`setvalue\` = '${CONFIG["hostname"]}' WHERE \`setname\` = 'domainUrl';"
+        fi
+    fi
+}
+
+function clearUsercache {
+    dockerexec exec "<web-container>" bash -c 'exec 3<>/dev/tcp/usercache/11211 && echo "flush_all" >&3 && read -u 3 msg_in && echo "$msg_in"'
+}
+
+#####################
+# Wrapper functions #
+#####################
+function phpexec {
+    if read -r -t 0; then
+        INPUT="$(cat /dev/stdin)"
+    fi
+    # TODO: Check if we should run async
+    if type docker >/dev/null 2>&1; then
+        if [ ! "$(dockerexec ps -q -f "name=<web-container>")" ]; then
+            if type php >/dev/null 2>&1; then
+                php index.php "$@"
+            else
+                echo "Environment not running!"
+            fi
+        else
+            if read -r -t 0; then
+                echo "$INPUT" | dockerexec exec -i --user www-data "<web-container>" php index.php "$@"
+            else
+                dockerexec exec -i --user www-data "<web-container>" php index.php "$@"
+            fi
+        fi
+    else
+        php index.php "$@"
+    fi
+}
+
+function dockerexec {
+    if read -r -t 0; then
+        INPUT="$(cat /dev/stdin)"
+        get_config_array
+        echo "$INPUT" | internal_dockerexec "$@"
+    else
+        get_config_array
+        internal_dockerexec "$@"
+    fi
+}
+
+function internal_dockerexec {
+    local ENV_NAME="$(getenvname)"
+    local ARGS=()
+    for index in "$@"; do
+        index="${index//"<web-container>"/"<container-prefix><env-name>_web_1"}"
+        index="${index//"<db-container>"/"<container-prefix><env-name>_db_1"}"
+        index="${index//"<cache-container>"/"<container-prefix><env-name>_usercache_1"}"
+        index="${index//"<phpma-container>"/"<container-prefix><env-name>_phpmyadmin_1"}"
+        index="${index//"<proxy-container>"/"<proxy-prefix>-proxy"}"
+        index="${index//"<container-prefix>"/"clxenv"}"
+        index="${index//"<proxy-prefix>"/"clxenvs"}"
+        index="${index//"<proxy-network>"/"nginx-proxy"}"
+        index="${index//"<env-name>"/"$ENV_NAME"}"
+        ARGS+=("$index")
+    done
+    if read -r -t 0; then
+        cat /dev/stdin | docker "${ARGS[@]}"
+    else
+        docker "${ARGS[@]}"
+    fi
+}
+
+function dockercomposeexec {
+    get_config_array
+    docker-compose --project-name "clxenv$(getenvname)" "$@"
+}
+
+function getenvname {
+    local ENV_NAME="${CONFIG[hostname]//"."/}"
+    ENV_NAME="${ENV_NAME//"-"/}"
+    echo "$ENV_NAME"
+}
+
+# Returns 1 for docker, 0 for local, 2 for non-running docker
+function mysql_is_local {
+    if [ "$(dockerexec ps -q -f "name=<web-container>")" ]; then
+        return 1
+    else
+        if type mysql >/dev/null 2>&1; then
+            return 0
+        fi
+        return 2
+    fi
+}
+
+function mysql_create_tempfile {
+    if mysql_is_local; then
+        TEMP_FILES["db-connection"]="$(mktemp)"
+        echo "[mysql]
+default-character-set=utf8
+database=${CONFIG["db-name"]}
+[client]
+host=${CONFIG["db-host"]}
+user=${CONFIG["db-user"]}
+password=${CONFIG["db-pass"]}" > "${TEMP_FILES["db-connection"]}"
+    else
+        # TODO: Make trap delete files in container
+        TEMP_FILES["db-connection"]=$(dockerexec exec "<db-container>" mktemp)
+        echo "[mysql]
+default-character-set=utf8
+database=${CONFIG["db-name"]}
+[client]
+host=${CONFIG["db-host"]}
+user=${CONFIG["db-user"]}
+password=${CONFIG["db-pass"]}" | internal_dockerexec exec -i "<db-container>" bash -c "cat > ${TEMP_FILES["db-connection"]}"
+    fi
+}
+
+function mysql_dump {
+    if mysql_is_local; then
+        mysqldump --defaults-file="${TEMP_FILES["db-connection"]}" "$@"
+    else
+        dockerexec exec "<db-container>" mysqldump --defaults-file="${TEMP_FILES["db-connection"]}" "$@"
+    fi
+}
+
+function mysql_exec {
+    if mysql_is_local; then
+        mysql --defaults-file="${TEMP_FILES["db-connection"]}" -A -e "$@"
+        return $?
+    else
+        echo "$1" > "./tmp/db/import.sql"
+        shift
+        # Since mysql's SOURCE does not return an error code we need to check STDERR
+        TEMP_FILES["mysql_source_error_log"]="$(mktemp)"
+        internal_dockerexec exec "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'" 2> >(tee "${TEMP_FILES["mysql_source_error_log"]}" >&2)
+        if [ -s "$TEMP_FILES["mysql_source_error_log"]" ]; then
+            RES=1
+        else
+            RES=0
+        fi
+        rm "./tmp/db/import.sql"
+        return $RES
+    fi
+}
+
+function mysql_load {
+    if mysql_is_local; then
+        cat "$1" | mysql --defaults-file="${TEMP_FILES["db-connection"]}" -A
+    else
+        cp "$1" "./tmp/db/import.sql"
+        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} -e 'SOURCE /tmp/import/import.sql'"
+        rm "./tmp/db/import.sql"
+    fi
+}
+
+function mysql_load_named {
+    if ! command -v pv >/dev/null 2>&1; then
+        echo "$1"
+        mysql_load "$2"
+        return
+    fi
+    if mysql_is_local; then
+        pv -pterb -N "$1" "$2" | mysql --defaults-file="${TEMP_FILES["db-connection"]}" -A
+    else
+        echo "$1"
+        mysql_load "$2"
+    fi
+}
+
+function mysql_drop_tempfile {
+    if [ "$(dockerexec ps -q -f "name=<web-container>")" ]; then
+        dockerexec exec "<db-container>" rm "${TEMP_FILES["db-connection"]}"
+        unset TEMP_FILES["db-connection"]
+    fi
+}
+
+####################
+# Helper functions #
+####################
+
+# regex_replace <haystack> <regex> <replacement>
+# Matches multi-line and replaces only first occurences (/non-global)
+# regex match 1 needs to be whole match
+# regex match 2 needs to be everything before replaced part
+# regex match 3 needs to be everything after replaced part
+function regex_replace {
+    local HAYSTACK="$1"
+    local REGEX="$2"
+    local REPLACEMENT="$3"
+    [[ "$HAYSTACK" =~ $REGEX ]]
+    REPLACE="${BASH_REMATCH[2]}${REPLACEMENT}${BASH_REMATCH[3]}"
+    HAYSTACK="${HAYSTACK//"${BASH_REMATCH[0]}"/"$REPLACE"}"
+    echo "$HAYSTACK"
+}
+
+# regex_replace <haystack> <regex> <replacement>
+# Matches multi-line and recursively replaces all occurences (/global)
+# regex match 1 needs to be whole match
+# regex match 2 needs to be everything before replaced part
+# regex match 3 needs to be everything after replaced part
+# TODO: Does not work for regex matching empty string
+function regex_replace_all {
+    local HAYSTACK="$1"
+    local OLDHAYSTACK=""
+
+    while [[ "$HAYSTACK" != "$OLDHAYSTACK" ]]; do
+        OLDHAYSTACK="$HAYSTACK"
+        HAYSTACK="$(regex_replace "$HAYSTACK" "$2" "$3")"
+    done
+    echo "$HAYSTACK"
+}
+
+# Drop all blocks from a template
+#
+# A block has the following notation: <name>...</name>
+function drop_all_blocks_form_template {
+    local TEMPLATE="$1"
+    local REGEX="(<[a-z0-9_-]+>)[^<]*(</[a-z0-9_-]+>)"
+    # check if template still contains any blocks
+    while [[ "$TEMPLATE" =~ $REGEX ]]; do
+        # verify that the opening and closing tags of the block do match
+        OPENING_TAG="${BASH_REMATCH[1]//[<>]/}"
+        CLOSING_TAG="${BASH_REMATCH[2]//[<\/>]/}"
+        if [[ "$OPENING_TAG" == "$CLOSING_TAG" ]]; then
+            # drop the whole block
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/}"
+        else
+            # opening tag does not match -> this indicated that the opening
+            # tag is not a block-tag, but a placeholder instead.
+            # so let's just remove that placeholder then
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/"${BASH_REMATCH[2]}"}"
+        fi
+    done
+
+    echo "$TEMPLATE"
+}
+
+# Usage: if runs_as_proxy; then
+function runs_as_proxy {
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        return 0
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function is_wrapper {
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        return 0
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        return 0
+    fi
+    return 1
+}
+
+function get_real_pwd {
+    local working_directory
+    working_directory="$PWD"
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        working_directory="$PROXY_HOST_DIR"
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        working_directory="${ARGUMENTS["proxy-host-dir"]}"
+    fi
+    echo $working_directory
+}
+
+# Usage: if isPortFree 123; then
+function isPortFree {
+    local hostname
+    hostname="localhost"
+    if runs_as_proxy; then
+        local route
+        route=($(grep -E "eth0\s*00000000" < /proc/net/route))
+        hostname="$((16#${route[2]:6:2})).$((16#${route[2]:4:2})).$((16#${route[2]:2:2})).$((16#${route[2]:0:2}))"
+    fi
+    if (echo >"/dev/tcp/$hostname/$1") &>/dev/null; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+#####################
+# Decide what to do #
+#####################
+
+# this finds "cx" in current pwd or above
+path="$(pwd)"
+result=""
+found=false
+while [[ $path != / ]];
+do
+    result=$(find "$path" -maxdepth 1 -mindepth 1 -name "cx" -execdir pwd \;)
+    if [[ "$result" != "" ]]; then
+        found=true
+        break;
+    fi
+    # Note: if you want to ignore symlinks, use "$(realpath -s "$path"/..)"
+    path="$(realpath -s "$path"/..)"
+done
+if ! $found; then
+    # command is init
+    if [[ "${COMMANDS[0]}" == "env" ]] && [[ "${COMMANDS[1]}" == "init" ]]; then
+        # download cx and call init
+        wget "$DOWNLOAD_URL" || curl -O "$DOWNLOAD_URL"
+        chmod +x cx
+        ./cx "$@"
+        exit
+
+    # command is envs
+    elif [[ "${COMMANDS[0]}" == "envs" ]]; then
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
+        COMMANDS=("${COMMANDS[@]:1}")
+        cmd_envs "${COMMANDS[@]/#/}"
+        exit
+    elif [[ "${COMMANDS[0]}" == "help" && ( "${COMMANDS[1]}" == "" || "${COMMANDS[1]}" == "envs" || ( "${COMMANDS[1]}" == "env" && "${COMMANDS[2]}" == "init" ) ) ]]; then
+        shift
+        cmd_help "$@"
+        exit
+    fi
+    echo "cx not found, you may want to call \`cx env init\`";
+    exit
+fi
+# get the directory this script lies in
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd -P )"
+if [[ "$(pwd -P)" != "$result" || "$DIR" != "$result" ]]; then
+    prevPwd="$(pwd -P)"
+    cd "$result" || exit
+    ./cx "$@"
+    RES=$?
+    cd "$prevPwd"
+    exit $RES
+fi
+
+ORIG_ARGS=("$@")
+case "${COMMANDS[0]}" in
+    envs)
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
+        COMMANDS=("${COMMANDS[@]:1}")
+        cmd_envs "${COMMANDS[@]/#/}"
+        ;;
+    env)
+        COMMANDS=("${COMMANDS[@]:1}")
+        if read -r -t 0; then
+            cat /dev/stdin | cmd_env "${COMMANDS[@]/#/}"
+            exit $?
+        else
+            cmd_env "${COMMANDS[@]/#/}"
+            exit $?
+        fi
+        ;;
+    debug)
+        if [[ ${ARGUMENTS["web"]} == true ]]; then
+            dockerexec logs -f "<web-container>"
+            exit
+        elif [[ ${ARGUMENTS["request"]} ]]; then
+            requestId=$(tac tmp/log/dbg.log | grep '^[^ ].*"([a-z0-9]\+)" ' -m1 | grep -o ' "([0-9a-z]\+)" ')
+            if [ -t 0 ] ; then
+                grep -Poz ".*\"\(${requestId:3:12}\)\"(.+)([\n] .*)*[\n]" tmp/log/dbg.log | tr -d '\000' | less -F
+            else
+                grep -Poz ".*\"\(${requestId:3:12}\)\"(.+)([\n] .*)*[\n]" tmp/log/dbg.log | tr -d '\000'
+            fi
+            exit
+        elif [[ ${ARGUMENTS["follow"]} ]]; then
+            tail -f -n0 tmp/log/dbg.log
+            exit
+        elif [[ ${ARGUMENTS["clear-usercache"]} ]]; then
+            clearUsercache
+            exit
+        elif [[ ${ARGUMENTS["install-x-debug"]} ]]; then
+            get_config_array
+            internal_dockerexec exec -i "<web-container>" bash -c "pecl install xdebug && docker-php-ext-enable xdebug && apachectl -k graceful"
+            exit
+        fi
+        lastError="$(tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac)"
+        if [[ ${ARGUMENTS["stack"]} == true ]]; then
+            requestId="$(echo "$lastError" | grep '^[^ ].*"([a-z0-9]\+)" ' -m1 | grep -o ' "([0-9a-z]\+)" ' | grep -o '[0-9a-z]\+')"
+            if [ -t 0 ] ; then
+                echo "$lastError"$'\n'"$(grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          ')" | less
+            else
+                echo "$lastError"
+                grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          '
+            fi
+        else
+            echo "$lastError"
+        fi
+        ;;
+    *)
+        if [[ "${COMMANDS[0]}" == "" || "${COMMANDS[0]}" == "help" ]]; then
+            # wrapper for "help" command to deliver help for internal commands
+            if [[ "${COMMANDS[1]}" == "" || " ${INTERNAL_COMMANDS[@]} " =~ " ${COMMANDS[1]} " ]]; then
+                COMMANDS=("${COMMANDS[@]:1}")
+                cmd_help "${COMMANDS[@]/#/}"
+            else
+                shift
+                phpexec help "$@"
+            fi
+        else
+            # if system looks installed
+            if [ -f "index.php" ]; then
+                # TODO: add help text if return value indicates a setup problem (db conn., .htaccess, ...)
+                phpexec "$@"
+            else
+                echo "Cloudrexx does not seem to be installed. Did you already execute the \"env init\" command?"
+                cmd_help "${COMMANDS[1]}"
+            fi
+        fi
+        ;;
+esac
+
+#########################################
+# End of nice part, lesser systems next #
+#########################################
+
+exit
+:WIN
+@ECHO off
+REM Check if bash script is present
+DIR /b /a-d |find /v "." |find "cx" >nul
+if %errorlevel% NEQ 0 (
+    docker run --rm --name clx-win-wrapper -v "%cd%/":/root cloudrexx/ubuntu bash -c "cd /root && wget -q https://raw.githubusercontent.com/Cloudrexx/cloudrexx/master/cx && chmod +x cx"
+)
+
+SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
+set string=%cd%
+
+REM Split on first doublepoint to get drive letter separately
+for /f "tokens=1 delims=:" %%a in ("%string%") do set new_var=%%a
+
+REM Replace uppercase drive letter by lowercase
+call :tolower new_var
+
+REM Merge new path and replace backslashes and colons
+set string=%new_var%%string:~2%
+set string=%string:\=/%
+set string=/host_mnt/%string::/=/%
+
+REM Special case: user wants to start interactive shell to wrapper container
+if "%*" == "env shell --wrapper" (
+    docker run --rm -ti --name clx-win-wrapper -e PROXY_HOST_DIR="%string%" -v "%cd%/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu sh -c "cd /root && bash"
+    goto :EOF
+)
+
+REM Pass everything through our wrapper
+REM TODO add support for global cx
+docker run --rm -ti --name clx-win-wrapper -v "%cd%/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "cd /root && ./cx --proxy-host-dir='%string%' %*"
+goto :EOF
+
+:tolower
+for %%L IN (a b c d e f g h i j k l m n o p q r s t u v w x y z) DO SET %1=!%1:%%L=%%L!
+goto :EOF

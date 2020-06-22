@@ -86,7 +86,7 @@ class LanguageFile extends \Cx\Core_Modules\Listing\Model\Entity\DataSet  {
      * An Array containing the overwritten placeholders
      * @var \Cx\Core\Locale\Model\Entity\Placeholder[], placeholder name as key
      */
-    protected $placeholders;
+    protected $placeholders = array();
 
     /**
      * The path to the yaml file containing the customized placeholder data
@@ -139,17 +139,12 @@ class LanguageFile extends \Cx\Core_Modules\Listing\Model\Entity\DataSet  {
         // load component specific language data from init
         $init = \Env::get('init');
         if (!$onlyCustomized) {
-            try {
-                $this->data = $init->getComponentSpecificLanguageDataByCode(
-                    $this->componentName,
-                    $frontend,
-                    $sourceLanguage->getIso1(),
-                    false
-                );
-            } catch(\InitCMSException $e) {
-                \Message::add($e->getMessage(), \Message::CLASS_ERROR);
-                return;
-            }
+            $this->data = $init->getComponentSpecificLanguageDataByCode(
+                $this->componentName,
+                $frontend,
+                $sourceLanguage->getIso1(),
+                false
+            );
         }
 
         // generate path to yaml file

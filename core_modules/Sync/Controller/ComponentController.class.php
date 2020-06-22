@@ -207,6 +207,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             // Most exceptions should be catched inside the API!
             http_response_code(400); // BAD REQUEST
             echo 'Exception of type "' . get_class($e) . '" with message "' . $e->getMessage() . '"';
+            \DBG::log($e->getTraceAsString());
         }
     }
     
@@ -545,7 +546,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $i = 0;
         $severity = 'INFO';
         // for as long as there are changes of non-locked hosts
-        $query = $em->createQuery('SELECT h FROM ' . $this->getNamespace() . '\Model\Entity\Host h WHERE h.state = 0');
+        $fiveMinutesAgo = $this->getComponent(
+            'DateTime'
+        )->createDateTimeForDb('5 minutes ago');
+        $query = $em->createQuery('
+            SELECT
+                h
+            FROM
+                ' . $this->getNamespace() . '\Model\Entity\Host h
+            WHERE
+                h.state = 0 OR
+                (
+                    h.state = 1 AND
+                    h.lastUpdate < :fiveMinutesAgo
+                )
+        ')->setParameter(
+            'fiveMinutesAgo',
+            $fiveMinutesAgo->format('Y-m-d H:i:s')
+        );
         $query->useResultCache(false);
         $nonLockedHosts = $query->getResult();
         $hasNonLockedChanges = false;
@@ -571,6 +589,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     if (!$host->handleChange($change)) {
                         $severity = 'WARNING';
                         $host->disable();
+                        \DBG::msg(
+                            'SYNC ERROR: Host "' . $host->getHost() .
+                                '" could not handle change #' .
+                                $change->getId() . '. Host disabled.'
+                        );
                         break 2;
                     }
                     $i++;
@@ -585,6 +608,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $host->removeLock();
             }
             $query = $em->createQuery('SELECT h FROM ' . $this->getNamespace() . '\Model\Entity\Host h WHERE h.state = 0');
+            $query->useResultCache(false);
             $nonLockedHosts = $query->getResult();
             $hasNonLockedChanges = false;
             foreach ($nonLockedHosts as $host) {
@@ -689,6 +713,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return $dependingFields;
     }
     
+    /**
+     * Remote side
+     */
     public function getIdMapping($entityType, $foreignHost = '', $foreignId = '', $localId = '', $allowMultiple = false) {
         $em = $this->cx->getDb()->getEntityManager();
         $qb = $em->createQueryBuilder();
@@ -715,7 +742,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             } else {
                 $mapping = $query->getSingleResult();
             }
-        } catch (\Doctrine\ORM\NoResultException $e) {}
+        } catch (\Doctrine\ORM\NoResultException $e) {
+        } catch (\Doctrine\ORM\NonUniqueResultException $e) {
+            \DBG::log($query->getDql());
+            throw $e;
+        }
         return $mapping;
     }
     

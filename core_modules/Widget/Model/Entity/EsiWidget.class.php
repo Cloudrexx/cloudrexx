@@ -132,6 +132,26 @@ class EsiWidget extends Widget {
     const ESI_VAR_NAME_COUNTRY = 'country';
 
     /**
+     * @const int Index for ESI variable for additional path parts
+     */
+    const ESI_VAR_ID_PATH = 128;
+
+    /**
+     * @const string Name of ESI variable for additional path parts
+     */
+    const ESI_VAR_NAME_PATH = 'path';
+
+    /**
+     * @const int Index for ESI variable for query string
+     */
+    const ESI_VAR_ID_QUERY = 256;
+
+    /**
+     * @const string Name of ESI variable for query string
+     */
+    const ESI_VAR_NAME_QUERY = 'query';
+
+    /**
      * ESI variables configured to be sent for this Widget
      *
      * @var int Combination of the constants
@@ -261,6 +281,9 @@ class EsiWidget extends Widget {
 
     /**
      * Returns the params for the JsonAdapter call
+     * If you add an ESI variable core_module Cache needs to be updated as well:
+     * - Controller\CacheLib (multiple times)
+     * - Model\Entity\ReverseProxyCloudrexx::globDrop()
      * @param string $targetComponent Parse target component name
      * @param string $targetEntity Parse target entity name
      * @param string $targetId Parse target entity ID
@@ -287,6 +310,8 @@ class EsiWidget extends Widget {
             static::ESI_VAR_ID_USER => static::ESI_VAR_NAME_USER,
             static::ESI_VAR_ID_CURRENCY => static::ESI_VAR_NAME_CURRENCY,
             static::ESI_VAR_ID_COUNTRY => static::ESI_VAR_NAME_COUNTRY,
+            static::ESI_VAR_ID_PATH => static::ESI_VAR_NAME_PATH,
+            static::ESI_VAR_ID_QUERY => static::ESI_VAR_NAME_QUERY,
         );
         foreach ($esiVars as $esiVarId=>$esiVarName) {
             if (!$this->isEsiVariableActive($esiVarId)) {
@@ -327,6 +352,20 @@ class EsiWidget extends Widget {
                         $esiVarValue = $this->getComponent(
                             'GeoIp'
                         )->getCountryCode(array());
+                        break;
+                    case static::ESI_VAR_NAME_PATH:
+                        $esiVarValue = $this->getComponent('Widget')->encode(
+                            \Env::get('Resolver')->getAdditionalPath()
+                        );
+                        break;
+                    case static::ESI_VAR_NAME_QUERY:
+                        $params = $this->cx->getRequest()->getUrl()->getParamArray();
+                        unset($params['__cap']);
+                        unset($params['section']);
+                        unset($params['cmd']);
+                        $esiVarValue = $this->getComponent('Widget')->encode(
+                            http_build_query($params, '', '&')
+                        );
                         break;
                 }
             }

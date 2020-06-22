@@ -269,6 +269,7 @@ class VotingManager
             $votingTitle=stripslashes($objResult->fields['question']);
             $votingVotes=$objResult->fields['votes'];
             $votingDate=strtotime($objResult->fields['datesec']);
+            $votingDate = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
 
             $images = 1;
             $query="SELECT id, question, votes FROM ".DBPREFIX."voting_results WHERE voting_system_id='$votingId' ORDER BY id";
@@ -291,7 +292,7 @@ class VotingManager
 
             $this->_objTpl->setVariable(array(
                 'VOTING_TITLE'               => $votingTitle,
-                'VOTING_DATE'                => showFormattedDate($votingDate),
+                'VOTING_DATE'                => $votingDate,
                 'VOTING_RESULTS_TEXT'         => $votingResultText,
                 'VOTING_RESULTS_TOTAL_VOTES' => $votingVotes,
                 'VOTING_TOTAL_TEXT'          => $_ARRAYLANG['TXT_VOTING_TOTAL'],
@@ -318,6 +319,7 @@ class VotingManager
                 $votingTitle=stripslashes($objResult->fields['title']);
                 $votingVotes=$objResult->fields['votes'];
                 $votingDate=strtotime($objResult->fields['datesec']);
+                $votingDate = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
                 $votingStatus=$objResult->fields['status'];
 
                 if ($votingStatus==0) {
@@ -333,7 +335,7 @@ class VotingManager
 
                 $this->_objTpl->setVariable(array(
                     'VOTING_OLDER_TEXT'       => "<a href='?cmd=Voting&amp;votingid=$votingid'>".$votingTitle."</a>",
-                    'VOTING_OLDER_DATE'      => showFormattedDate($votingDate),
+                    'VOTING_OLDER_DATE'      => $votingDate,
                     'VOTING_OLDER_VOTES'     => ($votingVotes > 0 && $objResult->fields['submit_check'] == 'email') ? '<a href="?cmd=Voting&amp;act=detail&amp;id='.$votingid.'" title="'.$_ARRAYLANG['TXT_VOTING_SHOW_EMAIL_ADRESSES'].'">'.$votingVotes.'</a>' : $votingVotes,
                     'VOTING_ID'              => $votingid,
                     'VOTING_LIST_CLASS'      => $class,
@@ -685,6 +687,7 @@ class VotingManager
 // TODO: Never used
 //            $votingVotes=$objResult->fields['votes'];
             $votingDate=strtotime($objResult->fields['datesec']);
+            $votingDate = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
 // TODO: Never used
 //            $votingStatus=$objResult->fields['status'];
         } else {
@@ -704,7 +707,7 @@ class VotingManager
         $submitbutton= '<input type="submit" value="'.$_ARRAYLANG['TXT_SUBMIT'].'" name="Submit" />';
 
         $this->_objTpl->setVariable(array(
-            'VOTING_TITLE'             => htmlentities($votingTitle, ENT_QUOTES, CONTREXX_CHARSET)." - ".showFormattedDate($votingDate),
+            'VOTING_TITLE'             => htmlentities($votingTitle, ENT_QUOTES, CONTREXX_CHARSET)." - ".$votingDate,
             'VOTING_CODE'              => $_ARRAYLANG['TXT_VOTING_CODE'],
             'VOTING_RESULTS_TEXT'      => htmlentities($votingResultText, ENT_QUOTES, CONTREXX_CHARSET),
             'TXT_SUBMIT'               => htmlentities($submitbutton, ENT_QUOTES, CONTREXX_CHARSET),

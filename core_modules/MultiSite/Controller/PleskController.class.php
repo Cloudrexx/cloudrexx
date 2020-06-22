@@ -1979,6 +1979,7 @@ class PleskController extends HostController {
      * {@inheritdoc}
      */
     public function createWebDistributionAlias($mainName, $aliasName) {
+        $this->createSubscription($aliasName);
     }
 
     /**
@@ -2015,7 +2016,15 @@ class PleskController extends HostController {
         if (empty($domain)) {
             return false;
         }
-        
+
+        $allSubscriptions = $this->getAllSubscriptions();
+        $existingKey = in_array($domain, $allSubscriptions);
+        if ($existingKey !== false) {
+            \DBG::msg("MultiSite (PleskController): subscription already exists -> abort");
+            return $existingKey;
+        }
+        \DBG::msg("MultiSite (PleskController): subscription does not yet exists -> create");
+
         $xmldoc = $this->getXmlDocument();
         $packet = $this->getRpcPacket($xmldoc);
         
@@ -2060,8 +2069,31 @@ class PleskController extends HostController {
         $propertySslValueTag = $xmldoc->createElement('value', true);
         $propertySslTag->appendChild($propertySslValueTag);
 
+	// Note: the setting of additional-settings (and additional-ssl-settings) does not work with plesk.
+	// As a workaround the vHost templates have been adjusted (according to
+	// https://support.plesk.com/hc/en-us/articles/213367389-How-to-change-the-default-content-for-newly-created-domains-in-Plesk-Hierzu)
+	// to already contain the required apache directives. Those have been set as follows:
+	//
+	// vhost.conf:
+	// Include "/home/httpd/vhosts/h1.cloudrexx.com/scripts/apache_h1.cloudrexx.com_HTTP.conf"
+	//
+	// vhost_ssl.conf:
+	// Include "/home/httpd/vhosts/h1.cloudrexx.com/scripts/apache_h1.cloudrexx.com_HTTPS.conf"
+	//
+	// Additional note:
+	// Due to bug #PPPM-9858, the above does not work when creating a new site that points to an existing
+	// document root (in our case /home/httpd/vhosts/h1.cloudrexx.com/httpdocs/).
+	// As a workaround, the following event handler has been add in plesk to solve this issue:
+	//
+	// Ereignis: Domain erstellt
+	// Prioriät: 50 (normal)
+	// Benutzer: root
+	// Befehl:   /bin/bash /root/scripts/plesk_eventhandler_skel-cloudrexx.sh $NEW_DOMAIN_NAME
+	//
+	//
+	//
         // additional-settings
-        $propertyHttpTag = $xmldoc->createElement('property');
+        /*$propertyHttpTag = $xmldoc->createElement('property');
         $virtualHostTag->appendChild($propertyHttpTag);
         
         $propertyHttpNameTag = $xmldoc->createElement('name', 'additional-settings');
@@ -2072,10 +2104,10 @@ Include "/home/httpd/vhosts/h1.cloudrexx.com/scripts/apache_h1.cloudrexx.com_HTT
 ServerAlias *.MAIN-DOMAIN
 HTTP;
         $propertyHttpValueTag = $xmldoc->createElement('value', $httpValue);
-        $propertyHttpTag->appendChild($propertyHttpValueTag);
+        $propertyHttpTag->appendChild($propertyHttpValueTag);*/
 
         // additional-ssl-settings
-        $propertyHttpsTag = $xmldoc->createElement('property');
+        /*$propertyHttpsTag = $xmldoc->createElement('property');
         $virtualHostTag->appendChild($propertyHttpsTag);
         
         $propertyHttpsNameTag = $xmldoc->createElement('name', 'additional-ssl-settings');
@@ -2086,7 +2118,7 @@ Include "/home/httpd/vhosts/h1.cloudrexx.com/scripts/apache_h1.cloudrexx.com_HTT
 ServerAlias *.MAIN-DOMAIN
 HTTPS;
         $propertyHttpsValueTag = $xmldoc->createElement('value', $httpsValue);
-        $propertyHttpsTag->appendChild($propertyHttpsValueTag);
+        $propertyHttpsTag->appendChild($propertyHttpsValueTag);*/
 
         // execute request
         
@@ -2101,9 +2133,13 @@ HTTPS;
             $error = (isset($systemError) ? $systemError : $resultNode->errtext);
             throw new ApiRequestException("Error in creating site on existing subscription: {$error}");
         }
+        \DBG::msg("MultiSite (PleskController): subscription created");
         if ($resultNode->id) {
+            \DBG::msg("MultiSite (PleskController): configure newly created subscription");
             $this->disableMailService($resultNode->id);
+            \DBG::msg("MultiSite (PleskController): mail service disabled on newly created subscription");
             $this->disableDnsService($resultNode->id);
+            \DBG::msg("MultiSite (PleskController): dns service disabled on newly created subscription");
         }
         return $resultNode->id;
     }
@@ -2445,11 +2481,11 @@ HTTPS;
         $xmldoc = $this->getXmlDocument();
         $packet = $this->getRpcPacket($xmldoc);
 
-        $webspace = $xmldoc->createElement('site');
-        $packet->appendChild($webspace);
+        $site = $xmldoc->createElement('site');
+        $packet->appendChild($site);
 
         $set = $xmldoc->createElement('set');
-        $webspace->appendChild($set);
+        $site->appendChild($set);
 
         $filter = $xmldoc->createElement('filter');
         $set->appendChild($filter);
@@ -2476,7 +2512,7 @@ HTTPS;
         $property->appendChild($value);
 
         $response   = $this->executeCurl($xmldoc);
-        $resultNode = $response->webspace->set->result;
+        $resultNode = $response->site->set->result;
 
         $systemError = $response->system->errtext;
         if ('error' == (string) $resultNode->status || $systemError) {

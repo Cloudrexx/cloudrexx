@@ -310,6 +310,28 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
     /**
      * {@inheritDoc}
      */
+    public function addReadDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addReadDataAccess', array($readDataAccesses));
+
+        return parent::addReadDataAccess($readDataAccesses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeReadDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeReadDataAccess', array($readDataAccesses));
+
+        return parent::removeReadDataAccess($readDataAccesses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setReadDataAccesses(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess)
     {
 
@@ -327,6 +349,28 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getReadDataAccesses', array());
 
         return parent::getReadDataAccesses();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addWriteDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addWriteDataAccess', array($writeDataAccesses));
+
+        return parent::addWriteDataAccess($writeDataAccesses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeWriteDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeWriteDataAccess', array($writeDataAccesses));
+
+        return parent::removeWriteDataAccess($writeDataAccesses);
     }
 
     /**
@@ -354,7 +398,7 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
     /**
      * {@inheritDoc}
      */
-    public function setCallback($callback)
+    public function setCallback(\Cx\Core_Modules\Access\Model\Entity\Callback $callback)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCallback', array($callback));
@@ -416,6 +460,17 @@ class Permission extends \Cx\Core_Modules\Access\Model\Entity\Permission impleme
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

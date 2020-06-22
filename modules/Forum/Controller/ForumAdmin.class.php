@@ -174,7 +174,7 @@ class ForumAdmin extends ForumLibrary {
             'ADMIN_CONTENT'                => $this->_objTpl->get()
         ));
 
-        $this->act = $_REQUEST['act'];
+        $this->act = isset($_REQUEST['act']) ? $_REQUEST['act'] : '';
         $this->setNavigation();
     }
 
@@ -215,6 +215,7 @@ class ForumAdmin extends ForumLibrary {
 
            if (count($arrForums) > 0) {
                //there are categories in database
+               $index = 1;
                foreach ($arrForums as $intCounter => $arrValues) {
                    $this->_objTpl->setVariable(array(
                     'TXT_IMGALT_CHANGE_STATUS'    =>    $_ARRAYLANG['TXT_FORUM_CATEGORY_CHANGE_STATUS'],
@@ -232,8 +233,9 @@ class ForumAdmin extends ForumLibrary {
                     }
                 $strLanguages = count($this->_arrLanguages) > 1 ? \Html::getLanguageIcons($langState, 'index.php?cmd=Forum&amp;act=category_edit&amp;id=' . $arrValues['id']) : '';
 
+                $row = $index % 2 ? 'row2' : 'row1';
                 $this->_objTpl->setVariable(array(
-                       'CATEGORY_ROWCLASS'            =>    'row'.($index % 2),
+                       'CATEGORY_ROWCLASS'            => $row,
                        'CATEGORY_ID'                =>    $arrValues['id'],
                        'CATEGORY_STATUS_ICON'        =>    ($arrValues['status'] == 1) ? 'led_green' : 'led_red',
                        'CATEGORY_TYPE_ICON'        =>    ($arrValues['level'] == 0) ? '<img src="'.ASCMS_MODULE_WEB_PATH.'/Forum/View/Media/folder.gif" border="0" alt="'.$arrValues['name'].'" />' : '<img src="'.ASCMS_MODULE_WEB_PATH.'/Forum/View/Media/comment.gif" border="0" alt="'.$arrValues['name'].'" />',
@@ -248,6 +250,7 @@ class ForumAdmin extends ForumLibrary {
                        'CATEGORY_LASTPOST'            =>    $arrValues['last_post_str'].(!empty($arrValues['last_post_date']) ? ', '.$arrValues['last_post_date'] : '')
                    ));
                    $this->_objTpl->parse('showCategories');
+                   $index++;
                }
 
                $this->_objTpl->hideBlock('noCategories');
@@ -277,8 +280,12 @@ class ForumAdmin extends ForumLibrary {
                $arrLanguages = array();
 
                foreach ($this->_arrLanguages as $intLangId => $arrValues) {
-                   $arrLanguages[$intCounter%3] .= '<input checked="checked" type="checkbox" name="frmAddCategory_Languages[]" value="'.$intLangId.'" />'.$arrValues['long'].' ['.$arrValues['short'].']<br />';
+                   if (!isset($arrLanguages[$intCounter % 3])) {
+                       $arrLanguages[$intCounter % 3] = '';
+                   }
 
+                   $checkboxHtml = '<input checked="checked" type="checkbox" name="frmAddCategory_Languages[]" value="'.$intLangId.'" />'.$arrValues['long'].' ['.$arrValues['short'].']<br />';
+                   $arrLanguages[$intCounter % 3] .= $checkboxHtml;
                    $this->_objTpl->setVariable(array(
                        'CATEGORY_ADD_NAME_LANGID'    =>    $intLangId,
                        'CATEGORY_ADD_DESC_LANGID'    =>    $intLangId,
@@ -298,9 +305,12 @@ class ForumAdmin extends ForumLibrary {
                }
 
                $this->_objTpl->setVariable(array(
-                   'CATEGORY_ADD_LANGUAGES_1'    =>    $arrLanguages[0],
-                   'CATEGORY_ADD_LANGUAGES_2'    =>    $arrLanguages[1],
-                   'CATEGORY_ADD_LANGUAGES_3'    =>    $arrLanguages[2]
+                   'CATEGORY_ADD_LANGUAGES_1' => isset($arrLanguages[0])
+                       ? $arrLanguages[0] : '',
+                   'CATEGORY_ADD_LANGUAGES_2' => isset($arrLanguages[1])
+                       ? $arrLanguages[1] : '',
+                   'CATEGORY_ADD_LANGUAGES_3' => isset($arrLanguages[2])
+                       ? $arrLanguages[2] : '',
                ));
            }
 
@@ -598,9 +608,9 @@ class ForumAdmin extends ForumLibrary {
             $intParentId     = intval($objResult->fields['parent_id']);
 
             $this->_objTpl->setVariable(array(
-                'VALUE_CATEGORY_ID'    =>    $intCategoryId,
-                'VALUE_NAME'        =>    $this->_arrTranslations[$intCategoryId][$this->_intLangId]['name'],
-                'VALUE_DESC'        =>    $this->_arrTranslations[$intCategoryId][$this->_intLangId]['desc']
+                'VALUE_CATEGORY_ID' => $intCategoryId,
+                'VALUE_NAME'        => isset($this->_arrTranslations[$intCategoryId][$this->_intLangId]) ? $this->_arrTranslations[$intCategoryId][$this->_intLangId]['name'] : '',
+                'VALUE_DESC'        => isset($this->_arrTranslations[$intCategoryId][$this->_intLangId]) ? $this->_arrTranslations[$intCategoryId][$this->_intLangId]['desc'] : '',
             ));
 
             if ($intParentId == 0) {
@@ -636,18 +646,21 @@ class ForumAdmin extends ForumLibrary {
                    $arrLanguages = array();
 
                    foreach ($this->_arrLanguages as $intLangId => $arrValues) {
-                       $strChecked        = (array_key_exists($intLangId, $this->_arrTranslations[$intCategoryId])) ? 'checked' : '';
-                       $strDisabled     = ($intParentId == 0) ? '' : ((!array_key_exists($intLangId, $this->_arrTranslations[$intParentId])) ? 'disabled="disabled"' : '');
+                       $strChecked   = (array_key_exists($intLangId, $this->_arrTranslations[$intCategoryId])) ? 'checked' : '';
+                       $strDisabled  = ($intParentId == 0) ? '' : ((!array_key_exists($intLangId, $this->_arrTranslations[$intParentId])) ? 'disabled="disabled"' : '');
+                       if (!isset($arrLanguages[$intCounter % 3])) {
+                           $arrLanguages[$intCounter % 3] = '';
+                       }
 
-                       $arrLanguages[$intCounter%3] .= '<input type="checkbox" name="frmUpdateCategory_Languages[]" value="'.$intLangId.'" '.$strDisabled.' '.$strChecked.' />'.$arrValues['long'].' ['.$arrValues['short'].']<br />';
-
+                       $checkboxHtml = '<input type="checkbox" name="frmUpdateCategory_Languages[]" value="'.$intLangId.'" '.$strDisabled.' '.$strChecked.' />'.$arrValues['long'].' ['.$arrValues['short'].']<br />';
+                       $arrLanguages[$intCounter % 3] .=  $checkboxHtml;
                        $this->_objTpl->setVariable(array(
-                           'CATEGORY_EDIT_NAME_LANGID'    =>    $intLangId,
-                           'CATEGORY_EDIT_DESC_LANGID'    =>    $intLangId,
-                           'CATEGORY_EDIT_NAME_LANG'    =>    $arrValues['long'].' ['.$arrValues['short'].']',
-                           'CATEGORY_EDIT_DESC_LANG'    =>    $arrValues['long'].' ['.$arrValues['short'].']',
-                           'CATEGORY_EDIT_NAME_VALUE'    =>    $this->_arrTranslations[$intCategoryId][$intLangId]['name'],
-                           'CATEGORY_EDIT_DESC_VALUE'    =>    $this->_arrTranslations[$intCategoryId][$intLangId]['desc']
+                           'CATEGORY_EDIT_NAME_LANGID' => $intLangId,
+                           'CATEGORY_EDIT_DESC_LANGID' => $intLangId,
+                           'CATEGORY_EDIT_NAME_LANG'   => $arrValues['long'].' ['.$arrValues['short'].']',
+                           'CATEGORY_EDIT_DESC_LANG'   => $arrValues['long'].' ['.$arrValues['short'].']',
+                           'CATEGORY_EDIT_NAME_VALUE'  => isset($this->_arrTranslations[$intCategoryId][$intLangId]) ? $this->_arrTranslations[$intCategoryId][$intLangId]['name'] : '',
+                           'CATEGORY_EDIT_DESC_VALUE'  => isset($this->_arrTranslations[$intCategoryId][$intLangId]) ? $this->_arrTranslations[$intCategoryId][$intLangId]['desc'] : '',
                        ));
                        $this->_objTpl->parse('categoryNameFields');
                        $this->_objTpl->parse('categoryDescFields');
@@ -656,9 +669,12 @@ class ForumAdmin extends ForumLibrary {
                    }
 
                    $this->_objTpl->setVariable(array(
-                       'CATEGORY_EDIT_LANGUAGES_1'    =>    $arrLanguages[0],
-                       'CATEGORY_EDIT_LANGUAGES_2'    =>    $arrLanguages[1],
-                       'CATEGORY_EDIT_LANGUAGES_3'    =>    $arrLanguages[2]
+                       'CATEGORY_EDIT_LANGUAGES_1' => isset($arrLanguages[0])
+                           ? $arrLanguages[0] : '',
+                       'CATEGORY_EDIT_LANGUAGES_2' => isset($arrLanguages[1])
+                           ? $arrLanguages[1] : '',
+                       'CATEGORY_EDIT_LANGUAGES_3' => isset($arrLanguages[2])
+                           ? $arrLanguages[2] : '',
                    ));
                }
 

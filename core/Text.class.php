@@ -718,7 +718,9 @@ DBG::log("Text::getSqlSnippets(): ERROR: Empty keys");
         if (!is_array($keys)) $keys = array($keys);
         $query_field = '';
         $query_join = '';
-        $arrSql = array();
+        $arrSql = array(
+            'alias' => array(),
+        );
         foreach ($keys as $alias => $key) {
             $table_alias = 'text_'.++$table_alias_index;
             $field_id_alias = $table_alias.'_id';

@@ -70,17 +70,17 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     protected $affiliation;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $registrationFormFieldNames;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $registrationFormFieldValues;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\RegistrationForm
+     * @var \Cx\Modules\Calendar\Model\Entity\RegistrationForm
      */
     protected $registrationForm;
 
@@ -183,11 +183,21 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Add registrationFormFieldName
      *
-     * @param Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldName
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldName
      */
     public function addRegistrationFormFieldName(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldName)
     {
         $this->registrationFormFieldNames[] = $registrationFormFieldName;
+    }
+
+    /**
+     * Remove registrationFormFieldNames
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldNames
+     */
+    public function removeRegistrationFormFieldName(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldNames)
+    {
+        $this->registrationFormFieldNames->removeElement($registrationFormFieldNames);
     }
 
     /**
@@ -203,7 +213,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Get registrationFormFieldNames
      *
-     * @return Doctrine\Common\Collections\Collection $registrationFormFieldNames
+     * @return \Doctrine\Common\Collections\Collection $registrationFormFieldNames
      */
     public function getRegistrationFormFieldNames()
     {
@@ -215,7 +225,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
      *
      * @param integer $langId lang id
      *
-     * @return null|Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
+     * @return null|\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
      */
     public function getRegistrationFormFieldNamesByLangId($langId)
     {
@@ -235,7 +245,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Add registrationFormFieldValue
      *
-     * @param Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValue
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValue
      */
     public function addRegistrationFormFieldValue(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValue)
     {
@@ -243,9 +253,19 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove registrationFormFieldValues
+     *
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValues
+     */
+    public function removeRegistrationFormFieldValue(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValues)
+    {
+        $this->registrationFormFieldValues->removeElement($registrationFormFieldValues);
+    }
+
+    /**
      * Set registrationFormFieldValues
      *
-     * @param Doctrine\Common\Collections\Collection $registrationFormFieldValues
+     * @param \Doctrine\Common\Collections\Collection $registrationFormFieldValues
      */
     public function setRegistrationFormFieldValues($registrationFormFieldValues)
     {
@@ -255,7 +275,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Get registrationFormFieldValues
      *
-     * @return Doctrine\Common\Collections\Collection $registrationFormFieldValues
+     * @return \Doctrine\Common\Collections\Collection $registrationFormFieldValues
      */
     public function getRegistrationFormFieldValues()
     {
@@ -265,7 +285,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Set registrationForm
      *
-     * @param Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm
      */
     public function setRegistrationForm(\Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm)
     {
@@ -275,7 +295,7 @@ class RegistrationFormField extends \Cx\Model\Base\EntityBase {
     /**
      * Get registrationForm
      *
-     * @return Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm
+     * @return \Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm
      */
     public function getRegistrationForm()
     {

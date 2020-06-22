@@ -202,6 +202,9 @@ class U2u extends U2uLibrary
           foreach($buddyNames as $buddyKey => $buddyValue) {
                 if($id!=$buddyValue) {
                 $name=$this->_getName($buddyValue);
+                if (!$name) {
+                    continue;
+                }
                 $this->_objTpl->setVariable('TXT_U2U_OPTION_VALUE', $name['username']);
                 $this->_objTpl->parse('u2u_user_drop_down');
                 }
@@ -395,6 +398,9 @@ class U2u extends U2uLibrary
 
         foreach($objResult as $objId => $objValue) {
             $userName   = $this->_getName($objValue['buddies_id']);
+            if (!$userName) {
+                continue;
+            }
             $userEmail  = $this->_getEmail($objValue['buddies_id']);
             $userCity   = $this->_getCity($objValue['buddies_id']);
             $userSite   = $this->_getSite($objValue['buddies_id']);
@@ -668,6 +674,7 @@ class U2u extends U2uLibrary
                        $this->arrStatusMsg['error'][] = $errorString;
                        $errorMessage = true;
                     } else {
+                        $errArray[0] = array();
                         $errArray[0]['receipents_userid']  =  $ID;
                         $errArray[0]['sending_userid']     =  $objFWUser->objUser->getId();
                         $errArray[0]['title']              =  contrexx_addslashes(strip_tags(trim(htmlentities($_REQUEST['title'],ENT_QUOTES,CONTREXX_CHARSET))));

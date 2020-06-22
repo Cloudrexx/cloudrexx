@@ -236,3 +236,5 @@ $_ARRAYLANG['TXT_VIEWMANAGER_SOURCE'] = 'Source';
 $_ARRAYLANG['TXT_THEME_ERROR_IN_INSERT_THEME'] = 'Could not save the theme in database.';
 $_ARRAYLANG['TXT_UNABLE_TO_CONVERT_THEME_TO_COMPONENT'] = 'Unable to convert theme to component.Please make sure the theme folder has read and write permission.';
 $_ARRAYLANG['TXT_CORE_VIEWMANAGER_LOADING'] = "Loading...";
+$_ARRAYLANG['TXT_VIEWMANAGER_INVALID_FILE_ENCODING_MSG'] = "Warning: The file %s contains invalid characters (code unit sequences). The invalid characters have been replaced by a unicode replacement character (U+FFFD)";
+$_ARRAYLANG['TXT_VIEWMANAGER_CONFIRM_INVALID_FILE_ENCODING'] = "By saving this file, any invalid characters will be lost. Please confirm to store this file anyway.";

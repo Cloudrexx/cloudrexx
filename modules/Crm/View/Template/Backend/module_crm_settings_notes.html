@@ -113,16 +113,16 @@
             <!-- BEGIN users -->
             <tr class="{TXT_ROW}">
                 <td><input type="checkbox" name="selected[]" value="{TXT_NOTES_ID}" onclick="isChecked(this.checked);"/></td>
-                <td style="text-align:center"><a href="./index.php?cmd=Crm&act=noteschangestatus&ids={TXT_NOTES_ID}&stat={TXT_NOTES_STATVAL}"><img src="../core/Core/View/Media/icons/led_{TXT_NOTES_STATUS}.gif" alt="" /></a></td>
+                <td style="text-align:center"><a href="?cmd=Crm&act=noteschangestatus&ids={TXT_NOTES_ID}&stat={TXT_NOTES_STATVAL}"><img src="../core/Core/View/Media/icons/led_{TXT_NOTES_STATUS}.gif" alt="" /></a></td>
                 <td><input type="hidden" name="form_id[]" value="{TXT_NOTES_ID}" /><input  style="width:25px; text-align:right; padding:2px;" type="text" name="form_pos[]" value="{TXT_NOTES_SORTING}"></td>
                 <td><img src="{TXT_NOTES_ICON}"/></td>
-                <td><a href="./index.php?cmd=Crm&amp;act=settings&amp;tpl=notes&amp;fn=editnotestype&amp;id={TXT_NOTES_ID}">{TXT_NOTES_NAME}</a></td>
+                <td><a href="?cmd=Crm&amp;act=settings&amp;tpl=notes&amp;fn=editnotestype&amp;id={TXT_NOTES_ID}">{TXT_NOTES_NAME}</a></td>
                 <td style="text-align: right;">
-                        <a title="Edit" href="./index.php?cmd=Crm&amp;act=settings&amp;tpl=notes&amp;fn=editnotestype&id={TXT_NOTES_ID}">
+                        <a title="Edit" href="?cmd=Crm&amp;act=settings&amp;tpl=notes&amp;fn=editnotestype&id={TXT_NOTES_ID}">
                             <img width="16" height="16" border="0" alt='{TXT_EDIT}' src="../core/Core/View/Media/icons/edit.gif">
                         </a>
                         <!-- BEGIN noteDeleteIcon -->
-                        <a title="Delete" onclick="return confirmSubmit();" href="./index.php?cmd=Crm&act=settings&tpl=notes&idr={TXT_NOTES_ID}">
+                        <a title="Delete" onclick="return confirmSubmit();" href="?cmd=Crm&act=settings&tpl=notes&idr={TXT_NOTES_ID}">
                             <img width="17" height="17" border="0" alt='{TXT_DELETE}' src="../core/Core/View/Media/icons/delete.gif">
                         </a>
                         <!-- END noteDeleteIcon -->

@@ -1,0 +1,50 @@
+/*Styles for next and previous news link blocks*/
+#news-link-blocks-cont {
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #D6D6D6;
+    padding: 20px 0;
+}
+#news-previous-link-block {
+    float: left;
+    width: 50%;
+    text-align: left;
+}
+#news-next-link-block {
+    float: right;
+    width: 50%;
+    text-align: right;
+}
+.news-link-label {
+    cursor: pointer;
+    width: auto;
+    color: #9C9C9C;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+.news-title-label {
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+}
+.news-title-label.news-title-label-next,
+.news-link-label.news-link-label-next {
+    float: right;
+    text-align: right;
+}
+.news-title-label.news-title-label-prev,
+.news-link-label.news-link-label-prev {
+    float: left;
+    text-align: left;
+}
+.news-link-label-next small {
+    font-size: 20px;
+    margin-left: 5px;
+}
+.news-link-label-prev small {
+    font-size: 20px;
+    margin-right: 5px;
+}
+.news-title-label h6 {
+    padding: 5px 0;
+}

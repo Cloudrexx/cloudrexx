@@ -47,6 +47,7 @@ Cx\Core\Locale\Model\Entity\Locale:
       joinColumn:
         name: iso_1
         referencedColumnName: iso_1
+        nullable: false
     country:
       targetEntity: Cx\Core\Country\Model\Entity\Country
       inversedBy: locales
@@ -67,3 +68,4 @@ Cx\Core\Locale\Model\Entity\Locale:
       joinColumn:
         name: source_language
         referencedColumnName: iso_1
+        nullable: false

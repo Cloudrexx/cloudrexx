@@ -98,7 +98,8 @@ class User_Setting_Mail
                 '[[HOST]]'                => 'TXT_ACCESS_HOST_DESC',
                 '[[ACTIVATION_LINK]]'    => 'TXT_ACCESS_ACTIVATION_LINK_DESC',
                 '[[HOST_LINK]]'            => 'TXT_ACCESS_HOST_LINK_DESC',
-                '[[SENDER]]'            => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'            => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array(
                 '[[ACTIVATION_LINK]]'
@@ -109,7 +110,8 @@ class User_Setting_Mail
             'placeholders'    => array(
                 '[[USERNAME]]'    => 'TXT_ACCESS_USERNAME_DESC',
                 '[[URL]]'        => 'TXT_ACCESS_RESET_PW_URL_DESC',
-                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array(
                 '[[URL]]'
@@ -120,7 +122,8 @@ class User_Setting_Mail
             'placeholders'    => array(
                 '[[USERNAME]]'    => 'TXT_ACCESS_USERNAME_DESC',
                 '[[HOST]]'        => 'TXT_ACCESS_HOST_DESC',
-                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array()
         ),
@@ -129,7 +132,8 @@ class User_Setting_Mail
             'placeholders'    => array(
                 '[[USERNAME]]'    => 'TXT_ACCESS_USERNAME_DESC',
                 '[[HOST]]'        => 'TXT_ACCESS_HOST_DESC',
-                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array()
         ),
@@ -138,7 +142,8 @@ class User_Setting_Mail
             'placeholders'    => array(
                 '[[USERNAME]]'    => 'TXT_ACCESS_USERNAME_DESC',
                 '[[LINK]]'        => 'TXT_ACCESS_MANAGE_USER_LINK_DESC',
-                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array(
                 '[[USERNAME]]'
@@ -153,7 +158,42 @@ class User_Setting_Mail
                 '[[LINK]]'        => 'TXT_ACCESS_LINK_DESC',
                 '[[EMAIL]]'        => 'TXT_ACCESS_EMAIL_DESC',
                 '[[PASSWORD]]'        => 'TXT_ACCESS_PASSWORD',
-                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC'
+                '[[SENDER]]'    => 'TXT_ACCESS_SENDER_DESC',
+                '[[YEAR]]'          => 'TXT_ACCESS_YEAR_DESC',
+            ),
+            'required'    => array()
+        ),
+        'signup_notification'    => array(
+            'title'    => 'TXT_ACCESS_SIGNUP_NOTIFICATION',
+            'placeholders'    => array(
+                '[HOST]'          => 'TXT_ACCESS_HOST_DESC',
+                '[USER_ID]'       => 'TXT_ACCESS_USER_ID_SIGNUP',
+                '[PROFILE_NAME]'  => 'TXT_ACCESS_PROFILE_NAME_SIGNUP_DESC',
+                '[PROFILE_DATA]'  => 'TXT_ACCESS_PROFILE_DATA_SIGNUP_DESC',
+                '[[PROFILE_ATTRIBUTE_LIST]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_NAME]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_OLD_VALUE]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_VALUE]<br />
+                    [PROFILE_ATTRIBUTE_LIST]]'  => 'TXT_ACCESS_PROFILE_ATTRIBUTE_LIST_SIGNUP_DESC',
+                '[YEAR]'          => 'TXT_ACCESS_YEAR_DESC',
+            ),
+            'required'    => array()
+        ),
+        'user_profile_modification'    => array(
+            'title'    => 'TXT_ACCESS_USER_PROFILE_MODIFICATION',
+            'placeholders'    => array(
+                '[HOST]'          => 'TXT_ACCESS_HOST_DESC',
+                '[USER_ID]'       => 'TXT_ACCESS_USER_ID',
+                '[PROFILE_NAME]'  => 'TXT_ACCESS_PROFILE_NAME_DESC',
+                '[PROFILE_DATA]'  => 'TXT_ACCESS_PROFILE_DATA_DESC',
+                '[[PROFILE_ATTRIBUTE_LIST]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;[[PROFILE_ATTRIBUTE_CHANGED]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_NAME]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_OLD_VALUE]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_VALUE]<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;[PROFILE_ATTRIBUTE_CHANGED]]<br />
+                    [PROFILE_ATTRIBUTE_LIST]]'  => 'TXT_ACCESS_PROFILE_ATTRIBUTE_LIST_DESC',
+                '[YEAR]'          => 'TXT_ACCESS_YEAR_DESC',
             ),
             'required'    => array()
         ),
@@ -549,10 +589,11 @@ class User_Setting_Mail
     function getPlaceholders()
     {
         $arrPlaceholders = array_map(
-            create_function(
-                '$langVar',
-                'global $_CORELANG;return $_CORELANG[$langVar];'
-            ),
+            function ($langVar) {
+                global $_CORELANG;
+
+                return $_CORELANG[$langVar];
+            },
             $this->arrAvailableTypes[$this->type]['placeholders']
         );
 
@@ -575,6 +616,13 @@ class User_Setting_Mail
 
     function getFormats()
     {
-        return array_map(create_function('$langVar', 'global $_CORELANG;return $_CORELANG[$langVar];'), $this->arrAvailableFormats);
+        return array_map(
+            function ($langVar) {
+                global $_CORELANG;
+
+                return $_CORELANG[$langVar];
+            },
+            $this->arrAvailableFormats
+        );
     }
 }

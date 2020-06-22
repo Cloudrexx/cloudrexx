@@ -1,0 +1,217 @@
+<!Doctype html>
+<html>
+    <head>
+        <title>Website offline</title>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            html, body {
+                width: 100%;
+                height: 100%;
+                padding: 0;
+                margin: 0;
+                font-family: "Roboto", "sans-serif"
+            }
+
+            a,
+            a:link,
+            a:visited {
+                color: #1a74bd;
+                text-decoration: none;
+            }
+
+            a:hover,
+            a:focus,
+            a:active {
+                color: #0b4c7a;
+                cursor: pointer;
+            }
+
+            #container {
+                position: relative;
+                float: left;
+                width: auto;
+                min-width: 100%;
+                min-height: 100%;
+                background: #ffffff;
+            }
+
+            * html #container {/* for ie6 */
+                height: 100%;
+            }
+
+            .maintenance-content {
+
+                background: #616161;
+                width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 150px;
+                display: block;
+                text-align: center;
+                color: #fff;
+                padding: 23px 0 30px 0;
+            }
+            
+            .maintenance-content h1 {
+                font-size: 32px;
+                font-weight: normal;
+                margin: 5px 0 0 0;
+                float: none;
+            }
+            
+            .maintenance-content span {
+                font-size: 14px;
+                font-weight: normal;
+            }
+            
+            @media (max-width: 767px) {
+                .maintenance-content {
+                    width: 95%;
+                    margin-top: 120px;
+                    margin-bottom: 50px;
+                }
+            }
+            
+            #header {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 53px;
+                background-color: #0071bc;
+            }
+
+            #header a.logo {
+                position: absolute;
+                left: 12px;
+                top: 14px;
+                width: 145px;
+                height: 25px;
+                background: url("https://media.cloudrexx.com/1.0.0/cloudrexx_logo_145x25.png") no-repeat;
+                outline: 0;
+            }
+            
+            #footer {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 24px;
+                background-color: #0071bc;
+            }
+
+            #footer a {
+                display: block;
+                position: absolute;
+                left: 12px;
+                top: 5px;
+                width: auto;
+                font-size: 11px;
+                color: #ffffff;
+                outline: 0;
+            }
+
+            #footer a:hover,
+            #footer a:focus {
+                background: transparent;
+            }
+
+            div.maintenance-content {
+                width: 600px;
+                box-shadow: 2px 2px 2px #444444;
+            }
+
+            div.maintenance-content h1 {
+                border-style: solid;
+                border-width: 0;
+                border-color: white;
+                border-bottom-width: 1px;
+                margin-left: 20px !important;
+                margin-right: 20px !important;
+                padding-bottom: 20px;
+            }
+
+            div.maintenance-content p {
+                font-size: 18px;
+                margin: 20px;
+                margin-top: 30px;
+            }
+
+            div.maintenance-content a,
+            div.maintenance-content a:visited {
+                color: white;
+                text-decoration: underline !important;
+            }
+
+            div.maintenance-content a:hover,
+            div.maintenance-content a:active,
+            div.maintenance-content a:focus {
+                color: white;
+                text-decoration: none !important;
+            }
+
+            div.maintenance-content a.button {
+                display: inline-block;
+                background-color: #95C700;
+                padding: 10px 16px;
+                font-size: 18px;
+                color: white;
+                text-decoration: none !important;
+                box-shadow: 2px 2px 2px #444444;
+            }
+
+            div.maintenance-content a.button:nth-child(2n) {
+                background-color: #2196f3;
+                margin-left: 40px;
+            }
+        </style>
+        <script type="text/javascript">
+            var lang = "en";
+            var langData = {
+                "en": {
+                    "TITLE": "Website offline",
+                    "TEXT": "This website is currently offline. Please come back at a later time."
+                },
+                "de": {
+                    "TITLE": "Website Offline",
+                    "TEXT": "Diese Website ist aktuell offline. Bitte besuchen Sie uns später wieder."
+                }
+            };
+
+            // language auto-detection: German if browser language starts with "de", "en" otherwise
+            var browserLang = window.navigator.userLanguage || window.navigator.language;
+            if (browserLang.startsWith("de")) {
+                lang = "de";
+            }
+
+            function __(index) {
+                return langData[lang][index];
+            }
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                function() {
+                    var elements = document.getElementsByClassName('langtext');
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].innerHTML = __(elements[i].getAttribute("data-lang"));
+                    }
+                }
+            );
+        </script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <a class="logo" href="index.php"></a>
+            </div>            
+            <div class="maintenance-content">
+                <h1 class="langtext" data-lang="TITLE"></h1>
+                <p class="langtext" data-lang="TEXT"></p>
+                <img src="/core_modules/MultiSite/View/Media/Offline.png" />
+            </div>
+            <div id="footer">
+                <a href="https://www.cloudrexx.com/" target="_blank">&copy; CLOUDREXX AG, Switzerland</a>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,4 +1,5 @@
 #MultiSiteMaintenanceIndication {
+    display: none;
     z-index: 1000001;
     width: 100%;
     text-align:center;
@@ -9,6 +10,42 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
+}
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage{
+    display: inline;
+}
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationClose{
+    float: right;
+    border: #8a6d3b 1px solid;
+    border-radius: 3px;
+    border-width: 2px;
+    font-weight: bold;
+    display: inline;
+    margin-top: -2px;
+    margin-bottom: -2px;
+}
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationClose a,
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationClose a:link,
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationClose a:visited{
+    display: block;
+    padding: 2px;
+}
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationClose a:hover{
+    color: #fcf8e3;
+    background-color: #8a6d3b;
+}
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage a,
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage a:link,
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage a:visited,
+#MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage a:hover{
+    color: #1a74bd;
+}
+@media screen and (max-width: 999px) {
+    #MultiSiteMaintenanceIndication #MultiSiteMaintenanceIndicationMessage{
+        float: left;
+        text-align: left;
+        width: 80%;
+    }
 }
 .ui-dialog.ui-widget.ui-widget-content.ui-corner-all.cxDialog.noTitle {
     top: 40px !important;

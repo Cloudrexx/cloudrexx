@@ -290,24 +290,12 @@ class Login
                 $objFWUser->objUser->reset();
                 $objFWUser->logoutAndDestroySession();
                 $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-                $sessionObj = $cx->getComponent('Session')->getSession();
+                $cx->getComponent('Session')->getSession();
             } elseif (isset($_POST['login'])) {
                 $_GET['relogin'] = 'true';
             }
         }
         if ((!isset($_GET['relogin']) || $_GET['relogin'] != 'true') && $objFWUser->objUser->login() || $objFWUser->checkAuth()) {
-            //Clear cache
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $cx->getEvents()->triggerEvent(
-                'clearEsiCache',
-                array(
-                    'Widget',
-                    array(
-                        'access_currently_online_member_list',
-                        'access_last_active_member_list'
-                    )
-                )
-            );
             $groupRedirect = ($objGroup = $objFWUser->objGroup->getGroup($objFWUser->objUser->getPrimaryGroupId())) && $objGroup->getHomepage() ? preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $objGroup->getHomepage()) : CONTREXX_SCRIPT_PATH;
             \LinkGenerator::parseTemplate($groupRedirect);
             if (isset($_SESSION['redirect'])) {
@@ -352,8 +340,21 @@ class Login
             'TXT_LOGIN_REMEMBER_ME' => $_CORELANG['TXT_CORE_REMEMBER_ME'],
             'TXT_PASSWORD_LOST'     => $_CORELANG['TXT_PASSWORD_LOST'],
             'LOGIN_REDIRECT'        => $redirect,
-            'LOGIN_STATUS_MESSAGE'  => $this->_statusMessage,
         ));
+        if ($this->_objTpl->blockExists('login_status_message')) {
+            if (empty($this->_statusMessage)) {
+                $this->_objTpl->hideBlock('login_status_message');
+            } else {
+                $this->_objTpl->setVariable(
+                    'LOGIN_STATUS_MESSAGE', $this->_statusMessage
+                );
+                $this->_objTpl->parse('login_status_message');
+            }
+        } else {
+            $this->_objTpl->setVariable(
+                'LOGIN_STATUS_MESSAGE', $this->_statusMessage
+            );
+        }
         return $this->_objTpl->get();
     }
 

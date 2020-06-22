@@ -147,7 +147,6 @@ $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'] = "El formulario de
 $_ARRAYLANG['TXT_CONTACT_FAILED_DELETE_CONTACT_FORM'] = "\¡El formulario de contacto no ha podido ser eliminado debido a un error!";
 $_ARRAYLANG['TXT_CONTACT_DATA_RECORD_UPDATED_SUCCESSFUL_VALIDATE'] = "Sus cambios han sido insertados en la base de datos. Debido a la limitaci&oacute;n de sus permisos de usuario, un administrador debe verificar su actualizaci&oacute;n antes de que los resultados de la misma aparezcan en la p&aacute;gina web.";
 $_ARRAYLANG['TXT_CONTACT_SETTINGS_UPDATED'] = "Los cambios han sido aplicados.";
-$_ARRAYLANG['TXT_CONTACT_META_DATE_BY_EXPORT'] = "Metadatos para exportar";
 $_ARRAYLANG['TXT_CONTACT_DEFAULT_FEEDBACK_TXT'] = "Gracias por su inter&eacute;s. Nos pondremos en contacto usted lo antes posible.";
 $_ARRAYLANG['TXT_CONTACT_SHOW_FORM_AFTER_SUBMIT'] = "Mostrar el formulario de nuevo cuando se muestra la confirmaci&oacute;n de env&iacute;o.";
 $_ARRAYLANG['TXT_CONTACT_LANG'] = "Idioma";

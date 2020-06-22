@@ -77,107 +77,119 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
      */
     public function getAccessableMethods() {
         $multiSiteProtocol = (\Cx\Core\Setting\Controller\Setting::getValue('multiSiteProtocolIn','MultiSite') == 'mixed')? $this->cx->getRequest()->getUrl()->getProtocol(): \Cx\Core\Setting\Controller\Setting::getValue('multiSiteProtocolIn','MultiSite');
+        $permissionCbAuthAnyProtocol = new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, array(), array(), array($this, 'auth'));
+        $permissionCbAuthForcedProtocol = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, array(), array(), array($this, 'auth'));
+        $permissionCbByModeAnyProtocol = new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, array(), array(), array($this, 'checkAuthenticationByMode'));
+        $permissionCbByModeForcedProtocol = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, array(), array(), array($this, 'checkAuthenticationByMode'));
+        $permissionCbCheckLicense = new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, array(), array(), array($this, 'checkGetLicenseAccess'));
+        $permissionCbVerifyOwner = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, array(), array(), array($this, 'verifyWebsiteOwnerOrIscRequest'));
+        $permissionPostRequest = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false);
+        $permissionMultiSiteAccess = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, array(), array(183));
+        $permissionPostAuthenticated = new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true);
         return array(
-            'signup'                => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifySignupRequest')),
-            'email'                 => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false),
-            'address'               => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false),
-            'createWebsite'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
+            'signup'                => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, array(), array(), array($this, 'verifySignupRequest')),
+            'email'                 => $permissionPostRequest,
+            'address'               => $permissionPostRequest,
+            'createWebsite'         => $permissionCbAuthForcedProtocol,
             // protocol workaround as option multiSiteProtocol is not set on WEBSITE
-            'createUser'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateUser'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateOwnUser'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'mapDomain'             => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'unMapDomain'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateDomain'          => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateDefaultCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, null, array(183), null),
-            'setWebsiteDetails'     => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'updateWebsiteState'    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, null, array(183), null),
-            'ping'                  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'pong'                  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'setLicense'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'setupConfig'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getDefaultWebsiteIp'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'resetFtpPassword'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkResetFtpPasswordAccess')),
-            'updateServiceServerSetup' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'destroyWebsite'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),
-            'executeOnWebsite'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'executeOnManager'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'generateAuthToken'     => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'executeSql'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
-            'removeUser'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'setWebsiteTheme'       => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getFtpUser'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getFtpAccounts'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getLicense'            => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkGetLicenseAccess')),
-            'remoteLogin'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, null, array(183), null),
-            'editLicense'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkGetLicenseAccess')),
-            'executeQueryBySession' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, null, array(183), null),
-            'stopQueryExecution'    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true, null, array(183), null),
-            'modifyMultisiteConfig' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkGetLicenseAccess')),
-            'sendAccountActivation' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'checkSendAccountActivation')),
-            'getPayrexxUrl'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false),
-            'push'                  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'websiteBackup'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'triggerWebsiteBackup'  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'triggerWebsiteRestore' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getWebsiteInfo'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'deleteWebsiteBackup'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'downloadWebsiteBackup' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'getAllBackupFilesInfo' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'sendFileToRemoteServer'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'updateWebsiteConfig'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateWebsiteSubscriptionInfo'     => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'websiteRestore'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'addNewWebsiteInSubscription' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'checkUserStatusOnRestore' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getUserInfoFromBackup'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getAvailableSubscriptionsByUserId' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'websiteLogin'          => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getAdminUsers'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getUser'               => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getResourceUsageStats' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'enableMailService'     => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),            
-            'disableMailService'    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),
-            'resetEmailPassword'    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),            
-            'getMailServiceStatus'  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),
-            'createMailServiceAccount' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'deleteMailServiceAccount' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'manageSubscription'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getPanelAutoLoginUrl' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'mapNetDomain'          => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')), 
-            'unMapNetDomain'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')), 
-            'updateNetDomain'       => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')), 
-            'createAdminUser'       => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'payrexxAutoLoginUrl'     => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'updateOwnWebsiteState'  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'verifyWebsiteOwnerOrIscRequest')),
-            'getMainDomain'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'setMainDomain'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
+            'createUser'            => $permissionCbAuthAnyProtocol,
+            'updateUser'            => $permissionCbAuthAnyProtocol,
+            'updateOwnUser'         => $permissionPostAuthenticated,
+            'mapDomain'             => $permissionCbAuthAnyProtocol,
+            'unMapDomain'           => $permissionCbAuthAnyProtocol,
+            'updateDomain'          => $permissionCbAuthAnyProtocol,
+            'updateDefaultCodeBase' => $permissionMultiSiteAccess,
+            'setWebsiteDetails'     => $permissionCbAuthForcedProtocol,
+            'updateWebsiteState'    => $permissionMultiSiteAccess,
+            'ping'                  => $permissionCbAuthForcedProtocol,
+            'pong'                  => $permissionCbAuthForcedProtocol,
+            'setLicense'            => $permissionCbAuthAnyProtocol,
+            'setupConfig'           => $permissionCbAuthAnyProtocol,
+            'getDefaultWebsiteIp'   => $permissionCbAuthForcedProtocol,
+            'resetFtpPassword'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, array(), array(), array($this, 'checkResetFtpPasswordAccess')),
+            'updateServiceServerSetup' => $permissionCbAuthForcedProtocol,
+            'destroyWebsite'        => $permissionCbVerifyOwner,
+            'executeOnWebsite'      => $permissionCbAuthForcedProtocol,
+            'executeOnManager'      => $permissionCbAuthForcedProtocol,
+            'generateAuthToken'     => $permissionCbAuthAnyProtocol,
+            'executeSql'            => $permissionCbByModeAnyProtocol,
+            'removeUser'            => $permissionCbAuthAnyProtocol,
+            'setWebsiteTheme'       => $permissionCbAuthAnyProtocol,
+            'getFtpUser'            => $permissionCbAuthAnyProtocol,
+            'getFtpAccounts'        => $permissionCbAuthAnyProtocol,
+            'getLicense'            => $permissionCbCheckLicense,
+            'remoteLogin'           => $permissionMultiSiteAccess,
+            'editLicense'           => $permissionCbCheckLicense,
+            'executeQueryBySession' => $permissionMultiSiteAccess,
+            'stopQueryExecution'    => $permissionMultiSiteAccess,
+            'modifyMultisiteConfig' => $permissionCbCheckLicense,
+            'sendAccountActivation' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, array(), array(), array($this, 'checkSendAccountActivation')),
+            'getPayrexxUrl'         => $permissionPostRequest,
+            'push'                  => $permissionCbAuthAnyProtocol,
+            'websiteBackup'         => $permissionCbAuthForcedProtocol,
+            'triggerWebsiteBackup'  => $permissionPostAuthenticated,
+            'triggerWebsiteRestore' => $permissionPostAuthenticated,
+            'getWebsiteInfo'        => $permissionCbAuthForcedProtocol,
+            'deleteWebsiteBackup'   => $permissionCbAuthForcedProtocol,
+            'downloadWebsiteBackup' => $permissionCbAuthForcedProtocol,
+            'getAllBackupFilesInfo' => $permissionCbAuthForcedProtocol,
+            'sendFileToRemoteServer'=> $permissionCbAuthForcedProtocol,
+            'updateWebsiteConfig'   => $permissionCbAuthAnyProtocol,
+            'updateWebsiteSubscriptionInfo'     => $permissionCbAuthForcedProtocol,
+            'websiteRestore'        => $permissionCbAuthForcedProtocol,
+            'addNewWebsiteInSubscription' => $permissionCbAuthAnyProtocol,
+            'checkUserStatusOnRestore' => $permissionPostAuthenticated,
+            'getUserInfoFromBackup'   => $permissionCbAuthAnyProtocol,
+            'getAvailableSubscriptionsByUserId' => $permissionPostAuthenticated,
+            'websiteLogin'          => $permissionPostAuthenticated,
+            'getAdminUsers'         => $permissionCbAuthAnyProtocol,
+            'getUser'               => $permissionCbAuthAnyProtocol,
+            'getResourceUsageStats' => $permissionCbAuthAnyProtocol,
+            'enableMailService'     => $permissionCbVerifyOwner,
+            'disableMailService'    => $permissionCbVerifyOwner,
+            'resetEmailPassword'    => $permissionCbVerifyOwner,
+            'getMailServiceStatus'  => $permissionCbVerifyOwner,
+            'createMailServiceAccount' => $permissionCbAuthForcedProtocol,
+            'deleteMailServiceAccount' => $permissionCbAuthForcedProtocol,
+            'manageSubscription'   => $permissionPostAuthenticated,
+            'getPanelAutoLoginUrl' => $permissionPostAuthenticated,
+            'mapNetDomain'          => $permissionCbAuthAnyProtocol,
+            'unMapNetDomain'        => $permissionCbAuthAnyProtocol,
+            'updateNetDomain'       => $permissionCbAuthAnyProtocol,
+            'createAdminUser'       => $permissionCbAuthAnyProtocol,
+            'payrexxAutoLoginUrl'     => $permissionPostAuthenticated,
+            'updateOwnWebsiteState'  => $permissionCbVerifyOwner,
+            'getMainDomain'         => $permissionCbAuthAnyProtocol,
+            'setMainDomain'         => $permissionCbAuthAnyProtocol,
             'deleteAccount'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true),   
-            'isComponentLicensed'  => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getModuleAdditionalData' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),            
-            'changePlanOfMailSubscription' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'domainManipulation'    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'isUniqueEmail'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'auth')),
-            'getMailServicePlans'   => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, array(183), null),
-            'trackAffiliateId'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
-            'checkAvailabilityOfAffiliateId' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'setAffiliate'        => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'sendNotificationForPayoutRequest' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getCodeBaseVersions' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
-            'getWebsitesByCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
-            'triggerWebsiteUpdate' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), false, null, null, array($this, 'checkAuthenticationByMode')),
-            'websiteUpdate' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'sendUpdateNotification' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateWebsiteCodeBase' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'copyWebsite' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post'), true),
-            'getDomainSslCertificate' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'linkSsl'                 => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'setWebsiteOwner' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getWebsiteSize' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getServerWebsiteList' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'checkServerWebsiteAccessedByClient' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'updateAutomaticCertificates' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
-            'getServerWebsitePath' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), false, null, null, array($this, 'auth')),
+            'isComponentLicensed'  => $permissionCbAuthAnyProtocol,
+            'getModuleAdditionalData' => $permissionCbAuthAnyProtocol,
+            'changePlanOfMailSubscription' => $permissionCbAuthAnyProtocol,
+            'domainManipulation'    => $permissionCbAuthAnyProtocol,
+            'isUniqueEmail'         => $permissionCbAuthForcedProtocol,
+            'getMailServicePlans'   => $permissionMultiSiteAccess,
+            'trackAffiliateId'      => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('get', 'post'), false),
+            'checkAvailabilityOfAffiliateId' => $permissionPostAuthenticated,
+            'setAffiliate'        => $permissionPostAuthenticated,
+            'sendNotificationForPayoutRequest' => $permissionPostAuthenticated,
+            'getCodeBaseVersions' => $permissionCbByModeForcedProtocol,
+            'getWebsitesByCodeBase' => $permissionCbByModeForcedProtocol,
+            'triggerWebsiteUpdate' => $permissionCbByModeForcedProtocol,
+            'websiteUpdate' => $permissionCbAuthAnyProtocol,
+            'sendUpdateNotification' => $permissionCbAuthAnyProtocol,
+            'updateWebsiteCodeBase' => $permissionCbAuthAnyProtocol,
+            'copyWebsite' => $permissionPostAuthenticated,
+            'getDomainSslCertificate' => $permissionCbAuthAnyProtocol,
+            'linkSsl'                 => $permissionCbAuthAnyProtocol,
+            'setWebsiteOwner' => $permissionCbAuthAnyProtocol,
+            'getWebsiteSize' => $permissionCbAuthAnyProtocol,
+            'getServerWebsiteList' => $permissionCbAuthAnyProtocol,
+            'checkServerWebsiteAccessedByClient' => $permissionCbAuthAnyProtocol,
+            'updateAutomaticCertificates' => $permissionCbAuthAnyProtocol,
+            'getServerWebsitePath' => $permissionCbAuthAnyProtocol,
+            'banIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
+            'unbanIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
+            'checkIp' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array($multiSiteProtocol), array('post','get'/*todo: remove get */), false, array(), array(), array($this, 'checkIpMgmtAccess')),
         );  
     }
 
@@ -1028,7 +1040,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             'status'    => 'success',
             'log'       => \DBG::getMemoryLogs(),
             'message'   => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_PROFILE_UPDATED_SUCCESS'],
-            'reload'    => ($params['post']['reload'] ? true : false ),
+            'reload'    => !empty($params['post']['reload']),
         );
     }
     
@@ -1184,7 +1196,42 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         // register request as intersystem communication request (ISC)
         self::$isIscRequest = true;
 
+        // skip memory-logging certain POST requests
+        if (
+            isset($params['post']['act']) &&
+            in_array(
+                $params['post']['act'],
+                array(
+                    // remote-login request
+                    'generateAuthToken',
+                    'linkSsl',
+                )
+            )
+        ) {
+            return true;
+        }
+
+        // skip memory-logging certain GET requests
+        if (
+            isset($params['get']['act']) &&
+            in_array(
+                $params['get']['act'],
+                array(
+                    // website modifications
+                    'setWebsiteDetails',
+                    // website backup creation (on service server)
+                    'websiteBackup',
+                    // website restore creation (on service server)
+                    'websiteRestore',
+                    'linkSsl',
+                )
+            )
+        ) {
+            return true;
+        }
+
         // activate memory-logging
+        \DBG::msg('activate memory logging');
         $this->activateDebuggingToMemory();
 
         return true;
@@ -1918,6 +1965,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                 $website->setServerWebsite($serverWebsite);
             }
             $em->flush();
+            $em->getConfiguration()->getResultCacheImpl()->deleteAll();
             if ($updateDomainMaps || $oldServerWebsite != $serverWebsite) {
                 $domainRepository = $em->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Domain');
                 $domainRepository->exportDomainAndWebsite();
@@ -2924,6 +2972,25 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         }
         return false;
     }
+
+    public function checkIpMgmtAccess($params) {
+        switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
+            case ComponentController::MODE_SERVICE:
+            case ComponentController::MODE_HYBRID:
+                break;
+
+            default:
+                return false;
+        }
+
+        if (!isset($params['get']['key'])) {
+            return false;
+        }
+        if ($params['get']['key'] != 'f5_1z-b9iyxw23_342]be') {
+            return false;
+        }
+        return true;
+    }
     
     /*
      * Updating setup data in servers
@@ -3103,13 +3170,17 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                             switch(true) {
                                 case preg_match('/^(SELECT|DESC|SHOW|EXPLAIN|CHECK|OPTIMIZE|REPAIR|ANALYZE|CACHE INDEX)/', (strtoupper($query))):
                                     $objResult = $objDatabase->GetAll($query);
-                                    $resultSet[$key]['query'] = $query;
-                                    $resultSet[$key]['resultValue'] = (count($objResult) > 0) ? $objResult : $_ARRAYLANG['TXT_MULTISITE_NO_RECORD_FOUND'];
+                                    $resultSet[$key] = array(
+                                        'query'       => $query,
+                                        'resultValue' => (count($objResult) > 0) ? $objResult : $_ARRAYLANG['TXT_MULTISITE_NO_RECORD_FOUND']
+                                    );
                                     break;
                                 case preg_match('/^(UPDATE|DELETE|REPLACE|INSERT)/', (strtoupper($query))):
                                     $objResult = $objDatabase->Execute($query);
-                                    $resultSet[$key]['query'] = $query;
-                                    $resultSet[$key]['resultValue'] = '';
+                                    $resultSet[$key] = array(
+                                        'query'       => $query,
+                                        'resultValue' => ''
+                                    );
                                     if ($objResult) {
                                         switch (true) {
                                             case preg_match('/^INSERT/', (strtoupper($query))):
@@ -3126,8 +3197,10 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                     break;
                                 default :
                                     $objResult = $objDatabase->Execute($query);
-                                    $resultSet[$key]['query'] = $query;
-                                    $resultSet[$key]['resultValue'] =  '';
+                                    $resultSet[$key] = array(
+                                        'query'       => $query,
+                                        'resultValue' => ''
+                                    );
                                     break;
                             }
                             if ($objResult !== false) {
@@ -3541,23 +3614,40 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         global $_ARRAYLANG;
         self::loadLanguageData();
         
-        $websiteId = $params['post']['websiteId'];
-        if (empty($websiteId)) {
+        $loginType = ($params['post']['loginType'] == 'customerpanel') ? 'customerpanel' : 'website';
+        if (!empty($params['post']['websiteId'])) {
+           $websiteId = $params['post']['websiteId'];
+        }
+        if (!empty($params['post']['ownerId'])) {
+            $ownerId = $params['post']['ownerId'];
+        }
+        if (
+            (
+                $loginType == 'website' &&
+                empty($websiteId)
+            ) || (
+                $loginType == 'customerpanel' &&
+                empty($ownerId) &&
+                empty($websiteId)
+            )
+        ) {
             return false;
         }
-        $loginType = ($params['post']['loginType'] == 'customerpanel') ? 'customerpanel' : 'website';
         try {
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_MANAGER:
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_HYBRID:
-                    $websiteRepository = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
-                    $website   = $websiteRepository->findOneBy(array('id' => $websiteId));
-                    if (!$website) {
-                        return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
+                    if ($websiteId) {
+                        $websiteRepository = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
+                        $website   = $websiteRepository->findOneBy(array('id' => $websiteId));
+                        if (!$website) {
+                            return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
+                        }
+                        $ownerId = $website->getOwner()->getId();
                     }
                                     
                     if ($loginType == 'customerpanel') {
-                        $response = self::executeCommandOnManager('generateAuthToken', array('ownerId' => $website->getOwner()->getId()));
+                        $response = self::executeCommandOnManager('generateAuthToken', array('ownerId' => $ownerId));
                         if ($response->status == 'error' || $response->data->status == 'error') {
                             return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
                         }
@@ -3967,6 +4057,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     public function websiteBackup($params) 
     {
         global $_ARRAYLANG;
+        self::loadLanguageData();
         
         if (empty($params) || empty($params['post'])) {
             \DBG::log(__METHOD__.' failed!: '.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_PARAMS']);
@@ -4044,7 +4135,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     return array(
                         'status'  => 'success', 
                         'message' => $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_BACKUP_SUCCESS'],
-                        'log'     => \DBG::getMemoryLogs(),
+                        'log'     => array('see logs on service server of command websiteBackup'),//\DBG::getMemoryLogs(),
                         'backups' => $archives,
                     );
                     break;
@@ -4114,21 +4205,24 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     protected function createWebsiteArchive($websiteBackupPath) 
     {
         // increase memory_limit to be able to handle huge websites
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '2048M');
         $archiveFilePath         = $websiteBackupPath . '_'.date('Y-m-d H-i-s').'.zip';
         $websiteZipArchive       = new \PclZip($archiveFilePath);
+        \DBG::msg(__METHOD__ . ': add data from ' . $websiteBackupPath);
         $websiteArchiveFileCount = $websiteZipArchive->add($websiteBackupPath, PCLZIP_OPT_REMOVE_PATH, $websiteBackupPath);
 
         if ($websiteArchiveFileCount == 0) {
             throw new MultiSiteJsonException(__METHOD__.' : Failed to create Zip Archiev ' . $websiteZipArchive->errorInfo(true));
         }
 
+        \DBG::msg(__METHOD__ . ': exclude non-relevant data');
         $explodeFileCount = $websiteZipArchive->delete(PCLZIP_OPT_BY_PREG, '/\/tmp\/session_*|.ftpaccess$/');
         if ($explodeFileCount == 0) {
             throw new MultiSiteJsonException(__METHOD__.' : Failed to explode .ftpaccess in the  Archiev' . $websiteZipArchive->errorInfo(true));
         }
 
         //cleanup website Backup Folder
+        \DBG::msg(__METHOD__ . ': clean up');
         \Cx\Lib\FileSystem\FileSystem::delete_folder($websiteBackupPath, true);
 
         return basename($archiveFilePath);
@@ -4597,7 +4691,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                 throw new MultiSiteJsonException('Failed to create the website databse backup location Folder');
             }
             $sqlFilePath = $websiteBackupPath.'/database/sql_dump.sql';
-            $exportDbCommand = 'mysqldump -h '. $dbHost . ' -u ' . $dbUserName . ' -p\'' . $dbPassword . '\' '.$dbName.' > '.$sqlFilePath;
+            $exportDbCommand = 'mysqldump --skip-extended-insert -h '. $dbHost . ' -u ' . $dbUserName . ' -p\'' . $dbPassword . '\' '.$dbName.' > '.$sqlFilePath;
 
             //create database sql dump for the website
             exec($exportDbCommand, $output, $error);
@@ -4656,17 +4750,16 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     public function websiteRestore($params)
     {
         global $_ARRAYLANG;
-        
-        $backupLocation = \Cx\Core\Setting\Controller\Setting::getValue('websiteBackupLocation', 'MultiSite');
-        if (   empty($params)
-            || empty($params['post'])
-            || (   !\Cx\Lib\FileSystem\FileSystem::exists($backupLocation)
-                && !\Cx\Lib\FileSystem\FileSystem::make_folder($backupLocation))
+        self::loadLanguageData();
+
+        if (
+            empty($params) ||
+            empty($params['post'])
         ) {
             \DBG::log(__METHOD__.' Failed! : '.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_PARAMS']);
             throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_RESTORE_FAILED']);
         }
-        
+
         $websiteName           = isset($params['post']['websiteName']) 
                                  ? contrexx_input2raw($params['post']['websiteName']) 
                                  : '';
@@ -4703,6 +4796,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         throw new MultiSiteException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_SERVICE_SERVER']);
                     }
                     
+                    \DBG::log('Forward websiteRestore to ServiceServer');
                     $response = self::executeCommandOnServiceServer('websiteRestore', $params['post'], $websiteServiceServer);
 
                     if (!isset($response)) {
@@ -4725,13 +4819,110 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     if ($response->status == 'error' || (isset($response->data) && $response->data->status == 'error')) {
                         throw new MultiSiteException('Restore failed');
                     }
+
+                    // init notification mail
+                    \Cx\Core\MailTemplate\Controller\MailTemplate::init('MultiSite');
+                    $substitution = array();
+
+                    // add info about backup
+                    $backupData = array();
+                    if (
+                        isset($response->data) &&
+                        isset($response->data->backup_website_name)
+                    ) {
+                        $backupData['BACKUP_WEBSITE_NAME'] = $response->data->backup_website_name;
+                    }
+                    if (
+                        isset($response->data) &&
+                        isset($response->data->backup_date)
+                    ) {
+                        $backupData['BACKUP_DATE'] = $response->data->backup_date;
+                    }
+                    if (
+                        isset($response->data) &&
+                        isset($response->data->backup_source)
+                    ) {
+                        $backupData['BACKUP_SOURCE'] = $response->data->backup_source;
+                    }
+                    if ($backupData) {
+                        $substitution['BACKUP'] = array(
+                            '0' => $backupData,
+                        );
+                    }
+
+                    // fetch owner details
+                    $objUser = \FWUser::getFWUserObject()->objUser;
+                    $user = $objUser->getUser($selectedUserId);
+                    if ($user) {
+                        $gender = $user->objAttribute->getById($user->getProfileAttribute('gender'));
+                        $country = $user->objAttribute->getById('country_' . $user->getProfileAttribute('country'));
+                        $substitution['CUSTOMER'] = array(
+                            '0' => array(
+                                'CUSTOMER_EMAIL' => $user->getEmail(),
+                                'CUSTOMER_GENDER' => $gender->getId() ? $gender->getName() : '',
+                                'CUSTOMER_FIRSTNAME' => $user->getProfileAttribute('firstname'),
+                                'CUSTOMER_LASTNAME' => $user->getProfileAttribute('lastname'),
+                                'CUSTOMER_COMPANY' => $user->getProfileAttribute('company'),
+                                'CUSTOMER_ZIP' => $user->getProfileAttribute('zip'),
+                                'CUSTOMER_CITY' => $user->getProfileAttribute('city'),
+                                'CUSTOMER_COUNTRY' => $country->getId() ? $country->getName() : '',
+                                'CUSTOMER_PHONE' => $user->getProfileAttribute('phone_office'),
+                            ),
+                        );
+                    }
+
+                    $subscription = null;
+                    if ($subscriptionId) {
+                        $subscriptionRepo = \Env::get('em')->getRepository('Cx\Modules\Order\Model\Entity\Subscription');
+                        $subscription = $subscriptionRepo->findOneBy(array('externalSubscriptionId' => $subscriptionId));
+                    }
+                    if ($subscription) {
+                        $substitution['SUBSCRIPTION'] = array(
+                            '0' => array(
+                                'SUBSCRIPTION_ID' => $subscription->getId(),
+                                'SUBSCRIPTION_NAME' => $subscription->getProduct()->getName(),
+                            ),
+                        );
+                    }
+
+                    $websiteUrl = ComponentController::getApiProtocol().$websiteName.'.'.\Cx\Core\Setting\Controller\Setting::getValue('multiSiteDomain','MultiSite');
+
+                    // send notification mail to admin
+                    \DBG::msg(__METHOD__ . ': send notification email > ADMIN');
+                    \Cx\Core\MailTemplate\Controller\MailTemplate::send(array(
+                        'section' => 'MultiSite',
+                        'key' => 'notifyRestoreInfo',
+                        'search' => array(
+                            '[[MULTISITE_DOMAIN]]',
+                            '[[WEBSITE_URL]]',
+                            '[[WEBSITE_NAME]]',
+                            '[[WEBSITE_SERVICE_SERVER_NAME]]',
+                        ),
+                        'replace' => array(
+                            \Cx\Core\Setting\Controller\Setting::getValue('multiSiteDomain','MultiSite'),
+                            $websiteUrl,
+                            $websiteName,
+                            $websiteServiceServer->getHostname(),
+                        ),
+                        'substitution' => $substitution,
+                    ));
     
+                    // return response
                     if (isset($response->data)) {
                         return $response->data;
                     }
                     break;
                 case ComponentController::MODE_HYBRID:
                 case ComponentController::MODE_SERVICE:
+                    $backupLocation = \Cx\Core\Setting\Controller\Setting::getValue('websiteBackupLocation', 'MultiSite');
+                    if (
+                        !\Cx\Lib\FileSystem\FileSystem::exists($backupLocation) &&
+                        !\Cx\Lib\FileSystem\FileSystem::make_folder($backupLocation)
+                    ) {
+                        \DBG::log(__METHOD__.' Failed! : '.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_PARAMS']);
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_RESTORE_FAILED']);
+                    }
+
                     $websiteBackupFilePath = \Cx\Core\Setting\Controller\Setting::getValue('websiteBackupLocation', 'MultiSite').'/'.$websiteBackupFileName;
 
                     if (   !\Cx\Lib\FileSystem\FileSystem::exists($websiteBackupFilePath) 
@@ -4756,12 +4947,25 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
 
                     $this->updateUserAccountsOnRestore($website, $selectedUserId, false);
 
+                    $websiteInfoArray = $this->getWebsiteInfoFromZip($websiteBackupFilePath, 'info/meta.yml');
+                    $backupWebsiteName = '';
+                    $backupDate = '';
+                    if ($websiteInfoArray['website']['websiteName']) {
+                        $backupWebsiteName = $websiteInfoArray['website']['websiteName'];
+                    }
+                    if ($websiteInfoArray['backupDateTime']) {
+                        $backupDate = $websiteInfoArray['backupDateTime'];
+                    }
+
                     return array(
                         'status'    => 'success', 
                         'message'   => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_RESTORE_SUCCESS'], $websiteName),
                         'websiteUrl'=> ComponentController::getApiProtocol() . $website->getBaseDn()->getName(),
                         'websiteId' => $website->getId(),
-                        'log'       => \DBG::getMemoryLogs(),
+                        'backup_website_name' => $backupWebsiteName,
+                        'backup_date' => $backupDate,
+                        'backup_source' => $websiteBackupFilePath,
+                        'log'     => array('see logs on service server of command websiteBackup'),//\DBG::getMemoryLogs(),
                     ); 
                     break;
                 default:
@@ -4839,7 +5043,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         try {
             $websiteInfoArray = $this->getWebsiteInfoFromZip($websiteBackupFilePath, 'info/meta.yml');
             if (empty($websiteInfoArray)) {
-                throw new MultiSiteJsonException('Failed to get the website Information from file');
+                throw new MultiSiteJsonException(__METHOD__.': Failed to get the website Information from file');
             }
             
             $params = array(
@@ -4877,15 +5081,22 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             }
             
             $response = JsonMultiSiteController::executeCommandOnManager('addNewWebsiteInSubscription', $params);
-            
+
+            if (isset($response->log)) {
+                \DBG::appendLogs(array_map(function($logEntry) {return '(Manager) '.$logEntry;}, $response->log));
+            }
+            if (isset($response->data) && isset($response->data->log)) {
+                \DBG::appendLogs(array_map(function($logEntry) {return '(Manager) '.$logEntry;}, $response->data->log));
+            }
             if ($response->status == 'error' || $response->data->status == 'error') {
-                if (isset($response->log)) {
-                    \DBG::appendLogs(array_map(function($logEntry) {return '(Manager) '.$logEntry;}, $response->log));
+                $message = '';
+                if (isset($response->message)) {
+                    $message = ' (' . $response->message . ')';
                 }
-                if (isset($response->data) && isset($response->data->log)) {
-                    \DBG::appendLogs(array_map(function($logEntry) {return '(Manager) '.$logEntry;}, $response->data->log));
+                if (isset($response->data->message)) {
+                    $message = ' (' . $response->data->message . ')';
                 }
-                throw new MultiSiteJsonException('Failed to create a website: '.$websiteName);
+                throw new MultiSiteJsonException('Failed to create a website: ' . $websiteName . $message);
             }
         } catch (\Exception $e) {
             throw new MultiSiteJsonException(
@@ -4930,14 +5141,26 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
      */
     protected function websiteRepositoryRestore($websitePath, $websiteBackupFilePath)
     {
-        ini_set('memory_limit', '1024M');
+        ini_set('memory_limit', '2048M');
         if (!\Cx\Lib\FileSystem\FileSystem::exists($websiteBackupFilePath)) {
             throw new MultiSiteJsonException(__METHOD__.' failed! : Website Backup file does not exists!.');
         }
         
         $restoreWebsiteFile = new \PclZip($websiteBackupFilePath);
-        if ($restoreWebsiteFile->extract(PCLZIP_OPT_PATH, $websitePath, PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config))*$/', PCLZIP_OPT_REMOVE_PATH, 'dataRepository', PCLZIP_OPT_REPLACE_NEWER) == 0) {
-            throw new MultiSiteJsonException(__METHOD__.' failed! : Failed to extract the website repostory on restore.');
+        if ($restoreWebsiteFile->extract(
+            // destination path
+            PCLZIP_OPT_PATH, $websitePath,
+            // do not extract /config folder, except for yaml-files.
+            // however, yaml-files of system components must also
+            // not get extracted
+            PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?!Config|MultiSite|Support|DomainRepository)[^\/]+\.yml)))*$/',
+            // strip folder dataRepository from extraction
+            PCLZIP_OPT_REMOVE_PATH, 'dataRepository',
+            // extract any file (and overwrite existing files) independent of
+            // its creation time
+            PCLZIP_OPT_REPLACE_NEWER
+        ) == 0) {
+            throw new MultiSiteJsonException(__METHOD__.' failed! : Failed to extract the website repository on restore.');
         }
 
         // create tmp directory
@@ -5002,9 +5225,14 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             if ($error) {
                 throw new MultiSiteJsonException('Failed to import database on restore.');
             }
-            $this->getComponent('Cache')->setCachePrefix($dbName.'.'.$dbPrefix);
+
+            // flush cache of website
+            global $_DBCONFIG;
+            $_DBCONFIGofServiceServer = $_DBCONFIG;
+            $_DBCONFIG['database'] = $dbName;
             $this->getComponent('Cache')->clearCache(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED);
-            $this->getComponent('Cache')->setCachePrefix();
+            $_DBCONFIG = $_DBCONFIGofServiceServer;
+
             //cleanup website tempory folder
             if (!\Cx\Lib\FileSystem\FileSystem::delete_folder($websiteTempPath, true)) {
                 throw new MultiSiteJsonException('Failed to delete the website temp folder on restore.');
@@ -5065,6 +5293,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             
             \DBG::log('JsonMultiSiteController: Restore website Configurations..');
             $resp = JsonMultiSiteController::executeCommandOnWebsite('updateWebsiteConfig', $websiteConfigInfo, $website);
+            if (isset($resp->data) && isset($resp->data->log)) {
+                \DBG::appendLogs(array_map(function($logEntry)use($website) {return '(Website: '.$website->getName().') '.$logEntry;}, $resp->data->log));
+            }
             if ($resp->status == 'error' || $resp->data->status == 'error') {
                 throw new MultiSiteJsonException('Failed to update website configurations.');
             }
@@ -5097,19 +5328,22 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     public function updateWebsiteConfig($params)
     {
         global $_ARRAYLANG;
-        
+
         try {
             if (empty($params) || empty($params['post'])) {
                 throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_INVALID_PARAMS']);
             }
-            
+
             \DBG::log('JsonMultiSiteController: Restore website multisite configurations..');
             $this->updateWebsiteMultisiteConfigOnRestore($params['post']['websiteMultisite']);
             
             \DBG::log('JsonMultiSiteController: Restore website configurations / settings..');
             $this->updateWebsiteConfigOnRestore($params['post']['websiteConfig']);
-            
-            return array('status' => 'success');
+
+            return array(
+                'status' => 'success',
+                'log'    => \DBG::getMemoryLogs(),
+            );
         } catch (\Throwable $e) {
             \DBG::log(__METHOD__.' failed! : '.$e->getMessage());
             return array(
@@ -5161,22 +5395,40 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         if (empty($websiteInfo)) {
             throw new MultiSiteJsonException(__METHOD__.' : failed!. Website info should not be empty');
         }
-        
-        $updateConfigArray = array(
-            'systemStatus', 'languageDetection', 'coreGlobalPageTitle', 'mainDomainId', 'forceDomainUrl', 
-            'coreListProtectedPages', 'searchVisibleContentOnly', 'advancedUploadFrontend', 'forceProtocolFrontend',
-            'coreAdminEmail', 'contactFormEmail', 'contactCompany', 'contactAddress', 'contactZip', 'contactPlace',
-            'contactCountry', 'contactPhone', 'contactFax', 'dashboardNews', 'dashboardStatistics',
-            'advancedUploadBackend', 'sessionLifeTime', 'sessionLifeTimeRememberMe', 'forceProtocolBackend', 
-            'coreIdsStatus', 'passwordComplexity', 'coreAdminName', 'xmlSitemapStatus', 'frontendEditingStatus',
-            'corePagingLimit','searchDescriptionLength', 'googleMapsAPIKey', 'googleAnalyticsTrackingId'
-        );
-        
+
         \Cx\Core\Setting\Controller\Setting::init('Config', null, 'Yaml');
-        foreach ($updateConfigArray as $config) {
-            \Cx\Core\Setting\Controller\Setting::set($config, $websiteInfo[$config]['value']);
+        foreach ($websiteInfo as $config) {
+            // skip system info
+            if (
+                in_array(
+                    $config['group'],
+                    array('license', 'release')
+                ) ||
+                $config['name'] == 'installationId'
+            ) {
+                continue;
+            }
+
+            // skip special options
+            if (
+                in_array(
+                    $config['name'],
+                    array(
+                        // setting the main domain is not possible,
+                        // as the specified domain most likely does not exist
+                        'mainDomainId',
+                        // forcing the main domain might result
+                        // in unexpected behavior
+                        'forceDomainUrl',
+                    )
+                )
+            ) {
+                continue;
+            }
+
+            // update config
+            \Cx\Core\Setting\Controller\Setting::set($config['name'], $config['value']);
         }
-        
         \Cx\Core\Setting\Controller\Setting::updateAll();
     }
     
@@ -5422,7 +5674,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
 
                     $websiteInfoArray = $this->getWebsiteInfoFromZip($uploadedFilePath, 'info/meta.yml');
                     if (empty($websiteInfoArray)) {
-                        throw new MultiSiteJsonException('Failed to get the website Information from file');
+                        throw new MultiSiteJsonException(__METHOD__.': Failed to get the website Information from file');
                     }
 
                     $userEmailId = isset($websiteInfoArray['website']) && isset($websiteInfoArray['website']['websiteEmail'])
@@ -5480,7 +5732,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     
                     $websiteInfoArray = $this->getWebsiteInfoFromZip($uploadedFilePath, 'info/meta.yml');
                     if (empty($websiteInfoArray)) {
-                        throw new MultiSiteJsonException('Failed to get the website Information from file');
+                        throw new MultiSiteJsonException(__METHOD__.': Failed to get the website Information from file');
                     }
 
                     $userEmailId = isset($websiteInfoArray['website']) && isset($websiteInfoArray['website']['websiteEmail'])
@@ -6323,7 +6575,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
      */
     
     public function getResourceUsageStats() {
-        global $_ARRAYLANG;
+        global $_ARRAYLANG, $_CONFIG;
         self::loadLanguageData();
         
         try {
@@ -6349,9 +6601,18 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                 break;
 
                             case 'Shop':
+                                $pagingLimitBkp = $_CONFIG['corePagingLimit'];
+                                $_CONFIG['corePagingLimit'] = 10000;
                                 $count = 0;
                                 $products = \Cx\Modules\Shop\Controller\Products::getByShopParams($count, 0, null, null, null, null, false, false, null, null, true);
-                                $usage = count($products);
+                                $_CONFIG['corePagingLimit'] = $pagingLimitBkp;
+                                foreach ($products as $product) {
+                                    if ($product->active()) {
+                                        continue;
+                                    }
+                                    $count--;
+                                }
+                                $usage = $count;
                                 break;
 
                             case 'Crm':
@@ -6390,21 +6651,25 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     {
         global $_ARRAYLANG;
         if (\FWValidator::isEmpty($params['post']['websiteId'])) {
-            throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Insufficient arguments supplied: ' . var_export($params, true));
+            \DBG::msg(__METHOD__ . ' failed: Insufficient arguments supplied:');
+            \DBG::dump($params);
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_INVALID_CALL']);
         }
         try {
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
                 case ComponentController::MODE_MANAGER:
                     $website = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website')->findOneBy(array('id' => $params['post']['websiteId']));
                     if (!$website) {
-                        throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Unkown Website-ID: ' . $params['post']['websiteId']);
+                        \DBG::msg(__METHOD__ . ' failed: Unkown Website-ID: ' . $params['post']['websiteId']);
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE']);
                     }
                     if ($website->getOwner()->getId() != \FWUser::getFWUserObject()->objUser->getId()) {
                         return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_MULTISITE_WEBSITE_NOT_MULTISITE_USER']);
                     }
                     $mailServiceServer = $website->getMailServiceServer();
                     if (!$mailServiceServer || \FWValidator::isEmpty($website->getMailAccountId())) {
-                        throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Unkown mail service server.');
+                        \DBG::msg(__METHOD__ . ' failed: Unkown mail service server.');
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER']);
                     }
 
                     $clientIp = !\FWValidator::isEmpty($_SERVER['HTTP_X_FORWARDED_FOR']) ? trim(end(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']))) : $_SERVER['REMOTE_ADDR'];
@@ -6422,7 +6687,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     break;
             }
         } catch (\Exception $e) {
-            throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed:' . $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] . $e->getMessage());
+            \DBG::msg(__METHOD__ . ' failed: ' . $e->getMessage());
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED']);
         }
     }
 
@@ -6646,7 +6912,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         static::executeCommandOnServiceServer(
                             'updateWebDistributionAlias',
                             $params['post'],
-                            $website->getServiceServer()
+                            $website->getWebsiteServiceServer()
                         );
                     } catch (\Exception $e) {
                         \DBG::log('SYSERROR: Could not update WebDistributionAlias while executing "' . $methodName . '" for website "' . $website->getName() . '"!');
@@ -6666,7 +6932,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                         $result = static::executeCommandOnServiceServer(
                             'updateAutomaticCertificates',
                             $certParams,
-                            $website->getServiceServer()
+                            $website->getWebsiteServiceServer()
                         );
                     } catch (\Exception $e) {
                         \DBG::log('SYSERROR: Could not update self-signed certificates while executing "' . $methodName . '" for website "' . $website->getName() . '"!');
@@ -7751,11 +8017,10 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     {
         global $_ARRAYLANG;
 
-        if (   empty($params['post']) 
-            || empty($params['post']['websiteName']) 
-            || empty($params['post']['domainName']) 
-            || empty($params['post']['certificateName']) 
-            || empty($params['post']['privateKey']) 
+        if (   empty($params['post'])
+            || empty($params['post']['websiteName'])
+            || empty($params['post']['domainName'])
+            || empty($params['post']['certificateName'])
         ) {
             \DBG::msg('JsonMultiSiteController::linkSsl() failed: Insufficient arguments supplied: ' . var_export($params, true));
             throw new MultiSiteJsonException($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_DOMAIN_SSL_FAILED']);
@@ -7770,6 +8035,9 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     $siteList = $hostingController->getAllWebDistributionAliases(
                         $websiteName
                     );
+
+                    // list of installed ssl certificates
+                    $sslCertificates = array();
                     
                     if (!in_array($params['post']['domainName'], $siteList)) {
                         // this should not happen, WebDistributionAlias should already exist!
@@ -7783,21 +8051,28 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                             $websiteName,
                             $params['post']['domainName']
                         );
-                        if (!empty($sslCertificates)) {
-                            $hostingController->removeSSLCertificates(
-                                $websiteName,
-                                $params['post']['domainName'],
-                                $sslCertificates
-                            );
-                        }
                     }
-                    
+
+                    // abort in caes no custom ssl-certificat has been
+                    // submitted. In that case the server will automatically
+                    // issue a self-signed certificate
+                    if (
+                        empty($params['post']['privateKey']) &&
+                        empty($params['post']['certificate'])
+                    ) {
+                        return array(
+                            'status' => 'success',
+                            'log'    => \DBG::getMemoryLogs(),
+                        );
+                    }
+
+                    // install supplied custom ssl-certificate
                     $installSslCertificate = $hostingController->installSSLCertificate(
                         $websiteName,
-                                                                        $params['post']['certificateName'], 
-                                                                        $params['post']['domainName'], 
-                                                                        $params['post']['privateKey'],
-                                                                        $params['post']['certificate'], 
+                        $params['post']['certificateName'],
+                        $params['post']['domainName'],
+                        $params['post']['privateKey'],
+                        $params['post']['certificate'],
                         $params['post']['caCertificate']
                     );
                     if ($installSslCertificate) {
@@ -7806,6 +8081,14 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                             $params['post']['certificateName'],
                             $siteId
                         )) {
+                            // drop old (now obsolete) ssl certificates
+                            if ($sslCertificates) {
+                                $hostingController->removeSSLCertificates(
+                                    $websiteName,
+                                    $params['post']['domainName'],
+                                    $sslCertificates
+                                );
+                            }
                             return array('status' => 'success');
                         }
                     }
@@ -8358,6 +8641,200 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         return array(
             'status' => 'success',
         );
+    }
+
+    public function banIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // whitelist private and reserved ip addresses (to prevent
+            // accicential blocking of a local system)
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP,
+                \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            // whitelist trusted ips
+            $whiteListedIps = array(
+                # myself
+                '80.74.136.182',
+                # admin.cloudrexx.com
+                '35.156.102.144',
+                # aws lambda (or the client who did call banIp)
+                $_SERVER['REMOTE_ADDR'],
+                # cloudrexx office
+                '94.126.252.74',
+                # aws maintenance ip
+                '35.158.166.147',
+            );
+            if (count(preg_grep('/^' . preg_quote($ip, '/') . '$/', $whiteListedIps)) > 0) {
+                throw new \Exception("$ip is whitelisted");
+            }
+
+            $reason = 'no reason supplied';
+// todo change to POST
+            if (isset($params['get']['reason'])) {
+                if (preg_match('/^[a-zA-Z0-9+\/]+={0,2}$/', $params['get']['reason'])) {
+                    $reason = 'reason: ' . base64_decode($params['get']['reason']);
+                } else {
+                    $reason = 'reason: ' . $params['get']['reason'];
+                }
+            }
+
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+
+                $data = $file->getData();
+                // do intentionally not check for value '1'
+                // as this does allow us to whitelist certain ips
+                if (preg_match(
+                    '/^' . preg_quote($ip, '/') . ' .*$/m',
+                    $data
+                )) {
+                    throw new \Exception("$ip is already registered");
+                }
+
+                $reason = preg_replace(
+                    '/[\n\r]/',
+                    '',
+                    $reason
+                );
+                $content = $ip . ' 1 # ' . date('c'). ' - ' . $reason . "\n";
+
+                $file->append($content);
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to ban $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "IP $ip banned",
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
+    }
+
+    public function unbanIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // ensure supplied ip is a valid ip
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+                $data = $file->getData();
+                $count = 0;
+                $data = preg_replace(
+                    '/^' . preg_quote($ip, '/') . ' 1.*$\n/m',
+                    '',
+                    $data,
+                    -1,
+                    $count
+                );
+                if (
+                    $data !== null &&
+                    $count
+                ) {
+                    $file->write($data);
+                } else {
+                    throw new \Exception('unknown ip ' . $ip);
+                }
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to unban $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "$ip unbanned",
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
+    }
+
+    public function checkIp($params) {
+        try {
+// todo change to POST
+            if (!isset($params['get']['ip'])) {
+                throw new \Exception('no ip');
+            }
+
+// todo change to POST
+            $ip = $params['get']['ip'];
+
+            // ensure supplied ip is a valid ip
+            if (filter_var(
+                $ip,
+                \FILTER_VALIDATE_IP
+            ) === false) {
+                throw new \Exception('no valid ip');
+            }
+
+            $status = 'unknown';
+            try {
+                $file = new \Cx\Lib\FileSystem\File(
+                    $this->cx->getWebsiteDocumentRootPath() .
+                    '/core_modules/MultiSite/Data/BlockedIpMap.txt'
+                );
+
+                $data = $file->getData();
+                if (preg_match(
+                    '/^' . preg_quote($ip, '/') . ' .*$/m',
+                    $data
+                )) {
+                    $status = 'registered';
+                }
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                \DBG::msg($e->getMessage());
+                throw new \Exception("unable to check ip $ip");
+            }
+
+            return array(
+                'status' => 'success',
+                'message' => "IP $ip is " . $status,
+            );
+        } catch (\Exception $e) {
+            return array(
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            );
+        }
     }
 }
 

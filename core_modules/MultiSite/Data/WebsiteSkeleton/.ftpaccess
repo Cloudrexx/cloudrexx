@@ -1,9 +1,17 @@
-<Directory>
-  # We don't want to manipulate .ftpaccess files
-  PathDenyFilter "(\\.ftpaccess)$"
-  # Hide configuration files from view
-  HideFiles "(\\.ftpaccess)$"
-  <Limit WRITE>
-    DenyAll
-  </Limit>
-</Directory>
+# Deny .ftpaccess file creation
+PathDenyFilter \.ftpaccess$
+
+# Hide .ftpaccess files
+# as well as write-protected files
+HideFiles ^(\.ftpaccess|favicon\.ico|robots\.txt|sitemap.*\.xml)$
+
+# Deny any access to hidden files
+# (write-protected files from above)
+<Limit ALL>
+  IgnoreHidden on
+</Limit>
+
+# Deny global write-access
+<Limit WRITE>
+  DenyAll
+</Limit>

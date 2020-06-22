@@ -95,7 +95,6 @@ $_ARRAYLANG['TXT_COMMENTS'] = "Mitteilungen";
 $_ARRAYLANG['TXT_ID'] = "ID";
 $_ARRAYLANG['TXT_ADDRESS_CUSTOMER'] = "Kundenadresse";
 $_ARRAYLANG['TXT_TAC'] = "Allgemeine Gesch�ftsbedingungen";
-$_ARRAYLANG['TXT_ACCEPT_TAC'] = "Ich best�tige die Richtigkeit der gemachten Angaben und die <a href=\\\"index.php?section=Shop&amp;cmd=terms\\\" target=\\\"_blank\\\">Gesch�ftsbedingungen</a> zu kennen und akzeptiere diese.";
 $_ARRAYLANG['TXT_TOTAL_PRICE'] = "Gesamtpreis";
 $_ARRAYLANG['TXT_ORDER_INFOS'] = "Bestellinformationen";
 $_ARRAYLANG['TXT_ORDER_PREPARED'] = "Die Bestellung ist nun f�r die Zahlung vorbereitet.";

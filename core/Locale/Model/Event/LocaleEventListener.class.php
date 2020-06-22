@@ -53,5 +53,8 @@ class LocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListen
      */
     public function onFlush($eventArgs) {
         $eventArgs->getEntityManager()->getConfiguration()->getResultCacheImpl()->deleteAll();
+
+        // drop page and ESI cache
+        $this->getComponent('Cache')->clearCache();
     }
 }

@@ -88,47 +88,50 @@ class SettingsLanguageFile extends LanguageFile  {
         // load component specific language data from init
         $init = \Env::get('init');
         if (!$onlyCustomized) {
+            // We do not surround this with try-catch as this must not throw an exception!
+            $baseData = $init->getComponentSpecificLanguageDataByCode(
+                $this->componentName,
+                $frontend,
+                'en',
+                false
+            );
             try {
-                $baseData = $init->getComponentSpecificLanguageDataByCode(
-                    $this->componentName,
-                    $frontend,
-                    'en',
-                    false
-                );
                 $sourceData = $init->getComponentSpecificLanguageDataByCode(
                     $this->componentName,
                     $frontend,
                     $sourceLanguage->getIso1(),
                     false
                 );
+            } catch(\InitCMSException $e) {
+                // Source language is not set: internally change to EN and add message
+                return;
+            }
+            try {
                 $destData = $init->getComponentSpecificLanguageDataByCode(
                     $this->componentName,
                     $frontend,
                     $destLanguage->getIso1(),
                     false
                 );
+            } catch(\InitCMSException $e) {}
 
-                $this->data = array();
-                foreach ($baseData as $name=>$value) {
-                    if (!isset($sourceData[$name])) {
-                        $sourceData[$name] = $value;
-                    }
-                    if (!isset($destData[$name])) {
-                        $destData[$name] = $value;
-                    }
-                    $this->data[$name] = array(
-                        'id' => $name,
-                        'sourceLang' => $sourceData[$name],
-                        'destLang' => $destData[$name],
-                        'virtual' => true,
-                        'initData' => $destData[$name],
-                    );
+            $this->data = array();
+            foreach ($baseData as $name=>$value) {
+                if (!isset($sourceData[$name])) {
+                    $sourceData[$name] = $value;
                 }
-                $this->updateLanguageData();
-            } catch(\InitCMSException $e) {
-                \Message::add($e->getMessage(), \Message::CLASS_ERROR);
-                return;
+                if (!isset($destData[$name])) {
+                    $destData[$name] = $value;
+                }
+                $this->data[$name] = array(
+                    'id' => $name,
+                    'sourceLang' => $sourceData[$name],
+                    'destLang' => $destData[$name],
+                    'virtual' => true,
+                    'initData' => $destData[$name],
+                );
             }
+            $this->updateLanguageData();
         }
     }
 

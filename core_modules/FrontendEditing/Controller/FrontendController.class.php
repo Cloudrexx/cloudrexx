@@ -116,8 +116,8 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
         $contrexxJavascript->setVariable('contentTemplates', $this->getCustomContentTemplates(), 'FrontendEditing');
         $contrexxJavascript->setVariable('defaultTemplate', $this->getDefaultTemplate(), 'FrontendEditing');
 
-        $configPath = ASCMS_PATH_OFFSET . substr(\Env::get('ClassLoader')->getFilePath(ASCMS_CORE_PATH . '/Wysiwyg/ckeditor.config.js.php'), strlen(ASCMS_DOCUMENT_ROOT));
-        $contrexxJavascript->setVariable('configPath', $configPath . '?langId=' . FRONTEND_LANG_ID, 'FrontendEditing');
+        $configPath = $this->cx->getComponent('Wysiwyg')->getConfigPath();
+        $contrexxJavascript->setVariable('configPath', $configPath, 'FrontendEditing');
     }
 
     /**

@@ -52,6 +52,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     protected $canonicalUrl = null;
 
+    /**
+     * @var MediaDirectory
+     */
+    protected $mediaDirectory = null;
+
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
@@ -67,29 +72,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         global $_CORELANG, $subMenuTitle, $objTemplate;
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $objMediaDirectory = new MediaDirectory(\Env::get('cx')->getPage()->getContent(), $this->getName());
-                $objMediaDirectory->pageTitle = \Env::get('cx')->getPage()->getTitle();
-                $pageMetaTitle = \Env::get('cx')->getPage()->getMetatitle();
-                $objMediaDirectory->metaTitle = $pageMetaTitle;
-                \Env::get('cx')->getPage()->setContent($objMediaDirectory->getPage());
-                if ($objMediaDirectory->getPageTitle() != '' && $objMediaDirectory->getPageTitle() != \Env::get('cx')->getPage()->getTitle()) {
-                    \Env::get('cx')->getPage()->setTitle($objMediaDirectory->getPageTitle());
-                    \Env::get('cx')->getPage()->setContentTitle($objMediaDirectory->getPageTitle());
-                    \Env::get('cx')->getPage()->setMetaTitle($objMediaDirectory->getPageTitle());
-                }
-                if ($objMediaDirectory->getMetaTitle() != '') {
-                    \Env::get('cx')->getPage()->setMetatitle($objMediaDirectory->getMetaTitle());
-                }
-                if ($objMediaDirectory->getMetaDescription() != '') {
-                    \Env::get('cx')->getPage()->setMetadesc($objMediaDirectory->getMetaDescription());
-                }
-                if ($objMediaDirectory->getMetaImage() != '') {
-                    \Env::get('cx')->getPage()->setMetaimage($objMediaDirectory->getMetaImage());
-                }
-                if ($objMediaDirectory->getMetaKeys() != '') {
-                    \Env::get('cx')->getPage()->setMetakeys($objMediaDirectory->getMetaKeys());
-                }
-
+                // we need to re-instanciate MediaDirectory as
+                // page content could have changed
+                $this->mediaDirectory = new MediaDirectory(
+                    $page->getContent(),
+                    $this->getName()
+                );
+                $this->mediaDirectory->pageTitle = $page->getTitle();
+                $this->mediaDirectory->metaTitle = $page->getMetatitle();
+                $page->setContent($this->mediaDirectory->getPage());
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
@@ -195,41 +186,85 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Parse entries of specific form, category and/or level.   
         // Entries are listed in custom set order
         if ($objTemplate->blockExists('mediadirList')) {
-            // hold information if a specific block has been parsed
-            $foundOne = false;
-
-            // fetch mediadir object data
-            $objMediadirForm = new MediaDirectoryForm(null, $this->getName());
-            $objMediadirCategory = new MediaDirectoryCategory(null, null, 0, $this->getName());
-            $objMediadirLevel = new MediaDirectoryLevel(null, null, 1, $this->getName());
-
-            // put all object data into one array
+            // fetch IDs of forms and categories having published data that
+            // could be parsed
             $objects = array(
-                'form' => array_keys($objMediadirForm->getForms()),
-                'category' => array_keys($objMediadirCategory->arrCategories),
-                'level' => array_keys($objMediadirLevel->arrLevels),
+                'form' => MediaDirectoryForm::getIdsWithPublishedData(),
+                'category' => MediaDirectoryCategory::getIdsWithPublishedData(),
             );
 
-            // check for form specific entry listing
-            foreach ($objects as $objectType => $arrObjectList) {
-                foreach ($arrObjectList as $objectId) {
-                    // the specific block to parse. I.e.:
-                    //    mediadirList_form_3
-                    //    mediadirList_category_4
-                    //    mediadirList_level_5
-                    $block = 'mediadirList_'.$objectType.'_'.$objectId;
-                    if ($objTemplate->blockExists($block)) {
-                        $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate($block, $objTemplate);
-                        $config['filter'][$objectType] = $objectId;
-                        $objMediadir->parseEntries($objTemplate, $block, $config);
-                        $foundOne = true;
-                    }
-                }
+            // fetch level data only in case the use of levels has been
+            // activated
+            if ($objMediadir->arrSettings['settingsShowLevels']) {
+                $objects['level'] =
+                    MediaDirectoryLevel::getIdsWithPublishedData();
             }
 
-            // fallback, no specific block has been parsed
+            // get blocks to filter by form/category/level
+            $blocks = $objTemplate->getBlockList('mediadirList');
+            $filterRegex = '/^mediadirList_(form|category|level)_([0-9]+)$/';
+            $filterBlocks = preg_grep(
+                $filterRegex,
+                $blocks
+            );
+
+            // the specific block to parse. I.e.:
+            //    mediadirList_form_3
+            //    mediadirList_category_4
+            //    mediadirList_level_5
+            foreach ($filterBlocks as $block) {
+                // extract filter type (form/category/level) and associated ID
+                // out of the template-block
+                if (!preg_match($filterRegex, $block, $filterConfig)) {
+                    continue;
+                }
+                $objectType = $filterConfig[1];
+                $objectId = $filterConfig[2];
+
+                // verify that the set filter matches any published data that
+                // can be listed
+                if (
+                    !isset($objects[$objectType]) ||
+                    !in_array($objectId, $objects[$objectType])
+                ) {
+                    // hide invalid blocks (-> non-published levels, categories
+                    // or forms)
+                    $objTemplate->hideBlock($block);
+                    continue;
+                }
+
+                // extend filter by additional config from url arguments
+                $requestParams = $this->cx->getRequest()->getUrl()->getParamArray();
+                $categoryId = 0;
+                if (isset($requestParams['cid'])) {
+                    $categoryId = intval($requestParams['cid']);
+                }
+                $levelId = 0;
+                if (isset($requestParams['lid'])) {
+                    $levelId = intval($requestParams['lid']);
+                }
+
+                // extend filter by additional config from functional
+                // placeholders from filter block
+                $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate(
+                    $block,
+                    $objTemplate,
+                    null,
+                    $categoryId,
+                    $levelId
+                );
+
+                // ensure filter from filter-block has highest precedence
+                $config['filter'][$objectType] = $objectId;
+
+                // finally, fill the specific filter block with its published
+                // entries
+                $objMediadir->parseEntries($objTemplate, $block, $config);
+            }
+
+            // fallback, no specific filter block was found in the template
             // -> parse all entries now (use template block mediadirList)
-            if(!$foundOne) {
+            if(!$filterBlocks) {
                 $objMediadir->parseEntries($objTemplate);
             }
         }
@@ -278,12 +313,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
      */
     public function resolve($parts, $page) {
-        // in case the requested URL does not contain any slug-parts
-        // there is nothing for us to do as it is a regular page request
-        if (empty($parts)) {
-            return;
-        }
-
         // abort resolving in case pretty-URLs is not in case
         $objMediaDirectoryEntry = new MediaDirectoryEntry($this->getName());
         if (!$objMediaDirectoryEntry->arrSettings['usePrettyUrls']) {
@@ -296,10 +325,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $detailPage = $page;
         $slugCount = count($parts);
         $cmd = $page->getCmd();
+        $noParts = false;
 
-        // Extract slug part from the end of the requested URL.
-        // This might be the slug of an entry, level or category
-        $slug = array_pop($parts);
+        if (empty($parts)) {
+            $noParts = true;
+        } else {
+            // Extract slug part from the end of the requested URL.
+            // This might be the slug of an entry, level or category
+            $slug = array_pop($parts);
+        }
 
         // fetch category & level from page's CMD in case the requested URL
         // does not contain a category nor a level 
@@ -319,6 +353,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
         }
 
+        // in case the requested URL does not contain any slug-parts
+        // there is nothing else for us to do as it is a regular page request
+        if ($noParts) {
+            // inject level as request arguments from page's CMD
+            if ($levelId) {
+                $this->cx->getRequest()->getUrl()->setParam('lid', $levelId);
+            }
+
+            // inject category as request arguments from page's CMD
+            if ($categoryId) {
+                $this->cx->getRequest()->getUrl()->setParam('cid', $categoryId);
+            }
+
+            return;
+        }
+
         // check if the extracted slug is an entry
         $entryId = $objMediaDirectoryEntry->findOneBySlug($slug, null, $categoryId, $levelId);
         if ($entryId) {
@@ -333,6 +383,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $formId = null;
                 $formData = $objMediaDirectoryEntry->getFormData();
                 foreach ($formData as $arrForm) {
+                    if (empty($arrForm['formCmd'])) {
+                        continue;
+                    }
                     if ($arrForm['formCmd'] == $cmd) {
                         $formId = $arrForm['formId'];
                         break;
@@ -418,20 +471,28 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // in case we have not yet identified a category and a level
         // lets check if the requested URL does contain any
         // virtual level or category
+        $matchedLevelId = 0;
+        $matchedCategoryId = 0;
         while (
             $slug &&
             !($levelId && $categoryId)
         ) {
             // let's check if a level exists by the supplied slug
-            if (!$levelId && $objMediaDirectoryEntry->arrSettings['settingsShowLevels']) {
+            if (!$matchedLevelId && $objMediaDirectoryEntry->arrSettings['settingsShowLevels']) {
                 $objMediaDirectoryLevel = new MediaDirectoryLevel(null, null, 0, $this->getName());
-                $levelId = $objMediaDirectoryLevel->findOneBySlug($slug);
+                $matchedLevelId = $objMediaDirectoryLevel->findOneBySlug($slug);
+                if ($matchedLevelId) {
+                    $levelId = $matchedLevelId;
+                }
             }
 
             // let's check if a category exists by the supplied slug
-            if (!$categoryId) {
+            if (!$matchedCategoryId) {
                 $objMediaDirectoryCategory = new MediaDirectoryCategory(null, null, 0, $this->getName());
-                $categoryId = $objMediaDirectoryCategory->findOneBySlug($slug);
+                $matchedCategoryId = $objMediaDirectoryCategory->findOneBySlug($slug);
+                if ($matchedCategoryId) {
+                    $categoryId = $matchedCategoryId;
+                }
             }
 
             // fetch parent slug (if any is left)
@@ -464,6 +525,39 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'Link',
             '<' . $this->canonicalUrl->toString() . '>; rel="canonical"'
         );
+
+        $page = $response->getPage();
+        if (!$page) {
+            return;
+        }
+        $this->mediaDirectory = new MediaDirectory(
+            $page->getContent(),
+            $this->getName()
+        );
+        $this->mediaDirectory->pageTitle = $page->getTitle();
+        $this->mediaDirectory->metaTitle = $page->getMetatitle();
+        // we need to parse the complete page as the meta info is not set otherwise
+        $this->mediaDirectory->getPage();
+        if (
+            $this->mediaDirectory->getPageTitle() != '' &&
+            $this->mediaDirectory->getPageTitle() != $page->getTitle()
+        ) {
+            $page->setTitle($this->mediaDirectory->getPageTitle());
+            $page->setContentTitle($this->mediaDirectory->getPageTitle());
+            $page->setMetaTitle($this->mediaDirectory->getPageTitle());
+        }
+        if ($this->mediaDirectory->getMetaTitle() != '') {
+            $page->setMetatitle($this->mediaDirectory->getMetaTitle());
+        }
+        if ($this->mediaDirectory->getMetaDescription() != '') {
+            $page->setMetadesc($this->mediaDirectory->getMetaDescription());
+        }
+        if ($this->mediaDirectory->getMetaImage() != '') {
+            $page->setMetaimage($this->mediaDirectory->getMetaImage());
+        }
+        if ($this->mediaDirectory->getMetaKeys() != '') {
+            $page->setMetakeys($this->mediaDirectory->getMetaKeys());
+        }
     }
 
     protected function setCanonicalUrl(

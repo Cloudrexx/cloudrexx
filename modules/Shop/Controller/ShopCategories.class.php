@@ -159,6 +159,7 @@ class ShopCategories
      * array(
      *    'id => ShopCategory ID
      *    'name' => Category name,
+     *    'shortDescription' => Category short description,
      *    'description' => Category description,
      *    'parent_id' => parent ID
      *    'ord' => order value,
@@ -264,6 +265,7 @@ class ShopCategories
             self::$arrCategory[$id] = array(
                 'id' => $id,
                 'name' => $objCategory->name(),
+                'shortDescription' => $objCategory->shortDescription(),
                 'description' => $objCategory->description(),
                 'parent_id' => $objCategory->parent_id(),
                 'ord' => $objCategory->ord(),
@@ -608,6 +610,7 @@ class ShopCategories
             FRONTEND_LANG_ID, 'Shop',
             array(
                 'name' => ShopCategory::TEXT_NAME,
+                'shortDescription' => ShopCategory::TEXT_SHORT_DESCRIPTION,
                 'description' => ShopCategory::TEXT_DESCRIPTION,
             )
         );
@@ -621,6 +624,10 @@ class ShopCategories
         (!empty($objCategory->name)
             ? " AND ".$arrSql['alias'][ShopCategory::TEXT_NAME].
               " LIKE '%".addslashes($objCategory->name)."%'"
+            : '').
+        (!empty($objCategory->shortDescription)
+            ? " AND ".$arrSql['alias'][ShopCategory::TEXT_SHORT_DESCRIPTION].
+              " LIKE '%".addslashes($objCategory->shortDescription)."%'"
             : '').
         (!empty($objCategory->description)
             ? " AND ".$arrSql['alias'][ShopCategory::TEXT_DESCRIPTION].

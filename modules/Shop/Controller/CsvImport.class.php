@@ -280,7 +280,7 @@ class CsvImport
      */
     static function InsertNewCat($catName, $catParent)
     {
-        $objCategory = new ShopCategory($catName, '', $catParent);
+        $objCategory = new ShopCategory($catName, '', '', $catParent);
         if ($objCategory->store()) {
             return $objCategory->id();
         }

@@ -1,5 +1,7 @@
-<Directory>
-  <Limit WRITE>
-    AllowAll
-  </Limit>
-</Directory>
+# Overwrite inherited list of hidden files
+HideFiles ^\.ftpaccess$
+
+# Allow write-access
+<Limit WRITE>
+  AllowAll
+</Limit>

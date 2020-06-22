@@ -59,4 +59,97 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             new \Cx\Core\Model\Model\Event\EntityBaseEventListener()
         );
     }
+
+    /**
+     * Slugifies the given string
+     * @param $string The string to slugify
+     * @return $string The slugified string
+     */
+    public function slugify($string) {
+        // replace international characters
+        $string = $this->getComponent('LanguageManager')
+            ->replaceInternationalCharacters($string);
+
+        // replace spaces
+        $string = preg_replace('/\s+/', '-', $string);
+
+        // replace all non-url characters
+        $string = preg_replace('/[^a-zA-Z0-9-_]/', '', $string);
+
+        // replace duplicate occurrences (in a row) of char "-" and "_"
+        $string = preg_replace('/([-_]){2,}/', '-', $string);
+
+        return $string;
+    }
+
+    /**
+     * Returns a list of command mode commands provided by this component
+     *
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode()
+    {
+        return array('Model');
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     *
+     * @param string  $command The name of the command to fetch the description from
+     * @param boolean $short   Whether to return short or long description
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false)
+    {
+        switch ($command) {
+            case 'Model':
+                $desc = 'Provides cleanup function for database table';
+                if ($short) {
+                    return $desc;
+                }
+
+                $desc .= PHP_EOL . 'optimize' . "\t" .
+                    'Optimize tables. This speeds up the system and can save some disk space.';
+
+                return $desc;
+            default :
+                return '';
+        }
+    }
+
+    /**
+     * Execute api command
+     *
+     * @param string $command       Name of command to execute
+     * @param array  $arguments     List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array())
+    {
+        $subcommand = null;
+        if (!empty($arguments[0])) {
+            $subcommand = $arguments[0];
+        }
+
+        switch ($command) {
+            case 'Model':
+                switch ($subcommand) {
+                    case 'optimize':
+                        // Optimize all tables based on DBPREFIX
+                        $db        = $this->cx->getDb()->getAdoDb();
+                        $objResult = $db->Execute('SHOW TABLE STATUS LIKE "' . DBPREFIX . '%"');
+
+                        while (!$objResult->EOF) {
+                            $db->Execute('OPTIMIZE TABLE ' . $objResult->fields['Name']);
+                            $objResult->MoveNext();
+                        }
+                        break;
+                    default :
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }

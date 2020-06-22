@@ -96,14 +96,22 @@ class CrmContact
                              c.customer_currency, c.contact_amount,
                              c.contact_familyname, c.contact_title,
                              c.contact_role, c.contact_customer, c.contact_language,c.company_size,
-                             c.notes, c.contact_type,c.user_account,c.updated_date,c.added_date,
-                             c.industry_type,e.email,p.phone, c.datasource,
-                             c.gender,c.profile_picture, c.`email_delivery`
+                             c.notes, c.contact_type,c.user_account, c.updated_date, c.added_date,
+                             c.industry_type, e.email,p.phone, c.datasource,
+                             c.gender, c.salutation, c.profile_picture, c.`email_delivery`,
+                             a.address, a.city, a.state, a.zip, a.country, w.url, 
+                             `com`.`customer_name` as `linkedCompany`
                          FROM `".DBPREFIX."module_{$this->moduleName}_contacts` AS c
                          LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_customer_contact_emails` as e
                              ON (c.`id` = e.`contact_id` AND e.`is_primary` = '1')
                          LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_customer_contact_phone` as p
                              ON (c.`id` = p.`contact_id` AND p.`is_primary` = '1')
+                         LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_customer_contact_address` as a
+                             ON (c.`id` = a.`contact_id` AND a.`is_primary` = '1')
+                         LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_customer_contact_websites` as w
+                             ON (c.`id` = w.`contact_id` AND w.`is_primary` = '1')
+                         LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_contacts` as `com`
+                             ON (c.`contact_customer` = `com`.`id`)
                          WHERE c.`id` = {$this->id}";
             $objResult = $objDatabase->Execute($query);
             if (false != $objResult) {
@@ -117,6 +125,7 @@ class CrmContact
                 $this->contact_role     = $objResult->fields['contact_role'];
                 $this->contact_language = $objResult->fields['contact_language'];
                 $this->companySize      = $objResult->fields['company_size'];
+                $this->linkedCompany    = $objResult->fields['linkedCompany'];
                 $this->contact_customer = $objResult->fields['contact_customer'];
                 $this->addedUser        = $objResult->fields['customer_addedby'];
                 $this->currency         = $objResult->fields['customer_currency'];
@@ -125,11 +134,18 @@ class CrmContact
                 $this->account_id       = $objResult->fields['user_account'];
                 $this->datasource       = $objResult->fields['datasource'];
                 $this->contact_gender   = $objResult->fields['gender'];
+                $this->salutation       = $objResult->fields['salutation'];
                 $this->profile_picture  = $objResult->fields['profile_picture'];
                 $this->emailDelivery    = $objResult->fields['email_delivery'];
 
                 $this->email            = $objResult->fields['email'];
                 $this->phone            = $objResult->fields['phone'];
+                $this->address          = $objResult->fields['address'];
+                $this->city             = $objResult->fields['city'];
+                $this->state            = $objResult->fields['state'];
+                $this->zip              = $objResult->fields['zip'];
+                $this->country          = $objResult->fields['country'];
+                $this->url              = $objResult->fields['url'];
                 $this->added_date       = $objResult->fields['added_date'];
                 $this->updated_date     = $objResult->fields['updated_date'];
             }
@@ -168,6 +184,7 @@ class CrmContact
                            c.user_account,
                            c.datasource,
                            c.gender,
+                           c.salutation,
                            c.contact_language,
                            con.customer_name AS contactCustomer,
                            t.label AS cType,
@@ -228,6 +245,7 @@ class CrmContact
             'contact_type'      => isset ($this->contactType) ? (int) $this->contactType : '',
             'user_account'      => isset ($this->account_id) ? (int) $this->account_id : '',
             'gender'            => isset ($this->contact_gender) ? (int) $this->contact_gender : '',
+            'salutation'        => isset ($this->salutation) ? (int) $this->salutation : 0,
             'profile_picture'   => array ( 'val' => isset ($this->profile_picture) && !empty($this->profile_picture) ? $this->profile_picture : null, 'omitEmpty' => true),
             'email_delivery'    => isset ($this->emailDelivery) ? contrexx_input2int($this->emailDelivery) : 1,
         );
@@ -342,6 +360,7 @@ class CrmContact
         $this->contact_title    = '';
         $this->contact_role     = '';
         $this->contact_language = 0;
+        $this->linkedCompany    = '';
         $this->contact_customer = 0;
         $this->addedUser        = 0;
         $this->currency         = 0;
@@ -351,11 +370,18 @@ class CrmContact
         $this->account_id       = 0;
         $this->datasource       = 0;
         $this->contact_gender   = 0;
+        $this->salutation       = 0;
         $this->profile_picture  = '';
         $this->emailDelivery    = 1;
 
         $this->email            = '';
         $this->phone            = '';
+        $this->address          = '';
+        $this->city             = '';
+        $this->state            = '';
+        $this->zip              = '';
+        $this->country          = '';
+        $this->url              = '';
         $this->added_date       = '';
         $this->updated_date     = '';
     }

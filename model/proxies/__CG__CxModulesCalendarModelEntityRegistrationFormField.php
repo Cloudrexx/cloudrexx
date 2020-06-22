@@ -299,6 +299,17 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
     /**
      * {@inheritDoc}
      */
+    public function removeRegistrationFormFieldName(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName $registrationFormFieldNames)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRegistrationFormFieldName', array($registrationFormFieldNames));
+
+        return parent::removeRegistrationFormFieldName($registrationFormFieldNames);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setRegistrationFormFieldNames($registrationFormFieldNames)
     {
 
@@ -338,6 +349,17 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRegistrationFormFieldValue', array($registrationFormFieldValue));
 
         return parent::addRegistrationFormFieldValue($registrationFormFieldValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeRegistrationFormFieldValue(\Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue $registrationFormFieldValues)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRegistrationFormFieldValue', array($registrationFormFieldValues));
+
+        return parent::removeRegistrationFormFieldValue($registrationFormFieldValues);
     }
 
     /**
@@ -415,6 +437,17 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

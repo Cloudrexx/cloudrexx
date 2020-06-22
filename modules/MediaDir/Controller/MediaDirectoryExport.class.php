@@ -81,7 +81,7 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
 
             $objForm = new MediaDirectoryForm($intFormId, $this->moduleName);
             $objInputfields = new MediaDirectoryInputfield($intFormId, false, null, $this->moduleName);
-            $strFilename = contrexx_raw2encodedUrl($objForm->arrForms[$intFormId]['formName'][0])."_".mktime().".csv";
+            $strFilename = contrexx_raw2encodedUrl($objForm->arrForms[$intFormId]['formName'][0])."_".time().".csv";
 
             if($arrCategoryIds != null) {
                 foreach($arrCategoryIds as $intKey => $intCategoryId) {
@@ -140,7 +140,7 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                                                             WHERE
                                                                 entry.entry_id ='".$intEntryId."'
                                                             AND
-                                                                entry.lang_id ='".FRONTEND_LANG_ID."'
+                                                                entry.lang_id ='" . static::getOutputLocale()->getId() . "'
                                                            ");
                 if ($objResultEntry !== false) {
                     while (!$objResultEntry->EOF) {
@@ -237,7 +237,7 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                   AND
                     cat_rel.`entry_id` = '".intval($intEntryId)."'
                   AND
-                    cat_name.`lang_id` = '".intval(FRONTEND_LANG_ID)."'
+                    cat_name.`lang_id` = '" . static::getOutputLocale()->getId() . "'
                   ORDER BY
                     cat_name.`category_name` ASC
                   ";
@@ -254,7 +254,7 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                   AND
                     level_rel.`entry_id` = '".intval($intEntryId)."'
                   AND
-                    level_name.`lang_id` = '".intval(FRONTEND_LANG_ID)."'
+                    level_name.`lang_id` = '" . static::getOutputLocale()->getId() . "'
                   ORDER BY
                     level_name.`level_name` ASC
                   ";

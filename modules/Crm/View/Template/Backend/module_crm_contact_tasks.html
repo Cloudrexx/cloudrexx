@@ -20,7 +20,7 @@
         <!-- BEGIN showTask -->
         <tr class="{CRM_TASK_EXPIRED_CLASS} {TXT_ROW}" style="height:26px;">
             <td style="text-align: center;">
-                <span style="cursor: pointer;" rel="task_{CRM_TASK_ID}" task_status="{TXT_STATUS}" onclick="showTaskStatusPanel(this);"><img src="../core/Core/View/Media/icons/{CRM_TASK_TYPE_ACTIVE}" alt="status" /></span>
+                <span style="cursor: pointer;" rel="task_{CRM_TASK_ID}" task_status="{TXT_STATUS}" onclick="showTaskStatusPanel(this);"><img src="/core/Core/View/Media/icons/{CRM_TASK_TYPE_ACTIVE}" alt="status" /></span>
             </td>
             <td>
                     <div class="taskTypeDiv">
@@ -37,10 +37,10 @@
             <td>{CRM_ADDEDBY}</td>
             <td style="padding:4px;text-align: right;">
                 <!-- BEGIN task_edit_block -->
-                <a href="index.php?cmd={MODULE_NAME}&amp;act=task&amp;tpl=modify&{CSRF_PARAM}&amp;id={CRM_TASK_ID}{CRM_REDIRECT_LINK}" target="_self" title="{TXT_CRM_IMAGE_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_CRM_IMAGE_EDIT}" title="{TXT_CRM_IMAGE_EDIT}" /></a>
+                <a href="index.php?cmd={MODULE_NAME}&amp;act=task&amp;tpl=modify&{CSRF_PARAM}&amp;id={CRM_TASK_ID}{CRM_REDIRECT_LINK}" target="_self" title="{TXT_CRM_IMAGE_EDIT}"><img src="/core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_CRM_IMAGE_EDIT}" title="{TXT_CRM_IMAGE_EDIT}" /></a>
                 <!-- END task_edit_block -->
                 <!-- BEGIN task_delete_block -->
-                <a onclick="return confirmTaskDelete();" href="./index.php?cmd={MODULE_NAME}&act=task&tpl=deleteTask&{CSRF_PARAM}&id={CRM_TASK_ID}{CRM_REDIRECT_LINK}" target="_self" title="{TXT_CRM_IMAGE_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_CRM_IMAGE_DELETE}" title="{TXT_CRM_IMAGE_DELETE}" /></a>
+                <a onclick="return confirmTaskDelete();" href="./index.php?cmd={MODULE_NAME}&act=task&tpl=deleteTask&{CSRF_PARAM}&id={CRM_TASK_ID}{CRM_REDIRECT_LINK}" target="_self" title="{TXT_CRM_IMAGE_DELETE}"><img src="/core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_CRM_IMAGE_DELETE}" title="{TXT_CRM_IMAGE_DELETE}" /></a>
                 <!-- END task_delete_block -->
             </td>
         </tr>

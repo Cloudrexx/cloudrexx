@@ -105,7 +105,7 @@ class EventField extends \Cx\Model\Base\EntityBase {
     protected $orgCountry;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Event
+     * @var \Cx\Modules\Calendar\Model\Entity\Event
      */
     protected $event;
 
@@ -363,7 +363,7 @@ class EventField extends \Cx\Model\Base\EntityBase {
     /**
      * Get event
      *
-     * @return Cx\Modules\Calendar\Model\Entity\Event $event
+     * @return \Cx\Modules\Calendar\Model\Entity\Event $event
      */
     public function getEvent()
     {

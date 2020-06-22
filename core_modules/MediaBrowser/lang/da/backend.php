@@ -30,7 +30,7 @@
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @access      public
  * @package     cloudrexx
- * @subpackage  coremodule_filebrowser
+ * @subpackage  coremodule_mediabrowser
  */
 $_ARRAYLANG['TXT_CLOSE'] = "Luk";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_1'] = "Mediearkiv #1";
@@ -47,10 +47,8 @@ $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_4'] = "Mediearkiv #4";
 $_ARRAYLANG['TXT_FILEBROWSER_FILES'] = "Filer";
 $_ARRAYLANG['TXT_FILEBROWSER_WEBPAGES'] = "Websider";
 $_ARRAYLANG['TXT_FILEBROWSER_PREVIEW'] = "Forhåndsvisning";
-$_ARRAYLANG['TXT_FILEBROWSER_BLOG'] = "Blog";
 $_ARRAYLANG['TXT_FILEBROWSER_PODCAST'] = "Podcast";
 $_ARRAYLANG['TXT_FILEBROWSER_UPLOAD_FILE_MULTI'] = "Upload file(s)";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIADIR'] = "Media Directory";
 $_ARRAYLANG['TXT_FILEBROWSER_DOWNLOADS'] = "Digital Asset Management";
 $_ARRAYLANG['TXT_FILEBROWSER_START_FILE_UPLOADER'] = "or start File Uploader...";
-?>

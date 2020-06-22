@@ -109,6 +109,18 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
 
         $tplContent = $pdfTemplates->getHtmlContent();
+
+        // parse blocks
+        $tplContent = preg_replace(
+            '/\[\[(BLOCK_[A-Z_0-9]+)\]\]/',
+            '{\1}',
+            $tplContent
+        );
+        \Cx\Modules\Block\Controller\Block::setBlocks($tplContent);
+        $tplContent = $this->getComponent('Cache')->internalEsiParsing(
+            $tplContent
+        );
+
         \Cx\Core\MailTemplate\Controller\MailTemplate::substitute(
             $tplContent,
             $substitution,
@@ -139,6 +151,40 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array(
             'filePath' => $session->getWebTempPath() . '/' . $fileName . '.pdf',
             'fileName' => $fileName . '.pdf'
+        );
+    }
+
+    /**
+     * https://stackoverflow.com/questions/39120906/mpdf-use-another-font-without-editing-the-package-files
+     */
+    public function postComponentLoad()
+    {
+        if (
+            defined('_MPDF_TTFONTPATH') ||
+            defined('_MPDF_SYSTEM_TTFONTS_CONFIG')
+        ) {
+            return;
+        }
+        define(
+            '_MPDF_TTFONTPATH',
+            $this->cx->getWebsiteDocumentRootPath() . \Cx\Core\Core\Controller\Cx::FOLDER_NAME_MEDIA
+                . '/Pdf/ttfonts/'
+        );
+        define(
+            '_MPDF_SYSTEM_TTFONTS_CONFIG',
+            $this->getDirectory() . '/Controller/clx_config.php'
+        );
+        if (
+            defined('_MPDF_SYSTEM_TTFONTS')
+        ) {
+            return;
+        }
+        define(
+            '_MPDF_SYSTEM_TTFONTS',
+            ltrim(
+                $this->cx->getLibraryFolderName(),
+                '/'
+            ) . '/mpdf/ttfonts/'
         );
     }
 }

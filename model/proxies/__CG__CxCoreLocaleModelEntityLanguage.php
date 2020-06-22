@@ -299,6 +299,28 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function addLocaleRelatedBySourceLanguage(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addLocaleRelatedBySourceLanguage', array($localeRelatedBySourceLanguages));
+
+        return parent::addLocaleRelatedBySourceLanguage($localeRelatedBySourceLanguages);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeLocaleRelatedBySourceLanguage(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeLocaleRelatedBySourceLanguage', array($localeRelatedBySourceLanguages));
+
+        return parent::removeLocaleRelatedBySourceLanguage($localeRelatedBySourceLanguages);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addLocaleRelatedBySourceLanguages(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedBySourceLanguages)
     {
 
@@ -316,6 +338,28 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLocaleRelatedBySourceLanguages', array());
 
         return parent::getLocaleRelatedBySourceLanguages();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addLocaleRelatedByIso1(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addLocaleRelatedByIso1', array($localeRelatedByIso1s));
+
+        return parent::addLocaleRelatedByIso1($localeRelatedByIso1s);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeLocaleRelatedByIso1(\Cx\Core\Locale\Model\Entity\Locale $localeRelatedByIso1s)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeLocaleRelatedByIso1', array($localeRelatedByIso1s));
+
+        return parent::removeLocaleRelatedByIso1($localeRelatedByIso1s);
     }
 
     /**
@@ -382,6 +426,17 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

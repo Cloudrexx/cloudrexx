@@ -147,7 +147,10 @@ window.setTimeout("go()", 3000);
             Html::getHidden('custom', $order_id).
             Html::getHidden('notify_url', $notify_url).
             Html::getHidden('return', $return).
-            Html::getHidden('cancel_return', $cancel_return).
+            // PayPal does no longer use 'return' by default for successfull payments.
+            // Instead is uses 'cancel_return'. Therefore we simply set the success-link
+            // as cancel-link
+            Html::getHidden('cancel_return', $return).
             $_ARRAYLANG['TXT_PAYPAL_SUBMIT'].'<br /><br />'.
             '<input type="submit" name="submitbutton" value="'.
             $_ARRAYLANG['TXT_PAYPAL_SUBMIT_BUTTON'].

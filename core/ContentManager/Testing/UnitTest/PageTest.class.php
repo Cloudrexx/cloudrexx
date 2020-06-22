@@ -290,6 +290,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
                 true,   // includeName
                 true,   // includeMetaData
                 true,   // includeProtection
+                true,   // includeEditingStatus
                 false,  // followRedirects
                 true    // followFallbacks
         );

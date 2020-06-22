@@ -63,14 +63,13 @@ class GuestBookManager extends GuestBookLibrary
      */
     function __construct()
     {
-        global  $objDatabase, $_ARRAYLANG, $objTemplate, $objInit;
+        global $_ARRAYLANG, $objTemplate, $objInit;
 
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/GuestBook/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $this->imagePath = ASCMS_MODULE_FOLDER;
         $this->langId=$objInit->userFrontendLangId;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_guestbook");
         $this->getSettings();
     }
     private function setNavigation()
@@ -220,7 +219,6 @@ class GuestBookManager extends GuestBookLibrary
             'TXT_FEMALE'        => $_ARRAYLANG['TXT_FEMALE'],
             'TXT_EMAIL'         => $_ARRAYLANG['TXT_EMAIL'],
             'TXT_HOMEPAGE'      => $_ARRAYLANG['TXT_HOMEPAGE'],
-            'TXT_IP_ADDRESS'    => $_ARRAYLANG['TXT_IP_ADDRESS'],
             'TXT_STORE'         => $_ARRAYLANG['TXT_STORE'],
             'TXT_RESET'         => $_ARRAYLANG['TXT_RESET'],
 // TODO: $_ARRAYLANG['txtBackToIndex'] does not exist
@@ -251,7 +249,6 @@ class GuestBookManager extends GuestBookLibrary
             $url = (isset($_POST['url'])&& strlen($_POST['url'])>7) ?  contrexx_addslashes(strip_tags($_POST['url'])) : '';
             $comment = contrexx_addslashes(nl2br($this->addHyperlinking(strip_tags($_POST['comment']))));
             $location = contrexx_addslashes(strip_tags($_POST['location']));
-            $ip = empty($_POST['ip']) ? $_SERVER['REMOTE_ADDR'] : contrexx_addslashes(strip_tags($_POST['ip']));
 
             if (!empty($url)) {
                 if (!\FWValidator::isUri($url)) {
@@ -266,11 +263,11 @@ class GuestBookManager extends GuestBookLibrary
                     INSERT INTO ".DBPREFIX."module_guestbook (
                         forename, name, gender,
                         url, datetime, email, comment,
-                        ip, location, lang_id
+                        location, lang_id
                     ) VALUES (
                         '$forename', '$name', '$gender',
                         '$url', '".date('Y-m-d H:i:s')."', '$mail', '$comment',
-                        '$ip', '$location', '$this->langId'
+                        '$location', '$this->langId'
                     )";
                 $objDatabase->Execute($query);
                 $this->strOkMessage = $_ARRAYLANG['TXT_GUESTBOOK_RECORD_STORED_SUCCESSFUL'];
@@ -309,7 +306,6 @@ class GuestBookManager extends GuestBookLibrary
             'TXT_FEMALE'     => $_ARRAYLANG['TXT_FEMALE'],
             'TXT_EMAIL'      => $_ARRAYLANG['TXT_EMAIL'],
             'TXT_HOMEPAGE'   => $_ARRAYLANG['TXT_HOMEPAGE'],
-            'TXT_IP_ADDRESS' => $_ARRAYLANG['TXT_IP_ADDRESS'],
             'TXT_DATE'       => $_ARRAYLANG['TXT_DATE'],
             'TXT_STORE'      => $_ARRAYLANG['TXT_STORE'],
             'TXT_RESET'      => $_ARRAYLANG['TXT_RESET'],
@@ -325,7 +321,6 @@ class GuestBookManager extends GuestBookLibrary
                                location,
                                email,
                                comment,
-                               ip,
                                datetime
                           FROM ".DBPREFIX."module_guestbook
                          WHERE id = ".intval($_GET['id']);
@@ -346,7 +341,6 @@ class GuestBookManager extends GuestBookLibrary
                     'GUESTBOOK_LOCATION'  => htmlentities($objResult->fields["location"], ENT_QUOTES, CONTREXX_CHARSET),
                     'GUESTBOOK_MAIL'      => htmlentities($objResult->fields["email"], ENT_QUOTES, CONTREXX_CHARSET),
                     'GUESTBOOK_COMMENT'   => $objResult->fields["comment"],
-                    'GUESTBOOK_IP'       => htmlentities($objResult->fields["ip"], ENT_QUOTES, CONTREXX_CHARSET),
                     'GUESTBOOK_DATE'         => $objResult->fields["datetime"],
                     'GUESTBOOK_ID'        => $objResult->fields["id"]
                 ));
@@ -425,7 +419,7 @@ class GuestBookManager extends GuestBookLibrary
 
         $query = "
             SELECT id, status, forename, name, gender,
-                   url, email, comment, ip, location,
+                   url, email, comment, location,
                    datetime
               FROM ".DBPREFIX."module_guestbook".
                     ($this->arrSettings['guestbook_only_lang_entries']
@@ -466,7 +460,6 @@ class GuestBookManager extends GuestBookLibrary
                        'GUESTBOOK_MAIL'     => $mail,
                        'GUESTBOOK_COMMENT'  => nl2br($objResult->fields["comment"]),
                        'GUESTBOOK_ID'       => $objResult->fields["id"],
-                       'GUESTBOOK_IP'       => "<a href='?cmd=NetTools&amp;tpl=whois&amp;address=".htmlentities($objResult->fields["ip"], ENT_QUOTES, CONTREXX_CHARSET)."' alt='".$_ARRAYLANG['TXT_SHOW_DETAILS']."' title='".$_ARRAYLANG['TXT_SHOW_DETAILS']."'>".htmlentities($objResult->fields["ip"], ENT_QUOTES, CONTREXX_CHARSET)."</a>"
             ));
             $this->_objTpl->parse('guestbook_row');
             $i++;
@@ -498,7 +491,6 @@ class GuestBookManager extends GuestBookLibrary
             $url = (isset($_POST['url'])&& strlen($_POST['url'])>7) ?  contrexx_addslashes(strip_tags($_POST['url'])) : "";
             $comment  = contrexx_addslashes(strip_tags($_POST['comment']));
             $location = contrexx_addslashes(strip_tags($_POST['location']));
-            $ip       = contrexx_addslashes(strip_tags($_POST['ip']));
             $date     = contrexx_addslashes(strip_tags($_POST['datetime']));
 
             $objValidator = new \FWValidator();
@@ -520,7 +512,6 @@ class GuestBookManager extends GuestBookLibrary
                                    url='$url',
                                    comment='$comment',
                                    location='$location',
-                                   ip='$ip',
                                    datetime='$date',
                                    lang_id='$this->langId'
                              WHERE id=$guestbookId";

@@ -272,8 +272,7 @@ die("Mail::deleteTemplate(): Obsolete method called!");
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_mail_content
              WHERE tpl_id=$template_id");
         if (!$objResult) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_mail");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_mail_content");
+
         return true;
     }
 

@@ -67,8 +67,8 @@ class MoveCommand extends Command {
      * @param array $arguments Array of commandline arguments
      */
     public function execute(array $arguments) {
-        $oldComponent = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[3], $arguments[2]);
-        $newComponent = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[5], $arguments[4]);
+        $oldComponent = new ReflectionComponent($arguments[3], $arguments[2]);
+        $newComponent = new ReflectionComponent($arguments[5], $arguments[4]);
 
         if ($oldComponent == $newComponent) {
             $this->interface->show('Nothing to do');

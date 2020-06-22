@@ -45,13 +45,70 @@ namespace Cx\Core_Modules\Privacy\Controller;
  * @subpackage  coremodule_privacy
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+
+    /**
+     * {@inheritdoc}
+     */
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('EsiWidget');
     }
 
-     /**
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson() {
+        return array('EsiWidgetController');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        $widgetController->registerWidget(
+            // TODO: Set correct ESI variables
+            new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                'COOKIE_NOTE'
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            return;
+        }
+        if (
+            \Cx\Core\Setting\Controller\Setting::getValue(
+                'cookieNote',
+                'Config'
+            ) != 'on'
+        ) {
+            return;
+        }
+        \JS::registerCode(
+            'var cookieNoteTtl = "' .
+            \Cx\Core\Setting\Controller\Setting::getValue(
+                'cookieNoteTtl',
+                'Config'
+            ) . '";'
+        );
+        \JS::registerCSS(substr($this->getDirectory(false, true) . '/View/Style/Frontend.css', 1));
+        \JS::registerJS(substr($this->getDirectory(false, true) . '/View/Script/Frontend.js', 1));
+        $this->cx->getTemplate()->_blocks['__global__'] = preg_replace(
+            '#</body[^>]*>#',
+            '{COOKIE_NOTE}\\0',
+            $this->cx->getTemplate()->_blocks['__global__']
+        );
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page

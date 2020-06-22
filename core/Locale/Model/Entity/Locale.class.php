@@ -63,7 +63,7 @@ class Locale extends \Cx\Model\Base\EntityBase {
     protected $orderNo;
 
     /**
-     * @var \Cx\Core\Locale\Model\Entity\Locale
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $locales;
 
@@ -88,7 +88,7 @@ class Locale extends \Cx\Model\Base\EntityBase {
     protected $sourceLanguage;
 
     /**
-     * @var \Cx\Core\View\Model\Entity\Frontend
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $frontends;
 
@@ -151,6 +151,29 @@ class Locale extends \Cx\Model\Base\EntityBase {
     public function getOrderNo()
     {
         return $this->orderNo;
+    }
+
+    /**
+     * Add locales
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $locales
+     * @return Locale
+     */
+    public function addLocale(\Cx\Core\Locale\Model\Entity\Locale $locales)
+    {
+        $this->locales[] = $locales;
+
+        return $this;
+    }
+
+    /**
+     * Remove locales
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $locales
+     */
+    public function removeLocale(\Cx\Core\Locale\Model\Entity\Locale $locales)
+    {
+        $this->locales->removeElement($locales);
     }
 
     /**
@@ -251,6 +274,29 @@ class Locale extends \Cx\Model\Base\EntityBase {
     public function getSourceLanguage()
     {
         return $this->sourceLanguage;
+    }
+
+    /**
+     * Add frontends
+     *
+     * @param \Cx\Core\View\Model\Entity\Frontend $frontends
+     * @return Locale
+     */
+    public function addFrontend(\Cx\Core\View\Model\Entity\Frontend $frontends)
+    {
+        $this->frontends[] = $frontends;
+
+        return $this;
+    }
+
+    /**
+     * Remove frontends
+     *
+     * @param \Cx\Core\View\Model\Entity\Frontend $frontends
+     */
+    public function removeFrontend(\Cx\Core\View\Model\Entity\Frontend $frontends)
+    {
+        $this->frontends->removeElement($frontends);
     }
 
     /**

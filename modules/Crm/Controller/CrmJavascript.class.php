@@ -71,7 +71,6 @@ class CrmJavascript {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
 
 
-        $TXT_ENTER_CURRENCY_FIELD = $_ARRAYLANG['TXT_ENTER_CURRENCY_FIELD'];
         $TXT_NAME_FIELD_SHOULD_HAVE_ALPHA = $_ARRAYLANG['TXT_NAME_FIELD_SHOULD_HAVE_ALPHA'];
         $TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY =$_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY'];
         $TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES = $_ARRAYLANG['TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES'];
@@ -153,7 +152,6 @@ function checkValidations() {
     var name   = document.getElementById("name").value;
     var sorting = document.getElementById("sortingNumber").value;
     if(trim(name)=="") {
- //       alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
 //        return false;
@@ -201,7 +199,6 @@ function checkValidationsEdit() {
      var name   = document.getElementById("name").value;
      var sorting = document.getElementById("sortingNumber").value;
     if(trim(name)=="") {
-//        alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
         //return false;
@@ -347,8 +344,6 @@ END;
     {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
 
-
-        $TXT_ENTER_CURRENCY_FIELD = $_ARRAYLANG['TXT_ENTER_CURRENCY_FIELD'];
         $TXT_NAME_FIELD_SHOULD_HAVE_ALPHA = $_ARRAYLANG['TXT_NAME_FIELD_SHOULD_HAVE_ALPHA'];
         $TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY =$_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY'];
         $TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES = $_ARRAYLANG['TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES'];
@@ -429,7 +424,6 @@ function checkValidations() {
     var name   = document.getElementById("name").value;
     var sorting = document.getElementById("sortingNumber").value;
     if(trim(name)=="") {
- //       alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
 //        return false;
@@ -478,7 +472,6 @@ function checkValidationsEdit() {
      var name   = document.getElementById("name").value;
      var sorting = document.getElementById("sortingNumber").value;
     if(trim(name)=="") {
-//        alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
         //return false;

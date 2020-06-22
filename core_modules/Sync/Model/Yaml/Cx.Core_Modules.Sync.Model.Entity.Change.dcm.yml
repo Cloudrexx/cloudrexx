@@ -27,15 +27,18 @@ Cx\Core_Modules\Sync\Model\Entity\Change:
   manyToOne:
     sync:
       targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+      inversedBy: changes
       joinColumn:
         name: sync_id
         referencedColumnName: id
+        nullable: false
     originSync:
       targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
-      inversedBy: changes
+      inversedBy: originChanges
       joinColumn:
         name: origin_sync_id
         referencedColumnName: id
+        nullable: false
   manyToMany:
     hosts:
       targetEntity: Cx\Core_Modules\Sync\Model\Entity\Host

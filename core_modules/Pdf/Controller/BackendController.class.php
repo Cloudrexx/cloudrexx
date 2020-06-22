@@ -128,6 +128,18 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             '_ACT_' . $classIdentifier
         );
 
+        // list of mPdf placemarkers
+        // see https://mpdf.github.io/what-else-can-i-do/replaceable-aliases.html
+        $mPdfPlacemarkers = array(
+            'nb',
+            'nbpg',
+            'PAGENO',
+            'DATE\s.+',
+            'colsum(?:\s\d+)?',
+            'iteration\s[a-z0-9]+',
+        );
+        $mPdfPlacemarkersRegexp = '(' . join('|', $mPdfPlacemarkers) . ')';
+
         return array(
             'header'     => $_ARRAYLANG[$placeholderPrefix],
             'entityName' => $_ARRAYLANG[$placeholderPrefix . '_ENTITY'],
@@ -194,10 +206,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         $length,
                         $value,
                         $options
-                    ) {
+                    ) use ($mPdfPlacemarkersRegexp) {
+                        // escape mPdf placemarkers
+                        $regexp = '/\{' . $mPdfPlacemarkersRegexp . '\}/';
+                        $value = preg_replace($regexp, '[[\1]]', $value);
                         $editor = new \Cx\Core\Wysiwyg\Wysiwyg(
                             $name,
-                            $value,
+                            contrexx_raw2xhtml($value),
                             'full'
                         );
                         $span   = new \Cx\Core\Html\Model\Entity\HtmlElement(
@@ -207,6 +222,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             new \Cx\Core\Html\Model\Entity\TextElement($editor)
                         );
                         return $span;
+                    },
+                    'storecallback' => function($value) use ($mPdfPlacemarkersRegexp) {
+                        // unescape mPdf placemarkers
+                        $regexp = '/\[\[' . $mPdfPlacemarkersRegexp . '\]\]/';
+                        return preg_replace($regexp, '{\1}', $value);
                     }
                 ),
             ),

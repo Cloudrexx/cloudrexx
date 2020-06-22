@@ -666,6 +666,8 @@ class DBG
 
     static function dump($val)
     {
+        global $_CONFIG;
+
         if (!self::$enable_dump) return;
 
         self::_escapeDoctrineDump($val);
@@ -677,14 +679,20 @@ class DBG
         if ($val === null) {
             $out = 'NULL';
         } else {
-            $out = var_export($val, true);
+            $out = stripslashes(var_export($val, true));
         }
         $out = str_replace("\n", "\n        ", $out);
         if (!self::$log_file && !self::$log_memory && php_sapi_name() != 'cli') {
             // we're logging directly to the browser
             // can't use contrexx_raw2xhtml() here, because it might not
             // have been loaded till now
-            self::_log('DUMP:   <p><pre>'.htmlentities($out, ENT_QUOTES, CONTREXX_CHARSET).'</pre></p>');
+            self::_log(
+                'DUMP:   <p><pre>' . htmlentities(
+                    $out,
+                    ENT_QUOTES,
+                    $_CONFIG['coreCharacterEncoding']
+                ) . '</pre></p>'
+            );
         } else {
             self::_log('DUMP:   '.$out);
         }
@@ -812,6 +820,77 @@ class DBG
         }
     }
 
+    /**
+     * Writes the last line of a request to the log
+     * @param \Cx\Core\Core\Controlller\Cx $cx Cx instance of the request
+     * @param bool $cached Whether this request is answered from cache
+     * @param string $outputModule (optional) Name of the output module
+     */
+    public static function writeFinishLine(
+        \Cx\Core\Core\Controller\Cx $cx,
+        bool $cached,
+        string $outputModule = ''
+    ) {
+        $requestInfo = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+        $requestIp = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+        $requestIpParts = explode('.', $requestIp);
+        end($requestIpParts);
+        $requestIpParts[key($requestIpParts)] = '[...]';
+        $requestIp = implode('.', $requestIpParts);
+        $requestHost = isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : $requestIp;
+        $requestUserAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $cachedStr = $cached ? 'cached' : 'uncached';
+        $userHash = '';
+        $stats = $cx->getComponent(
+            'Stats'
+        );
+        if ($stats) {
+            $counter = $stats->getCounterInstance();
+            if ($counter) {
+                $userHash = $counter->getUniqueUserId();
+            }
+        }
+
+        // fetch parsed response code
+        if ($cx->getResponse()) {
+            $httpResponseCode = $cx->getResponse()->getCode();
+        } else {
+            // as fallback fetch response code from set headers
+            $httpResponseCode = http_response_code();
+        }
+
+        register_shutdown_function(
+            function() use (
+                $cx,
+                $requestInfo,
+                $requestIp,
+                $requestHost,
+                $requestUserAgent,
+                $cachedStr,
+                $userHash,
+                $outputModule,
+                $httpResponseCode
+            ) {
+                $parsingTime = $cx->stopTimer();
+                $format = '(Cx: %1$s) Request parsing completed after %2$s "%3$s" "%4$s" "%5$s" "%6$s" "%7$s" "%8$s" "%9$s" "%10$s" "%11$s"';
+                $log = sprintf(
+                    $format,
+                    $cx->getId(),
+                    $parsingTime,
+                    $cachedStr,
+                    $requestInfo,
+                    $requestIp,
+                    $requestHost,
+                    $requestUserAgent,
+                    memory_get_peak_usage(true),
+                    $userHash,
+                    $outputModule,
+                    $httpResponseCode
+                );
+                \DBG::log($log);
+            }
+        );
+    }
 
     static function log($text, $firephp_action='log', $additional_args=null)
     {
@@ -864,7 +943,11 @@ class DBG
             }
             self::$memory_logs[] = date($dateFormat).' '.$text;
         } else {
-            echo $text.'<br />';
+            if (php_sapi_name() == 'cli') {
+                echo $text . PHP_EOL;
+            } else {
+                echo $text . '<br />';
+            }
             // force log message output
             if (ob_get_level()) {
                 ob_flush();
@@ -912,6 +995,8 @@ class DBG
 
     public static function logSQL($sql, $forceOutput = false)
     {
+        global $_CONFIG;
+
         $error = preg_match('#^[0-9]+:#', $sql);
 
         if ($error) {
@@ -948,10 +1033,19 @@ class DBG
                     break;
             }
         }
-        if (!self::$log_file && !self::$log_firephp && !self::$log_memory) {
+        if (
+            !self::$log_file &&
+            !self::$log_firephp &&
+            !self::$log_memory &&
+            php_sapi_name() != 'cli'
+        ) {
             // can't use contrexx_raw2xhtml() here, because it might not
             // have been loaded till now
-            $sql = htmlentities($sql, ENT_QUOTES, CONTREXX_CHARSET);
+            $sql = htmlentities(
+                $sql,
+                ENT_QUOTES,
+                $_CONFIG['coreCharacterEncoding']
+            );
         }
 
         self::_log('SQL: '.$sql, $status);
@@ -974,18 +1068,30 @@ class DBG
      * Reset the text that is being put in front of log messags
      */
     public static function resetLogPrefix() {
-        self::$setLogPrefix();
+        self::setLogPrefix();
+    }
+
+    public static function getLogHash() {
+        return self::$logHash;
     }
 }
 
 function DBG_log_adodb($msg)
 {
+    global $_CONFIG;
+
     if (strpos($msg, 'password') !== false) {
         DBG::logSQL('*LOGIN (query suppressed)*');
         return;
     }
 
-    $msg = trim(html_entity_decode(strip_tags($msg), ENT_QUOTES, CONTREXX_CHARSET));
+    $msg = trim(
+        html_entity_decode(
+            strip_tags($msg),
+            ENT_QUOTES,
+            $_CONFIG['coreCharacterEncoding']
+        )
+    );
     $sql = preg_replace('#^\([^\)]+\):\s*#', '', $msg);
     DBG::logSQL($sql);
 }

@@ -311,9 +311,9 @@ class FTPFile implements FileInterface
             // unable to use memory as temporary storage location,
             // try to create file in the session temp path
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $sessionObj = $cx->getComponent('Session')->getSession();
+            $session = $cx->getComponent('Session')->getSession();
 
-            $sessionTempPath = $_SESSION->getTempPath();
+            $sessionTempPath = $session->getTempPath();
             $pathInfo = pathinfo($this->file);
             $tempFile = $sessionTempPath.'/'.$pathInfo['basename'];
             $idx = 1;

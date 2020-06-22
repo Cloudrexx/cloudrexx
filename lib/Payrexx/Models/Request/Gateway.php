@@ -40,6 +40,22 @@ class Gateway extends \Payrexx\Models\Base
      * optional
      *
      * @access  protected
+     * @var     array
+     */
+    protected $pm;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     bool
+     */
+    protected $preAuthorization = false;
+
+    /**
+     * optional
+     *
+     * @access  protected
      * @var     string
      */
     protected $referenceId;
@@ -51,6 +67,14 @@ class Gateway extends \Payrexx\Models\Base
      * @var     array
      */
     protected $fields;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     string
+     */
+    protected $concardisOrderId;
 
     /**
      * mandatory
@@ -135,6 +159,46 @@ class Gateway extends \Payrexx\Models\Base
 
     /**
      * @access  public
+     * @return  array
+     */
+    public function getPm()
+    {
+        return $this->pm;
+    }
+
+    /**
+     * Set payment mean to use.
+     *
+     * @access  public
+     * @param   array   $pm
+     */
+    public function setPm($pm)
+    {
+        $this->pm = $pm;
+    }
+
+    /**
+     * @access  public
+     * @return  bool
+     */
+    public function getPreAuthorization()
+    {
+        return $this->preAuthorization;
+    }
+
+    /**
+     *  Whether charge payment manually at a later date.
+     *
+     * @access  public
+     * @param   bool    $preAuthorization
+     */
+    public function setPreAuthorization($preAuthorization)
+    {
+        $this->preAuthorization = $preAuthorization;
+    }
+
+    /**
+     * @access  public
      * @return  string
      */
     public function getReferenceId()
@@ -182,6 +246,26 @@ class Gateway extends \Payrexx\Models\Base
             'value' => $value,
             'name' => $name,
         );
+    }
+
+    /**
+     * @access  public
+     * @return  string
+     */
+    public function getConcardisOrderId()
+    {
+        return $this->concardisOrderId;
+    }
+
+    /**
+     * Set a custom order ID for the Concardis PSPs
+     *
+     * @access  public
+     * @param   string  $concardisOrderId
+     */
+    public function setConcardisOrderId($concardisOrderId)
+    {
+        $this->concardisOrderId = $concardisOrderId;
     }
 
     /**

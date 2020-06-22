@@ -343,6 +343,28 @@ class Relation extends \Cx\Core_Modules\Sync\Model\Entity\Relation implements \D
     /**
      * {@inheritDoc}
      */
+    public function addChild(\Cx\Core_Modules\Sync\Model\Entity\Relation $children)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addChild', array($children));
+
+        return parent::addChild($children);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeChild(\Cx\Core_Modules\Sync\Model\Entity\Relation $children)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeChild', array($children));
+
+        return parent::removeChild($children);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setChildren($children)
     {
 
@@ -459,6 +481,17 @@ class Relation extends \Cx\Core_Modules\Sync\Model\Entity\Relation implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

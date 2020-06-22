@@ -1144,7 +1144,6 @@ class Forum extends ForumLibrary {
                         ));
                         $success = true;
                         $suffix = '';
-                        \Env::get('cx')->getPage()->setTitle($_ARRAYLANG['TXT_FORUM_THREAD_ACTION_MOVE']);
                     break;
                     case 'close':
                         $query = "UPDATE `".DBPREFIX."module_forum_postings` SET `is_locked` = IF(`is_locked` = '0' OR `is_locked` = '', '1', '0') WHERE thread_id = ".intval($_REQUEST['id']);
@@ -1180,6 +1179,36 @@ class Forum extends ForumLibrary {
             $this->_objTpl->hideBlock('threadActions');
         }
         return true;
+    }
+
+    /**
+     * Get page title by thread id
+     *
+     * @return string
+     */
+    public function getPageTitle()
+    {
+        global $_ARRAYLANG;
+
+        $threadId = contrexx_input2int($_GET['id']);
+        if (
+            empty($_REQUEST['thread_actions']) ||
+            $_REQUEST['thread_actions'] !== 'move'
+        ) {
+            return;
+        }
+
+        if (!empty($_REQUEST['category_id'])) {
+            $catId = contrexx_input2int($_REQUEST['category_id']);
+        } else {
+            $catId = $this->_getCategoryIdFromThread($threadId);
+        }
+
+        if (!$this->_checkAuth($catId, 'move')) {
+            return;
+        }
+
+        return $_ARRAYLANG['TXT_FORUM_THREAD_ACTION_MOVE'];
     }
 
     /**

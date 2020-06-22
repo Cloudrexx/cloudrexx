@@ -518,7 +518,7 @@ class Website extends \Cx\Model\Base\EntityBase {
         global $_DBCONFIG, $_ARRAYLANG, $_CORELANG;
         
         \DBG::msg('Website::setup()');
-        \DBG::msg($options);
+        \DBG::dump($options);
         \DBG::msg('change Website::$status from "'.$this->status.'" to "'.self::STATE_SETUP.'"');
         $this->status = self::STATE_SETUP;
         \Env::get('em')->persist($this);
@@ -1298,7 +1298,7 @@ throw new WebsiteException('implement secret-key algorithm first!');
         $this->websiteController->createDb($objDb, $objDbUser);
 
         //call core db class to create db connection object
-        $dbClass = new \Cx\Core\Model\Db($objDb, $objDbUser);
+        $dbClass = new \Cx\Core\Model\Db($objDb, $objDbUser, null);
         $websitedb = $dbClass->getAdoDb();       
 
         return $websitedb;

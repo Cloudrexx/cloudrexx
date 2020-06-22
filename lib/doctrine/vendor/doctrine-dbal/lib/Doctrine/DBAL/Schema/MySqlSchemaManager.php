@@ -97,7 +97,7 @@ class MySqlSchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableColumnDefinition($tableColumn)
+    protected function _getPortableTableColumnDefinition($tableColumn, $table = '')
     {
         $tableColumn = array_change_key_case($tableColumn, CASE_LOWER);
 
@@ -175,6 +175,18 @@ class MySqlSchemaManager extends AbstractSchemaManager
             $options['precision'] = $precision;
         }
 
+        // CUSTOMIZING BY CLOUDREXX TO REVERSE LOOKUP ENUM TYPES
+        if (!empty($table)) {
+            $type = \Cx\Core\Model\Controller\YamlDriver::reverseLookupEnumType(
+                $table,
+                $tableColumn['field'],
+                $type
+            );
+        } else {
+            // passing $table to this method is a customizing
+            // if we did not get all usages we'd like to know:
+            \DBG::msg('$table not passed to ' . __CLASS__ . '::' . __METHOD__);
+        }
         return new Column($tableColumn['field'], \Doctrine\DBAL\Types\Type::getType($type), $options);
     }
 

@@ -217,3 +217,5 @@ $_ARRAYLANG['TXT_THEME_TEMPLATEEDITOR_EDIT'] = 'Anpassen';
 $_ARRAYLANG['TXT_THEME_ERROR_IN_INSERT_THEME'] = 'Das Template konnte nicht in der Datenbank gespeichert werden.';
 $_ARRAYLANG['TXT_UNABLE_TO_CONVERT_THEME_TO_COMPONENT'] = 'Das Template konnte nicht korrekt eingelesen werden. Stellen Sie sicher das auf das Verzeichnis im Dateisystem Schreibzugriff besteht.';
 $_ARRAYLANG['TXT_CORE_VIEWMANAGER_LOADING'] = "Laden...";
+$_ARRAYLANG['TXT_VIEWMANAGER_INVALID_FILE_ENCODING_MSG'] = "Achtung: Die Datei %s enthält ungültige Zeichen (Code Unit Sequenzen). Die ungültigen Zeichen wurden mit einem Unicode Ersatz Zeichen (U+FFFD) ersetzt.";
+$_ARRAYLANG['TXT_VIEWMANAGER_CONFIRM_INVALID_FILE_ENCODING'] = "Mit dem Speichervorgang gehen die ungültigen Zeichen verloren. Wollen Sie die Datei trotzdem speichern?";

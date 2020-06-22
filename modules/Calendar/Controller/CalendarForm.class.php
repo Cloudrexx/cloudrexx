@@ -37,6 +37,17 @@
 namespace Cx\Modules\Calendar\Controller;
 
 /**
+ * Exception class for if a transaction needs to be cancelled
+ * 
+ * @package    cloudrexx
+ * @subpackage module_calendar
+ * @author     Michael Ritter <michael.ritter@cloudrexx.com>
+ * @copyright  CLOUDREXX CMS - CLOUDREXX AG
+ * @version    1.00
+ */
+class TransactionFailedException extends \Exception {}
+
+/**
  * Calendar Class CalendarForm
  * 
  * @package    cloudrexx
@@ -434,7 +445,7 @@ class CalendarForm extends CalendarLibrary
         }
 
         if (intval($this->id) != 0) {
-            if (!self::saveInputfields($form, $inputFields)) {
+            if (!$this->saveInputfields($form, $inputFields)) {
                 return false;
             }
             if ($id == 0) {
@@ -453,60 +464,203 @@ class CalendarForm extends CalendarLibrary
     }
 
     /**
-     * save the form input fields
+     * Save the form input fields
      *      
-     * @param array $data
-     * 
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationForm $form Current form
+     * @param array $data Data to save
+     * @param boolean $hasChange (optional, reference) This is set to true if there's a change to the database
      * @return boolean true on success false otherwise
      */
-    function saveInputfields(
+    protected function saveInputfields(
         \Cx\Modules\Calendar\Model\Entity\RegistrationForm $form,
-        $data
-    ){
-        global $objDatabase;
+        $data,
+        &$hasChange = false
+    ) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objDatabase = $cx->getDb()->getAdoDb();
 
         $formFields = $form->getRegistrationFormFields();
-        foreach ($formFields as $formField) {
-            $formFieldNames = $formField->getRegistrationFormFieldNames();
-            foreach ($formFieldNames as $formFieldName) {
-                //Trigger preRemove event for FormFieldName Entity
-                $this->triggerEvent('model/preRemove', $formFieldName);
-            }
-            //Trigger preRemove event for FormField Entity
-            $this->triggerEvent('model/preRemove', $formField);
-        }
-        $query = '
-            DELETE
-                fn.*, ff.*
-            FROM
-                `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field_name` AS fn,
-                `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field` AS ff
-            WHERE
-                fn.`form_id` = '. contrexx_input2int($this->id) .'
-            AND
-                ff.`form` ='. contrexx_input2int($this->id) .'
-        ';
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) {
-            return false;
-        } else {
-            foreach ($formFields as $formField) {
-                $formFieldNames = $formField->getRegistrationFormFieldNames();
-                foreach ($formFieldNames as $formFieldName) {
-                    //Trigger postRemove event for FormFieldName Entity
-                    $this->triggerEvent('model/postRemove', $formFieldName);
-                }
-                //Trigger postRemove event for FormField Entity
-                $this->triggerEvent('model/postRemove', $formField);
-            }
-            $this->triggerEvent('model/postFlush');
+        // STEP 1: Create diff between db and $data fields
+        $changedFields = array();
+        $deletedFields = array();
+        $createdFields = array();
+
+        $this->createRegistrationFormFieldsDiff(
+            $form,
+            $formFields,
+            $data,
+            $changedFields,
+            $deletedFields,
+            $createdFields
+        );
+        $hasChange = count($changedFields) || count($deletedFields) ||
+            count($createdFields);
+        if (!$hasChange) {
+            return true;
         }
 
-        foreach ($data as $fieldId => $fieldValues) {
+        // STEP 2: Apply diff to database
+        $objDatabase->startTrans();
+        try {
+            $this->applyRegistrationFormFieldsDiffToDb(
+                $form,
+                $changedFields,
+                $deletedFields,
+                $createdFields
+            );
+
+            // commit transaction
+            $objDatabase->completeTrans();
+            //  trigger postFlush
+            $this->triggerEvent('model/postFlush');
+        } catch (TransactionFailedException $e) {
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
+            return false;
+        } catch (\Throwable $e) {
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
+            throw $e;
+        }
+        return true;
+    }
+
+    /**
+     * Applies a diff calculated with createRegistrationFormFieldsDiff()
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationForm $form Current form
+     * @param array $changedFields FieldID=>Array of field data of fields with a change
+     * @param array $deletedFields FieldID=>List of field entities to delete
+     * @param array $createdFields FieldID=>Array of field data of new fields
+     * @throws TransactionFailedException on SQL error
+     */
+    protected function applyRegistrationFormFieldsDiffToDb(
+        $form,
+        $changedFields,
+        $deletedFields,
+        $createdFields
+    ) {
+        $tablePrefix = DBPREFIX . 'module_' . $this->moduleTablePrefix .
+            '_registration_form';
+        // drop fields
+        foreach ($deletedFields as $fieldId=>$field) {
+            // delete data
+            foreach (
+                array(
+                    'field_value' => array(
+                        'conditionField' => 'field_id',
+                        'entities' => $field->getRegistrationFormFieldValues(),
+                    ),
+                    'field_name' => array(
+                        'conditionField' => 'field_id',
+                        'entities' => $field->getRegistrationFormFieldNames(),
+                    ),
+                    'field' => array(
+                        'conditionField' => 'id',
+                        'entities' => array($field),
+                    ),
+                ) as $tableSuffix => $params
+            ) {
+                $this->executeLegacySqlWithDoctrineEvents(
+                    $params['entities'],
+                    'Remove',
+                    'DELETE FROM
+                        `' . $tablePrefix . '_' . $tableSuffix . '`
+                    WHERE
+                        `' . $params['conditionField'] . '` = ' . $fieldId
+                );
+            }
+        }
+        // update fields
+        $this->executeSqlWithDoctrineEventsFormFormField(
+            $form,
+            $changedFields,
+            'Update',
+            function($fieldValue) use ($tablePrefix, $form) {
+                return '
+                    UPDATE
+                        `'. $tablePrefix .'_field`
+                    SET
+                        `type` = "'. $fieldValue['type'] .'",
+                        `required` = '. $fieldValue['required'] .',
+                        `order` = '. $fieldValue['order'] .',
+                        `affiliation` = "'. $fieldValue['affiliation'] .'"
+                    WHERE
+                        `id` = '. $fieldValue['id'] .' AND
+                        `form` = '. $form->getId() .'
+                ';
+            },
+            function($fieldNameData) use ($tablePrefix) {
+                return '
+                    UPDATE
+                        `' . $tablePrefix . '_field_name`
+                    SET
+                        `name` = "'. $fieldNameData['name'] .'",
+                        `default` = "'. $fieldNameData['default'] .'"
+                    WHERE
+                        `field_id` = '. $fieldNameData['fieldId'] . ' AND
+                        `form_id` = '. $fieldNameData['formId'] .' AND
+                        `lang_id` = '. $fieldNameData['langId'] .'
+                ';
+            }
+        );
+        // create fields
+        $this->executeSqlWithDoctrineEventsFormFormField(
+            $form,
+            $createdFields,
+            'Persist',
+            function($fieldValue) use ($tablePrefix, $form) {
+                return '
+                    INSERT INTO
+                        `'. $tablePrefix .'_field`
+                    SET
+                        `id` = '. $fieldValue['id'] .',
+                        `form` = '. $form->getId() .',
+                        `type` = "'. $fieldValue['type'] .'",
+                        `required` = '. $fieldValue['required'] .',
+                        `order` = '. $fieldValue['order'] .',
+                        `affiliation` = "'. $fieldValue['affiliation'] .'"
+                ';
+            },
+            function($fieldNameData) use ($tablePrefix) {
+                return '
+                    INSERT INTO
+                        `' . $tablePrefix . '_field_name`
+                    SET
+                        `field_id` = '. $fieldNameData['fieldId'] . ',
+                        `form_id` = '. $fieldNameData['formId'] .',
+                        `lang_id` = '. $fieldNameData['langId'] .',
+                        `name` = "'. $fieldNameData['name'] .'",
+                        `default` = "'. $fieldNameData['default'] .'"
+                ';
+            }
+        );
+    }
+
+    /**
+     * Creates or updates a form field and its names
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationForm $form Current form
+     * @param array $fieldData FieldID=>Array of field data of new fields or fields with a change
+     * @param string Doctrine event suffix ("Update" or "Persist")
+     * @param callable $fieldQueryCallback Callback to generate the field entity query
+     * @param callable $fieldNameQueryCallback Callback to generate the field name entity query
+     */
+    protected function executeSqlWithDoctrineEventsFormFormField(
+        $form,
+        $fieldData,
+        $eventSuffix,
+        $fieldQueryCallback,
+        $fieldNameQueryCallback
+    ) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objDatabase = $cx->getDb()->getAdoDb();
+
+        // update fields
+        foreach ($fieldData as $fieldId => $fieldValues) {
+            // update field
             $formFieldEntity = $this->getFormFieldEntity($form, $fieldValues);
-            //Trigger prePersist event for FormField Entity
+            // Trigger pre... event for FormField Entity
             $this->triggerEvent(
-                'model/prePersist', $formFieldEntity,
+                'model/pre' . $eventSuffix, $formFieldEntity,
                 array(
                     'relations' => array(
                         'oneToMany' => array(
@@ -523,68 +677,193 @@ class CalendarForm extends CalendarLibrary
                 ), true
             );
             $fieldValue = $fieldValues['fields'];
-            $query = '
-                INSERT INTO
-                    `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field`
-                SET
-                    `id`          =  '. contrexx_input2int($fieldId) .',
-                    `form`        =  '. contrexx_input2int($this->id) .',
-                    `type`        = "'. $fieldValue['type'] .'",
-                    `required`    =  '. $fieldValue['required'] .',
-                    `order`       =  '. $fieldValue['order'] .',
-                    `affiliation` = "'. $fieldValue['affiliation'] .'"
-            ';
-
-            $objResult = $objDatabase->Execute($query);
-
-            if ($objResult === false) {
-                continue;
+            $result = $objDatabase->Execute($fieldQueryCallback($fieldValue));
+            if (!$result) {
+                throw new TransactionFailedException('');
             }
 
-            $formFieldEntity = $this
-                ->em
-                ->getRepository('Cx\Modules\Calendar\Model\Entity\RegistrationFormField')
-                ->findOneById($fieldId);
-            foreach ($fieldValues['formFieldNames'] as $fieldNameValues) {
-                $fieldNameValues['formId']  = $this->id;
-                $fieldNameValues['fieldId'] = $fieldId;
+            // update field_names
+            foreach ($fieldValues['formFieldNames'] as $index=>$fieldNameData) {
                 $formFieldNameEntity = $this->getFormFieldNameEntity(
-                    $formFieldEntity, $fieldNameValues
+                    $formFieldEntity, $fieldNameData
                 );
-                if ($formFieldNameEntity) {
-                    //Trigger prePersist event for FormFieldName Entity
-                    $this->triggerEvent(
-                        'model/prePersist', $formFieldNameEntity,
-                        array(
-                            'relations' => array(
-                                'manyToOne' => 'getRegistrationFormField'
-                            )
-                        ), true
-                    );
-                }
+                //Trigger prePersist event for FormFieldName Entity
+                $this->triggerEvent(
+                    'model/pre' . $eventSuffix, $formFieldNameEntity,
+                    array(
+                        'relations' => array(
+                            'manyToOne' => 'getRegistrationFormField'
+                        )
+                    ), true
+                );
 
-                $query = '
-                    INSERT INTO
-                        `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_registration_form_field_name`
-                    SET
-                        `field_id` =  '. contrexx_input2int($fieldId) . ',
-                        `form_id`  =  '. $fieldNameValues['formId'] .',
-                        `lang_id`  =  '. $fieldNameValues['langId'] .',
-                        `name`     = "'. $fieldNameValues['name'] .'",
-                        `default`  = "'. $fieldNameValues['default'] .'"';
-
-                $objResult = $objDatabase->Execute($query);
-                if ($objResult !== false && $formFieldNameEntity) {
-                    //Trigger postPersist event for FormFieldName Entity
-                    $this->triggerEvent('model/postPersist', $formFieldNameEntity);
+                $result = $objDatabase->Execute(
+                    $fieldNameQueryCallback($fieldNameData)
+                );
+                if (!$result) {
+                    throw new TransactionFailedException('');
                 }
+                //Trigger postPersist event for FormFieldName Entity
+                $this->triggerEvent(
+                    'model/post' . $eventSuffix,
+                    $formFieldNameEntity
+                );
             }
             //Trigger postPersist event for FormField Entity
-            $this->triggerEvent('model/postPersist', $formFieldEntity);
+            $this->triggerEvent('model/post' . $eventSuffix, $formFieldEntity);
         }
-        $this->triggerEvent('model/postFlush');
+    }
 
-        return true;
+    /**
+     * Diffs existing form fields with supplied data
+     * @param \Cx\Modules\Calendar\Model\Entity\RegistrationForm $form Current form
+     * @param array $formFields List of RegistrationFormField entities that exist
+     * @param array $data Data to create diff to
+     * @param array $changedFields (reference) Changed fields will be in this array
+     * @param array $deletedFields (reference) Deleted fields will be in this array
+     * @param array $createdFields (reference) New fields will be in this array
+     */
+    protected function createRegistrationFormFieldsDiff(
+        $form,
+        $formFields,
+        $data,
+        &$changedFields,
+        &$deletedFields,
+        &$createdFields
+    ) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $formFieldRepo = $em->getRepository(
+            'Cx\Modules\Calendar\Model\Entity\RegistrationFormField'
+        );
+        $fieldNameRepo = $em->getRepository(
+            'Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName'
+        );
+        foreach ($formFields as $formField) {
+            if (!isset($data[$formField->getId()])) {
+                if (empty($formField->getId())) {
+                    continue;
+                }
+                // Case b) field exists in db but not in $data: schedule deletion
+                $deletedFields[$formField->getId()] = $formField;
+                unset($data[$formField->getId()]);
+                continue;
+            }
+            // Case a) field exists in db and in $data
+            $hasChange = false;
+            $originalFormField = $formFieldRepo->find($formField->getId());
+            $hasChange = $this->hasChangeInFields(
+                $originalFormField,
+                $formField,
+                array('type', 'required', 'order', 'affiliation')
+            ) || $this->hasChangeInEntityFields(
+                $data[$formField->getId()]['formFieldNames'],
+                function($index, $fieldData) use ($fieldNameRepo) {
+                    return $fieldNameRepo->findOneBy(array(
+                        'fieldId' => $fieldData['fieldId'],
+                        'formId' => $fieldData['formId'],
+                        'langId' => $fieldData['langId'],
+                    ));
+                },
+                function($index, $fieldData) use ($form) {
+                    return $form->getRegistrationFormFieldById(
+                        $fieldData['fieldId']
+                    )->getRegistrationFormFieldNamesByLangId(
+                        $fieldData['langId']
+                    );
+                },
+                array('name', 'default')
+            );
+            // Case a1) field has no change: ignore
+            // Case a2) field has a change: schedule update
+            if ($hasChange) {
+                $changedFields[$formField->getId()] = $data[$formField->getId()];
+            }
+            unset($data[$formField->getId()]);
+        }
+        // Case c) field exists in $data but not in db: schedule insert
+        $createdFields = $data;
+    }
+
+    /**
+     * Determines if a list of data contains a change between old and new entity
+     * 
+     * The callbacks will receive $data's key and value as first and second
+     * argument.
+     * @param array $data Key=>value array of data
+     * @param callable $originalEntityCallback Callback to get the original entity from an entry in $data
+     * @param callable $newEntityCallback Callback to get the new entity from an entry in $data
+     * @param array $fields List of fields to check
+     * @return boolean True if there's at least one change, false otherwise
+     */
+    protected function hasChangeInEntityFields(
+        $data,
+        $originalEntityCallback,
+        $newEntityCallback,
+        $fields
+    ) {
+        foreach ($data as $index=>$fieldData) {
+            if (
+                $this->hasChangeInFields(
+                    $originalEntityCallback($index, $fieldData),
+                    $newEntityCallback($index, $fieldData),
+                    $fields
+                )
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether a set of fields has been changed
+     * @param \Cx\Model\Entity\Base\EntityBase $originalEntity Original entity
+     * @param \Cx\Model\Entity\Base\EntityBase $newEntity New entity
+     * @param array $fields List of fields to check
+     * @return boolean True if there's at least one change, false otherwise
+     */
+    protected function hasChangeInFields($originalEntity, $newEntity, $fields) {
+        foreach ($fields as $property) {
+            $methodBaseName = \Doctrine\Common\Inflector\Inflector::classify(
+                $property
+            );
+            $getter = 'get' . $methodBaseName;
+            if ($originalEntity->$getter() != $newEntity->$getter()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Executes $sql using the legacy database abstraction
+     *
+     * Triggers pre$eventName and post$eventName for all entities in $entities
+     * before/after executing $sql. Throws a TransactionFailedException if
+     * executing $sql was not successful.
+     * @param array $entities List of Doctrine entities
+     * @param string $eventName Doctrine event name without "pre" or "post prefix
+     * @param string $sql SQL to execute
+     * @throws TransactionFailedException If SQL generated an error
+     */
+    protected function executeLegacySqlWithDoctrineEvents($entities, $eventName, $sql) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objDatabase = $cx->getDb()->getAdoDb();
+
+        //  trigger pre... event
+        foreach ($entities as $entity) {
+            $this->triggerEvent('model/pre' . $eventName, $entity);
+        }
+        // execute SQL
+        $result = $objDatabase->Execute($sql);
+        if (!$result) {
+            throw new TransactionFailedException($sql);
+        }
+        //  trigger post... event
+        foreach ($entities as $entity) {
+            $this->triggerEvent('model/post' . $eventName, $entity);
+        }
     }
 
     /**
@@ -866,7 +1145,7 @@ class CalendarForm extends CalendarLibrary
      *
      * @return Cx\Modules\Calendar\Model\Entity\RegistrationForm
      */
-    public function getFormEntity($id, $formDatas)
+    public function getFormEntity($id, $formDatas = array())
     {
         if (empty($id)) {
             $form = new \Cx\Modules\Calendar\Model\Entity\RegistrationForm();

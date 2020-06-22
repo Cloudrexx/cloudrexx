@@ -109,7 +109,6 @@ class MediaManager extends MediaLibrary
                                     ASCMS_THEMES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_ATTACH_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_ACCESS_PATH.DIRECTORY_SEPARATOR,
-                                    ASCMS_BLOG_IMAGES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_CALENDAR_IMAGE_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_DOWNLOADS_IMAGES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_GALLERY_PATH.DIRECTORY_SEPARATOR,
@@ -127,7 +126,6 @@ class MediaManager extends MediaLibrary
                                     'themes'       => ASCMS_THEMES_WEB_PATH . '/',
                                     'attach'       => ASCMS_ATTACH_WEB_PATH. '/',
                                     'Access'       => ASCMS_ACCESS_WEB_PATH . '/',
-                                    'Blog'         => ASCMS_BLOG_IMAGES_WEB_PATH . '/',
                                     'Calendar'     => ASCMS_CALENDAR_IMAGE_WEB_PATH . '/',
                                     'Downloads'    => ASCMS_DOWNLOADS_IMAGES_WEB_PATH . '/',
                                     'Gallery'      => ASCMS_GALLERY_WEB_PATH . '/',
@@ -230,14 +228,6 @@ class MediaManager extends MediaLibrary
                     <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>
                 ');
                 break;
-            case 'Blog':
-                \Permission::checkAccess(119, 'static');
-                $objTemplate->setVariable('CONTENT_NAVIGATION', '
-                    <a href="index.php?cmd=Media&amp;archive=content">'. $_ARRAYLANG['TXT_IMAGE_CONTENT'] .'</a>
-                    <a href="index.php?cmd=Media&amp;archive=attach" class="active">'. $_ARRAYLANG['TXT_MODULE'] .'</a>
-                    <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>
-                ');
-                break;
             case 'Calendar':
                 \Permission::checkAccess(16, 'static');
                 $objTemplate->setVariable('CONTENT_NAVIGATION', '
@@ -288,12 +278,13 @@ class MediaManager extends MediaLibrary
                 break;
             default:
                 \Permission::checkAccess(7, 'static');
+                $act = isset($_GET['act']) ? $_GET['act'] : '';
                 $objTemplate->setVariable('CONTENT_NAVIGATION', '
-                    <a href="index.php?cmd=Media&amp;archive=archive1" ' . ($this->archive == 'archive1' && !isset($_GET['act']) ? ' class="active"' : '') . '>'. $_ARRAYLANG['TXT_MEDIA_ARCHIVE'] .' #1</a>
+                    <a href="index.php?cmd=Media&amp;archive=archive1" ' . ($this->archive == 'archive1' && empty($act) ? ' class="active"' : '') . '>'. $_ARRAYLANG['TXT_MEDIA_ARCHIVE'] .' #1</a>
                     <a href="index.php?cmd=Media&amp;archive=archive2" ' . ($this->archive == 'archive2' ? ' class="active"' : '') . '>'. $_ARRAYLANG['TXT_MEDIA_ARCHIVE'] .' #2</a>
                     <a href="index.php?cmd=Media&amp;archive=archive3" ' . ($this->archive == 'archive3' ? ' class="active"' : '') . '>'. $_ARRAYLANG['TXT_MEDIA_ARCHIVE'] .' #3</a>
                     <a href="index.php?cmd=Media&amp;archive=archive4" ' . ($this->archive == 'archive4' ? ' class="active"' : '') . '>'. $_ARRAYLANG['TXT_MEDIA_ARCHIVE'] .' #4</a>
-                    <a href="index.php?cmd=Media&amp;archive=archive1&amp;act=settings" ' . ($this->archive == 'archive1' && $_GET['act'] == 'settings' ? ' class="active"' : '') . '>' . $_ARRAYLANG['TXT_MEDIA_SETTINGS'] . '</a>
+                    <a href="index.php?cmd=Media&amp;archive=archive1&amp;act=settings" ' . ($this->archive == 'archive1' && $act == 'settings' ? ' class="active"' : '') . '>' . $_ARRAYLANG['TXT_MEDIA_SETTINGS'] . '</a>
                 ');
                 break;
         }
@@ -335,6 +326,35 @@ class MediaManager extends MediaLibrary
     function getMediaPage()
     {
         global $_ARRAYLANG, $objTemplate;
+
+        // drop cache after any modification
+        if (
+            (
+                in_array(
+                    $this->getAct,
+                    array(
+                        'paste',
+                        'ren',
+                        'editImage',
+                        'saveSettings',
+                    )
+                )
+            ) || (
+                $this->getAct == 'newDir' &&
+                isset($_POST['dirName'])
+            ) || (
+                $this->getAct == 'copy' &&
+                isset($_POST['formSelected'])
+            ) || (
+                $this->getAct == 'delete' && (
+                    !empty($this->getFile) ||
+                    isset($_POST['formSelected'])
+                )
+            )
+        ) {
+            // drop complete cache to avoid problems with global placeholders
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
+        }
 
         switch($this->getAct) {
             case 'newDir':
@@ -447,7 +467,6 @@ class MediaManager extends MediaLibrary
                 break;
             case 'attach':
             case 'Access':
-            case 'Blog':
             case 'Calendar':
             case 'Downloads':
             case 'Gallery':
@@ -464,7 +483,6 @@ class MediaManager extends MediaLibrary
                     'Downloads' => 'TXT_DOWNLOADS',
                     'Calendar' => 'TXT_CALENDAR',
                     'Podcast' => 'TXT_PODCAST',
-                    'Blog' => 'TXT_BLOG_MODULE',
                 );
                 $moduleMatchTable = array(
                     'attach' => 'core',
@@ -670,13 +688,13 @@ class MediaManager extends MediaLibrary
                     \Cx\Lib\FileSystem\FileSystem::path_relative_to_root($mediaWebPath);
                     $mediaWebPath = '/'. $mediaWebPath; // Filesystem removes the beginning slash(/)
                 }
-                $file = rawurlencode($fileName);
+                $file = $fileName;
                 if ($key == 'dir') {
-                    $path = rawurlencode($mediaWebPath . $fileName . '/');
+                    $path = $mediaWebPath . $fileName . '/';
                     $previewUrl->setParam('act', null);
                     $previewUrl->setParam('file', null);
                 } elseif ($key == 'file') {
-                    $path = rawurlencode($mediaWebPath);
+                    $path = $mediaWebPath;
 
                     $filePath = $mediaPath . $fileName;
                     if ($this->_isImage($filePath)) {
@@ -687,13 +705,13 @@ class MediaManager extends MediaLibrary
                         $previewUrl->setParam('file', $file);
                     }
                 }
-                $deleteUrl->setParam('path', rawurlencode($mediaWebPath));
+                $deleteUrl->setParam('path', $mediaWebPath);
                 $deleteUrl->setParam('file', $file);
 
-                $renameUrl->setParam('path', rawurlencode($mediaWebPath));
+                $renameUrl->setParam('path', $mediaWebPath);
                 $renameUrl->setParam('file', $file);
 
-                $editUrl->setParam('path', rawurlencode($mediaWebPath));
+                $editUrl->setParam('path', $mediaWebPath);
                 $editUrl->setParam('file', $file);
 
                 if (!$image) {
@@ -793,7 +811,7 @@ class MediaManager extends MediaLibrary
             $uploader->setCallback('mediaCallbackJs');
             $uploader->setFinishedCallback(array(
                 ASCMS_CORE_MODULE_PATH . '/Media/Controller/MediaLibrary.class.php',
-                '\Cx\Core_modules\Media\Controller\MediaLibrary',
+                '\Cx\Core_Modules\Media\Controller\MediaLibrary',
                 'uploadFinished'
             ));
             $uploader->setOptions(//Set html attributes for styling or javascript.
@@ -1117,6 +1135,11 @@ class MediaManager extends MediaLibrary
             'TXT_BUTTON_SAVE'                       => $_ARRAYLANG['TXT_MEDIA_SAVE'],
             'TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION'],
             'TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY'],
+            'TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION'],
+            'TXT_CORE_MODULE_MEDIA_ENABLE_PRETTY_FORMAT_FUNCTIONALITY' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_ENABLE_PRETTY_FORMAT_FUNCTIONALITY'],
+            'TXT_CORE_MODULE_MEDIA_SEARCH'          => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_SEARCH'],
+            'TXT_CORE_MODULE_MEDIA_REPLACE'         => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_REPLACE'],
+            'TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION_TOOLTIP'=> $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_PRETTY_FORMAT_FUNCTION_TOOLTIP'],
             'TXT_CORE_MODULE_MEDIA_DISABLED'        => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_DISABLED'],
         ));
 
@@ -1198,6 +1221,10 @@ class MediaManager extends MediaLibrary
                     'MEDIA_MANAGE_NOT_ASSOCIATED_GROUPS'    => implode("\n", $arrNotAssociatedGroupManageOptions),
                     'MEDIA_ALLOW_USER_SEARCH_ON'            => ($this->_arrSettings['media' . $k . '_frontend_search'] == 'on') ? 'checked="checked"' : '',
                     'MEDIA_ALLOW_USER_SEARCH_OFF'           => ($this->_arrSettings['media' . $k . '_frontend_search'] == 'off') ? 'checked="checked"' : '',
+                    'MEDIA_PRETTY_FORMAT_ON'                => ($this->_arrSettings['media' . $k . '_pretty_file_names'] == 'on') ? 'checked="checked"' : '',
+                    'MEDIA_PRETTY_FORMAT_OFF'               => ($this->_arrSettings['media' . $k . '_pretty_file_names'] == 'off') ? 'checked="checked"' : '',
+                    'MEDIA_PRETTY_FORMAT_REGEX'             => contrexx_raw2xhtml($this->_arrSettings['media' . $k . '_pretty_file_name_regexp']),
+                    'MEDIA_PRETTY_FORMAT_DISPLAY'           => ($this->_arrSettings['media' . $k . '_pretty_file_names'] == 'on') ? 'block' : 'none',
             ));
             if ($this->_objTpl->blockExists("mediaAccessSection")) {
                 $this->_objTpl->parse("mediaAccessSection");
@@ -1215,7 +1242,7 @@ class MediaManager extends MediaLibrary
         global $objDatabase, $_ARRAYLANG;
 
         $this->_arrSettings = $this->createSettingsArray();
-        for ($i = 0; $i <=4; $i++)
+        for ($i = 1; $i <=4; $i++)
         {
             $frontendSearchkey     = 'mediaSettings_Media'. $i .'FrontendSearch';
             $settingFrontendSearch = !empty($_POST[$frontendSearchkey]) && $_POST[$frontendSearchkey] == 'on'
@@ -1229,6 +1256,30 @@ class MediaManager extends MediaLibrary
                 WHERE
                     `name` = "media' . $i . '_frontend_search"
             ');
+
+            $prettyFormatKey     = 'mediaSettings_Media'. $i .'PrettyFormat';
+            $settingPrettyFormat = !empty($_POST[$prettyFormatKey]) && $_POST[$prettyFormatKey] == 'on'
+                                      ? 'on' : 'off';
+            $objDatabase->Execute('
+                UPDATE
+                    `'.DBPREFIX.'module_media_settings`
+                SET
+                    `value` = "' . $settingPrettyFormat . '"
+                WHERE
+                    `name` = "media' . $i . '_pretty_file_names"
+            ');
+
+            $prettyFormatRegexpKey     = 'mediaSettings_Media'. $i .'PrettyFormatRegexp';
+            $settingPrettyFormatRegexp = isset($_POST[$prettyFormatRegexpKey]) ? contrexx_input2raw($_POST[$prettyFormatRegexpKey]) : '';
+            $objDatabase->Execute('
+                UPDATE
+                    `'.DBPREFIX.'module_media_settings`
+                SET
+                    `value` = "' . contrexx_raw2db($settingPrettyFormatRegexp) . '"
+                WHERE
+                    `name` = "media' . $i . '_pretty_file_name_regexp"
+            ');
+
             $oldMediaSetting = $this->_arrSettings['media' . $i . '_frontend_changable'];
             $newMediaSetting = '';
             if (isset($_POST['mediaSettings_Media' . $i . 'FrontendChangable'])) {

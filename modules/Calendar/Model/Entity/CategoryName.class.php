@@ -60,7 +60,7 @@ class CategoryName extends \Cx\Model\Base\EntityBase {
     protected $langId;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Category
+     * @var \Cx\Modules\Calendar\Model\Entity\Category
      */
     protected $category;
 

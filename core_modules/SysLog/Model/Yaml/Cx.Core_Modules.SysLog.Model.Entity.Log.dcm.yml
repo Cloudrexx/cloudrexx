@@ -10,16 +10,13 @@ Cx\Core_Modules\SysLog\Model\Entity\Log:
   fields:
     timestamp:
       type: datetime
-
     severity:
-      type: string
-
+      type: enum
+      values: ['INFO','WARNING','FATAL']
     message:
       type: string
-
     data:
-      type: string
-
+      type: text
+      length: 65535
     logger:
       type: string
- 

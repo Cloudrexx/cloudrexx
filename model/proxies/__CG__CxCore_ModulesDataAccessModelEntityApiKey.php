@@ -222,6 +222,28 @@ class ApiKey extends \Cx\Core_Modules\DataAccess\Model\Entity\ApiKey implements 
     /**
      * {@inheritDoc}
      */
+    public function addDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addDataAccessApiKey', array($dataAccessApiKeys));
+
+        return parent::addDataAccessApiKey($dataAccessApiKeys);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeDataAccessApiKey', array($dataAccessApiKeys));
+
+        return parent::removeDataAccessApiKey($dataAccessApiKeys);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addDataAccessApiKeys(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
     {
 
@@ -272,6 +294,17 @@ class ApiKey extends \Cx\Core_Modules\DataAccess\Model\Entity\ApiKey implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

@@ -1840,7 +1840,6 @@ class GalleryManager extends GalleryLibrary
     //comments
         $objResult = $objDatabase->Execute('    SELECT        id,
                                                             date,
-                                                            ip,
                                                             name,
                                                             email,
                                                             www,
@@ -1857,7 +1856,6 @@ class GalleryManager extends GalleryLibrary
                 $this->_objTpl->SetVariable(array(    'COMMENTS_ROWCLASS'    =>    ($i % 2)+1,
                                                     'COMMENTS_ID'        =>    $objResult->fields['id'],
                                                     'COMMENTS_DATE'        =>    date('d.m.Y',$objResult->fields['date']),
-                                                    'COMMENTS_IP'        =>    $objResult->fields['ip'],
                                                     'COMMENTS_NAME'        =>    $objResult->fields['name'],
                                                     'COMMENTS_EMAIL'    =>    $objResult->fields['email'],
                                                     'COMMENTS_WWW'        =>    $objResult->fields['www'],
@@ -1894,7 +1892,6 @@ class GalleryManager extends GalleryLibrary
         /** end paging **/
         $objResult = $objDatabase->SelectLimit('SELECT        id,
                                                             date,
-                                                            ip,
                                                             mark
                                                 FROM        '.DBPREFIX.'module_gallery_votes
                                                 WHERE        picid='.$intPid.'
@@ -1908,7 +1905,6 @@ class GalleryManager extends GalleryLibrary
                 $this->_objTpl->SetVariable(array(    'VOTES_ROWCLASS'    =>    ($i % 2)+1,
                                                     'VOTES_ID'            =>    $objResult->fields['id'],
                                                     'VOTES_DATE'        =>    date('d.m.Y',$objResult->fields['date']),
-                                                    'VOTES_IP'            =>    $objResult->fields['ip'],
                                                     'VOTES_MARK'        =>    $objResult->fields['mark']
                                             ));
                 $this->_objTpl->parse('showVotes');
@@ -2218,7 +2214,6 @@ class GalleryManager extends GalleryLibrary
         );
 
         $uploader = new Uploader();
-//        $comboUp = \Cx\Core_Modules\Upload\Controller\UploadFactory::getInstance()->newUploader('exposedCombo');
         $uploader->setFinishedCallback(array(ASCMS_MODULE_PATH.'/Gallery/Controller/GalleryManager.class.php', '\Cx\Modules\Gallery\Controller\GalleryManager', 'uploadFinished'));
         $uploader->setData($paths);
         $uploader->addClass('uploadbutton');
@@ -2329,9 +2324,14 @@ class GalleryManager extends GalleryLibrary
         //width of the image is wider than the allowed value. Show Error.
         $arrImageSize = getimagesize($tempPath.'/'.$file);
         if (intval($arrImageSize[0]) > intval($objGallery->arrSettings['image_width'])) {
-            $objGallery->strErrMessage = str_replace('{WIDTH}', $objGallery->arrSettings['image_width'], $lang['TXT_GALLERY_UPLOAD_ERROR_WIDTH']);
              @unlink($tempPath.'/'.$file);
-
+             throw new \Exception(
+                 str_replace(
+                     '{WIDTH}',
+                     $objGallery->arrSettings['image_width'],
+                     $lang['TXT_GALLERY_UPLOAD_ERROR_WIDTH']
+                 )
+             );
         }
 
         //check if file needs to be renamed
@@ -3699,7 +3699,6 @@ $strFileNew = '';
         $this->_objTpl->loadTemplateFile('module_gallery_edit_comment.html',true,true);
         $this->_objTpl->SetVariable(array(    'TXT_COMMENT_EDIT_TITLE'    =>    $_ARRAYLANG['TXT_COMMENT_EDIT'],
                                             'TXT_COMMENT_EDIT_DATE'        =>    $_ARRAYLANG['TXT_COMMENT_EDIT_DATE'],
-                                            'TXT_COMMENT_EDIT_IP'        =>    $_ARRAYLANG['TXT_COMMENT_EDIT_IP'],
                                             'TXT_COMMENT_EDIT_NAME'        =>    $_ARRAYLANG['TXT_COMMENT_EDIT_NAME'],
                                             'TXT_COMMENT_EDIT_EMAIL'    =>    $_ARRAYLANG['TXT_COMMENT_EDIT_EMAIL'],
                                             'TXT_COMMENT_EDIT_HOMEPAGE'    =>    $_ARRAYLANG['TXT_COMMENT_EDIT_HOMEPAGE'],
@@ -3709,7 +3708,6 @@ $strFileNew = '';
 
         $objResult = $objDatabase->Execute('    SELECT    picid,
                                                         `date`,
-                                                        ip,
                                                         name,
                                                         email,
                                                         www,
@@ -3721,7 +3719,6 @@ $strFileNew = '';
         $this->_objTpl->SetVariable(array(    'VALUE_COMMENT_EDIT_ID'            =>    $intCommentId,
                                             'VALUE_COMMENT_EDIT_PICID'        =>    $objResult->fields['picid'],
                                             'VALUE_COMMENT_EDIT_DATE'        =>    date('d.m.Y',$objResult->fields['date']),
-                                            'VALUE_COMMENT_EDIT_IP'            =>    $objResult->fields['ip'],
                                             'VALUE_COMMENT_EDIT_NAME'        =>    $objResult->fields['name'],
                                             'VALUE_COMMENT_EDIT_EMAIL'        =>    $objResult->fields['email'],
                                             'VALUE_COMMENT_EDIT_HOMEPAGE'    =>    $objResult->fields['www'],

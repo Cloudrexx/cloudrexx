@@ -286,7 +286,8 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         $query = 'SELECT tblU.`id`
             FROM `' . DBPREFIX . 'access_users` AS tblU
             INNER JOIN `' . DBPREFIX . 'access_user_profile` AS tblP ON tblP.`user_id` = tblU.`id`
-            WHERE tblU.`active` = true';
+            WHERE tblU.`active` = true
+              AND tblP.`birthday` != ""';
 
         if (!empty($gender)) {
             $query .= ' AND tblP.`gender` = "gender_' . $gender . '"';

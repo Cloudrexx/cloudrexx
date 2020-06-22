@@ -97,7 +97,7 @@ var Search = {
         }
 
         cx.ready(function() {
-            this.curRequest = new Ajax.Request("modules/Knowledge/Controller/search.php", {
+            this.curRequest = new Ajax.Request("/modules/Knowledge/Controller/search.php", {
                 method : "get",
                 parameters : {
                     section : "Knowledge",
@@ -109,8 +109,7 @@ var Search = {
                 {
                     var data = transport.responseText.evalJSON();
                     if (data.status == 1) {
-                        ref.clearBox();
-                        $(ref.resultBox).insert(data.content);
+                        $(ref.resultBox).replace(data.content);
                         ref.showBox();
                     } else {
                         ref.hideBox();

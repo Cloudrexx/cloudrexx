@@ -344,6 +344,15 @@ class CalendarEvent extends CalendarLibrary
     );
 
     /**
+     * Whether this event is a regular event (or recurrence according to the
+     * series configuration) or if the event is a manually added additional
+     * recurrence.
+     *
+     * @var boolean TRUE if event is a manually added recurrence
+     */
+    public $isAdditionalRecurrence = false;
+
+    /**
      * Event languages to show
      *
      * @access public
@@ -381,6 +390,13 @@ class CalendarEvent extends CalendarLibrary
      * @var array
      */
     public $invitedCrmGroups = array();
+
+    /**
+     * Event excluded CRM groups
+     *
+     * @var array
+     */
+    public $excludedCrmGroups = array();
 
     /**
      * Event invited mail
@@ -717,6 +733,12 @@ class CalendarEvent extends CalendarLibrary
     public $registrationExternalFullyBooked;
 
     /**
+     * Contains the last error message until its fetch using getErrorMessage()
+     * @var string
+     */
+    protected $errorMessage = '';
+
+    /**
      * Constructor
      *
      * Loads the event object of given id
@@ -747,7 +769,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function get($eventId, $eventStartDate=null, $langId=null) {
-        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
+        global $objDatabase, $_LANGID;
 
         $this->getSettings();
 
@@ -786,6 +808,7 @@ class CalendarEvent extends CalendarLibrary
                          event.google AS google,
                          event.invited_groups AS invited_groups,
                          event.invited_crm_groups AS invited_crm_groups,
+                         event.excluded_crm_groups AS excluded_crm_groups,
                          event.invited_mails AS invited_mails,
                          event.invitation_sent AS invitation_sent,
                          event.invitation_email_template AS invitation_email_template,
@@ -943,7 +966,40 @@ class CalendarEvent extends CalendarLibrary
                     $this->seriesData['seriesPatternExceptions'] = $seriesPatternExceptions;
                     $seriesAdditionalRecurrences = array();
                     if (!\FWValidator::isEmpty($objResult->fields['series_additional_recurrences'])) {
-                        $seriesAdditionalRecurrences = array_map(array($this, 'getInternDateTimeFromDb'), (array) explode(",", $objResult->fields['series_additional_recurrences']));
+                        // create array of manually added recurrences as
+                        // DateTime objects from comma-separated db-field
+                        $seriesAdditionalRecurrences = array_map(
+                            function($recurrence) {
+                                // convert db-timestamp notation into datetime
+                                $recurrenceDate = $this->getInternDateTimeFromDb($recurrence);
+
+                                // ensure time is correctly set for recurrence dates
+                                if ($this->all_day) {
+                                    // Forcely set time to 00:00 for all-day
+                                    // recurrence events.
+                                    // This is a fix to ensure old all-day
+                                    // recurrence dates that have been stored
+                                    // without a time-information are correct
+                                    $recurrenceDate->setTime(0, 0);
+
+                                // check if non-all-day recurrence event
+                                // contains time information
+                                } elseif (strpos($recurrence, ' ') === false) {
+                                    // recurrence is lacking time information,
+                                    // so let's set the event's start time as
+                                    // recurrence time
+                                    $recurrenceDate->setTime(
+                                        $this->startDate->format('H'),
+                                        $this->startDate->format('i')
+                                    );
+                                }
+                                return $recurrenceDate;
+                            },
+                            (array) explode(
+                                ',',
+                                $objResult->fields['series_additional_recurrences']
+                            )
+                        );
                     }
                     $this->seriesData['seriesAdditionalRecurrences'] = $seriesAdditionalRecurrences;
                 } else {
@@ -965,6 +1021,7 @@ class CalendarEvent extends CalendarLibrary
 
                 $this->invitedGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_groups']), PREG_GREP_INVERT);
                 $this->invitedCrmGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_crm_groups']), PREG_GREP_INVERT);
+                $this->excludedCrmGroups = preg_grep('/^$/', explode(',', $objResult->fields['excluded_crm_groups']), PREG_GREP_INVERT);
                 $this->invitedMails =  htmlentities($objResult->fields['invited_mails'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->registration = intval($objResult->fields['registration']);
                 $this->registrationForm = intval($objResult->fields['registration_form']);
@@ -1004,7 +1061,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function getData() {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
+        global $objDatabase;
 
         $activeLangs = explode(",", $this->showIn);
         $this->arrData = array();
@@ -1053,7 +1110,7 @@ class CalendarEvent extends CalendarLibrary
      * @return boolean true if saved successfully, false otherwise
      */
     function save($data){
-        global $objDatabase, $_LANGID, $_CONFIG, $objInit;
+        global $objDatabase, $_LANGID, $objInit;
 
         $this->getSettings();
 
@@ -1075,16 +1132,16 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
-
-        if (!empty($data['all_day'])) {
-            list($startHour, $startMin) = array(0, 0);
-            list($endHour, $endMin)     = array(23, 59);;
-        }
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate'],
+            !empty($data['all_day'])
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            !empty($data['all_day']),
+            true
+        );
 
         //event data
         $id            = isset($data['copy']) && !empty($data['copy']) ? 0 : (isset($data['id']) ? intval($data['id']) : 0);
@@ -1205,8 +1262,10 @@ class CalendarEvent extends CalendarLibrary
         $showIn                    = isset($data['showIn']) ? contrexx_addslashes(contrexx_strip_tags(join(",",$data['showIn']))) : '';
         $invited_groups            = isset($data['selectedGroups']) ? join(',', $data['selectedGroups']) : '';
         $invitedCrmGroups          = isset($data['calendar_event_invite_crm_memberships']) ? join(',', $data['calendar_event_invite_crm_memberships']) : '';
+        $excludedCrmGroups         = isset($data['calendar_event_excluded_crm_memberships']) ? join(',', $data['calendar_event_excluded_crm_memberships']) : '';
         $invited_mails             = isset($data['invitedMails']) ? contrexx_addslashes(contrexx_strip_tags($data['invitedMails'])) : '';
         $send_invitation           = isset($data['sendInvitation']) ? intval($data['sendInvitation']) : 0;
+        $sendInvitationTo         = isset($data['sendMailTo']) ? contrexx_input2raw($data['sendMailTo']) : CalendarMailManager::MAIL_INVITATION_TO_ALL;
         $invitationTemplate        = isset($data['invitationEmailTemplate']) ? contrexx_input2raw($data['invitationEmailTemplate']) : array();
         $registration              =   isset($data['registration']) && in_array($data['registration'], array(self::EVENT_REGISTRATION_NONE, self::EVENT_REGISTRATION_INTERNAL, self::EVENT_REGISTRATION_EXTERNAL))
                                      ? intval($data['registration']) : 0;
@@ -1229,14 +1288,36 @@ class CalendarEvent extends CalendarLibrary
         $placeMap                  = isset($data['placeMap']) ? contrexx_input2raw($data['placeMap']) : '';
         $update_invitation_sent    = ($send_invitation == 1);
 
+        $this->get($id);
+        if ($registration_form != $this->registrationForm) {
+            // if we already have registrations: abort!
+            $query = '
+                SELECT
+                    `id`
+                FROM
+                    `' . DBPREFIX . 'module_calendar_registration`
+                WHERE
+                    `event_id` = ' . $this->id . '
+                LIMIT 1
+            ';
+            $result = $objDatabase->Execute($query);
+            if ($result && !$result->EOF) {
+                // Abort!
+                global $_ARRAYLANG;
+                $this->errorMessage = $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTER_FORM_EDITED'];
+                return false;
+            }
+        }
+
+        $validUriScheme = '%^(?:(?:ftp|http|https)://|\[\[|//)%';
         if (!empty($placeWebsite)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeWebsite)) {
+            if (!preg_match($validUriScheme, $placeWebsite)) {
                 $placeWebsite = "http://".$placeWebsite;
             }
         }
 
         if (!empty($placeLink)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeLink)) {
+            if (!preg_match($validUriScheme, $placeLink)) {
                 $placeLink = "http://".$placeLink;
             }
         }
@@ -1261,13 +1342,13 @@ class CalendarEvent extends CalendarLibrary
         $orgEmail  = isset($data['organizerEmail']) ? contrexx_input2raw($data['organizerEmail']) : '';
 
         if (!empty($orgWebsite)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgWebsite)) {
+            if (!preg_match($validUriScheme, $orgWebsite)) {
                 $orgWebsite = "http://".$orgWebsite;
             }
         }
 
         if (!empty($orgLink)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgLink)) {
+            if (!preg_match($validUriScheme, $orgLink)) {
                 $orgLink = "http://".$orgLink;
             }
         }
@@ -1363,10 +1444,56 @@ class CalendarEvent extends CalendarLibrary
             if (!empty($data['additionalRecurrences'])) {
                 $additionalRecurrenceDates = array();
                 foreach ($data['additionalRecurrences'] as $additionalRecurrence) {
-                    $additionalRecurrenceDates[] = $this->getDbDateTimeFromIntern($this->getDateTime($additionalRecurrence, 23, 59))->format('Y-m-d');
+                    // ensure time is correctly set for recurrence date
+                    if ($allDay) {
+                        $hour = 0;
+                        $minute = 0;
+                    } else
+                        // check if non-all-day recurrence event
+                        // contains time information
+                    if (strpos($additionalRecurrence, ' ') === false) {
+                        // recurrence is lacking time information,
+                        // so let's set the event's start time as
+                        // recurrence time
+                        $hour = $startHour;
+                        $minute = $startMin;
+                    } else {
+                        $recurrenceData = explode(' ', $additionalRecurrence);
+                        $additionalRecurrence = $recurrenceData[0];
+                        $recurrenceTime = explode(':', $recurrenceData[1]);
+                        $hour = $recurrenceTime[0];
+                        $minute = $recurrenceTime[1];
+                    }
+
+                    // convert into db-timestamp format
+                    $additionalRecurrenceDate =
+                        $this->getDbDateTimeFromIntern(
+                            $this->getDateTime(
+                                $additionalRecurrence,
+                                $hour,
+                                $minute
+                            )
+                        )->format('Y-m-d H:i');
+
+                    // ignore additional recurrences that start before the
+                    // start-date of the event as those are not supported
+                    if ($additionalRecurrenceDate <= $startDate) {
+                        continue;
+                    }
+
+                    // add additional recurrence as DateTime
+                    $additionalRecurrenceDates[] = $additionalRecurrenceDate;
                 }
                 sort($additionalRecurrenceDates);
-                $seriesAdditionalRecurrences = join(",", $additionalRecurrenceDates);
+
+                // create comma-separated list of manually added recurrences
+                // for db storage
+                $seriesAdditionalRecurrences = join(
+                    ',',
+                    array_unique(
+                        $additionalRecurrenceDates
+                    )
+                );
             }
             switch($seriesType) {
                 case 1;
@@ -1471,6 +1598,7 @@ class CalendarEvent extends CalendarLibrary
             'show_in'                       => $showIn,
             'invited_groups'                => $invited_groups,
             'invited_crm_groups'            => $invitedCrmGroups,
+            'excluded_crm_groups'           => $excludedCrmGroups,
             'invited_mails'                 => $invited_mails,
             'invitation_email_template'     => json_encode($invitationTemplate),
             'registration'                  => $registration,
@@ -1533,6 +1661,14 @@ class CalendarEvent extends CalendarLibrary
         $event       = $this->getEventEntity($id, $formDatas);
         $eId         = $id;
         if ($id != 0) {
+            // In frontend, the status can not be changed.
+            // As only active events can be edited in frontend,
+            // the status must always be set to 1 in that case.
+            if ($this->cx->getMode() == $this->cx::MODE_FRONTEND) {
+                $status = 1;
+                $formData['status'] = $status;
+            }
+
             //Trigger preUpdate event for Event Entity
             $this->triggerEvent(
                 'model/preUpdate', $event,
@@ -1677,7 +1813,13 @@ class CalendarEvent extends CalendarLibrary
             // TO-DO set form data into $this
             $legacyEvent    = new CalendarEvent($this->id);
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-            $objMailManager->sendMail($legacyEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $invitationTemplate);
+            $objMailManager->sendMail(
+                $legacyEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION,
+                null,
+                $invitationTemplate,
+                $sendInvitationTo
+            );
         }
         foreach ($event->getInvite() as $invite) {
             $em->detach($invite);
@@ -1770,20 +1912,21 @@ class CalendarEvent extends CalendarLibrary
         return $eventFields;
     }
 
-    function loadEventFromPost($data)
+    function loadEventFromData($data)
     {
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate']
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            false,
+            true
+        );
 
         //event data
-        $startDate     = $this->getDateTime($startDate, intval($startHour), intval($startMin));
-        $endDate       = $this->getDateTime($endDate, intval($endHour), intval($endMin));
-
-        $this->startDate = $startDate;
-        $this->endDate   = $endDate;
+        $this->startDate = $this->getDateTime($startDate, intval($startHour), intval($startMin));
+        $this->endDate = $this->getDateTime($endDate, intval($endHour), intval($endMin));
 
         //series pattern
         $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
@@ -1797,6 +1940,7 @@ class CalendarEvent extends CalendarLibrary
         $seriesPatternType              = 0;
         $seriesPatternDouranceType      = 0;
         $seriesPatternEnd               = 0;
+        $seriesPatternEndDate           = '';
         $seriesExeptions = '';
 
         if($seriesStatus == 1) {
@@ -1879,6 +2023,7 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
+        $this->seriesStatus = $seriesStatus;
         $this->seriesData['seriesPatternCount'] = intval($seriesPatternCount);
         $this->seriesData['seriesType'] = intval($seriesType);
         $this->seriesData['seriesPatternCount'] = intval($seriesPatternCount);
@@ -2136,8 +2281,8 @@ class CalendarEvent extends CalendarLibrary
     function _handleUpload($id)
     {
         $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
-        $sessionObj = $cx->getComponent('Session')->getSession();
-        $tmpUploadDir     = $_SESSION->getTempPath().'/'.$id.'/'; //all the files uploaded are in here
+        $session = $cx->getComponent('Session')->getSession();
+        $tmpUploadDir     = $session->getTempPath().'/'.$id.'/'; //all the files uploaded are in here
         $depositionTarget = $this->uploadImgPath; //target folder
         $pic              = '';
 
@@ -2198,8 +2343,6 @@ class CalendarEvent extends CalendarLibrary
      */
     static function getEventSearchQuery($term)
     {
-        global $_LANGID;
-
         $query = "SELECT event.`id` AS `id`,
                          event.`startdate`,
                          field.`title` AS `title`,
@@ -2209,7 +2352,7 @@ class CalendarEvent extends CalendarLibrary
                          MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
-                   WHERE   (event.id = field.event_id AND field.lang_id = '".intval($_LANGID)."')
+                   WHERE   (event.id = field.event_id AND field.lang_id = '".FRONTEND_LANG_ID."')
                        AND event.status = 1
                        AND (   field.title LIKE ('%$term%')
                             OR field.teaser LIKE ('%$term%')
@@ -2221,14 +2364,16 @@ class CalendarEvent extends CalendarLibrary
     }
 
     /**
-     * Loads the location fields from the selected media directory entry
+     * Loads the location or host data from the specified MediaDir entry
      *
-     * @param integer $intMediaDirId  media directory Entry id
-     * @param string  $type           place type
-     *                                availble options are place or host
-     * @return null   it loads the place values based on the media directory Entry id and type
+     * @param integer $intMediaDirId  ID of the MediaDir entry
+     * @param string  $type           Set to 'place' to load entry as location
+     *                                data. Otherwise set to 'host' to load
+     *                                entry as host data.
+     * @return boolean                TRUE on success (data loaded), FALSE on
+     *                                failure (no data loaded).
      */
-    function loadPlaceFromMediadir($intMediaDirId = 0, $type = 'place')
+    public function loadPlaceFromMediadir($intMediaDirId = 0, $type = 'place')
     {
         $place         = '';
         $place_street  = '';
@@ -2238,57 +2383,87 @@ class CalendarEvent extends CalendarLibrary
         $place_website = '';
         $place_phone   = '';
 
-        if (!empty($intMediaDirId)) {
-            $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
-            $objMediadirEntry->getEntries(intval($intMediaDirId));
-            //get inputfield object
-            $objInputfields = new \Cx\Modules\MediaDir\Controller\MediaDirectoryInputfield($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId'],false,$objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus'], 'MediaDir');
+        // reset any existing data
+        if ($type == 'place') {
+            $this->place         = $place;
+            $this->place_street  = $place_street;
+            $this->place_zip     = $place_zip;
+            $this->place_city    = $place_city;
+            $this->place_country = $place_country;
+            $this->place_website = $place_website;
+            $this->place_phone   = $place_phone;
+            $this->place_map     = '';
+            $this->google        = false;
+        } else {
+            $this->org_name   = $place;
+            $this->org_street = $place_street;
+            $this->org_zip    = $place_zip;
+            $this->org_city   = $place_city;
+            $this->org_country= $place_country;
+            $this->org_website= $place_website;
+            $this->org_phone  = $place_phone;
+            $this->org_email  = '';
+        }
 
-            foreach ($objInputfields->arrInputfields as $arrInputfield) {
+        // abort in case no entry from mediadir has been selected
+        if (empty($intMediaDirId)) {
+            return false;
+        }
 
-                $intInputfieldType = intval($arrInputfield['type']);
-                if ($intInputfieldType != 16 && $intInputfieldType != 17) {
-                    if(!empty($arrInputfield['type'])) {
-                        $strType = $arrInputfield['type_name'];
-                        $strInputfieldClass = "\Cx\Modules\MediaDir\Model\Entity\MediaDirectoryInputfield".ucfirst($strType);
-                        try {
-                            $objInputfield = \Cx\Modules\MediaDir\Controller\safeNew($strInputfieldClass,'MediaDir');
+        $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
+        $objMediadirEntry->getEntries(intval($intMediaDirId));
 
-                            if(intval($arrInputfield['type_multi_lang']) == 1) {
-                                $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, $objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus']);
-                            } else {
-                                $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, null);
-                            }
+        // abort in case no entry could be found by the specified ID
+        if (!$objMediadirEntry->countEntries()) {
+            return false;
+        }
 
-                            switch ($arrInputfield['context_type']) {
-                                case 'title':
-                                    $place = end($arrInputfieldContent);
-                                    break;
-                                case 'address':
-                                    $place_street = end($arrInputfieldContent);
-                                    break;
-                                case 'zip':
-                                    $place_zip = end($arrInputfieldContent);
-                                    break;
-                                case 'city':
-                                    $place_city = end($arrInputfieldContent);
-                                    break;
-                                case 'country':
-                                    $place_country = end($arrInputfieldContent);
-                                    break;
-                                case 'website':
-                                    $place_website = end($arrInputfieldContent);
-                                    break;
-                                case 'phone':
-                                    $place_phone = end($arrInputfieldContent);
-                                    break;
-                            }
+        //get inputfield object
+        $objInputfields = new \Cx\Modules\MediaDir\Controller\MediaDirectoryInputfield($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId'],false,$objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus'], 'MediaDir');
 
-                        } catch (Exception $error) {
-                            echo "Error: ".$error->getMessage();
-                        }
-                    }
+        foreach ($objInputfields->arrInputfields as $arrInputfield) {
+            if (empty($arrInputfield['type'])) {
+                continue;
+            }
+
+            $strType = $arrInputfield['type_name'];
+            $strInputfieldClass = "\Cx\Modules\MediaDir\Model\Entity\MediaDirectoryInputfield".ucfirst($strType);
+            try {
+                $objInputfield = \Cx\Modules\MediaDir\Controller\safeNew($strInputfieldClass,'MediaDir');
+
+                if(intval($arrInputfield['type_multi_lang']) == 1) {
+                    $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, $objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus']);
+                } else {
+                    $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, null);
                 }
+
+                switch ($arrInputfield['context_type']) {
+                    case 'title':
+                        $place = end($arrInputfieldContent);
+                        break;
+                    case 'address':
+                        $place_street = end($arrInputfieldContent);
+                        break;
+                    case 'zip':
+                        $place_zip = end($arrInputfieldContent);
+                        break;
+                    case 'city':
+                        $place_city = end($arrInputfieldContent);
+                        break;
+                    case 'country':
+                        $place_country = end($arrInputfieldContent);
+                        break;
+                    case 'website':
+                        $place_website = end($arrInputfieldContent);
+                        break;
+                    case 'phone':
+                        $place_phone = end($arrInputfieldContent);
+                        break;
+                }
+
+            } catch (Exception $error) {
+                \DBG::dump($error->getMessage());
+                return false;
             }
         }
 
@@ -2301,6 +2476,7 @@ class CalendarEvent extends CalendarLibrary
             $this->place_website = $place_website;
             $this->place_phone   = $place_phone;
             $this->place_map     = '';
+            $this->google        = true;
         } else {
             $this->org_name   = $place;
             $this->org_street = $place_street;
@@ -2312,6 +2488,7 @@ class CalendarEvent extends CalendarLibrary
             $this->org_email  = '';
         }
 
+        return true;
     }
 
     /**
@@ -2321,51 +2498,36 @@ class CalendarEvent extends CalendarLibrary
      */
     function loadPlaceLinkFromMediadir($intMediaDirId = 0, $type = 'place')
     {
-        global $_LANGID, $_CONFIG;
-
         $placeUrl       = '';
         $placeUrlSource = '';
 
-        if (!empty($intMediaDirId)) {
-            $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
-            $objMediadirEntry->getEntries(intval($intMediaDirId));
-
-            $pageRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
-            $pages = $pageRepo->findBy(array(
-                'cmd'    => contrexx_addslashes('detail'.intval($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId'])),
-                'lang'   => $_LANGID,
-                'type'   => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION,
-                'module' => 'MediaDir',
-            ));
-
-            if(count($pages)) {
-                $strDetailCmd = 'detail'.intval($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId']);
-            } else {
-                $strDetailCmd = 'detail';
-            }
-
-            $pages = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page')->getFromModuleCmdByLang('MediaDir', $strDetailCmd);
-
-            $arrActiveFrontendLanguages = \FWLanguage::getActiveFrontendLanguages();
-            if (isset($arrActiveFrontendLanguages[FRONTEND_LANG_ID]) && isset($pages[FRONTEND_LANG_ID])) {
-                $langId = FRONTEND_LANG_ID;
-            } else if (isset($arrActiveFrontendLanguages[BACKEND_LANG_ID]) && isset($pages[BACKEND_LANG_ID])) {
-                $langId = BACKEND_LANG_ID;
-            } else {
-                foreach ($arrActiveFrontendLanguages as $lang) {
-                    if (isset($pages[$lang['id']])) {
-                        $langId = $lang['id'];
-                        break;
-                    }
-                }
-            }
-
-            $url = $pages[$langId]->getUrl(ASCMS_PROTOCOL."://".$_CONFIG['domainUrl'].ASCMS_PATH_OFFSET, "?eid={$intMediaDirId}");
-
-            $place          = ($type = 'place') ? $this->place : $this->org_name;
-            $placeUrl       = "<a href='".$url."' target='_blank' >". (!empty($place) ? $place : $url) ."</a>";
-            $placeUrlSource = $url;
+        if (empty($intMediaDirId)) {
+            return array('', '');
         }
+
+        $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
+        $objMediadirEntry->getEntries(intval($intMediaDirId));
+
+        // abort in case entry is unknown or invalid
+        if (!$objMediadirEntry->countEntries()) {
+            return array('', '');
+        }
+
+        try {
+            $url = $objMediadirEntry->getDetailUrl();
+        } catch (\Cx\Modules\MediaDir\Controller\MediaDirectoryEntryException $e) {
+            return array('', '');
+        }
+
+        // MediaDir might throw an exception if it doesn't find a detail URL,
+        // however it might also return NULL
+        if (!$url) {
+            return array('', '');
+        }
+
+        $place          = ($type = 'place') ? $this->place : $this->org_name;
+        $placeUrl       = "<a href='".$url."' target='_blank' >". (!empty($place) ? $place : $url) ."</a>";
+        $placeUrlSource = $url;
 
         return array($placeUrl, $placeUrlSource);
     }
@@ -2523,6 +2685,91 @@ class CalendarEvent extends CalendarLibrary
     }
 
     /**
+     * Return the registered mail addresses as MailRecipients
+     *
+     * @return array        the mail recipients
+     */
+    public function getRegistrationMailRecipients()
+    {
+
+        $queryRegistration = '
+            SELECT DISTINCT `reg_form_val`.`reg_id`, `reg_form_field`.`type`, 
+              `reg_form_val`.`value`, `invite`.`invitee_type`, `invite`.`invitee_id`
+              FROM `' . DBPREFIX . 'module_calendar_registration` AS `reg`
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_invite` AS `invite`
+                ON `reg`.`invite_id` = `invite`.`id`
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_registration_form_field` as `reg_form_field` 
+                ON `reg_form_field`.`form` = ' . contrexx_input2int($this->registrationForm) . '
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_registration_form_field_value` as `reg_form_val`
+                ON `reg_form_field`.`id` = `reg_form_val`.`field_id` AND `reg_form_val`.`reg_id` = `reg`.`id`
+                  
+                WHERE `reg`.`event_id` = ' . $this->id . ' 
+                AND `reg`.`type` = 1';
+        $database = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $objRegistration = $database->Execute($queryRegistration);
+
+        $recipientsData = array();
+        $mailRecipients = array();
+        if (!$objRegistration) {
+            return $mailRecipients;
+        }
+        while (!$objRegistration->EOF) {
+
+            $regId = $objRegistration->fields['reg_id'];
+            $type = $objRegistration->fields['type'];
+
+            if (!isset($recipientsData[$regId])) {
+                $recipientsData[$regId] = array();
+            }
+
+            $recipientsData[$regId][$type] =
+                $objRegistration->fields['value'];
+            $recipientsData[$regId]['type'] =
+                $objRegistration->fields['invitee_type'];
+            $recipientsData[$regId]['invitee_id'] =
+                $objRegistration->fields['invitee_id'];
+
+            $objRegistration->MoveNext();
+        }
+
+
+        foreach ($recipientsData as $recipientData) {
+            $lang = null;
+
+            // if the recipient is a crm or access user, get its language
+            if ($recipientData['type'] == MailRecipient::RECIPIENT_TYPE_CRM_CONTACT) {
+                $contact = new \Cx\Modules\Crm\Model\Entity\CrmContact();
+                if ($contact->load($recipientData['invitee_id'])) {
+                    $lang = $contact->contact_language;
+                }
+            } elseif ($recipientData['type'] == MailRecipient::RECIPIENT_TYPE_ACCESS_USER) {
+                $user =
+                    \FWUser::getFWUserObject()->objUser->getUser(
+                        $recipientData['invitee_id']
+                    );
+                if ($user) {
+                    $lang = $user->getFrontendLanguage();
+                }
+            }
+
+            $recipient = new MailRecipient();
+            $recipient->setId(isset($recipientData['invitee_id']) ? $recipientData['invitee_id'] : 0);
+            $recipient->setLang($lang);
+            $recipient->setAddress(isset($recipientData['mail']) ? $recipientData['mail'] : '');
+            $recipient->setType(isset($recipientData['type']) ? $recipientData['type'] : '');
+            $recipient->setFirstname(isset($recipientData['firstname']) ? $recipientData['firstname'] : '');
+            $recipient->setLastname(isset($recipientData['lastname']) ? $recipientData['lastname'] : '');
+            $recipient->setUsername(isset($recipientData['mail']) ? $recipientData['mail'] : '');
+            $mailRecipients[] = $recipient;
+        }
+
+        return $mailRecipients;
+    }
+
+    /**
      * Reset the registration count values.
      */
     public function resetRegistrationCount()
@@ -2646,5 +2893,135 @@ class CalendarEvent extends CalendarLibrary
         }
 
         return $eventField;
+    }
+
+    /**
+     * Tells whether there's an unread error message
+     * @return boolean True if there's an unread error message, false otherwise
+     */
+    public function hasErrorMessage() {
+        return !empty($this->errorMessage);
+    }
+
+    /**
+     * Returns the current error message or an empty string if there's none
+     * @return string Error message or empty string
+     */
+    public function getErrorMessage() {
+        $msg = $this->errorMessage;
+        $this->errorMessage = '';
+        return $msg;
+    }
+
+    /**
+     * Sets the location related properties based on the configured source mode
+     *
+     * Call this method before pushing any location-data to the view layer.
+     * If the event contains any location-data, then the related properies (
+     * {@see CalendarEvent::place} / {@see CalendarEvent::place_street} /
+     * {@see CalendarEvent::place_zip} / {@see CalendarEvent::place_city} /
+     * {@see CalendarEvent::place_country} / {@see CalendarEvent::place_website}
+     * / {@see CalendarEvent::place_phone} / {@see CalendarEvent::place_map} /
+     * {@see CalendarEvent::google}) will be initialized accordingly.
+     *
+     * @return boolean TRUE of the event contains any host-data, otherwise FALSE
+     */
+    public function loadLocationData() {
+        // abort in case no location data has been set
+        if (
+            // manual entry
+            (
+                // option set to: manual entry only
+                $this->arrSettings['placeData'] == 1 || (
+                    // option set to: manual entry and mediadir selection
+                    $this->arrSettings['placeData'] == 3 &&
+                    // event has manual entry selected
+                    $this->locationType == 1
+                )
+            ) &&
+            $this->place == '' &&
+            $this->place_street == '' &&
+            $this->place_zip == '' &&
+            $this->place_city == '' &&
+            $this->place_country == '' &&
+            $this->place_website == '' &&
+            $this->place_phone == ''
+        ) {
+            return false;
+        }
+
+        if (
+            // abort in case no mediadir entry has been selected
+            (
+                $this->arrSettings['placeData'] > 1 &&
+                $this->locationType == 2 &&
+                !$this->loadPlaceFromMediadir($this->place_mediadir_id, 'place')
+            ) || (
+                // event has not been converted to new location type after
+                // option placeData has been changed
+                $this->arrSettings['placeData'] == 2 &&
+                $this->locationType == 1
+            )
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets the host related properties based on the configured source mode
+     *
+     * Call this method before pushing any host-data to the view layer.
+     * If the event contains any host-data, then the related properies (
+     * {@see CalendarEvent::org_name} / {@see CalendarEvent::org_street} /
+     * {@see CalendarEvent::org_zip} / {@see CalendarEvent::org_city} /
+     * {@see CalendarEvent::org_country} / {@see CalendarEvent::org_website} /
+     * {@see CalendarEvent::org_phone} / {@see CalendarEvent::org_email})
+     * will be initialized accordingly.
+     *
+     * @return boolean TRUE of the event contains any host-data, otherwise FALSE
+     */
+    public function loadHostData() {
+        // abort in case no host data has been set
+        if (
+            // manual entry
+            (
+                // option set to: manual entry only
+                $this->arrSettings['placeDataHost'] == 1 || (
+                    // option set to: manual entry and mediadir selection
+                    $this->arrSettings['placeDataHost'] == 3 &&
+                    // event has manual entry selected
+                    $this->hostType == 1
+                )
+            ) &&
+            $this->org_name == '' &&
+            $this->org_street == '' &&
+            $this->org_zip == '' &&
+            $this->org_city == '' &&
+            $this->org_country == '' &&
+            $this->org_website == '' &&
+            $this->org_phone == ''
+        ) {
+            return false;
+        }
+
+        if (
+            // abort in case no mediadir entry has been selected
+            (
+                $this->arrSettings['placeDataHost'] > 1 &&
+                $this->hostType == 2 &&
+                !$this->loadPlaceFromMediadir($this->host_mediadir_id, 'host')
+            ) || (
+                // event has not been converted to new host type after
+                // option placeDataHost has been changed
+                $this->arrSettings['placeDataHost'] == 2 &&
+                $this->hostType == 1
+            )
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -78,7 +78,9 @@ class Sandbox {
                     }
                 );
                 try {
-                    $table = new \BackendTable($lister->getData());
+                    $table = new \BackendTable($lister->getData(
+                        \Cx\Core\Core\Controller\Cx::instanciate()->getRequest()->getParams()
+                    ));
                     $this->result = $table->toHtml().$lister;
                 } catch (\Exception $e) {
                     $this->result = 'Could not execute query (' . $e->getMessage() . ')!';
@@ -93,7 +95,12 @@ class Sandbox {
                     $this->errrorHandlerActive = true;
                     // Since DBG catches the rest (E_PARSE) let's use that
                     ob_start();
-                    $function = create_function('$em, $cx', '' . $this->code . ';');
+                    $function = function ($em, $cx) {
+                        // The use of eval() is prohibited by the development guidelines of cloudrexx.
+                        // However, as the sandbox's purpose is to run code from within the backend
+                        // section, we do allow the usage of *eval()* in this very specific case.
+                        return eval($this->code);
+                    };
                     $dbgContents = ob_get_clean();
                     \DBG::activate($dbgMode);
                     if (!is_callable($function)) {

@@ -68,6 +68,8 @@ class MediaDirectoryInputfieldFile extends \Cx\Modules\MediaDir\Controller\Media
     {
         global $objDatabase, $_ARRAYLANG, $objInit;
 
+        $langId = static::getOutputLocale()->getId();
+
         switch ($intView) {
             default:
             case 1:
@@ -88,7 +90,7 @@ class MediaDirectoryInputfieldFile extends \Cx\Modules\MediaDir\Controller\Media
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[FRONTEND_LANG_ID]) ? $arrValue[FRONTEND_LANG_ID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 } else {
                     $arrValue = null;
@@ -431,11 +433,12 @@ INPUT;
 
         $intId = intval($arrInputfield['id']);
         $intEntryDefaultLang = $objDatabase->getOne("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
+        $langId = static::getOutputLocale()->getId();
 
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            $intLangId = in_array(FRONTEND_LANG_ID, $arrTranslationStatus) ? FRONTEND_LANG_ID : contrexx_input2int($intEntryDefaultLang);
+            $intLangId = in_array($langId, $arrTranslationStatus) ? $langId : contrexx_input2int($intEntryDefaultLang);
         } else {
-            $intLangId = FRONTEND_LANG_ID;
+            $intLangId = $langId;
         }
         $objResult = $objDatabase->Execute("
             SELECT `value`

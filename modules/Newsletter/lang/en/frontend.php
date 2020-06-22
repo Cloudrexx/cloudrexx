@@ -131,4 +131,5 @@ $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_DATE'] = "Day";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_MONTH'] = "Month";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_YEAR'] = "Year";
 $_ARRAYLANG['TXT_NEWSLETTER_UNSUBSCRIBE_IF_ONLY_ONE_LIST_ACTIVE'] = "You must select at least one list! If you would like to no longer receive any news at all, please %s.";
-?>
+$_ARRAYLANG['TXT_NEWSLETTER_NOT_CONFIRM_MSG'] = 'Confirm link has expired, please subscribe and confirm again to receive our newsletter. Thank you!';
+$_ARRAYLANG['TXT_NEWSLETTER_MAILING_CONFIRM_SUCCESSFUL'] = 'Your consent for receiving email campaigns has been saved.';

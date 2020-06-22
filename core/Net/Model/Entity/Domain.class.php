@@ -75,7 +75,7 @@ class Domain extends \Cx\Core\Model\Model\Entity\YamlEntity {
      * Constructor to initialize a new domain.
      * @param   string  $name   Domain name of new domain
      */
-    public function __construct($name) {
+    public function __construct($name = '') {
         $this->setName($name);
     }
 

@@ -265,6 +265,16 @@ JSCaptchaValidation;
         return $this->securityCheck;
     }
 
+    /**
+     * Disable the captcha check
+     *
+     * @return void
+     */
+    public function disable()
+    {
+        $this->securityCheck = true;
+    }
+
     private function isValidCode()
     {
         if (empty($_POST['coreCaptchaCode'])) {

@@ -75,12 +75,12 @@ class Invite extends \Cx\Model\Base\EntityBase {
     protected $token;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Registration
+     * @var \Cx\Modules\Calendar\Model\Entity\Registration
      */
     protected $registration;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Event
+     * @var \Cx\Modules\Calendar\Model\Entity\Event
      */
     protected $event;
 
@@ -242,7 +242,7 @@ class Invite extends \Cx\Model\Base\EntityBase {
     /**
      * Set registration
      *
-     * @param Cx\Modules\Calendar\Model\Entity\Registration $registration
+     * @param \Cx\Modules\Calendar\Model\Entity\Registration $registration
      */
     public function setRegistration(\Cx\Modules\Calendar\Model\Entity\Registration $registration)
     {
@@ -252,7 +252,7 @@ class Invite extends \Cx\Model\Base\EntityBase {
     /**
      * Get registration
      *
-     * @return Cx\Modules\Calendar\Model\Entity\Registration $registration
+     * @return \Cx\Modules\Calendar\Model\Entity\Registration $registration
      */
     public function getRegistration()
     {
@@ -262,7 +262,7 @@ class Invite extends \Cx\Model\Base\EntityBase {
     /**
      * Set event
      *
-     * @param Cx\Modules\Calendar\Model\Entity\Event $event
+     * @param \Cx\Modules\Calendar\Model\Entity\Event $event
      */
     public function setEvent(\Cx\Modules\Calendar\Model\Entity\Event $event)
     {
@@ -272,7 +272,7 @@ class Invite extends \Cx\Model\Base\EntityBase {
     /**
      * Get event
      *
-     * @return Cx\Modules\Calendar\Model\Entity\Event $event
+     * @return \Cx\Modules\Calendar\Model\Entity\Event $event
      */
     public function getEvent()
     {

@@ -98,7 +98,7 @@ class Subscription extends \Cx\Model\Base\EntityBase {
     /**
      * Constructor
      */
-    public function __construct($product, $options) {
+    public function __construct($product = null, $options = array()) {
         // Important:
         // A subscription must always have a valid $product.
         // The following exception is for the sole purpose of making this class

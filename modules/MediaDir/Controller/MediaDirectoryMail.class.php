@@ -109,7 +109,7 @@ class MediaDirectoryMail extends MediaDirectoryLibrary
                                                     WHERE
                                                         action_id='".$this->intAction."'
                                                     AND
-                                                        lang_id='".intval(FRONTEND_LANG_ID)."'
+                                                        lang_id='" . static::getOutputLocale()->getId() . "'
                                                     AND
                                                         active='1'
                                                     LIMIT 1");
@@ -168,7 +168,7 @@ class MediaDirectoryMail extends MediaDirectoryLibrary
                                                         ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields AS rel_inputfield
                                                     WHERE (rel_inputfield.`entry_id`='".$this->intEntryId."')
                                                     AND (rel_inputfield.`field_id` = (".$strRelQuery."))
-                                                    AND (rel_inputfield.`lang_id` = '".FRONTEND_LANG_ID."')
+                                                    AND (rel_inputfield.`lang_id` = '" . static::getOutputLocale()->getId() . "')
                                                     AND (rel_inputfield.`value` != '')
                                                     GROUP BY value
                                                     ");
@@ -177,11 +177,25 @@ class MediaDirectoryMail extends MediaDirectoryLibrary
         }
 
         $objEntry = new MediaDirectoryEntry($this->moduleName);
+
+        // note: if option 'settingsConfirmNewEntries' is set to true
+        // and we are currently processing the notification emails
+        // being triggered after a new entry has been submitted in the
+        // frontend, then the newly submitted entry won't be loaded by
+        // MediaDirectoryEntry::getEntries() as this method does only
+        // find confirmed entries. Where as the newly submitted
+        // entry is not yet confirmed.
+        // However this is fine, as the loaded entry will only be used
+        // to fetch its frontend-link. The latter should not be available
+        // as long as the entry has not yet been confirmed.
         $objEntry->getEntries($this->intEntryId);
 
         $strDetailUrl = '';
         try {
-            $strDetailUrl = $objEntry->getDetailUrl(true)->toString();
+            $detailUrl = $objEntry->getDetailUrl(true);
+            if ($detailUrl) {
+                $strDetailUrl = $detailUrl->toString();
+            }
         } catch (MediaDirectoryEntryException $e) {}
 
         $strProtocol = ASCMS_PROTOCOL;

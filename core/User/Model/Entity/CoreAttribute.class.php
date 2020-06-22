@@ -170,7 +170,7 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set accessId
      *
-     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
+     * @param \Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
      */
     public function setAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $accessId)
     {
@@ -180,7 +180,7 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessId
      *
-     * @return Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
+     * @return \Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
      */
     public function getAccessId()
     {
@@ -190,7 +190,7 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set readAccessId
      *
-     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     * @param \Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
      */
     public function setReadAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId)
     {
@@ -200,7 +200,7 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get readAccessId
      *
-     * @return Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     * @return \Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
      */
     public function getReadAccessId()
     {

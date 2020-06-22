@@ -43,6 +43,10 @@ class Andx extends Composite
         'Doctrine\ORM\Query\Expr\Func',
         'Doctrine\ORM\Query\Expr\Orx',
         'Doctrine\ORM\Query\Expr\Andx',
+        // This allows nested conditions. Fix by <michael.ritter@cloudrexx.com>
+        // Based on https://github.com/iamluc/GloomyPagerBundle/issues/2
+        // and https://github.com/doctrine/doctrine2/issues/1865
+        'Doctrine\DBAL\Query\Expression\CompositeExpression',
     );
 
     /**

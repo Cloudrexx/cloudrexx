@@ -73,12 +73,30 @@ class Message
         self::CLASS_OK,
     );
 
+    /**
+     * Check if there is a session present
+     *
+     * If a session is present, but has not yet initialized,
+     * then the session will be initialized.
+     *
+     * @return  boolean TRUE if a session is present. Otherwise FALSE.
+     */
+    protected static function checkForSession() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $session = $cx->getComponent('Session');
+        return (bool) $session->getSession(false);
+    }
+
 
     /**
      * Clears the messages
      */
     static function clear()
     {
+        if (!static::checkForSession()) {
+            return;
+        }
+
         unset($_SESSION['messages']);
     }
 
@@ -96,6 +114,10 @@ class Message
      */
     static function have($class=null)
     {
+        if (!static::checkForSession()) {
+            return false;
+        }
+
         if (empty($class)) {
             return !empty($_SESSION['messages']);
         }
@@ -122,6 +144,10 @@ class Message
      */
     static function save()
     {
+        if (!static::checkForSession()) {
+            return;
+        }
+
         if (empty($_SESSION['messages'])) {
             return;
         }
@@ -142,6 +168,10 @@ class Message
      */
     static function restore()
     {
+        if (!static::checkForSession()) {
+            return;
+        }
+
         if (empty($_SESSION['messages_stack'])) {
             self::clear();
             return;
@@ -166,9 +196,11 @@ class Message
      */
     static function add($message, $class=self::CLASS_INFO)
     {
-        if (!\Cx\Core\Session\Model\Entity\Session::isInitialized()) {
-            throw new \Exception("\Message can't be used at this point as no session has been initialized yet!");
+        if (!static::checkForSession()) {
+            \DBG::log('Message can\'t be used at this point as no session has been initialized yet!');
+            return;
         }
+
         if (empty($_SESSION['messages'])) {
             $_SESSION['messages'] = array();
         }
@@ -267,6 +299,10 @@ class Message
      */
     private static function show_backend($objTemplateLocal=null)
     {
+        if (!static::checkForSession()) {
+            return;
+        }
+
         if (empty($_SESSION['messages'])) return;
 
         global $objTemplate;
@@ -315,6 +351,10 @@ class Message
      */
     private static function show_frontend($objTemplateLocal=null)
     {
+        if (!static::checkForSession()) {
+            return null;
+        }
+
         if (empty($_SESSION['messages'])) return null;
 
         global $objTemplate;
@@ -360,6 +400,10 @@ class Message
     static function get()
     {
         global $objTemplate;
+
+        if (!static::checkForSession()) {
+            return null;
+        }
 
         if (empty($_SESSION['messages'])) return null;
         foreach (self::$message_classes as $class) {

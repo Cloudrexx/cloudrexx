@@ -140,7 +140,30 @@ class Country extends \Cx\Model\Base\EntityBase {
     /**
      * Add locales
      *
-     * @param Cx\Core\Locale\Model\Entity\Locale $locales
+     * @param \Cx\Core\Locale\Model\Entity\Locale $locales
+     * @return Country
+     */
+    public function addLocale(\Cx\Core\Locale\Model\Entity\Locale $locales)
+    {
+        $this->locales[] = $locales;
+
+        return $this;
+    }
+
+    /**
+     * Remove locales
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $locales
+     */
+    public function removeLocale(\Cx\Core\Locale\Model\Entity\Locale $locales)
+    {
+        $this->locales->removeElement($locales);
+    }
+
+    /**
+     * Add locales
+     *
+     * @param \Cx\Core\Locale\Model\Entity\Locale $locales
      */
     public function addLocales(\Cx\Core\Locale\Model\Entity\Locale $locales)
     {
@@ -150,7 +173,7 @@ class Country extends \Cx\Model\Base\EntityBase {
     /**
      * Get locales
      *
-     * @return Doctrine\Common\Collections\Collection $locales
+     * @return \Doctrine\Common\Collections\Collection $locales
      */
     public function getLocales()
     {

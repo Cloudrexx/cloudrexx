@@ -98,7 +98,7 @@ $_ARRAYLANG['TXT_MULTISITE_ADD_NEW_WEBSITE'] = 'Neue Website hinzuf&uuml;gen';
 
 // Subscription trial
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE'] = 'Webseite';
-$_ARRAYLANG['TXT_MULTISITE_WEBSITE_CHOOSE_SUBSCRIPTION'] = 'Abo w&auml;hlen';
+$_ARRAYLANG['TXT_MULTISITE_WEBSITE_CHOOSE_SUBSCRIPTION'] = 'Abo wählen';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATE_TRIAL'] = 'Als Trial erstellen';
 $_ARRAYLANG['TXT_MULTISITE_UNKOWN_WEBSITE'] = 'Die angeforderte Website ist unbekannt.';
 $_ARRAYLANG['TXT_MULTISITE_SUBSCRIPTION_ACTIVE'] = 'Aktiv';
@@ -141,6 +141,7 @@ $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_SUCCESSFULLY'] = 'Der E-Mail Di
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_ENABLED_FAILED'] = 'Die Aktivierung der E-Mail Dienste schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_FAILED'] = 'Die Abschaltung der E-Mail Dienste schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] = 'Die E-Mail Verwaltung kann zur Zeit nicht geöffnet werden.';
+$_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER'] = 'E-Mail Service nicht verfügbar';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_OPEN_ADMINISTRATION'] = 'Verwaltung öffnen';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATE_MAIL_ACCOUNT_FAILED'] = 'Die Erstellung eines E-Mail Kontos schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_DELETE_MAIL_ACCOUNT_FAILED'] = 'Die Löschung des E-Mail Kontos schlug fehl.';
@@ -281,6 +282,8 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'] = 'Weiter zur Übersicht
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_OWNER_EMAIL_UNIQUE_ERROR'] = 'Die E-Mail Adresse %1$s wird bereits von einem anderen Benutzer unter %2$s eingesetzt und kann daher nicht verwendet werden.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAPPING_DOMAIN_FAILED'] = 'Die Verknüpfung Ihrer Website mit der Domain %s ist nicht zulässig.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_PROFILE_UPDATED_SUCCESS']= 'Ihr Profil wurde erfolgreich aktualisiert.';
+$_ARRAYLANG['TXT_MULTISITE_INVALID_CALL'] = 'Ungültige Anfrage';
+$_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE'] = 'Ungültige Website';
 
 //mail service
 $_ARRAYLANG['TXT_MULTISITE_NO_MAIL_SERVER_FOUND'] = 'E-Mail Service Server ist nicht verfügbar';
@@ -352,6 +355,9 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE'] = 'Website';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_ALL'] ='Alle';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATION_LOGS'] = 'Benachrichtigungsprotokoll';
 
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATIONCANCELLEDPROFILEATTRIBUTEID'] = 'ID der Benutzerprofil-Eigenschaft für abgemeldete E-Mail Benachrichtigungen';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATIONCANCELLEDPROFILEATTRIBUTEID_TOOLTIP']='ID der Benutzerprofil-Eigenschaft zum speichern des Status, ob der Benutzer die E-Mail Benachrichtigungen deaktiviert hat.';
+
 //update
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE'] = 'Website-Update wird gestartet';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_TRIGGERING_WEBSITE_UPDATE_SUCCESS_MSG'] = 'Website-Update wird ausgeführt';
@@ -384,3 +390,11 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITEBACKUPLIMIT_TOOLTIP'] = 'Maximale 
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_BACKUP_LIMIT_ERROR'] = 'Die Webseite ist zu Gross, ein Backup wird nicht empfohlen.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_WEBSITE_COPY_LIMIT_ERROR'] = 'Von dieser Webseite kann keine Kopie erstellt werden, bitte melden Sie sich beim <a href="http://support.cloudrexx.com" target="_blank">Support</a>';
 
+//get website list
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_LIST_ERROR']= 'Failed to get the website list.';
+
+//get server website path
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_SERVER_WEBSITE_PATH_ERROR']= 'Failed to get the server website path.';
+
+//update the website domain theme map
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_WEBSITE_DOMAIN_THEME_ERROR']= 'Failed to update the website domain theme map.';

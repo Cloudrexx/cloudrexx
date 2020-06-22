@@ -483,9 +483,6 @@ body a:hover {text-decoration: none;}
 #subnavigation li.level-4 a {
     font-size: 12px;
 }
-#menubuilder3 {
-    padding-top: 0;
-}
 #subnavigation li.level-1 > a {
     display: none;
 }

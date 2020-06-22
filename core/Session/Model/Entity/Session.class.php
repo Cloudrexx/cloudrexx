@@ -161,21 +161,24 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
      */
     public static function getInstance()
     {
-        if (!isset(static::$instance))
-        {
-            static::$instance = new static();
-            $_SESSION = static::$instance;
+        try {
+            if (!isset(static::$instance)) {
+                static::$instance = new static();
+                $_SESSION = static::$instance;
 
-            // read the session data
-            $_SESSION->readData();
+                // read the session data
+                $_SESSION->readData();
 
-            //earliest possible point to set debugging according to session.
-            $_SESSION->restoreDebuggingParams();
+                //earliest possible point to set debugging according to session.
+                $_SESSION->restoreDebuggingParams();
 
-            $_SESSION->cmsSessionExpand();
+                $_SESSION->cmsSessionExpand();
+            }
+
+            return static::$instance;
+        } catch (\Exception $e) {
+            return null;
         }
-
-        return static::$instance;
     }
 
     /**
@@ -248,27 +251,85 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     /**
      * Default object constructor.
      */
-    public function __construct()
-    {
-
+    public function __construct() {
         if (ini_get('session.auto_start')) {
             session_destroy();
         }
 
         register_shutdown_function(array(& $this, 'releaseLocks'));
 
-            $this->initDatabase();
-            $this->initRememberMe();
-            $this->initSessionLifetime();
+        $this->initDatabase();
+        $this->initRememberMe();
+        $this->initSessionLifetime();
+        $this->initCookieConfig();
 
-        if (session_set_save_handler(
-            $this, true))
-        {
+        if (session_set_save_handler($this, true)) {
             session_start();
-
         } else {
             $this->cmsSessionError();
         }
+    }
+
+    /**
+     * Initialize session cookie configuration
+     *
+     * This does set the following:
+     * - initial lifetime of the cookie
+     * - httpOnly flag
+     * - secure flag in case HTTPS is forced in both, back- and frontend
+     *
+     * @throws \Exception If the cookie is only allowed to be transmitted
+     *                    over HTTPS (secure flag), but the request has been
+     *                    made over HTTP, then an exception is thrown to
+     *                    prevent the disclosure of the session ID over HTTP.
+     */
+    protected function initCookieConfig() {
+        // init config
+        $lifetime = $this->lifetime;
+        $path = '/';
+        $domain = ini_get('session.cookie_domain');
+        $secure = false;
+
+        // see https://www.owasp.org/index.php/HttpOnly
+        $httponly = true;
+
+        // transfer cookie only over HTTPS if
+        // HTTPS has been forced
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $forceProtocolBackend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolBackend',
+            'Config'
+        );
+        $forceProtocolFrontend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolFrontend',
+            'Config'
+        );
+        // secure flag is only enabled, if HTTPS is beeing forced in both,
+        // front- and backend
+        if (
+            $forceProtocolBackend == 'https' &&
+            $forceProtocolFrontend == 'https'
+        ) {
+            $secure = true;
+        }
+        // abort session initialization in case session is only allowed
+        // over an encrypted connection, but the request has been made
+        // over an non-encrypted connection
+        if (
+            $secure &&
+            $cx->getRequest()->getUrl()->getProtocol() != 'https'
+        ) {
+            throw new \Exception('Unable to initialize session over a non encrypted connection');
+        }
+
+        // set cookie config
+        session_set_cookie_params(
+            $lifetime,
+            $path,
+            $domain,
+            $secure,
+            $httponly
+        );
     }
 
     /**
@@ -363,7 +424,8 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
                   WHERE
                     `sessionid` = '" . static::getInstance()->sessionid . "'
                   AND
-                    `parent_id` = '$varId'";
+                    `parent_id` = '$varId'
+                  ORDER BY `id`";
 
         /** @var $objResult ADORecordSet */
         $objResult = \Env::get('db')->Execute($query);
@@ -438,7 +500,7 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         $sessionId = !empty($_COOKIE[session_name()]) ? $_COOKIE[session_name()] : null;
         if (isset($_POST['remember_me'])) {
             $this->rememberMe = true;
-            if ($this->sessionExists($sessionId)) {//remember me status for new sessions will be stored in cmsSessionRead() (when creating the appropriate db entry)
+            if (static::sessionExists($sessionId)) {//remember me status for new sessions will be stored in cmsSessionRead() (when creating the appropriate db entry)
                 \Env::get('db')->Execute('UPDATE `' . DBPREFIX . 'sessions` SET `remember_me` = 1 WHERE `sessionid` = "' . contrexx_input2db($sessionId) . '"');
             }
         } else {
@@ -452,13 +514,32 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     }
 
     /**
-     * Checks if the passed session exists.
+     * Check if a session exists
      *
-     * @access  protected
-     * @param   string     $sessionId
-     * @return  boolean
+     * If a session-ID is passed as $sessionId, then it will check if a session
+     * identified by that session-ID is present.
+     * Otherwise it will check if a session identified by the session-cookie
+     * exists.
+     *
+     * @param   string     $sessionId   Session-ID to check for
+     * @return  boolean TRUE if a session exists. Otherwise FALSE.
      */
-    protected function sessionExists($sessionId) {
+    public static function sessionExists($sessionId = '') {
+        if (static::isInitialized()) {
+            return true;
+        }
+
+        if (
+            empty($sessionId) &&
+            !empty($_COOKIE[session_name()])
+        ) {
+            $sessionId = $_COOKIE[session_name()];
+        }
+
+        if (empty($sessionId)) {
+            return false;
+        }
+
         /** @var $objResult ADORecordSet */
         $objResult = \Env::get('db')->Execute('SELECT 1 FROM `' . DBPREFIX . 'sessions` WHERE `sessionid` = "' . contrexx_input2db($sessionId) . '"');
         if ($objResult && ($objResult->RecordCount() > 0)) {
@@ -500,7 +581,15 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         $ses = session_name();
         if (isset($_COOKIE[$ses])) {
             $expirationTime = ($this->lifetime > 0 ? $this->lifetime + time() : 0);
-            setcookie($ses, $_COOKIE[$ses], $expirationTime, '/');
+            setcookie(
+                $ses,
+                $_COOKIE[$ses],
+                $expirationTime,
+                '/',
+                ini_get('session.cookie_domain'),
+                ini_get('session.cookie_secure'),
+                ini_get('session.cookie_httponly')
+            );
         }
     }
 
@@ -793,7 +882,7 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $data) {
+    public function offsetSet($offset, $data, $callableOnSet = null, $callableOnGet = null, $callableOnUnset = null, $callableOnValidateKey = null) {
         static::validateSessionKeyLength($offset);
 
         if (!isset($this->locks[$offset])) {

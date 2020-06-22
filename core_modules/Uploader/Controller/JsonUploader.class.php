@@ -104,16 +104,25 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
         ) {
             $id = ($params['get']['id']);
             $uploadedFileCount = isset($params['get']['uploadedFileCount']) ? intval($params['get']['uploadedFileCount']) : 0;
-            $path = $_SESSION->getTempPath() . '/'.$id.'/';
+            $session = $this->cx->getComponent('Session')->getSession();
+            $path = $session->getTempPath() . '/'.$id.'/';
             $tmpPath = $path;
         } elseif (isset($params['post']['path'])) {
-            $path_part = explode("/", $params['post']['path'], 2);
-            $mediaSourceManager
-                = $this->cx->getMediaSourceManager();
-            $path = $mediaSourceManager->getMediaTypePathsbyNameAndOffset($path_part[0],0)
-                . '/' . $path_part[1];
-
-            $tmpPath = $_SESSION->getTempPath();
+            // This case is deprecated and should not be used!
+            \DBG::msg('Using deprecated upload case without upload ID!');
+            $path_part = explode('/', $params['post']['path'], 2);
+            if (!isset($params['mediaSource'])) {
+                $mediaSourceManager = $this->cx->getMediaSourceManager();
+                $path = $mediaSourceManager->getMediaTypePathsbyNameAndOffset(
+                    $path_part[0],
+                    0
+                );
+            } else {
+                $path = current($params['mediaSource']->getDirectory());
+            }
+            $path .= '/' . $path_part[1];
+            $session = $this->cx->getComponent('Session')->getSession();
+            $tmpPath = $session->getTempPath();
         } else {
             return array(
                 'OK' => 0,
@@ -202,7 +211,7 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
             $file = false;
             foreach($files as $fileInfo){
                 if ($fileInfo->isFile()) {
-                    $file = $fileInfo->getRealPath();
+                    $file = str_replace(DIRECTORY_SEPARATOR, '/', $fileInfo->getRealPath());
                     break;
                 }
             }

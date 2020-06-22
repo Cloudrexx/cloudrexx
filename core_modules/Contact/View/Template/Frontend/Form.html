@@ -1,0 +1,41 @@
+<!-- BEGIN contact_form_css_link -->
+<link href="{CONTACT_FORM_CSS_HREF}" rel="stylesheet" type="text/css" />
+<!-- END contact_form_css_link -->
+
+<div class="text-warning" id="contactFeedback">{CONTACT_FEEDBACK_TEXT}</div>
+<div id="contactDescription">
+<!-- BEGIN formText -->
+    {CONTACT_FORM_TEXT}
+<!-- END formText -->
+</div>
+<div class="text-danger" id="contactFormError">{TXT_NEW_ENTRY_ERORR}</div>
+<!-- BEGIN contact_form -->
+<form role="form" id="contactForm{CONTACT_FORM_CUSTOM_STYLE_ID}"
+    class="contactForm{CONTACT_FORM_CUSTOM_STYLE_ID}"
+    action="{CONTACT_FORM_ACTION}" method="post" enctype="multipart/form-data"
+    onsubmit="return checkAllFields();">
+    <fieldset id="contactFrame">
+        <legend>{CONTACT_FORM_NAME}</legend>
+
+        <!-- BEGIN contact_form_field_list -->
+        {CONTACT_FORM_FIELD}
+        <!-- END contact_form_field_list -->
+
+        <!-- BEGIN contact_form_captcha -->
+        <div class="contact row form-group">
+        <label>{TXT_CONTACT_CAPTCHA}</label>
+        {CONTACT_CAPTCHA_CODE}
+        </div>
+        <!-- END contact_form_captcha -->
+
+        <div class="contact row form-group">
+            <input class="contactFormClass_button btn btn-default" type="submit"
+                name="submitContactForm" value="{TXT_CONTACT_SUBMIT}" />
+            <input class="contactFormClass_button btn btn-default" type="reset"
+                value="{TXT_CONTACT_RESET}" />
+            <input type="hidden" name="unique_id" value="{CONTACT_UNIQUE_ID}" />
+        </div>
+    </fieldset>
+</form>
+<!-- END contact_form -->
+{CONTACT_JAVASCRIPT}

@@ -73,10 +73,10 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'startDate', 'endDate', 'useCustomDateDisplay', 'showStartDateList', 'showEndDateList', 'showStartTimeList', 'showEndTimeList', 'showTimeTypeList', 'showStartDateDetail', 'showEndDateDetail', 'showStartTimeDetail', 'showEndTimeDetail', 'showTimeTypeDetail', 'google', 'access', 'priority', 'price', 'link', 'pic', 'attach', 'placeMediadirId', 'showIn', 'invitedGroups', 'invitedCrmGroups', 'invitedMails', 'invitationSent', 'invitationEmailTemplate', 'registration', 'registrationNum', 'registrationNotification', 'emailTemplate', 'ticketSales', 'numSeating', 'seriesStatus', 'seriesType', 'seriesPatternCount', 'seriesPatternWeekday', 'seriesPatternDay', 'seriesPatternWeek', 'seriesPatternMonth', 'seriesPatternType', 'seriesPatternDouranceType', 'seriesPatternEnd', 'seriesPatternEndDate', 'seriesPatternBegin', 'seriesPatternExceptions', 'seriesAdditionalRecurrences', 'status', 'confirmed', 'showDetailView', 'author', 'allDay', 'locationType', 'placeId', 'placeStreet', 'placeWebsite', 'placeZip', 'placeLink', 'placePhone', 'placeMap', 'hostType', 'orgName', 'orgStreet', 'orgWebsite', 'orgZip', 'orgLink', 'orgPhone', 'orgEmail', 'hostMediadirId', 'registrationExternalLink', 'registrationExternalFullyBooked', 'eventFields', 'invite', 'registrations', 'categories', 'registrationForm', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'type', 'startDate', 'endDate', 'useCustomDateDisplay', 'showStartDateList', 'showEndDateList', 'showStartTimeList', 'showEndTimeList', 'showTimeTypeList', 'showStartDateDetail', 'showEndDateDetail', 'showStartTimeDetail', 'showEndTimeDetail', 'showTimeTypeDetail', 'google', 'access', 'priority', 'price', 'link', 'pic', 'attach', 'placeMediadirId', 'showIn', 'invitedGroups', 'invitedCrmGroups', 'excludedCrmGroups', 'invitedMails', 'invitationSent', 'invitationEmailTemplate', 'registration', 'registrationNum', 'registrationNotification', 'emailTemplate', 'ticketSales', 'numSeating', 'seriesStatus', 'independentSeries', 'seriesType', 'seriesPatternCount', 'seriesPatternWeekday', 'seriesPatternDay', 'seriesPatternWeek', 'seriesPatternMonth', 'seriesPatternType', 'seriesPatternDouranceType', 'seriesPatternEnd', 'seriesPatternEndDate', 'seriesPatternBegin', 'seriesPatternExceptions', 'seriesAdditionalRecurrences', 'status', 'confirmed', 'showDetailView', 'author', 'allDay', 'locationType', 'placeId', 'placeStreet', 'placeWebsite', 'placeZip', 'placeLink', 'placePhone', 'placeMap', 'hostType', 'orgName', 'orgStreet', 'orgWebsite', 'orgZip', 'orgLink', 'orgPhone', 'orgEmail', 'hostMediadirId', 'registrationExternalLink', 'registrationExternalFullyBooked', 'eventFields', 'invite', 'registrations', 'categories', 'registrationForm', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'startDate', 'endDate', 'useCustomDateDisplay', 'showStartDateList', 'showEndDateList', 'showStartTimeList', 'showEndTimeList', 'showTimeTypeList', 'showStartDateDetail', 'showEndDateDetail', 'showStartTimeDetail', 'showEndTimeDetail', 'showTimeTypeDetail', 'google', 'access', 'priority', 'price', 'link', 'pic', 'attach', 'placeMediadirId', 'showIn', 'invitedGroups', 'invitedCrmGroups', 'invitedMails', 'invitationSent', 'invitationEmailTemplate', 'registration', 'registrationNum', 'registrationNotification', 'emailTemplate', 'ticketSales', 'numSeating', 'seriesStatus', 'seriesType', 'seriesPatternCount', 'seriesPatternWeekday', 'seriesPatternDay', 'seriesPatternWeek', 'seriesPatternMonth', 'seriesPatternType', 'seriesPatternDouranceType', 'seriesPatternEnd', 'seriesPatternEndDate', 'seriesPatternBegin', 'seriesPatternExceptions', 'seriesAdditionalRecurrences', 'status', 'confirmed', 'showDetailView', 'author', 'allDay', 'locationType', 'placeId', 'placeStreet', 'placeWebsite', 'placeZip', 'placeLink', 'placePhone', 'placeMap', 'hostType', 'orgName', 'orgStreet', 'orgWebsite', 'orgZip', 'orgLink', 'orgPhone', 'orgEmail', 'hostMediadirId', 'registrationExternalLink', 'registrationExternalFullyBooked', 'eventFields', 'invite', 'registrations', 'categories', 'registrationForm', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'type', 'startDate', 'endDate', 'useCustomDateDisplay', 'showStartDateList', 'showEndDateList', 'showStartTimeList', 'showEndTimeList', 'showTimeTypeList', 'showStartDateDetail', 'showEndDateDetail', 'showStartTimeDetail', 'showEndTimeDetail', 'showTimeTypeDetail', 'google', 'access', 'priority', 'price', 'link', 'pic', 'attach', 'placeMediadirId', 'showIn', 'invitedGroups', 'invitedCrmGroups', 'excludedCrmGroups', 'invitedMails', 'invitationSent', 'invitationEmailTemplate', 'registration', 'registrationNum', 'registrationNotification', 'emailTemplate', 'ticketSales', 'numSeating', 'seriesStatus', 'independentSeries', 'seriesType', 'seriesPatternCount', 'seriesPatternWeekday', 'seriesPatternDay', 'seriesPatternWeek', 'seriesPatternMonth', 'seriesPatternType', 'seriesPatternDouranceType', 'seriesPatternEnd', 'seriesPatternEndDate', 'seriesPatternBegin', 'seriesPatternExceptions', 'seriesAdditionalRecurrences', 'status', 'confirmed', 'showDetailView', 'author', 'allDay', 'locationType', 'placeId', 'placeStreet', 'placeWebsite', 'placeZip', 'placeLink', 'placePhone', 'placeMap', 'hostType', 'orgName', 'orgStreet', 'orgWebsite', 'orgZip', 'orgLink', 'orgPhone', 'orgEmail', 'hostMediadirId', 'registrationExternalLink', 'registrationExternalFullyBooked', 'eventFields', 'invite', 'registrations', 'categories', 'registrationForm', 'validators', 'virtual');
     }
 
     /**
@@ -750,6 +750,28 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function setExcludedCrmGroups($excludedCrmGroups)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setExcludedCrmGroups', array($excludedCrmGroups));
+
+        return parent::setExcludedCrmGroups($excludedCrmGroups);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getExcludedCrmGroups()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getExcludedCrmGroups', array());
+
+        return parent::getExcludedCrmGroups();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setInvitedMails($invitedMails)
     {
 
@@ -976,6 +998,28 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSeriesStatus', array());
 
         return parent::getSeriesStatus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setIndependentSeries($independentSeries)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIndependentSeries', array($independentSeries));
+
+        return parent::setIndependentSeries($independentSeries);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIndependentSeries()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIndependentSeries', array());
+
+        return parent::getIndependentSeries();
     }
 
     /**
@@ -1784,6 +1828,17 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function removeEventField(\Cx\Modules\Calendar\Model\Entity\EventField $eventFields)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeEventField', array($eventFields));
+
+        return parent::removeEventField($eventFields);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setEventFields($eventFields)
     {
 
@@ -1812,6 +1867,17 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'addInvite', array($invite));
 
         return parent::addInvite($invite);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeInvite(\Cx\Modules\Calendar\Model\Entity\Invite $invite)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeInvite', array($invite));
+
+        return parent::removeInvite($invite);
     }
 
     /**
@@ -1856,6 +1922,17 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRegistration', array($registration));
 
         return parent::addRegistration($registration);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeRegistration(\Cx\Modules\Calendar\Model\Entity\Registration $registrations)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRegistration', array($registrations));
+
+        return parent::removeRegistration($registrations);
     }
 
     /**
@@ -1916,6 +1993,28 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function addCategory(\Cx\Modules\Calendar\Model\Entity\Category $categories)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCategory', array($categories));
+
+        return parent::addCategory($categories);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeCategory(\Cx\Modules\Calendar\Model\Entity\Category $categories)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCategory', array($categories));
+
+        return parent::removeCategory($categories);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setRegistrationForm(\Cx\Modules\Calendar\Model\Entity\RegistrationForm $registrationForm)
     {
 
@@ -1966,6 +2065,17 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

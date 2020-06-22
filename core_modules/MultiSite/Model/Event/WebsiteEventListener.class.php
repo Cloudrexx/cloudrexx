@@ -45,7 +45,7 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
         ) {
             $this->setOwnerUser($eventArgs);
         }
-        
+
         foreach ($domains as $domain) {
             \DBG::msg('Update domain (map to new IP of Website): '.$domain->getName());
             if ($domain->getComponentType() == \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_WEBSITE
@@ -84,6 +84,34 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
                 \Cx\Core\Setting\Controller\Setting::init('MultiSite', '', 'FileSystem', $websiteConfigPath);
                 \Cx\Core\Setting\Controller\Setting::set('websiteState', $website->getStatus());
                 \Cx\Core\Setting\Controller\Setting::update('websiteState');
+
+                // This will execute the flush-cache command on the website
+                // $website due to the fact that we did just initialize the
+                // MultiSite config of that website.
+                // Therefore the method execAsync() will assume that this
+                // website is currently loaded.
+                // This cache-flush is essential for the following reasons:
+                // - drop any existing page and esi cache (in case the website
+                //   has been enabled or disabled)
+                // - drop user cache to force re-fetch of MultiSite.yml that
+                //   has just been upaded
+                //
+                // Execute `./cx MultiSite pass <website> sudo Cache clear all`
+                // asynchronously.
+                //
+                // Note: the command 'sudo' will ensure that the 'Cache'
+                // command will be executed even if the website is currently
+                // disabled or offline.
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $cx->getComponent('Core')->execAsync(
+                    'sudo',
+                    array(
+                        'Cache',
+                        'clear',
+                        'all',
+                    )
+                );
+
                 // we must re-initialize the original MultiSite settings of the main installation
                 \Cx\Core\Setting\Controller\Setting::init('MultiSite', '', 'FileSystem', null, \Cx\Core\Setting\Controller\Setting::REPOPULATE);
                 break;
@@ -103,6 +131,7 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
                 
                 //hostName
                 $websiteServiceServer = $website->getWebsiteServiceServer();
+
                 //Update the Website Status and codeBase
                 $params = array(
                     'websiteId'   => $website->getId(),
@@ -186,9 +215,8 @@ class WebsiteEventListener implements \Cx\Core\Event\Model\Entity\EventListener 
             }
         }
     }
-    
+
     public function onEvent($eventName, array $eventArgs) {        
         $this->$eventName(current($eventArgs));
     }
 }
-

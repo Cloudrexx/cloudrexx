@@ -191,7 +191,7 @@ $_ARRAYLANG['TXT_CRM_CHANGES_UPDATED_SUCCESSFULLY'] = "Changes updated successfu
 $_ARRAYLANG['TXT_CRM_CURRENCY']          = "Currency";
 $_ARRAYLANG['TXT_CRM_ADD_CURRENCY']      = "Add Currency";
 $_ARRAYLANG['TXT_CRM_TITLE_STATUS']      = 'Status';
-$_ARRAYLANG['TXT_CRM_NAME']               = 'Name';
+$_ARRAYLANG['TXT_CRM_NAME']               = 'First Name';
 $_ARRAYLANG['TXT_CRM_CURRENCY_ALREADY_EXISTS'] = "Currency already exists";
 $_ARRAYLANG['TXT_CRM_CURRENCY_ADDED_SUCCESSFULLY']       = 'Currency added successfully';
 $_ARRAYLANG['TXT_CRM_CURRENCY_RATES']           = 'Rates';
@@ -502,6 +502,7 @@ $_ARRAYLANG['TXT_CRM_ADD_NEW_ACCOUNT']              = "Add new user account";
 $_ARRAYLANG['TXT_CRM_DATASOURCE']                   = "Data source";
 $_ARRAYLANG['TXT_CRM_SOCIAL_NETWORK']               = "Social network";
 $_ARRAYLANG['TXT_CRM_GENDER']                       = "Gender";
+$_ARRAYLANG['TXT_CRM_SALUTATION']                   = "Salutation";
 $_ARRAYLANG['TXT_CRM_NOT_SPECIFIED']                = "Not specified";
 $_ARRAYLANG['TXT_CRM_GENDER_MALE']                  = "Male";
 $_ARRAYLANG['TXT_CRM_GENDER_FEMALE']                = "Female";
@@ -622,3 +623,12 @@ $_ARRAYLANG['TXT_CRM_EMAIL_DELIVERY'] = 'Email delivery';
 $_ARRAYLANG['TXT_CRM_FILTER_STATUS'] = 'Filter status';
 $_ARRAYLANG['TXT_CRM_TASK_STATUS_OPEN'] = 'Open';
 $_ARRAYLANG['TXT_CRM_TASK_STATUS_COMPLETED'] = 'Completed';
+
+// Settings
+$_ARRAYLANG['TXT_ENTER_SORTING']   = 'Enter a sort value';
+$_ARRAYLANG['TXT_SORTING_NUMERIC'] = 'Sort value should be in numeric [0-9]';
+$_ARRAYLANG['TXT_ENTRIES_MARKED']  = 'Up arrow';
+
+// Settings interface import message
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS']      = 'Records Imported Successfully.';
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_MEMORY_ERROR'] = 'CSV import process is interrupted due to insufficient memory in available.';

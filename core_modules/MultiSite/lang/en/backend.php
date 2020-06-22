@@ -293,6 +293,7 @@ $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_ENABLED_FAILED'] = 'Mail service activat
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_FAILED'] = 'Mail service deactivation failed.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_OPEN_ADMINISTRATION'] = 'Open administration';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] = 'The email management console is currently not available.';
+$_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER'] = 'Email service unavailable';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATE_MAIL_ACCOUNT_FAILED'] = 'Failed to create an email account.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_DELETE_MAIL_ACCOUNT_FAILED'] = 'Failed to delete the email account.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATED_MAIL_ACCOUNT_SUCCESSFULLY'] = 'Email account successfully created.';
@@ -376,6 +377,8 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_EXTERNALPAYMENTCUSTOMERIDPROFILEATTRIBUTE
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_EXTERNALPAYMENTCUSTOMERIDPROFILEATTRIBUTEID_TOOLTIP']='The user profile attribute Id used to store the customer ID of the external payment provider.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_AFFILIATEIDPROFILEATTRIBUTEID'] = 'Affiliate ID user profile attribute ID';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_AFFILIATEIDPROFILEATTRIBUTEID_TOOLTIP']='The user profile attribute Id used to store the Affiliate ID.';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATIONCANCELLEDPROFILEATTRIBUTEID'] = 'Cancelled notification emails user profile attribute ID';
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_NOTIFICATIONCANCELLEDPROFILEATTRIBUTEID_TOOLTIP']='ID of profile attribute to store the information if the user did cancel the subscription to receive notification emails.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SUBSCRIPTION_CANCEL_LABEL'] = 'Cancel subscription';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_BUTTON_CANCEL'] = 'Cancel';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SUBSCRIPTION_CANCEL_CONTENT'] = 'You are about to cancel this subscription. The subscription will be terminated by the %s. After this date, all websites associated to this subscription will no longer be accessible.';
@@ -427,6 +430,8 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'] = 'Go to the overview pa
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_OWNER_EMAIL_UNIQUE_ERROR'] = 'The e-mail %1$s is already in use by a user account on %2$s and can therefore not be used.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAPPING_DOMAIN_FAILED'] = 'Mapping your website to the domain %s is not allowed.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_PROFILE_UPDATED_SUCCESS']= 'Your profile has been updated successfully.';
+$_ARRAYLANG['TXT_MULTISITE_INVALID_CALL'] = 'Invalid request';
+$_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE'] = 'Unkown website';
 
 //mail service
 $_ARRAYLANG['TXT_MULTISITE_NO_MAIL_SERVER_FOUND'] = 'Mail service server is not available';
@@ -561,12 +566,25 @@ $_ARRAYLANG['TXT_MULTISITE_NEW_SUBSCRIPTION'] = 'New subscription';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_COPY_DESCRIPTION'] = 'The \'copy\' process, copies the selected website data, users and component settings to new website.
 Please enter the new \'Website name\' and choose the \'Subscription\' to continue.
 If you want to buy a new subscription for the website use \'New subscription\' button.';
+$_ARRAYLANG['TXT_MULTISITE_SETTINGS_UPDATE_WEBSITE_SERVER_ERROR_MSG'] = 'Could not set the website repository "%s". There are %s active client websites accessing this website\'s shared data.';
 
 //set owner user
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_CHANGE_OWNER_USER_ERROR'] = 'Error while switching the owner user';
 
 //get website list
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_LIST_ERROR']= 'Failed to get the website list.';
+
+//get the website mode
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_WEBSITE_MODE_ERROR']= 'Failed to get the website mode.';
+
+//get server website path
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_SERVER_WEBSITE_PATH_ERROR']= 'Failed to get the server website path.';
+
+//update the website domain theme map
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_UPDATE_WEBSITE_DOMAIN_THEME_ERROR']= 'Failed to update the website domain theme map.';
+
+//get servre website list by mode
+$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GET_SERVER_WEBSITE_BY_MODE_CLIENT_ERROR_MSG']= 'Failed to get the server website list.';
 
 //set the website details
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_SET_WEBSITE_DETAILS_ERROR']= 'Failed to set the website details.';

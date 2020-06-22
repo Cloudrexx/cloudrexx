@@ -73,10 +73,10 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'relations', 'readPermission', 'writePermission', 'syncs', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'readPermission', 'writePermission', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'relations', 'readPermission', 'writePermission', 'syncs', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'readPermission', 'writePermission', 'validators', 'virtual');
     }
 
     /**
@@ -310,6 +310,28 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
     /**
      * {@inheritDoc}
      */
+    public function addDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addDataAccessApiKey', array($dataAccessApiKeys));
+
+        return parent::addDataAccessApiKey($dataAccessApiKeys);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeDataAccessApiKey', array($dataAccessApiKeys));
+
+        return parent::removeDataAccessApiKey($dataAccessApiKeys);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addDataAccessApiKeys(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
     {
 
@@ -327,39 +349,6 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDataAccessApiKeys', array());
 
         return parent::getDataAccessApiKeys();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relation)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRelation', array($relation));
-
-        return parent::addRelation($relation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRelations()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRelations', array());
-
-        return parent::getRelations();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setRelations($relations)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRelations', array($relations));
-
-        return parent::setRelations($relations);
     }
 
     /**
@@ -409,28 +398,6 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
     /**
      * {@inheritDoc}
      */
-    public function addSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $sync)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addSync', array($sync));
-
-        return parent::addSync($sync);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSyncs()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSyncs', array());
-
-        return parent::getSyncs();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getComponentController()
     {
 
@@ -459,6 +426,17 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

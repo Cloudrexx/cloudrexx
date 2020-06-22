@@ -75,6 +75,43 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     /**
      * {@inheritdoc}
      */
+    public function getCommandsForCommandMode() {
+        return array('config');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommandDescription($command, $short = false) {
+        switch ($command) {
+            case 'config':
+                if ($short) {
+                    return 'Allows (re-)initialization of base configuration';
+                }
+                return $this->getCommandDescription($command, true) . '
+
+    Usage: ./cx config init [--force]';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
+        switch ($command) {
+            case 'config':
+                $force = current($arguments) == '--force';
+                \Cx\Core\Config\Controller\Config::init(null, $force);
+                echo 'Done' . PHP_EOL;
+                break;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
         $widgetController = $this->getComponent('Widget');

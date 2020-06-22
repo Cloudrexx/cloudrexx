@@ -1,9 +1,6 @@
 Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
   type: entity
   table: module_calendar_registration_form_field
-  indexes:
-    contrexx_module_calendar_form_ibfk:
-      columns: [ form ]
   id:
     id:
       type: integer
@@ -11,7 +8,8 @@ Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
         strategy: AUTO
   fields:
     type:
-      type: string
+      type: enum
+      values: ['inputtext','textarea','select','radio','checkbox','mail','seating','agb','salutation','firstname','lastname','selectBillingAddress','fieldset']
     required:
       type: integer
     order:
@@ -19,9 +17,6 @@ Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
     affiliation:
       type: string
       length: 45
-  uniqueConstraints:
-    form:
-      columns: [ form ]
   oneToMany:
     registrationFormFieldNames:
       targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
@@ -35,4 +30,5 @@ Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
       inversedBy: registrationFormFields
       joinColumn:
         name: form
+        nullable: false
         referencedColumnName: id

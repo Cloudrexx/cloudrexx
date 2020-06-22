@@ -39,7 +39,6 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "Nieuwsberichten";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "Nieuwsbericht";
 $_ARRAYLANG['TXT_HYPERLINKS'] = "Hyperlinks";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "Externe bronnen";
-$_ARRAYLANG['TXT_LINK'] = "Link";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "Nieuwsinhoud";
 $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'] = "Gerelateerde hyperlinks";
 $_ARRAYLANG['TXT_NEWS_SOURCE'] = "Bron";

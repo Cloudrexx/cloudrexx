@@ -47,11 +47,6 @@ namespace Cx\Core\NetManager\Controller;
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController {
 
     /**
-     * Template object
-     */
-    protected $template;
-
-    /**
      * Returns a list of available commands (?act=XY)
      * @return array List of acts
      */
@@ -67,18 +62,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * To show messages, use \Message class
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
+     * @param boolean $isSingle Wether edit view or not
      */
     public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
-        // this class inherits from Controller, therefore you can get access to
-        // Cx like this:
-        $this->cx;
-        $this->template = $template;
-
-        // instantiate the default View Controller
-        $objController = new \Cx\Core\NetManager\Controller\DefaultController($this->getSystemComponentController(), $this->cx);
-        $objController->parsePage($this->template, array());
-
-        \Message::show();
+        $this->parseEntityClassPage($template, 'Cx\Core\Net\Model\Entity\Domain', current($cmd), array(), $isSingle);
     }
 
     /**
@@ -168,6 +155,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
                             preg_match_all('/\d+/', $rowId, $ids, null, 0);
 
+                            // hostname's ID is 0
+                            if (!$ids[0][1]) {
+                                return '';
+                            }
+
                             $actionIcons = '';
                             $csrfParams = \Cx\Core\Csrf\Controller\Csrf::param();
                             if ($mainDomainName !== $rowData['name']) {
@@ -204,6 +196,4 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 break;
         }
     }
-
-
 }

@@ -60,6 +60,8 @@ class YamlSettingEventListenerException extends \Exception {}
 class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener {
     public function preUpdate($eventArgs) {
         global $_CONFIG,$_ARRAYLANG;
+        $cx = $this->cx;
+        $isCliCall = $cx->isCliCall();
         try {
             $objSetting = $eventArgs->getEntity();
             $value = $objSetting->getValue();
@@ -70,6 +72,16 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         \Message::add($_ARRAYLANG['TXT_CORE_TIMEZONE_INVALID'], \Message::CLASS_ERROR);
                         throw new YamlSettingEventListenerException($_ARRAYLANG['TXT_CORE_TIMEZONE_INVALID']);
                     }
+
+                    if ($value != $_CONFIG[$objSetting->getName()]) {
+                        //clear cache
+                         $widgetNames = array(
+                            'DATE',
+                        );
+                        $this->cx->getEvents()->triggerEvent(
+                            'clearEsiCache', array('Widget',  $widgetNames)
+                        );
+                    }
                     break;
 
                 case 'mainDomainId':
@@ -79,14 +91,17 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         if ($objMainDomain) {
                             $domainUrl = $objMainDomain->getName();
                             $protocol = 'http';
-                            if ($_CONFIG['forceProtocolFrontend'] != 'none') {
-                                $protocol = $_CONFIG['forceProtocolFrontend'];
+                            if ($_CONFIG['forceProtocolBackend'] != 'none') {
+                                $protocol = $_CONFIG['forceProtocolBackend'];
                             }
-                            if (\Cx\Core\Config\Controller\Config::checkAccessibility($protocol, $domainUrl)) {
-                                $this->getComponent('Cache')->deleteNonPagePageCache();
-                            } else {
+                            if (
+                                !$isCliCall &&
+                                !\Cx\Core\Config\Controller\Config::checkAccessibility($protocol, $domainUrl)
+                            ) {
                                 \Message::add(sprintf($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_MAINDOMAIN'], $domainUrl), \Message::CLASS_ERROR);
                                 $objSetting->setValue($_CONFIG['mainDomainId']);
+                            } else {
+                                $this->getComponent('Cache')->deleteNonPagePageCache();
                             }
                         }
                     }
@@ -94,8 +109,12 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
 
                 case 'forceProtocolFrontend':
                     if ($_CONFIG['forceProtocolFrontend'] != $value) {
-                        if (!\Cx\Core\Config\Controller\Config::checkAccessibility($value)) {
-                            \Message::add($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_PROTOCOL'], \Message::CLASS_ERROR);
+                        if (
+                            !$isCliCall &&
+                            !\Cx\Core\Config\Controller\Config::checkAccessibility($value)
+                        ) {
+                            $domainAddr = $value . '://' . $_CONFIG['domainUrl'] . '/';
+                            \Message::add(sprintf($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_PROTOCOL'], $domainAddr), \Message::CLASS_ERROR);
                             $objSetting->setValue('none');
                         }
                     }
@@ -106,20 +125,30 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
 
                 case 'forceProtocolBackend':
                     if ($_CONFIG['forceProtocolBackend'] != $value) {
-                        if (!\Cx\Core\Config\Controller\Config::checkAccessibility($value)) {
-                            \Message::add($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_PROTOCOL'], \Message::CLASS_ERROR);
+                        if (
+                            !$isCliCall &&
+                            !\Cx\Core\Config\Controller\Config::checkAccessibility($value)
+                        ) {
+                            $domainAddr = $value . '://' . $_CONFIG['domainUrl'] . '/';
+                            \Message::add(sprintf($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_PROTOCOL'], $domainAddr), \Message::CLASS_ERROR);
                             $objSetting->setValue('none');
                         }
                     }
                     break;
 
                 case 'forceDomainUrl':
+                    if ($value == 'off') {
+                        break;
+                    }
                     $useHttps = $_CONFIG['forceProtocolBackend'] == 'https';
                     $protocol = 'http';
                     if ($useHttps == 'https') {
                         $protocol = 'https';
                     }
-                    if (!\Cx\Core\Config\Controller\Config::checkAccessibility($protocol)) {
+                    if (
+                        !$isCliCall &&
+                        !\Cx\Core\Config\Controller\Config::checkAccessibility($protocol)
+                    ) {
                         \Message::add($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_FORCE_MAINDOMAIN'], \Message::CLASS_ERROR);
                         $objSetting->setValue('off');
                     }
@@ -167,6 +196,34 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                             array('Widget', 'METAIMAGE')
                         );
                     }
+                    break;
+                case 'useVirtualLanguageDirectories':
+                    if ($value == 'on' || $value == $_CONFIG[$objSetting->getName()]) {
+                        break;
+                    }
+
+                    $locale = $this->cx->getDb()->getEntityManager()
+                        ->getRepository('\Cx\Core\Locale\Model\Entity\Locale')
+                        ->findAll();
+                    // Set strong tag to the text
+                    $strongText = new \Cx\Core\Html\Model\Entity\HtmlElement('strong');
+                    $strongText->addChild(
+                        new \Cx\Core\Html\Model\Entity\TextElement(
+                            $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']
+                        )
+                    );
+
+                    if ($value === 'off' && count($locale) > 1) {
+                        \Message::error(
+                            sprintf(
+                                $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'],
+                                $strongText
+                            )
+                        );
+                        $objSetting->setValue('on');
+                    }
+                    break;
+                default :
                     break;
             }
         } catch (YamlSettingEventListenerException $e) {

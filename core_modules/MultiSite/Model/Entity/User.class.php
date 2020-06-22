@@ -25,6 +25,16 @@ class User extends \User {
      */
     protected $multiSiteId = null;
 
+    public function __construct($baseUser = null)
+    {
+        parent::__construct();
+
+        if ($baseUser) {
+            $this->arrLoadedUsers = &$baseUser->arrLoadedUsers;
+            $this->arrCachedUsers = &$baseUser->arrCachedUsers;
+        }
+    }
+
     /**
      * Set a custom ID which shall be used for a newly created user instead of the next auto-increment ID.
      * @param   integer $id The user-ID to use for the newly created user account
@@ -32,6 +42,22 @@ class User extends \User {
     public function setMultiSiteId($id){
         $this->multiSiteId = $id;
     }    
+
+    /**
+     * @inheritdoc
+     */
+    public function getUser($id, $forceReload = false) {
+        $objUser = parent::getUser($id, $forceReload);
+        if ($objUser === false) {
+            return false;
+        }
+
+        if (isset($this->arrLoadedUsers[$id]['password'])) {
+            $objUser->setHashedPassword($this->arrLoadedUsers[$id]['password']);
+        }
+
+        return $objUser;
+    }
 
     /**
      * Overwritten \User::createUser() method

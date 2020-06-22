@@ -13,9 +13,11 @@ Cx\Modules\Calendar\Model\Entity\Invite:
     timestamp:
       type: integer
       column: date
+      options:
+        unsigned: true
     inviteeType:
-      type: string
-      length: 255
+      type: enum
+      values: ['-','AccessUser','CrmContact']
       column: invitee_type
     inviteeId:
       type: integer
@@ -23,6 +25,7 @@ Cx\Modules\Calendar\Model\Entity\Invite:
     email:
       type: string
       length: 255
+      nullable: true
       column: email
     token:
       type: string
@@ -38,4 +41,5 @@ Cx\Modules\Calendar\Model\Entity\Invite:
       inversedBy: invite
       joinColumn:
         name: event_id
+        nullable: false
         referencedColumnName: id

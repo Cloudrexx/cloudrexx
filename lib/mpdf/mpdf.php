@@ -6384,8 +6384,8 @@ class mPDF
 			/* -- END TABLES -- */
 			$ipaddingL = $this->blk[$this->blklvl]['padding_left'];
 			$ipaddingR = $this->blk[$this->blklvl]['padding_right'];
-			$paddingL = ($ipaddingL * _MPDFK);
-			$paddingR = ($ipaddingR * _MPDFK);
+			$paddingL = (intval($ipaddingL) * _MPDFK);
+			$paddingR = (intval($ipaddingR) * _MPDFK);
 			$this->cMarginL = $this->blk[$this->blklvl]['border_left']['w'];
 			$this->cMarginR = $this->blk[$this->blklvl]['border_right']['w'];
 
@@ -7600,8 +7600,8 @@ class mPDF
 			/* -- END TABLES -- */
 			$ipaddingL = $this->blk[$this->blklvl]['padding_left'];
 			$ipaddingR = $this->blk[$this->blklvl]['padding_right'];
-			$paddingL = ($ipaddingL * _MPDFK);
-			$paddingR = ($ipaddingR * _MPDFK);
+			$paddingL = (intval($ipaddingL) * _MPDFK);
+			$paddingR = (intval($ipaddingR) * _MPDFK);
 			$this->cMarginL = $this->blk[$this->blklvl]['border_left']['w'];
 			$cpaddingadjustL = -$this->cMarginL;
 			$this->cMarginR = $this->blk[$this->blklvl]['border_right']['w'];
@@ -10892,7 +10892,7 @@ class mPDF
 	{
 		$filter = ($this->compress) ? '/Filter /FlateDecode ' : '';
 		reset($this->images);
-		while (list($file, $info) = each($this->images)) {
+		foreach ($this->images as $file => $info) {
 			$this->_newobj();
 			$this->images[$file]['n'] = $this->n;
 			$this->_out('<</Type /XObject');
@@ -13035,7 +13035,7 @@ class mPDF
 	function _putformobjects()
 	{
 		reset($this->formobjects);
-		while (list($file, $info) = each($this->formobjects)) {
+		foreach ($this->formobjects as $file => $info) {
 			$this->_newobj();
 			$this->formobjects[$file]['n'] = $this->n;
 			$this->_out('<</Type /XObject');
@@ -13728,7 +13728,12 @@ class mPDF
 			$lh = $this->_getNormalLineheight();
 		}
 		if (preg_match('/mm/', $lh)) {
-			return (($lh + 0.0) / $k); // convert to number
+			$lhAsInt = 0;
+			$match = array();
+			if (preg_match('/^([.0-9]*)/', $lh, $match)) {
+				$lhAsInt = $match[1];
+			}
+			return (($lhAsInt + 0.0) / $k); // convert to number
 		} elseif ($lh > 0) {
 			return ($fs * $lh);
 		}
@@ -13769,7 +13774,12 @@ class mPDF
 			$lineheight = ($fontsize * $lh);
 			$leading += $linegap; // specified in hhea or sTypo in OpenType tables	****************************************
 		} elseif (preg_match('/mm/', $CSSlineheight)) {
-			$lineheight = (($CSSlineheight + 0.0) / $shrin_k);
+			$CSSlineheightAsInt = 0;
+			$match = array();
+			if (preg_match('/^([.0-9]*)/', $CSSlineheight, $match)) {
+				$CSSlineheightAsInt = $match[1];
+			}
+			$lineheight = (($CSSlineheightAsInt + 0.0) / $shrin_k);
 		} // convert to number
 		// ??? If lineheight is a factor e.g. 1.3  ?? use factor x 1em or ? use 'normal' lineheight * factor ******************************
 		// Could depend on value for $text_height - a draft CSS value as set above for now
@@ -14133,7 +14143,7 @@ class mPDF
 		}
 	}
 
-	function GetFullPath(&$path, $basepath = '')
+	function GetFullPath(&$path, $basepath = '', $tagname = '')
 	{
 		// When parsing CSS need to pass temporary basepath - so links are relative to current stylesheet
 		if (!$basepath) {
@@ -16445,12 +16455,12 @@ class mPDF
 					// mPDF 6
 					$this->tag->CloseTag($endtag, $a, $i); // mPDF 6
 				} else { // OPENING TAG
+					if (strpos($e, ' ')) {
+						$te = strtoupper(substr($e, 0, strpos($e, ' ')));
+					} else {
+						$te = strtoupper($e);
+					}
 					if ($this->blk[$this->blklvl]['hide']) {
-						if (strpos($e, ' ')) {
-							$te = strtoupper(substr($e, 0, strpos($e, ' ')));
-						} else {
-							$te = strtoupper($e);
-						}
 						// mPDF 6
 						if ($te == 'THEAD' || $te == 'TBODY' || $te == 'TFOOT' || $te == 'TR' || $te == 'TD' || $te == 'TH') {
 							$this->lastoptionaltag = $te;
@@ -16465,11 +16475,6 @@ class mPDF
 
 					/* -- CSS-POSITION -- */
 					if ($this->inFixedPosBlock) {
-						if (strpos($e, ' ')) {
-							$te = strtoupper(substr($e, 0, strpos($e, ' ')));
-						} else {
-							$te = strtoupper($e);
-						}
 						$this->fixedPosBlock .= '<' . $e . '>';
 						if (in_array($te, $this->outerblocktags) || in_array($te, $this->innerblocktags)) {
 							$this->fixedPosBlockDepth++;
@@ -16499,8 +16504,8 @@ class mPDF
 						}
 						if (trim($path) != '' && !(stristr($e, "src=") !== false && substr($path, 0, 4) == 'var:') && substr($path, 0, 1) != '@') {
 							$path = htmlspecialchars_decode($path); // mPDF 5.7.4 URLs
-							$orig_srcpath = $path;
-							$this->GetFullPath($path);
+                            $orig_srcpath = $path;
+							$this->GetFullPath($path, '', $te);
 							$regexp = '/ (href|src)="(.*?)"/i';
 							$e = preg_replace($regexp, ' \\1="' . $path . '"', $e);
 						}
@@ -26346,9 +26351,9 @@ class mPDF
 					if (isset($tpl['resources'])) {
 						$this->current_parser = $tpl['parser'];
 						reset($tpl['resources'][1]);
-						while (list($k, $v) = each($tpl['resources'][1])) {
+						foreach ($tpl['resources'][1] as $k => $v) {
 							if ($k == '/Shading') {
-								while (list($k2, $v2) = each($v[1])) {
+							    foreach ($v[1] as $k2 => $v2) {
 									$this->_out($k2 . " ", false);
 									$this->pdf_write_value($v2);
 								}
@@ -30557,21 +30562,32 @@ class mPDF
 		// Setting e.g. margin % will use maxsize (pagewidth) and em will use fontsize
 		// Returns values using 'mm' units
 		$size = trim(strtolower($size));
+		$sizeAsInt = 0;
+		$match = array();
+		if (preg_match('/^([.0-9]*)/', $size, $match)) {
+			$sizeAsInt = $match[1];
+		}
 
-		if ($size == 'thin')
+		if ($size == 'thin') {
 			$size = 1 * (25.4 / $this->dpi); //1 pixel width for table borders
-		elseif (stristr($size, 'px'))
+		} elseif (stristr($size, 'px')) {
+			$size = $sizeAsInt;
 			$size *= (25.4 / $this->dpi); //pixels
-		elseif (stristr($size, 'cm'))
+		} elseif (stristr($size, 'cm')) {
+			$size = $sizeAsInt;
 			$size *= 10; //centimeters
-		elseif (stristr($size, 'mm'))
+		} elseif (stristr($size, 'mm')) {
+			$size = $sizeAsInt;
 			$size += 0; //millimeters
-		elseif (stristr($size, 'pt'))
+		} elseif (stristr($size, 'pt')) {
+			$size = $sizeAsInt;
 			$size *= 25.4 / 72; //72 pts/inch
-		elseif (stristr($size, 'rem')) {
+		} elseif (stristr($size, 'rem')) {
+			$size = $sizeAsInt;
 			$size += 0; //make "0.83rem" become simply "0.83"
 			$size *= ($this->default_font_size / _MPDFK);
 		} elseif (stristr($size, 'em')) {
+			$size = $sizeAsInt;
 			$size += 0; //make "0.83em" become simply "0.83"
 			if ($fontsize) {
 				$size *= $fontsize;
@@ -30579,71 +30595,84 @@ class mPDF
 				$size *= $maxsize;
 			}
 		} elseif (stristr($size, '%')) {
+			$size = $sizeAsInt;
 			$size += 0; //make "90%" become simply "90"
 			if ($fontsize && $usefontsize) {
 				$size *= $fontsize / 100;
 			} else {
 				$size *= $maxsize / 100;
 			}
-		} elseif (stristr($size, 'in'))
+		} elseif (stristr($size, 'in')) {
+			$size = $sizeAsInt;
 			$size *= 25.4; //inches
-		elseif (stristr($size, 'pc'))
+		} elseif (stristr($size, 'pc')) {
+			$size = $sizeAsInt;
 			$size *= 38.1 / 9; //PostScript picas
-		elseif (stristr($size, 'ex')) { // Approximates "ex" as half of font height
+		} elseif (stristr($size, 'ex')) { // Approximates "ex" as half of font height
+			$size = $sizeAsInt;
 			$size += 0; //make "3.5ex" become simply "3.5"
 			if ($fontsize) {
 				$size *= $fontsize / 2;
 			} else {
 				$size *= $maxsize / 2;
 			}
-		} elseif ($size == 'medium')
+		} elseif ($size == 'medium') {
 			$size = 3 * (25.4 / $this->dpi); //3 pixel width for table borders
-		elseif ($size == 'thick')
+		} elseif ($size == 'thick') {
 			$size = 5 * (25.4 / $this->dpi); //5 pixel width for table borders
-		elseif ($size == 'xx-small') {
+		} elseif ($size == 'xx-small') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 0.7;
 			} else {
 				$size *= $maxsize * 0.7;
 			}
 		} elseif ($size == 'x-small') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 0.77;
 			} else {
 				$size *= $maxsize * 0.77;
 			}
 		} elseif ($size == 'small') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 0.86;
 			} else {
 				$size *= $maxsize * 0.86;
 			}
 		} elseif ($size == 'medium') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize;
 			} else {
 				$size *= $maxsize;
 			}
 		} elseif ($size == 'large') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 1.2;
 			} else {
 				$size *= $maxsize * 1.2;
 			}
 		} elseif ($size == 'x-large') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 1.5;
 			} else {
 				$size *= $maxsize * 1.5;
 			}
 		} elseif ($size == 'xx-large') {
+			$size = $sizeAsInt;
 			if ($fontsize) {
 				$size *= $fontsize * 2;
 			} else {
 				$size *= $maxsize * 2;
 			}
-		} else
+		} else {
+			$size = $sizeAsInt;
 			$size *= (25.4 / $this->dpi); //nothing == px
+		}
 
 		return $size;
 	}
@@ -31091,7 +31120,7 @@ class mPDF
 				// A dictionary.
 				$this->_out("<<", false);
 				reset($value[1]);
-				while (list($k, $v) = each($value[1])) {
+				foreach ($value[1] as $k => $v) {
 					$this->_out($k . ' ',false);
 					$this->pdf_write_value($v);
 				}

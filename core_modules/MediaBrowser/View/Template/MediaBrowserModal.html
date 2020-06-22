@@ -20,7 +20,7 @@
             <select class="selectsource"
                     ng-options="source as source.name for source in sources"
                     ng-model="selectedSource" ng-change="updateSource(false, true)"
-                    ng-show="activeController === 'MediaBrowserListCtrl'"
+                    ng-show="activeController === 'FilebrowserCtrl'"
                     ng-class="sources ? '' : 'loading'">
                 <option value="files">
                     {{:: 'TXT_FILEBROWSER_FILES' | translate }}
