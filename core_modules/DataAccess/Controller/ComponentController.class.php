@@ -866,7 +866,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $method = $this->cx->getRequest()->getHttpRequestMethod();
         
         // handle CLI
-        if (php_sapi_name() == 'cli') {
+        if ($this->cx->isCliCall()) {
             try {
                 $this->getOutputModule(current($arguments));
             } catch (\Exception $e) {
