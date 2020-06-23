@@ -997,7 +997,7 @@ class Category
             return false;
         }
 
-        $this->checkCategoryPermission($_ARRAYLANG);
+        $this->checkCategoryPermission();
 
         if ($this->id) {
             if ($objDatabase->Execute("
