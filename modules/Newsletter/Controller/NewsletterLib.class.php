@@ -770,7 +770,7 @@ class NewsletterLib
 
     static function _getHTML($onlyId=false)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $objDatabase;
         $langData = \Env::get('init')->getComponentSpecificLanguageData('Newsletter');
 
         $html = '';
@@ -794,8 +794,8 @@ class NewsletterLib
                 $html .= "<br />";
             }
 
-            $html .= '<input type="text" onfocus="this.value=\'\'" name="email" value="'.$_ARRAYLANG['TXT_NEWSLETTER_EMAIL_ADDRESS'].'" style="width: 165px;" maxlength="255" /><br /><br />'."\n";
-            $html .= '<input type="submit" name="recipient_save" value="'.$_ARRAYLANG['TXT_NEWSLETTER_SUBSCRIBE'].'" />'."\n";
+            $html .= '<input type="text" onfocus="this.value=\'\'" name="email" value="'.$langData['TXT_NEWSLETTER_EMAIL_ADDRESS'].'" style="width: 165px;" maxlength="255" /><br /><br />'."\n";
+            $html .= '<input type="submit" name="recipient_save" value="'.$langData['TXT_NEWSLETTER_SUBSCRIBE'].'" />'."\n";
             $html .= "</form>\n";
         }
 
