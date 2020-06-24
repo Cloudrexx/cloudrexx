@@ -66,7 +66,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             case 'NEWSLETTER_BLOCK':
                 $template->setVariable($name, \Cx\Modules\Newsletter\Controller\NewsletterLib::_getHTML());
                 break;
-                
         }
     }
 }
