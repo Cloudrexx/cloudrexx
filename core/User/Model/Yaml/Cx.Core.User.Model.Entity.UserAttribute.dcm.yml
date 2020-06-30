@@ -61,6 +61,12 @@ Cx\Core\User\Model\Entity\UserAttribute:
       column: is_default
       options:
         default: "0"
+    context:
+      type: string
+      length: 255
+      nullable: false
+      options:
+        default: ''
   oneToMany:
     children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute

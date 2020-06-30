@@ -1310,6 +1310,7 @@ class CrmSettings extends CrmLibrary
                     $attribut->setNames($placeholderArr);
                     $attribut->setType('text');
                     $attribut->setParent(0);
+                    $attribut->moveToEnd();
 
                     if(!$attribut->store()){
                         throw new \Cx\Modules\Crm\Controller\CrmSettingsException('Failed to create User_Profile_Attribute for '.$key);

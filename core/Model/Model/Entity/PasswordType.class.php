@@ -76,7 +76,7 @@ class PasswordType extends \Doctrine\DBAL\Types\Type {
      */
     public function convertToDatabaseValue($value, \Doctrine\DBAL\Platforms\AbstractPlatform $platform)
     {
-        if (is_a($value, 'Password')) {
+        if (is_a($value, 'Cx\Core\Model\Model\Entity\Password')) {
             return $value;
         }
         return (string) Password::createFromPlaintext($value);
@@ -88,6 +88,14 @@ class PasswordType extends \Doctrine\DBAL\Types\Type {
     public function getName()
     {
         return 'password';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requiresSQLCommentHint(\Doctrine\DBAL\Platforms\AbstractPlatform $platform)
+    {
+        return true;
     }
 }
 

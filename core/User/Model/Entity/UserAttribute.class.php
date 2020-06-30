@@ -36,7 +36,7 @@
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Attributes that contain informations about the users.
+ * Attributes that contain information about the users.
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
@@ -154,7 +154,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     title="Attribute ID",
      * )
      *
-     * @var integer $id
+     * @var integer ID of the user attribute
      */
     protected $id;
 
@@ -224,7 +224,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *      }
      * )
      *
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @var string The type of the attribute
+     *     possibilities: text, textarea, mail, uri, date, image, checkbox,
+     *         menu, menu_option, group, frame, history
      */
     protected $type = self::TYPE_TEXT;
 
@@ -247,7 +249,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     default="false",
      * )
      *
-     * @var boolean $mandatory
+     * @var boolean Whether the attribute is mandatory
      */
     protected $mandatory = false;
 
@@ -263,7 +265,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     default="asc",
      * )
      *
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @var string How the child attributes should be sorted
+     *     possibilities: asc, desc, custom
      */
     protected $sortType = self::SORT_TYPE_ASC;
 
@@ -276,7 +279,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     default="0",
      * )
      *
-     * @var integer $orderId
+     * @var integer The order the attributes get listed
      */
     protected $orderId = 0;
 
@@ -291,7 +294,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
      *
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @var string Set a special privilege for users that do not have editing
+     *     rights from assigned group
+     *     possibilities: menu_select_higher, menu_select_lower
      */
     protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
@@ -305,7 +310,10 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     title="Access ID",
      * )
      *
-     * @var integer $accessId
+     * @var integer Permissions are handled using access IDs. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $accessId;
 
@@ -319,7 +327,10 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     title="Access ID read",
      * )
      *
-     * @var integer $readAccessId
+     * @var integer Unique identifier for reading access. There are two types:
+     *     Static (restrict the access to functions and sections - mostly backend)
+     *     Dynamic (restrict the access to content data - content pages,
+     *     categories, documents, etc.)
      */
     protected $readAccessId;
 
@@ -335,7 +346,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     }
      * )
      *
-     * @var \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @var \Cx\Core\User\Model\Entity\UserAttribute The associated parent
+     *     attribute
      */
     protected $parent;
 
@@ -366,17 +378,23 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     type="object",
      * )
      *
-     * @var \Doctrine\Common\Collections\Collection $children
+     * @var \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     protected $children;
 
     /**
-     * @var boolean $default
+     * @var boolean Whether the attribute is a default system attribute
      */
     protected $default;
 
     /**
-     * @var array[] $arrTypes
+     * @var string To identify attributes with a name
+     */
+    protected $context = '';
+
+    /**
+     * @var array[] Default configuration of the default attributes
      */
     protected $arrTypes = array(
         'text' => array(
@@ -503,6 +521,250 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     );
 
     /**
+     * @var array[] default attribute configuration
+     */
+    public $arrDefaultAttributeTemplates = array(
+        'picture' => array(
+            'type'         => 'image',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PROFILE_PIC',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'gender' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'custom',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_GENDER',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'gender_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'gender_female' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_FEMALE',
+            'order_id'     => 1
+        ),
+        'gender_male' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'gender',
+            'desc'         => 'TXT_ACCESS_MALE',
+            'order_id'     => 2,
+        ),
+        'title' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'desc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_TITLE',
+            'modifiable'   => array('mandatory', 'sort_order', 'access', 'children'),
+        ),
+        'title_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'title',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'value'        => '0',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'designation' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'desc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_DESIGNATION',
+        ),
+        'firstname' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_FIRSTNAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'lastname' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_LASTNAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'company' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_COMPANY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'address' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_ADDRESS',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'city' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_CITY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'zip' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_ZIP',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'country' => array(
+            'type'         => 'menu',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_COUNTRY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'country_undefined' => array(
+            'type'         => 'menu_option',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 'country',
+            'desc'         => 'TXT_ACCESS_NOT_SPECIFIED',
+            'value'        => '0',
+            'unknown'      => true,
+            'order_id'     => 0,
+        ),
+        'phone_office' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_OFFICE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_private' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_PRIVATE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_mobile' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_MOBILE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'phone_fax' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PHONE_FAX',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'birthday' => array(
+            'type'         => 'date',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_BIRTHDAY',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'website' => array(
+            'type'         => 'uri',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_WEBSITE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        /*'skype' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_SKYPE_NAME',
+            'modifiable'   => array('mandatory', 'access'),
+        ),*/
+        'profession' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_PREFESSION',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'interests' => array(
+            'type'         => 'text',
+            'multiline'    => true,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_INTERESTS',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+        'signature' => array(
+            'type'         => 'text',
+            'multiline'    => true,
+            'mandatory'    => false,
+            'sort_type'    => 'asc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_SIGNATURE',
+            'modifiable'   => array('mandatory', 'access'),
+        ),
+    );
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -534,7 +796,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer ID of the user attribute
      */
     public function getId()
     {
@@ -544,7 +806,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set type
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @param string $type
      */
     public function setType($type)
     {
@@ -554,7 +816,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get type
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @return string The type of the attribute
      */
     public function getType()
     {
@@ -578,7 +840,25 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      */
     public function getName()
     {
-        return $this->name;
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+
+        if (
+            $frontend ||
+            !$this->isDefault() ||
+            !isset(
+                $this->arrDefaultAttributeTemplates[$this->getContext()]['desc']
+            )
+        ) {
+            return $this->name;
+        }
+
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core', $frontend
+        );
+
+        return $_CORELANG[
+            $this->arrDefaultAttributeTemplates[$this->getContext()]['desc']
+        ];
     }
 
     /**
@@ -594,7 +874,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get mandatory
      *
-     * @return boolean $mandatory
+     * @return boolean Whether the attribute is mandatory
      */
     public function getMandatory()
     {
@@ -604,7 +884,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set sortType
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @param string $sortType
      */
     public function setSortType($sortType)
     {
@@ -614,7 +894,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get sortType
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @return string How the child attributes should be sorted
      */
     public function getSortType()
     {
@@ -634,7 +914,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get orderId
      *
-     * @return integer $orderId
+     * @return integer Order ID
      */
     public function getOrderId()
     {
@@ -644,7 +924,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Set accessSpecial
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @param string $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -654,7 +934,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get accessSpecial
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @return string Special access privilege
      */
     public function getAccessSpecial()
     {
@@ -674,7 +954,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get accessId
      *
-     * @return integer $accessId
+     * @return integer AccessIDs to manage permissions
      */
     public function getAccessId()
     {
@@ -694,7 +974,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get readAccessId
      *
-     * @return integer $readAccessId
+     * @return integer Unique identifier for reading access
      */
     public function getReadAccessId()
     {
@@ -716,7 +996,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean $default
+     * @return boolean Whether attribute is a default system attribute
      */
     public function getDefault()
     {
@@ -729,11 +1009,31 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean $default
+     * @return boolean Whether attribute is a default system attribute
      */
     public function isDefault()
     {
         return $this->getDefault();
+    }
+
+    /**
+     * Set context
+     *
+     * @param string $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
+
+    /**
+     * Get context
+     *
+     * @return string Name Identifier
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**
@@ -759,7 +1059,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection $child
+     * @return \Doctrine\Common\Collections\Collection Collection of child
+     *     user attributes
      */
     public function getChildren()
     {
@@ -789,7 +1090,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get userAttributeValues
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeValues
+     * @return \Doctrine\Common\Collections\Collection Collection of values
+     *     associated to this user attribute
      */
     public function getUserAttributeValues()
     {
@@ -809,7 +1111,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @return \Cx\Core\User\Model\Entity\UserAttribute The associated parent
+     *     attribute
      */
     public function getParent()
     {

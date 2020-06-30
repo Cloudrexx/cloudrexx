@@ -41,6 +41,7 @@ CREATE TABLE `contrexx_access_user_attribute` (
   `access_id` int NOT NULL,
   `read_access_id` int NOT NULL,
   `is_default` tinyint(1) DEFAULT '0' NOT NULL,
+  `context` VARCHAR(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   INDEX `contrexx_access_user_attribute_parent_id_ibfk` (`parent_id`)
 ) ENGINE=InnoDB ;
@@ -98,7 +99,7 @@ CREATE TABLE `contrexx_access_users` (
   `expiration` int unsigned NOT NULL DEFAULT '0',
   `validity` int unsigned NOT NULL DEFAULT '0',
   `last_auth` int unsigned NOT NULL DEFAULT '0',
-  `last_auth_status` smallint NOT NULL DEFAULT '0',
+  `last_auth_status` smallint NOT NULL DEFAULT '1',
   `last_activity` int unsigned NOT NULL DEFAULT '0',
   `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',

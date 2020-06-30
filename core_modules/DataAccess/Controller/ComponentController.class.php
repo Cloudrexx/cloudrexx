@@ -990,7 +990,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (!empty($arguments[2])) {
+            if (isset($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
                 $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {
@@ -1322,7 +1322,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return  string  The fixed string.
      */
     protected function fixMultilineDoc($doc) {
-        $formattedDoc = preg_replace('/\\\\n\s+\*\s?/', '\\\\n', $doc);
+        $formattedDoc = preg_replace('/\\\\n\s+\*\s/', '\\\\n', $doc);
 
         // verify that the replacement did work
         if ($formattedDoc === null) {

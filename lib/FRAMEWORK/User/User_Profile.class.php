@@ -117,6 +117,11 @@ class User_Profile
 
                 foreach ($arrValues as $nr => $value) {
                     $value = trim(contrexx_stripslashes($value));
+                    if ($attributeId == 'gender') {
+                        $value = $objAttribute->getAttributeIdByDefaultAttributeId(
+                            $value
+                        );
+                    }
 
                     if ($objAttribute->getType() === 'date') {
                         if (is_array($value)) {
@@ -261,7 +266,7 @@ class User_Profile
                 }
             }
 
-            if ($this->objAttribute->isCustomAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
+            if (!$this->objAttribute->isDefaultAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
                 foreach (array_diff(array_keys($this->arrCachedUsers[$this->id]['profile'][$attributeId]), array_keys($arrValue)) as $historyId) {
                     $attributeValue = $attributeValueRepo->findOneBy(
                         array('userAttribute' => $attributeId, 'user' => $this->id, 'history' => $historyId)
