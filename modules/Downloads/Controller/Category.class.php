@@ -997,7 +997,9 @@ class Category
             return false;
         }
 
-        $this->checkCategoryPermission();
+        if(!$this->checkCategoryPermission()) {
+            return false;
+        }
 
         if ($this->id) {
             if ($objDatabase->Execute("
@@ -1242,7 +1244,9 @@ class Category
                     $objSubcategory->setPermissionsRecursive(true);
                     $objSubcategory->setPermissions($arrPermissions);
                     $objSubcategory->setVisibility($this->visibility);
-                    $objSubcategory->checkCategoryPermission();
+                    if(!$this->checkCategoryPermission()) {
+                        return false;
+                    }
                     $objSubcategory->storePermissions();
                     $objSubcategory->next();
                 }
@@ -1300,6 +1304,7 @@ class Category
             $this->error_msg[] = $objParentCategory->getId() ? ($this->id ? sprintf($_ARRAYLANG['TXT_DOWNLOADS_UPDATE_CATEGORY_PROHIBITED'], htmlentities($this->getName(), ENT_QUOTES, CONTREXX_CHARSET)) : sprintf($_ARRAYLANG['TXT_DOWNLOADS_ADD_SUBCATEGORY_TO_CATEGORY_PROHIBITED'], htmlentities($this->getName(), ENT_QUOTES, CONTREXX_CHARSET))) : $_ARRAYLANG['TXT_DOWNLOADS_ADD_MAIN_CATEGORY_PROHIBITED'];
             return false;
         }
+        return true;
     }
 
     private function validateName()
@@ -1457,14 +1462,23 @@ class Category
 
     public function setPermissions($arrPermissions)
     {
-        $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
-
-        foreach ($arrPermissions as $permission => $arrPermission) {
-            $this->{$permission.'_protected'} = $arrPermission['protected'];
-            $this->{$permission.'_groups'} = $this->{$permission.'_protected'} ? $arrPermission['groups'] : array();
+        $oldPermissions = $this->getPermissions();
+        if(
+            $oldPermissions["read"]["groups"] == $arrPermissions["read"]["groups"] &&
+            $oldPermissions["add_subcategories"]["groups"] == $arrPermissions["add_subcategories"]["groups"] &&
+            $oldPermissions["manage_subcategories"]["groups"] == $arrPermissions["manage_subcategories"]["groups"] &&
+            $oldPermissions["add_files"]["groups"] == $arrPermissions["add_files"]["groups"] &&
+            $oldPermissions["manage_files"]["groups"] == $arrPermissions["manage_files"]["groups"]
+        ){
+            $this->permission_set = false;
+        } else {
+            $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
+            foreach ($arrPermissions as $permission => $arrPermission) {
+                $this->{$permission.'_protected'} = $arrPermission['protected'];
+                $this->{$permission.'_groups'} = $this->{$permission.'_protected'} ? $arrPermission['groups'] : array();
+            }
+            $this->permission_set = true;
         }
-
-        $this->permission_set = true;
     }
 
     public function setPermissionsRecursive($recursive)
