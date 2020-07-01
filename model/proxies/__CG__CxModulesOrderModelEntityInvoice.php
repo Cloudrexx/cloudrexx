@@ -73,10 +73,10 @@ class Invoice extends \Cx\Modules\Order\Model\Entity\Invoice implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'order', 'payments', 'invoiceItems', 'paid', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'order', 'payments', 'invoiceItems', 'paid', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'order', 'payments', 'invoiceItems', 'paid', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'order', 'payments', 'invoiceItems', 'paid', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -321,6 +321,17 @@ class Invoice extends \Cx\Modules\Order\Model\Entity\Invoice implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function isReseller()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isReseller', array());
+
+        return parent::isReseller();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -354,6 +365,17 @@ class Invoice extends \Cx\Modules\Order\Model\Entity\Invoice implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -371,6 +393,17 @@ class Invoice extends \Cx\Modules\Order\Model\Entity\Invoice implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

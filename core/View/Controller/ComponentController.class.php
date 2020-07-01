@@ -385,7 +385,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     /**
      * {@inheritDoc}
      */
-    public function preFinalize() {
+    public function preFinalize(\Cx\Core\Html\Sigma $template) {
         global $_ARRAYLANG;
 
         if (!count($this->introSteps)) {

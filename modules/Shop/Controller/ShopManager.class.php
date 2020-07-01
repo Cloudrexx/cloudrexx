@@ -2312,6 +2312,7 @@ if ($test === NULL) {
             'SHOP_DISTRIBUTION_MENU' => Distribution::getDistributionMenu(
                 $objProduct->distribution(), 'distribution',
                 'distributionChanged();', 'style="width: 220px"'),
+            'SHOP_DISTRIBUTION_DESC' => Distribution::getDistributionDescription(),
             'SHOP_WEIGHT' => ($distribution == 'delivery'
                 ? Weight::getWeightString($objProduct->weight()) : '0 g'),
             // User group menu, returns 'userGroupId'

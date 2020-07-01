@@ -184,14 +184,20 @@ class Invoice extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Get Sum of all the associated \Cx\Modules\Order\Model\Entity\InvoiceItem::$price
+     * Get Sum of all the associated \Cx\Modules\Order\Model\Entity\InvoiceItem::$price with VAT
      *
-     * @return decimal the sum of all associated \Cx\Modules\Order\Model\Entity\InvoiceItem::$price
+     * @return decimal the sum of all associated \Cx\Modules\Order\Model\Entity\InvoiceItem::$price with VAT
      */
     public function getAmount() {
         $totalInvoiceItemPrice = 0;
+        $isReseller = $this->isReseller();
+
         foreach($this->invoiceItems as $invoiceItem) {
-            $totalInvoiceItemPrice += $invoiceItem->getPrice();
+            $totalInvoiceItemPrice += $invoiceItem->getPrice() + (
+                $isReseller
+                    ? 0.00
+                    : ($invoiceItem->getPrice() * $invoiceItem->getVatRate() * 0.01)
+            );
         }
         return $totalInvoiceItemPrice;
     }
@@ -203,5 +209,14 @@ class Invoice extends \Cx\Model\Base\EntityBase {
      */
     public function getPaid() {
         return $this->paid;
+    }
+
+    /**
+     * Check if it is reseller or not
+     *
+     * @return boolean
+     */
+    public function isReseller() {
+        return false;
     }
 }

@@ -142,10 +142,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'subscription':
                 \Permission::checkAccess(ComponentController::SUBSCRIPTION_ACCESS_ID, 'static');
                 break;
-            case 'invoice':
+            case 'Invoice':
                 \Permission::checkAccess(ComponentController::INVOICE_ACCESS_ID, 'static');
                 break;
-            case 'payment':
+            case 'Payment':
                 \Permission::checkAccess(ComponentController::PAYMENT_ACCESS_ID, 'static');
                 break;
             default :
@@ -187,8 +187,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             'filtering' => false,
                         ),
                         'fields' => array(
+                            'id' => array(
+                                'header' => 'ID',
+                            ),
                             'contactId' => array(
-                                'header' => 'contactId',
+                                'header' => 'Kunde',
                                 'table' => array(
                                     'parse' => function($value) {
                                         global $_ARRAYLANG;
@@ -211,13 +214,56 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                             return $url;
                                     },
                                 ),
+                                'formfield' => function ($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
+                                    $userId    = \Cx\Modules\Crm\Controller\CrmLibrary::getUserIdByCrmUserId($fieldvalue);
+                                    $objUser   = \FWUser::getFWUserObject()->objUser->getUser($userId);
+                                    $userEmail = $objUser ? $objUser->getEmail() : '';
+
+                                    $element = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                                    //input field for contactId
+                                    $contactId = new \Cx\Core\Html\Model\Entity\DataElement($fieldname, $userId);
+                                    $contactId->setAttribute('class', 'live-search-user-id');
+                                    $contactId->setAttribute('id', $fieldname);
+                                    $contactId->setAttribute('type', 'hidden');
+                                    $element->addChild($contactId);
+                                    //input field for userEmail
+                                    $userEmail = new \Cx\Core\Html\Model\Entity\DataElement('contactName', $userEmail);
+                                    $userEmail->setAttribute('class', 'live-search-user-name');
+                                    $userEmail->setAttribute('id', 'contactName');
+                                    $userEmail->setAttribute('type', 'hidden');
+                                    $element->addChild($userEmail);
+                                    return $element;
+                                },
                             ),
                             'subscriptions' => array(
-                                'header' => 'subscriptions',
+                                'header' => 'Abo',
                                 'table'  => array(
                                     'parse' => function ($subscriptions) {
                                         $result = array();
                                         foreach ($subscriptions as $subscription) {
+                                            $product = $subscription->getProduct();
+                                            if (!$product) {
+                                                continue;
+                                            }
+
+                                            // non-functional products
+                                            if (empty($product->getEntityClass())) {
+                                                $note = '';
+                                                if (!empty($subscription->getNote())) {
+                                                    $note = ' (' . $subscription->getNote() . ')';
+                                                }
+                                                $subscriptionEditUrl = '<a href="index.php?cmd=Order&act=subscription&editid={0,'. $subscription->getId() .'}">' . $product->getName() . '</a>';
+                                                if (
+                                                    $subscription->getState() ==
+                                                    \Cx\Modules\Order\Model\Entity\Subscription::STATE_TERMINATED
+                                                ) {
+                                                    $subscriptionEditUrl = '<s>' . $subscriptionEditUrl. '</s>';
+                                                }
+                                                $result[] = $subscriptionEditUrl . $note;
+                                                continue;
+                                            }
+
+                                            // functional products of external components
                                             $productEntity     = $subscription->getProductEntity();
                                             if(!$productEntity) {
                                                 continue;
@@ -227,7 +273,14 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                             if (method_exists($productEntity, 'getEditLink')) {
                                                 $productEditLink = $productEntity->getEditLink();
                                             }
-                                            $subscriptionEditUrl = '<a href=​index.php?cmd=Order&act=subscription&editid='. $subscription->getId() .'>' . $productEntityName . '</a>';
+                                            $subscriptionEditUrl = '<a href="index.php?cmd=Order&act=subscription&editid={0,'. $subscription->getId() .'}">' . $productEntityName . '</a>';
+
+                                            if (
+                                                $subscription->getState() ==
+                                                \Cx\Modules\Order\Model\Entity\Subscription::STATE_TERMINATED
+                                            ) {
+                                                $subscriptionEditUrl = '<s>' . $subscriptionEditUrl. '</s>';
+                                            }
 
                                             $result[] = $subscriptionEditUrl . ' (' . $productEditLink . ')';
                                         }
@@ -235,6 +288,12 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                                         return implode(', ', $result);
                                     }
                                 )
+                            ),
+                            'invoices' => array(
+                                'showOverview' => false,
+                            ),
+                            'currency' => array(
+                                'header' => 'Währung',
                             ),
                         ),
                     );
@@ -255,13 +314,17 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_ID']
                         ),
                         'subscriptionDate' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_DATE']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_DATE'],
+                            'readonly' => true,
                         ),
                         'expirationDate' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_EXPIRATION_DATE']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_EXPIRATION_DATE'],
+                            'tooltip' => 'Zeitpunkt, wann das Abo abläuft. Wird für die automatische Verrechnung mit Kreditkarte benötigt.<br /><br />Beim Erfassen eines neuen Abos muss dieser Wert <strong>leer</strong> sein'
                         ),
                         'productEntityId' => array(
                             'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_PRODUCT_ENTITY'],
+                            'toolip' => 'Dies ist die ID des zum Abo dazugehörenden Objekts',
+                            'readonly' => true,
                             'table' => array(
                                 'parse' => function($value, $rowData) {
                                     $subscriptionRepo = \Env::get('em')->getRepository(
@@ -304,6 +367,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         ),
                         'renewalUnit' => array(
                             'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_RENEWAL_UNIT'],
+                            'formtext'  => 'Laufzeit (Einheit)',
+                            'tooltip'   => 'jährlich: <strong>year</strong><br />monatlich: <strong>month</strong>',
                             'table' => array(
                                 'parse' => function($value, $rowData) {
                                     if (empty($value)) {
@@ -325,22 +390,28 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             )
                         ),
                         'renewalQuantifier' => array(
-                            'showOverview' => false
+                            'showOverview' => false,
+                            'formtext'  => 'Laufzeit (Dauer)',
+                            'tooltip'   => 'Abo-Laufzeit in Jahre/Monate (abhängig von Option <i>Laufzeit (Einheit)</i>)',
                         ),
                         'renewalDate' => array(
                             'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_RENEWAL_DATE']
                         ),
                         'description' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_DESCRIPTION']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_DESCRIPTION'],
+                            'tooltip'   => 'Dieser Wert kann der Kunde selber setzen',
                         ),
                         'state' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_STATE']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_STATE'],
+                            'tooltip' => 'Aktives Abo: <strong>active</strong><br />Abo deaktiviert: <strong>inactive</strong><br />Abo abgestellt (Ende): <strong>terminated</strong><br />Abo gekündigt (aber noch aktiv): <strong>cancelled</strong>',
                         ),
                         'terminationDate' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_TERMI_DATE']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_TERMI_DATE'],
+                            'tooltip' => 'Falls das Abo gekündigt wurde (Status: cancelled) ist dies der Zeitpunkt an welchem das Abo ausläuft',
                         ),
                         'note' => array(
-                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_NOTE']
+                            'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_NOTE'],
+                            'tooltip' => 'Interne Informationen. Für den Kunden nicht sichtbar.',
                         ),
                         'product'  => array(
                             'header' => $_ARRAYLANG['TXT_MODULE_ORDER_SUBSCRIPTION_PRODUCT'],
@@ -359,13 +430,48 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                             )
                         ),
                         'paymentState' => array(
-                            'showOverview' => false
+                            'showOverview' => false,
+                            'header'    => 'Rechnungsstatus',
+                            'tooltip'   => 'Offen: <strong>open</strong><br />Bezahlt: <strong>paid</strong><br />Wartungsbeleg: <strong>renewal</strong>'
                         ),
                         'externalSubscriptionId' => array(
-                            'showOverview' => false
+                            'showOverview' => false,
+                            'header'    => 'Payrexx Konto ID',
+                            'readonly'  => true,
                         ),
                         'order' => array(
-                            'showOverview' => false
+                            'header' => 'Kunde',
+                            'table' => array(
+                                'parse' => function($value, $rowData) {
+                                    global $_ARRAYLANG;
+
+                                    $orderRepo = \Env::get('em')->getRepository(
+                                        'Cx\Modules\Order\Model\Entity\Order'
+                                    );
+                                    $order = $orderRepo->findOneBy(array('id' => $value));
+                                    if (!$order || !$order->getContactId()) {
+                                        return;
+                                    }
+
+                                    $userId   = \Cx\Modules\Crm\Controller\CrmLibrary::getUserIdByCrmUserId($order->getContactId());
+                                    $userName = \FWUser::getParsedUserTitle($userId);
+                                    $crmDetailLink = "<a href='index.php?cmd=Crm&amp;act=customers&amp;tpl=showcustdetail&amp;id={$order->getContactId()}'
+                                                title='{$_ARRAYLANG['TXT_MODULE_ORDER_CRM_CONTACT']}'>
+                                                <img
+                                                    src='".\Env::get('cx')->getCodeBaseCoreWebPath()."/Core/View/Media/navigation_level_1_189.png'
+                                                    width='16' height='16'
+                                                    alt='{$_ARRAYLANG['TXT_MODULE_ORDER_CRM_CONTACT']}'
+                                                />
+                                            </a>";
+
+                                    $url = "<a href='index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={$userId}'
+                                       title='{$_ARRAYLANG['TXT_MODULE_ORDER_MODIY_USER_ACCOUNT']}'>" .
+                                            $userName .
+                                            "</a>" .
+                                            $crmDetailLink;
+                                    return $url;
+                                }
+                            ),
                         ),
 
                     ),

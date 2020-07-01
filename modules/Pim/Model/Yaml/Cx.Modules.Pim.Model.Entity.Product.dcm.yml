@@ -76,3 +76,10 @@ Cx\Modules\Pim\Model\Entity\Product:
           upgrade_product_id:
             referencedColumnName: id
             nullable: false
+  manyToOne: # owning side
+    vatRate:
+      targetEntity: Cx\Modules\Pim\Model\Entity\VatRate
+      inversedBy: products
+      joinColumn:
+        name: vat_rate_id
+        referencedColumnName: id

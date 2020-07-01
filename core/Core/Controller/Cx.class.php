@@ -1959,14 +1959,22 @@ namespace Cx\Core\Core\Controller {
          * @param \Cx\Core\ContentManager\Model\Entity\Page $page The page object of which to fetch the application template from
          * @param String $component Optional argument to specify the component to load the template from, instead of using the page's module-attribute
          * @param String $themeType Optional argument to specify the output channel
+         * @param boolean	$parseWidgets	Whether any widgets shall get
+         *                                  parsed in the content or not. If set
+         *                                  to FALSE, then the raw (unparsed)
+         *                                  content will be returned.
          * @return String The content of the application template
          */
-        public static function getContentTemplateOfPage($page, $component = null, $themeType = \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB) {
+        public static function getContentTemplateOfPage($page, $component = null, $themeType = \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB, $parseWidgets = true) {
             $content = static::getContentTemplateOfPageWithoutWidget(
                 $page,
                 $component,
                 $themeType
             );
+
+            if (!$parseWidgets) {
+                return $content;
+            }
 
             // Components should not call this method. Instead they should set
             // the correct template to the page directly. This requires the

@@ -26,34 +26,22 @@
  */
 
 /**
- * Main controller for Pim
+ * Class VatRateRepository
  *
- * @copyright   Cloudrexx AG
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_pim
  */
 
-namespace Cx\Modules\Pim\Controller;
+namespace Cx\Modules\Pim\Model\Repository;
 
 /**
- * Main controller for Pim
- *
- * @copyright   Cloudrexx AG
+ * Class VatRateRepository
+ * 
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_pim
  */
-class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-
-    /**
-     * Get the Controller classes
-     *
-     * @return array name of the controller classes
-     */
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array('Backend', 'Default', 'VatRate');
-    }
-}
+class VatRateRepository extends \Doctrine\ORM\EntityRepository {}
