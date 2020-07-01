@@ -93,6 +93,34 @@ interface FileSystem {
     public function getFileList($directory, $recursive = true);
 
     /**
+     * Return an array of entries for the given file
+     *
+     * If $file is a file, returns information for that only.
+     * For a directory, includes all files in that folder.
+     * @param   File    $file
+     * @return  array
+     */
+    public function getInfo(File $file);
+
+    /**
+     * Return a RegexIterator for the given absolute folder path
+     *
+     * Returns an empty iterator (no elements) on failure; e.g. when the
+     * given path is invalid.
+     * @param   string  $folderPath     The absolute folder path
+     * @param   bool    $recursive      Recurse into subfolders if true
+     * @param   string  $regex          Defaults to /./,
+     *                                  matching any non-empty name
+     * @return  \RegexIterator
+     * @throws  MediaSourceException    on invalid folder path
+     */
+    public function getDirectoryIterator(
+        string $folderPath,
+        bool $recursive = false,
+        string $regex = '/./'
+    ): \RegexIterator;
+
+    /**
      * Removes the given file from the OS FS
      *
      * @param File $file File to remove
@@ -125,6 +153,36 @@ interface FileSystem {
      * @return string File contents
      */
     public function readFile(File $file);
+
+    /**
+     * Append the file contents to the output buffer
+     *
+     * SHOULD return the empty string, as the value may be sent along
+     * with the response by the caller.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  string
+     */
+    public function passthru(File $file);
+
+    /**
+     * Return the file size in bytes
+     *
+     * Throws an Exception if the argument is not a valid readable file.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  int
+     * @throws  \Exception  on invalid file
+     */
+    public function getSize(File $file): int;
+
+    /**
+     * Return the file modification timestamp
+     *
+     * Throws an Exception if the argument is not a valid readable file.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  int
+     * @throws  \Exception  on invalid file
+     */
+    public function getModificationTime(File $file): int;
 
     /**
      * Tells whether $file is a directory or not

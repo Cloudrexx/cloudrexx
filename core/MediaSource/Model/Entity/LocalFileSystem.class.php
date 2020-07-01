@@ -195,6 +195,88 @@ class LocalFileSystem extends EntityBase implements FileSystem
     }
 
     /**
+     * Return an array of entries for the given file
+     *
+     * If $file is a file, returns information for that only.
+     * For a directory, includes all files in that folder.
+     * @param   File    $file
+     * @return  array
+     */
+    public function getInfo(File $file): array
+    {
+        $regex = '/./';
+        $folderPath = (string) $file;
+        if ($this->isFile($file)) {
+            $folderPath = dirname($file);
+            $fileName = basename($file);
+            // The RegexIterator only matches the file name, not the path
+            $regex = '/^' . preg_quote($fileName, '/') . '$/';
+        }
+        $entries = [];
+        // The LocalFile path starts with a slash by definition,
+        // see LocalFile::__construct().
+        $folderPath = rtrim($this->rootPath . $folderPath, '/');
+        $iterator = $this->getDirectoryIterator($folderPath, false, $regex);
+        /** @var \DirectoryIterator $entry (extends \SplFileInfo) */
+        foreach ($iterator as $entry) {
+            if (preg_match('/(?:^\.|index\.php$)/', $entry->getFilename())) {
+                continue;
+            }
+            $absolutePath = $entry->getPath() . '/' . $entry->getFilename();
+            $relativepath = mb_strcut(
+                $absolutePath,
+                mb_strlen($this->getRootPath())
+            );
+            $struct = [
+                'size' => $entry->getSize(),
+                'type' => $entry->getType(),
+            ];
+            $entries[$relativepath] = $struct;
+        }
+        return $entries;
+    }
+
+    /**
+     * Return a RegexIterator for the given absolute folder path
+     *
+     * Returns an empty iterator (no elements) on failure; e.g. when the
+     * given path is invalid.
+     * @param   string  $folderPath     The absolute folder path
+     * @param   bool    $recursive      Recurse into subfolders if true
+     * @param   string  $regex          Defaults to /./,
+     *                                  matching any non-empty name
+     * @return  \RegexIterator
+     * @throws  MediaSourceException    on invalid folder path
+     */
+    public function getDirectoryIterator(
+        string $folderPath,
+        bool $recursive = false,
+        string $regex = '/./'
+    ): \RegexIterator {
+        try {
+            if ($recursive) {
+                return new \RegexIterator(
+                    new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator(
+                            $folderPath
+                        ), \RecursiveIteratorIterator::SELF_FIRST
+                    ), $regex
+                );
+            }
+            return new \RegexIterator(
+                new \IteratorIterator(
+                    new \DirectoryIterator(
+                        $folderPath
+                    )
+                ), $regex
+            );
+        } catch (\UnexpectedValueException $e) {
+            // Thrown by DirectoryIterator::__construct()
+            throw new MediaSourceException('', MediaSourceException::STATUS_404);
+        }
+    }
+
+    /**
      * Applies utf8_encode() to keys and values of an array
      * From: http://stackoverflow.com/questions/7490105/array-walk-recursive-modify-both-keys-and-values
      * @param array $array Array to encode
@@ -427,6 +509,76 @@ class LocalFileSystem extends EntityBase implements FileSystem
         File $file
     ) {
         return file_get_contents($this->rootPath . '/' . $file->__toString());
+    }
+
+    /**
+     * Append the file contents to the output buffer
+     *
+     * Returns the empty string.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  string
+     * @throws  MediaSourceException    on error
+     */
+    public function passthru(
+        File $file
+    ) {
+        if (!$this->isFile($file)) {
+            throw new MediaSourceException('', MediaSourceException::STATUS_400);
+        }
+        if (readfile($this->getPath($file)) === false) {
+            throw new MediaSourceException('', MediaSourceException::STATUS_403);
+        }
+        return '';
+    }
+
+    /**
+     * Return the file size in bytes
+     *
+     * Throws an Exception if the argument is not a valid readable file.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  int
+     * @throws  MediaSourceException    on error
+     * @internal    filesize() may return boolean false; however, that should
+     *              not occur, as the file is tested first.
+     */
+    public function getSize(
+        File $file
+    ): int {
+        if (!$this->isFile($file)) {
+            throw new MediaSourceException('', MediaSourceException::STATUS_400);
+        }
+        return filesize($this->getPath($file));
+    }
+
+    /**
+     * Return the file modification timestamp
+     *
+     * Throws an Exception if the argument is not a valid readable file.
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  int
+     * @throws  MediaSourceException    on error
+     * @internal    filemtime() may return boolean false; however, that should
+     *              not occur, as the file is tested first.
+     */
+    public function getModificationTime(
+        File $file
+    ): int {
+        if (!$this->isFile($file)) {
+            throw new MediaSourceException('', MediaSourceException::STATUS_400);
+        }
+        return filemtime($this->getPath($file));
+    }
+
+    /**
+     * Return the absolute path of the File
+     * @param   \Cx\Core\MediaSource\Model\Entity\File  $file
+     * @return  string
+     * @todo    Apply this to all methods
+     */
+    public function getPath(
+        File $file
+    ): string {
+        return $this->rootPath . $file;
     }
 
     public function isDirectory(
