@@ -29,7 +29,7 @@
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
  * @package     cloudrexx
- * @subpackage  coremodule_mediabrowser
+ * @subpackage  core_mediasource
  */
 
 namespace Cx\Core\MediaSource\Model\Entity;
@@ -42,7 +42,7 @@ use Cx\Core\DataSource\Model\Entity\DataSource;
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
  * @package     cloudrexx
- * @subpackage  coremodule_mediabrowser
+ * @subpackage  core_mediasource
  */
 class MediaSource extends DataSource {
 

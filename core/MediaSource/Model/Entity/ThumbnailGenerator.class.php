@@ -31,7 +31,7 @@
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
  * @package     cloudrexx
- * @subpackage  coremodule_mediabrowser
+ * @subpackage  core_mediasource
  */
 
 namespace Cx\Core\MediaSource\Model\Entity;
@@ -44,6 +44,8 @@ use Cx\Model\Base\EntityBase;
  *
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
  */
 class ThumbnailGenerator extends EntityBase
 {
