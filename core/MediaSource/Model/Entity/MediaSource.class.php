@@ -263,15 +263,18 @@ class MediaSource extends DataSource {
         $offset = 0,
         $fieldList = array()
     ) {
-        throw new \Exception('Not yet implemented');
-
-        // The following code is beta. We need to define what MediaSource
-        // returns: Binary file data or Metadata/file lists or both
-        /*$fileList = $this->getMediaSource()->getFileSystem()->getFileList('');
-        if (count($elementId) && $fileList[current($elementId)]) {
-            return array(current($elementId) => $fileList[current($elementId)]);
+        $path = $elementId['filename'] ?? '';
+        $mediaSource = $this->getMediaSource();
+        $mediaSourceName = $mediaSource->getName();
+        $fileSystem = $mediaSource->getFileSystem();
+        $file = new LocalFile($path, $fileSystem);
+        $fileList = $fileSystem->getInfo($file);
+        foreach (array_keys($fileList) as $path) {
+            // For restoring the original FileSystem;
+            // see RawOutputController::parse() for an example.
+            $fileList[$path]['source'] = $mediaSourceName;
         }
-        return $fileList;*/
+        return $fileList;
     }
 
     /**
