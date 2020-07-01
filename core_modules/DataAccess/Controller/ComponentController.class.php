@@ -859,10 +859,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             echo 'Exception of type "' . get_class($e) . '" with message "' . $e->getMessage() . '"';
         }
     }
-    
+
     /**
      * Version 1 of Cloudrexx RESTful API
-     * 
+     *
+     * Note that $arguments vary depending on the "protocol" (mode); i.e.
+     *  - CLI:  ['json', 'source', 'a/b', ...]
+     *  - HTTP: ['json', 'source', 'a', 'b', ...]
      * @param string $command Name of command to execute
      * @param array $arguments List of arguments for the command
      * @return void
