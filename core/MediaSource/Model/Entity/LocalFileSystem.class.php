@@ -72,36 +72,23 @@ class LocalFileSystem extends EntityBase implements FileSystem
             return $this->fileListCache[$directory][$recursive][$readonly];
         }
 
-        $dirPath = rtrim($this->rootPath . '/' . $directory,'/');
+        // The LocalFile path starts with a slash by definition,
+        // see LocalFile::__construct().
+        $dirPath = rtrim($this->rootPath . '/' . ltrim($directory, '/'), '/');
         if (!file_exists($dirPath)) {
             return array();
         }
 
         $regex = '/^((?!thumb(_[a-z]+)?).)*$/';
-        if ($recursive) {
-            $iteratorIterator = new \RegexIterator(
-                new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator(
-                        $dirPath
-                    ), \RecursiveIteratorIterator::SELF_FIRST
-                ), $regex
-            );
-        } else {
-            $iteratorIterator = new \RegexIterator(
-                new \IteratorIterator(
-                    new \DirectoryIterator(
-                        $dirPath
-                    )
-                ), $regex
-            );
-        }
-
+        $iteratorIterator = $this->getDirectoryIterator(
+            $dirPath,
+            $recursive,
+            $regex
+        );
         $jsonFileArray = array();
-
         $thumbnailList = $this->cx->getMediaSourceManager()
             ->getThumbnailGenerator()
             ->getThumbnails();
-
         foreach ($iteratorIterator as $file) {
             /**
              * @var $file \SplFileInfo
