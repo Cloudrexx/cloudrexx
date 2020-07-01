@@ -1322,7 +1322,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return  string  The fixed string.
      */
     protected function fixMultilineDoc($doc) {
-        $formattedDoc = preg_replace('/\\\\n\s+\*\s/', '\\\\n', $doc);
+        $formattedDoc = preg_replace('/\\\\n\s+\*\s?/', '\\\\n', $doc);
 
         // verify that the replacement did work
         if ($formattedDoc === null) {
