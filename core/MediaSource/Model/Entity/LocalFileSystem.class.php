@@ -584,13 +584,13 @@ class LocalFileSystem extends EntityBase implements FileSystem
     public function isDirectory(
         File $file
     ) {
-        return is_dir($this->rootPath . '/' . $file->__toString());
+        return is_dir($this->getPath($file));
     }
 
     public function isFile(
         File $file
     ) {
-        return is_file($this->rootPath . '/' . $file->__toString());
+        return is_file($this->getPath($file));
     }
 
     public function getLink(
