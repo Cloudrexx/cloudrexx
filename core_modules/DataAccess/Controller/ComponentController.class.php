@@ -730,16 +730,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @inheritdoc
      */
     protected $developerDocumentationUrl = 'https://wiki.cloudrexx.com/RESTful_API';
-    
+
     /**
      * Returns all Controller class names for this component (except this)
-     * 
+     *
      * Be sure to return all your controller classes if you add your own
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses()
     {
-        return array('JsonOutput', 'CliOutput', 'Backend', 'JsonDataAccess');
+        return array(
+            'JsonOutput',
+            'CliOutput',
+            'RawOutput',
+            'Backend',
+            'JsonDataAccess',
+        );
     }
 
     /**
