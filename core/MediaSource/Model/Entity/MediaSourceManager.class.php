@@ -333,7 +333,7 @@ class MediaSourceManager extends EntityBase
     {
         $mediaSources = $this->mediaTypes;
         if ($ignorePermissions) {
-            $this->allMediaTypePaths;
+            $mediaSources = $this->allMediaTypePaths;
         }
         foreach ($mediaSources as $mediaSource) {
             $mediaSourcePath = $mediaSource->getDirectory();
