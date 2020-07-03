@@ -1103,6 +1103,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (count($dataAccess->getAccessCondition())) {
                 $filter = array_merge($filter, $dataAccess->getAccessCondition());
             }
+
+            if (empty($dataAccess->getFieldList())) {
+                $dataAccess->setFieldList($dataSource->listFields());
+            }
             
             $data = array();
             $metaData = array();
