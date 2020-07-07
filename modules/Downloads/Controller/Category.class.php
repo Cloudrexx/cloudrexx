@@ -1244,7 +1244,7 @@ class Category
                     $objSubcategory->setPermissionsRecursive(true);
                     $objSubcategory->setPermissions($arrPermissions);
                     $objSubcategory->setVisibility($this->visibility);
-                    if(!$this->checkCategoryPermission()) {
+                    if(!$objSubcategory->checkCategoryPermission()) {
                         $objSubcategory->next();
                         continue;
                     }
