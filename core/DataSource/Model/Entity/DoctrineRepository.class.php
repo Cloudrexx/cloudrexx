@@ -150,6 +150,7 @@ class DoctrineRepository extends DataSource {
         // $order
         foreach ($order as $field=>$ascdesc) {
             if (
+                count($fieldList) &&
                 !in_array($field, $fieldList) ||
                 !in_array($ascdesc, array('ASC', 'DESC'))
             ) {
