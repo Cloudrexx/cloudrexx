@@ -1244,7 +1244,10 @@ class Category
                     $objSubcategory->setPermissionsRecursive(true);
                     $objSubcategory->setPermissions($arrPermissions);
                     $objSubcategory->setVisibility($this->visibility);
-                    $objSubcategory->checkCategoryPermission();
+                    if(!$this->checkCategoryPermission()) {
+                        $objSubcategory->next();
+                        continue;
+                    }
                     $objSubcategory->storePermissions();
                     $objSubcategory->next();
                 }
@@ -1462,13 +1465,7 @@ class Category
     {
         $oldPermissions = $this->getPermissions();
         $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
-        if(
-            $oldPermissions["read"]["groups"] != $arrPermissions["read"]["groups"] ||
-            $oldPermissions["add_subcategories"]["groups"] != $arrPermissions["add_subcategories"]["groups"] ||
-            $oldPermissions["manage_subcategories"]["groups"] != $arrPermissions["manage_subcategories"]["groups"] ||
-            $oldPermissions["add_files"]["groups"] != $arrPermissions["add_files"]["groups"] ||
-            $oldPermissions["manage_files"]["groups"] != $arrPermissions["manage_files"]["groups"]
-        ){
+        if($oldPermissions != $arrPermissions){
             foreach ($arrPermissions as $permission => $arrPermission) {
                 $this->{$permission.'_protected'} = $arrPermission['protected'];
                 $this->{$permission.'_groups'} = $this->{$permission.'_protected'} ? $arrPermission['groups'] : array();
@@ -1497,9 +1494,7 @@ class Category
 
             $arrPermissions[$type] = array(
                 'protected'             => $this->{$type.'_protected'},
-                'groups'                => $arrGroups,
-                'associated_groups'     => array(),
-                'not_associated_groups' => array()
+                'groups'                => $arrGroups
             );
 
         }
