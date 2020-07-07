@@ -1244,9 +1244,7 @@ class Category
                     $objSubcategory->setPermissionsRecursive(true);
                     $objSubcategory->setPermissions($arrPermissions);
                     $objSubcategory->setVisibility($this->visibility);
-                    if(!$this->checkCategoryPermission()) {
-                        return false;
-                    }
+                    $objSubcategory->checkCategoryPermission();
                     $objSubcategory->storePermissions();
                     $objSubcategory->next();
                 }
@@ -1463,16 +1461,14 @@ class Category
     public function setPermissions($arrPermissions)
     {
         $oldPermissions = $this->getPermissions();
+        $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
         if(
-            $oldPermissions["read"]["groups"] == $arrPermissions["read"]["groups"] &&
-            $oldPermissions["add_subcategories"]["groups"] == $arrPermissions["add_subcategories"]["groups"] &&
-            $oldPermissions["manage_subcategories"]["groups"] == $arrPermissions["manage_subcategories"]["groups"] &&
-            $oldPermissions["add_files"]["groups"] == $arrPermissions["add_files"]["groups"] &&
-            $oldPermissions["manage_files"]["groups"] == $arrPermissions["manage_files"]["groups"]
+            $oldPermissions["read"]["groups"] != $arrPermissions["read"]["groups"] ||
+            $oldPermissions["add_subcategories"]["groups"] != $arrPermissions["add_subcategories"]["groups"] ||
+            $oldPermissions["manage_subcategories"]["groups"] != $arrPermissions["manage_subcategories"]["groups"] ||
+            $oldPermissions["add_files"]["groups"] != $arrPermissions["add_files"]["groups"] ||
+            $oldPermissions["manage_files"]["groups"] != $arrPermissions["manage_files"]["groups"]
         ){
-            $this->permission_set = false;
-        } else {
-            $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
             foreach ($arrPermissions as $permission => $arrPermission) {
                 $this->{$permission.'_protected'} = $arrPermission['protected'];
                 $this->{$permission.'_groups'} = $this->{$permission.'_protected'} ? $arrPermission['groups'] : array();
