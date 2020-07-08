@@ -1465,6 +1465,16 @@ class Category
     {
         $oldPermissions = $this->getPermissions();
         $arrPermissions = $this->resolvePermissionDependencies($arrPermissions, $this->arrPermissionDependencies);
+
+        //remove indexes 'associated_groups' and 'not_associated_groups' to get same array structure for diff
+        foreach ($oldPermissions as $oldPerm => $arrOldPerm) {
+            foreach ($arrOldPerm as $item => $value) {
+                if ($item == 'associated_groups' || $item == 'not_associated_groups') {
+                    unset($oldPermissions[$oldPerm][$item]);
+                }
+            }
+        }
+
         if($oldPermissions != $arrPermissions){
             foreach ($arrPermissions as $permission => $arrPermission) {
                 $this->{$permission.'_protected'} = $arrPermission['protected'];
@@ -1494,7 +1504,9 @@ class Category
 
             $arrPermissions[$type] = array(
                 'protected'             => $this->{$type.'_protected'},
-                'groups'                => $arrGroups
+                'groups'                => $arrGroups,
+                'associated_groups'     => array(),
+                'not_associated_groups' => array()
             );
 
         }
