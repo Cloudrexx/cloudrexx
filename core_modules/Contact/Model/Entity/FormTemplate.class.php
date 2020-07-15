@@ -632,7 +632,8 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                 $checkboxSelected = '';
                 if (
                     $fieldValue == 1 ||
-                    !empty($_POST['contactFormField_' . $fieldId])
+                    !empty($_POST['contactFormField_' . $fieldId]) ||
+                    !empty($_GET[$fieldId])
                 ) {
                     $checkboxSelected = 'checked="checked"';
                 }
@@ -1001,26 +1002,61 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
             }
             $valueFromGet = '';
             if (isset($_GET[$fieldId])) {
-                $valueFromGet = contrexx_input2raw($_GET[$fieldId]);
+                $valueFromGet = contrexx_input2raw(
+                    $_GET[$fieldId]
+                );
             }
 
             $isOptionInPost = !empty($valueFromPost) && (
                 (
-                    is_array($valueFromPost) &&
-                    in_array($option, $valueFromPost)
+                    is_array($valueFromPost) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            in_array($index, $valueFromPost)
+                        ) || (
+                            $fieldType != 'recipient' &&
+                            in_array($option, $valueFromPost)
+                        )
+                    )
                 ) || (
                     !is_array($valueFromPost) && (
-                        $option == $valueFromPost ||
-                        strcasecmp($option, $valueFromPost) == 0
+                        (
+                            $fieldType == 'recipient' &&
+                            $index == $valueFromPost
+                        ) || (
+                            $fieldType != 'recipient' && (
+                                $option == $valueFromPost ||
+                                strcasecmp($option, $valueFromPost) == 0
+                            )
+                        )
                     )
                 )
             );
-            $isOptionInGet =
-                !empty($valueFromGet) &&
+            $isOptionInGet = !empty($valueFromGet) && (
                 (
-                    $option == $valueFromGet ||
-                    strcasecmp($option, $valueFromGet) == 0
-                );
+                    is_array($valueFromGet) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            in_array($index, $valueFromGet)
+                        ) || (
+                            $fieldType != 'recipient' &&
+                            in_array($option, $valueFromGet)
+                        )
+                    )
+                ) || (
+                    !is_array($valueFromGet) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            $index == $valueFromGet
+                        ) || (
+                            $fieldType != 'recipient' && (
+                                $option == $valueFromGet ||
+                                strcasecmp($option, $valueFromGet) == 0
+                            )
+                        )
+                    )
+                )
+            );
             $isOptionInAccessAttr =
                 $isSpecialType &&
                 isset($profileData[strtoupper($accessAttrId)]) &&

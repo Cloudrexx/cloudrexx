@@ -275,7 +275,7 @@ CREATE TABLE `contrexx_core_data_source` (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `identifier` varchar(255) NOT NULL,
   `options` longtext NOT NULL COMMENT '(DC2Type:array)',
-  `type` varchar(50) NOT NULL,
+  `type` enum('dataSource','mediaSource','ymlRepository','jsonDataSource','doctrineRepository','legacyDatabaseRepository') NOT NULL,
   PRIMARY KEY(`id`),
   UNIQUE KEY `identifier` (`identifier`)
 ) ENGINE = InnoDB;

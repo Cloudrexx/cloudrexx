@@ -37,6 +37,60 @@ namespace Cx\Core\MediaSource\Model\Entity;
 use Cx\Core\DataSource\Model\Entity\DataSource;
 
 /**
+ * MediaSource Exception
+ * @copyright   Cloudrexx AG
+ * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
+ */
+class MediaSourceException extends \Exception
+{
+    /**
+     * Supported status codes
+     */
+    const STATUS_200 = 200;
+    const STATUS_400 = 400;
+    const STATUS_403 = 403;
+    const STATUS_404 = 404;
+
+    /**
+     * Text for known status
+     */
+    const STATUS_TEXT = [
+        200 => 'Success',
+        400 => 'Bad Request',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+    ];
+
+    /**
+     * Construct a MediaSourceException
+     *
+     * Used to pass the status back to the caller.
+     * Applies the default code or message for 400 Bad Request
+     * if either is empty or invalid.
+     * @param   string      $message
+     * @param   int         $code
+     * @param   \Throwable  $previous
+     * @return  \MediaSourceException
+     */
+    public function __construct(
+        string $message = '',
+        int $code = 0,
+        \Throwable $previous = null
+    ) {
+        if (!$code || !array_key_exists($code, static::STATUS_TEXT)) {
+            $code = static::STATUS_400;
+        }
+        if (!$message) {
+            $message = static::STATUS_TEXT[$code];
+        }
+        parent::__construct($message, $code, $previous);
+    }
+
+}
+
+/**
  * Class MediaSource
  *
  * @copyright   Cloudrexx AG

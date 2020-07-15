@@ -1506,6 +1506,9 @@ namespace Cx\Core\Core\Controller {
                 $this->request
             );
             $this->response->setContentType('text/html');
+            if (isset($_REQUEST['disposition'])) {
+                $this->response->setContentDisposition($_REQUEST['disposition']);
+            }
             //call post-init hooks
             $this->ch->callPostInitHooks();
         }
@@ -2281,6 +2284,7 @@ namespace Cx\Core\Core\Controller {
                         $endcode
                     );
                     $objPDF->setContent($endcode);
+                    $objPDF->setDisposition($this->getResponse()->getContentDisposition());
                     $objPDF->Create();
                     exit;
                 }

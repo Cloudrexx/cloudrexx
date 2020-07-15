@@ -2353,16 +2353,19 @@ class CrmLibrary
 
         //update/insert additional fields
         //company
+        $company = '';
         if (!empty($result['company'])) {
             $company = $objDatabase->getOne("SELECT customer_name FROM `".DBPREFIX."module_{$this->moduleNameLC}_contacts` WHERE id = '".$result['company']."'");
         }
         //get default website
+        $website = '';
         foreach ($result['contactwebsite'] as $value) {
             if (!empty($value['value']) && $value['primary'] == '1') {
                 $website = contrexx_raw2db($value['value']);
             }
         }
         //get default phone
+        $phone = '';
         foreach ($result['contactphone'] as $value) {
             if (!empty($value['value']) && $value['primary'] == '1')
                 $phone = contrexx_input2db($value['value']);
@@ -2804,6 +2807,15 @@ class CrmLibrary
                 $this->contact->datasource     = 2;
                 $this->contact->account_id     = $userAccountId;
 
+                $oldEmail = '';
+                // set new email address
+                if (!empty($arrFormData['email'])) {
+                    // remember old email address
+                    $oldEmail = $this->contact->email;
+
+                    $this->contact->email = $arrFormData['email'];
+                }
+
                 //set profile picture
                 if (!empty ($arrFormData['picture'][0])) {
                     $picture = $arrFormData['picture'][0];
@@ -2837,7 +2849,7 @@ class CrmLibrary
                     $customerType = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_type','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if ($customerType !== false) {
                         $crmCompany->customerType = $customerType;
                     }
@@ -2845,7 +2857,7 @@ class CrmLibrary
                     $companySize = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_company_size','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if($companySize !== false){
                         $crmCompany->companySize = $companySize;
                     }
@@ -2853,13 +2865,9 @@ class CrmLibrary
                     $industryType = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_industry_type','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if($industryType !== false){
                         $crmCompany->industryType = $industryType;
-                    }
-
-                    if(isset($arrFormData["phone_office"])){
-                        $crmCompany->phone = $arrFormData["phone_office"];
                     }
 
                     // store/update the company profile
@@ -2868,15 +2876,72 @@ class CrmLibrary
                     // setting & storing the primary email address must be done after
                     // the company has been saved for the case where the company is
                     // being added as a new object without having an ID yet
-                    if (empty($crmCompany->email)) {
+                    if (
+                        // set email in case the company has no email set yet
+                        empty($crmCompany->email) ||
+                        // or in case the email changed and the company used
+                        // the same old email address
+                        $crmCompany->email == $oldEmail
+                    ) {
                         $crmCompany->email = $this->contact->email;
-                        $crmCompany->storeEMail();
+                        $crmCompany->updatePrimaryEmail(1);
                     }
 
+                    // update primary address in case it was the same
+                    if (
+                        isset($arrFormData['address'][0]) &&
+                        isset($arrFormData['city'][0]) &&
+                        isset($arrFormData['zip'][0]) &&
+                        isset($arrFormData['country'][0]) && (
+                            (
+                                trim($this->contact->address) == trim($crmCompany->address) &&
+                                trim($this->contact->city) == trim($crmCompany->city) &&
+                                trim($this->contact->state) == trim($crmCompany->state) &&
+                                trim($this->contact->zip) == trim($crmCompany->zip) &&
+                                trim($this->contact->country) == trim($crmCompany->country)
+                            ) || (
+                                empty(trim($crmCompany->address)) &&
+                                empty(trim($crmCompany->city)) &&
+                                empty(trim($crmCompany->state)) &&
+                                empty(trim($crmCompany->zip)) &&
+                                empty(trim($crmCompany->country))
+                            )
+                        )
+                    ) {
+                        $crmCompany->address = $arrFormData['address'][0] ?? $crmCompany->address;
+                        $crmCompany->city = $arrFormData['city'][0] ?? $crmCompany->city;
+                        $crmCompany->state = $arrFormData['state'][0] ?? $crmCompany->state;
+                        $crmCompany->zip = $arrFormData['zip'][0] ?? $crmCompany->zip;
+                        $country = \Cx\Core\Country\Controller\Country::getById($arrFormData['country'][0]);
+                        $crmCompany->country = $country['name'] ?? $crmCompany->country;
+                        $crmCompany->updatePrimaryAddress();
+                    }
+
+                    // set primary phone
+                    if (
+                        isset($arrFormData['phone_office'][0]) && (
+                            $this->contact->phone == $crmCompany->phone ||
+                            empty($crmCompany->phone)
+                        )
+                    ) {
+                        $crmCompany->phone = $arrFormData['phone_office'][0];
+                        $crmCompany->updatePrimaryPhone();
+                    }
+
+                    // assign company to person
                     $this->contact->contact_customer = $crmCompany->id;
                 }
 
                 if ($this->contact->save()) {
+                    // set primary email
+                    if (
+                        isset($arrFormData['email']) &&
+                        $arrFormData['email'] != $this->contact->email
+                    ) {
+                        // re-set email again as it has been reset by CrmContact::save()
+                        $this->contact->email = $arrFormData['email'];
+                        $this->contact->updatePrimaryEmail(0);
+                    }
 
                     // insert website
                     if (!empty ($arrFormData['website'][0])) {
@@ -2895,48 +2960,30 @@ class CrmLibrary
                         $db = $objDatabase->Execute($query);
                     }
 
-                    //insert address
-                    if (!empty ($arrFormData['address'][0]) || !empty ($arrFormData['city'][0]) || !empty ($arrFormData['zip'][0]) || !empty ($arrFormData['country'][0])) {
-                        $addressExists = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` WHERE is_primary = '1' AND contact_id = '{$this->contact->id}'");
+                    // set primary address
+                    if (
+                        isset($arrFormData['address'][0]) ||
+                        isset($arrFormData['city'][0]) ||
+                        isset($arrFormData['state'][0]) ||
+                        isset($arrFormData['zip'][0]) ||
+                        isset($arrFormData['country'][0])
+                    ) {
                         $country = \Cx\Core\Country\Controller\Country::getById($arrFormData['country'][0]);
-                        if ($addressExists && $addressExists->RecordCount()) {
-                            $query = "UPDATE `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` SET
-                                    address      = '". contrexx_input2db($arrFormData['address'][0]) ."',
-                                    city         = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    zip          = '". contrexx_input2db($arrFormData['zip'][0]) ."',
-                                    country      = '". $country['name'] ."',
-                                    Address_Type = '2'
-                                 WHERE is_primary   = '1' AND contact_id   = '{$this->contact->id}'";
-                        } else {
-                            $query = "INSERT INTO `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` SET
-                                    address      = '". contrexx_input2db($arrFormData['address'][0]) ."',
-                                    city         = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    state        = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    zip          = '". contrexx_input2db($arrFormData['zip'][0]) ."',
-                                    country      = '". $country['name'] ."',
-                                    Address_Type = '2',
-                                    is_primary   = '1',
-                                    contact_id   = '{$this->contact->id}'";
-                        }
-                        $objDatabase->Execute($query);
+                        $this->contact->address = $arrFormData['address'][0] ?? $this->contact->address;
+                        $this->contact->city = $arrFormData['city'][0] ?? $this->contact->city;
+                        $this->contact->state = $arrFormData['state'][0] ?? $this->contact->state;
+                        $this->contact->zip = $arrFormData['zip'][0] ?? $this->contact->zip;
+                        $this->contact->country = $country['name'] ?? $this->contact->country;
+                        $this->contact->updatePrimaryAddress();
                     }
 
-                    // insert Phone
-                    $contactPhone = array();
-                    if (!empty($arrFormData['phone_office'][0])) {
-                        $phoneExists = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_phone` WHERE is_primary = '1' AND contact_id = '{$this->contact->id}'");
-                        $fields = array(
-                            'phone'         => $arrFormData['phone_office'][0],
-                            'phone_type'    => '1',
-                            'is_primary'    => '1',
-                            'contact_id'    => $this->contact->id
-                        );
-                        if ($phoneExists && $phoneExists->RecordCount()) {
-                            $query  = \SQL::update("module_{$this->moduleNameLC}_customer_contact_phone", $fields, array('escape' => true))." WHERE is_primary = '1' AND `contact_id` = {$this->contact->id}";
-                        } else {
-                            $query  = \SQL::insert("module_{$this->moduleNameLC}_customer_contact_phone", $fields, array('escape' => true));
-                        }
-                        $objDatabase->Execute($query);
+                    // set primary phone
+                    if (
+                        isset($arrFormData['phone_office'][0]) &&
+                        $arrFormData['phone_office'][0] != $this->contact->phone
+                    ) {
+                        $this->contact->phone = $arrFormData['phone_office'][0];
+                        $this->contact->updatePrimaryPhone();
                     }
                 }
                 \Cx\Core\Setting\Controller\Setting::init($prevSection, $prevGroup, $prevEngine);
