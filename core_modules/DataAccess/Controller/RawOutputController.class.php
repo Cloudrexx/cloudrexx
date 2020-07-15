@@ -81,12 +81,10 @@ class RawOutputController extends OutputController
             return $filesystem->passthru($file);
         }
         // For consistency with the API
-// TODO: Enable after CLX-3359
-//        throw new \Cx\Core\MediaSource\Model\Entity\MediaSourceException(
-//            '',
-//            \Cx\Core\MediaSource\Model\Entity\MediaSourceException::STATUS_400
-//        );
-        return '';
+        throw new \Cx\Core\MediaSource\Model\Entity\MediaSourceException(
+            '',
+            \Cx\Core\MediaSource\Model\Entity\MediaSourceException::STATUS_400
+        );
     }
 
 }
