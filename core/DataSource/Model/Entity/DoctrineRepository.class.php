@@ -343,7 +343,8 @@ class DoctrineRepository extends DataSource {
      * @throws \Exception If something did not go as planned
      * @return string ID of the new entry
      */
-    public function add($data) {
+    public function add(array $data): array
+    {
         $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $entityClass = $this->getIdentifier();
@@ -356,11 +357,15 @@ class DoctrineRepository extends DataSource {
         $em->flush();
         return $this->getEntityIndexData($entity);
     }
-    
+
     /**
-     * @todo: This method should be elsewhere
+     * @param   \Cx\Core\Core\Model\Entity\EntityBase   $entity
+     * @return  array
+     * @todo    This method should be elsewhere
      */
-    protected function getEntityIndexData($entity) {
+    protected function getEntityIndexData(
+        \Cx\Core\Core\Model\Entity\EntityBase $entity
+    ): array {
         $em = $this->cx->getDb()->getEntityManager();
         $entityClassName = get_class($entity);
         $entityMetaData = $em->getClassMetadata($entityClassName);
@@ -373,11 +378,13 @@ class DoctrineRepository extends DataSource {
 
     /**
      * Updates an existing entry of this DataSource
-     * @param array $elementId field=>value-type condition array identifying an entry
-     * @param array $data Field=>value-type array. Not all fields are required.
-     * @throws \Exception If something did not go as planned
+     * @param   array   $elementId  field=>value-type condition array identifying an entry
+     * @param   array   $data       Field=>value-type array. Not all fields are required.
+     * @return  array
+     * @throws  \Exception          If something did not go as planned
      */
-    public function update($elementId, $data) {
+    public function update(array $elementId, array $data): array
+    {
         $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
@@ -392,14 +399,17 @@ class DoctrineRepository extends DataSource {
 
         $em->persist($entity);
         $em->flush();
+        return $this->getEntityIndexData($entity);
     }
 
     /**
      * Drops an entry from this DataSource
-     * @param array $elementId field=>value-type condition array identifying an entry
-     * @throws \Exception If something did not go as planned
+     * @param   array   $elementId  field=>value-type condition array identifying an entry
+     * @return  array
+     * @throws  \Exception          If something did not go as planned
      */
-    public function remove($elementId) {
+    public function remove(array $elementId): array
+    {
         $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
@@ -412,6 +422,7 @@ class DoctrineRepository extends DataSource {
 
         $em->remove($entity);
         $em->flush();
+        return [];
     }
 
     /**
@@ -474,7 +485,7 @@ class DoctrineRepository extends DataSource {
             // set the value as property of the current object, so it is ready to be stored in the database
             $entity->$fieldSetMethodName($data[$name]);
         }
-        
+
         $associationMappings = $entityClassMetadata->getAssociationMappings();
         $classMethods = get_class_methods($entity);
         foreach ($associationMappings as $field => $associationMapping) {

@@ -79,13 +79,13 @@ class YmlRepository extends DataSource {
      * @return array Two dimensional array (/table) of results (array($row=>array($fieldName=>$value)))
      */
     public function get(
-        $elementId = array(),
-        $filter = array(),
-        $order = array(),
-        $limit = 0,
-        $offset = 0,
-        $fieldList = array()
-    ) {
+        array $elementId = array(),
+        array $filter = array(),
+        array $order = array(),
+        int $limit = 0,
+        int $offset = 0,
+        array $fieldList = array()
+    ): array {
         throw new \Exception('Not yet implemented');
     }
 
@@ -94,7 +94,8 @@ class YmlRepository extends DataSource {
      * @param array $data Field=>value-type array. Not all fields may be required.
      * @throws \Exception If something did not go as planned
      */
-    public function add($data) {
+    public function add(array $data): array
+    {
         throw new \Exception('Not yet implemented');
     }
 
@@ -104,7 +105,8 @@ class YmlRepository extends DataSource {
      * @param array $data Field=>value-type array. Not all fields are required.
      * @throws \Exception If something did not go as planned
      */
-    public function update($elementId, $data) {
+    public function update(array $elementId, array $data): array
+    {
         throw new \Exception('Not yet implemented');
     }
 
@@ -113,7 +115,8 @@ class YmlRepository extends DataSource {
      * @param array $elementId field=>value-type condition array identifying an entry
      * @throws \Exception If something did not go as planned
      */
-    public function remove($elementId) {
+    public function remove(array $elementId): array
+    {
         throw new \Exception('Not yet implemented');
     }
 }

@@ -114,13 +114,13 @@ class LegacyDatabaseRepository extends DataSource {
      * @return array Two dimensional array (/table) of results (array($row=>array($fieldName=>$value)))
      */
     public function get(
-        $elementId = array(),
-        $filter = array(),
-        $order = array(),
-        $limit = 0,
-        $offset = 0,
-        $fieldList = array()
-    ) {
+        array $elementId = array(),
+        array $filter = array(),
+        array $order = array(),
+        int $limit = 0,
+        int $offset = 0,
+        array $fieldList = array()
+    ): array {
         $tableName = DBPREFIX . $this->getIdentifier();
         $whereList = array();
 
@@ -210,7 +210,8 @@ class LegacyDatabaseRepository extends DataSource {
      * @param array $data Field=>value-type array. Not all fields may be required.
      * @throws \BadMethodCallException ALWAYS! Legacy is not intended to be used for write access!
      */
-    public function add($data) {
+    public function add(array $data): array
+    {
         throw new \BadMethodCallException('Access denied');
     }
 
@@ -221,7 +222,8 @@ class LegacyDatabaseRepository extends DataSource {
      * @param array $data Field=>value-type array. Not all fields are required.
      * @throws \BadMethodCallException ALWAYS! Legacy is not intended to be used for write access!
      */
-    public function update($elementId, $data) {
+    public function update(array $elementId, array $data): array
+    {
         throw new \BadMethodCallException('Access denied');
     }
 
@@ -230,7 +232,8 @@ class LegacyDatabaseRepository extends DataSource {
      * @param array $elementId field=>value-type condition array identifying an entry
      * @throws \BadMethodCallException ALWAYS! Legacy is not intended to be used for write access!
      */
-    public function remove($elementId) {
+    public function remove(array $elementId): array
+    {
         throw new \BadMethodCallException('Access denied');
     }
 }

@@ -77,7 +77,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     protected $request;
 
     /**
-     * @var string one of STATUS_ERROR, STATUS_OK
+     * @var string One of STATUS_ERROR, STATUS_OK
      */
     protected $status;
 
@@ -92,7 +92,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     protected $metaData = array();
 
     /**
-     * @var two dimensional array: $messages[<type>][] = <messageText>
+     * @var array Two dimensional array: $messages[<type>][] = <messageText>
      */
     protected $messages = array();
 
@@ -108,8 +108,14 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @param string $status (optional) One of STATUS_ERROR, STATUS_OK
      * @param array $messages (optional) two dimensional array: $messages[<type>][] = <messageText>
      * @param array $data (optional) Set of data
+     * @param array $metaData (optional)
      */
-    public function __construct($status = '', $messages = array(), $data = array(), $metaData = array()) {
+    public function __construct(
+        string $status = '',
+        array $messages = array(),
+        array $data = array(),
+        array $metaData = array()
+    ) {
         $this->request = $this->cx->getRequest();
         $this->status = $status;
         $this->messages = $messages;
@@ -122,7 +128,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @param string $type Message type, one of MESSAGE_TYPE_*
      * @param string $text Message
      */
-    public function addMessage($type, $text) {
+    public function addMessage(string $type, string $text)
+    {
         if (!isset($this->messages[$type])) {
             $this->messages[$type] = array();
         }
@@ -133,7 +140,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * Sets response data
      * @param array $data Data for this response
      */
-    public function setData($data) {
+    public function setData(array $data)
+    {
         $this->data = $data;
     }
 
@@ -159,7 +167,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * If statusCode is not set yet, it sets it to 200 for OK, 400 for ERROR
      * @param string $status One of STATUS_ERROR, STATUS_OK
      */
-    public function setStatus($status) {
+    public function setStatus(string $status)
+    {
         if ($status == static::STATUS_OK) {
             $this->setStatusCode(200);
         } else {
@@ -170,10 +179,12 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
 
     /**
      * Sets the HTTP status code
-     * @param int Status code (as specified in https://tools.ietf.org/html/rfc7231#section-6)
-     * @param boolean (optional) Wheter to replace a previously set status code or not (default false)
+     * @param   int     $statusCode Status code as specified in
+     *                              https://tools.ietf.org/html/rfc7231#section-6
+     * @param   bool    $replace    Replace the current value if true
      */
-    public function setStatusCode($statusCode, $replace = false) {
+    public function setStatusCode(int $statusCode, bool $replace = false)
+    {
         if ($this->statusCode > 0 && !$replace) {
             return;
         }
@@ -182,9 +193,11 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
 
     /**
      * Returns the HTTP status code for this response
-     * @return int Status code (as specified in https://tools.ietf.org/html/rfc7231#section-6)
+     * @return  int                 Status code as specified in
+     *                              https://tools.ietf.org/html/rfc7231#section-6
      */
-    public function getStatusCode() {
+    public function getStatusCode(): int
+    {
         return $this->statusCode;
     }
 
@@ -192,7 +205,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * Returns the status for this response
      * @return string One of STATUS_ERROR, STATUS_OK
      */
-    public function getStatus() {
+    public function getStatus(): string
+    {
         return $this->status;
     }
 
@@ -200,7 +214,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * Returns data of this response
      * @return array Set of data
      */
-    public function getData() {
+    public function getData(): array
+    {
         $this->data;
     }
 
@@ -209,7 +224,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @param string $type (optional) Limits the result to a type of messages
      * @return array List of messages (of any type, except if $type is provided)
      */
-    public function getMessages($type = '') {
+    public function getMessages(string $type = ''): array
+    {
         if (empty($type)) {
             return array_merge(
                 $this->getMessages(static::MESSAGE_TYPE_SUCCESS),
@@ -217,7 +233,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
                 $this->getMessages(static::MESSAGE_TYPE_INFO)
             );
         }
-        return $this->messages[$type];
+        return $this->messages[$type] ?? [];
     }
 
     /**
@@ -226,7 +242,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @param string $text Message
      * @return boolean True if successful, false if message could not be found
      */
-    public function removeMessage($type, $text) {
+    public function removeMessage(string $type, string $text): bool
+    {
         if (!is_array($this->messages[$type])) {
             return false;
         }
@@ -243,7 +260,8 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * This is used in order to avoid public member variables
      * @return array Array representation of this object
      */
-    public function jsonSerialize() {
+    public function jsonSerialize(): array
+    {
         $this->metaData['request'] = $this->request;
         return array(
             'status' => $this->status,
@@ -256,9 +274,12 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     /**
      * Sets HTTP status code and writes this object to output buffer
      * @param \Cx\Core_Modules\DataAccess\Controller\OutputController $outputModule Output module to use for parsing
-     * @param boolean $setStatusCode (optional) Wheter to set HTTP status header (default: true)
+     * @param bool  $setStatusCode  Set the HTTP status header if true
      */
-    public function send($outputModule, $setStatusCode = true) {
+    public function send(
+        \Cx\Core_Modules\DataAccess\Controller\OutputController $outputModule,
+        bool $setStatusCode = true
+    ) {
         if ($setStatusCode) {
             http_response_code($this->getStatusCode());
         }

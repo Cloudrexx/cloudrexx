@@ -278,7 +278,8 @@ class LocalFileSystem extends EntityBase implements FileSystem
     }
 
     /**
-     * @todo check whether $file is part of this FS
+     * @todo    Check whether $file is part of this FS
+     * @todo    Return something that the caller is able to understand, or throw
      */
     public function removeFile(File $file) {
         global $_ARRAYLANG;

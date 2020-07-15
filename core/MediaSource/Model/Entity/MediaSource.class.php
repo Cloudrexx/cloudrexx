@@ -44,7 +44,14 @@ use Cx\Core\DataSource\Model\Entity\DataSource;
  * @package     cloudrexx
  * @subpackage  coremodule_mediabrowser
  */
-class MediaSource extends DataSource {
+class MediaSource extends DataSource
+{
+    /**
+     * The "primary key" of this DataSource subtype
+     * @see getIdentifierFieldNames()
+     * @see add()
+     */
+    const IDENTIFIER_FIELD_NAME = 'filename';
 
     /**
      * List of operations supported by this DataSource
@@ -235,8 +242,9 @@ class MediaSource extends DataSource {
     /**
      * @inheritdoc
      */
-    public function getIdentifierFieldNames() {
-        return array('filename');
+    public function getIdentifierFieldNames()
+    {
+        return [static::IDENTIFIER_FIELD_NAME];
     }
 
     /**
@@ -300,12 +308,14 @@ class MediaSource extends DataSource {
     }
 
     /**
-     * Adds a new entry to this DataSource
-     * @todo Chunked upload is untested and will most likely not work
-     * @param array $data Field=>value-type array. Not all fields may be required.
-     * @throws \Exception If something did not go as planned
+     * Upload and move a file to this MediaSource's directory
+     * @todo    Chunked upload is untested and will most likely not work
+     * @param   array   $data   Field=>value-type array. Not all fields may be required.
+     * @return  array           The primary key name and value
+     * @throws  \Exception      on failed upload
      */
-    public function add($data) {
+    public function add(array $data): array
+    {
         $mediaSource = $this->getMediaSource();
         // $data['path'] is not the file system path to the file, but a
         // combination of MediaSource identifier and a file system path.
@@ -321,7 +331,25 @@ class MediaSource extends DataSource {
         if ($res['status'] != 'success' || $res['data']['OK'] !== 1) {
             throw new \Exception('Upload failed: ' . $res['message']);
         }
-        return true;
+        $file = $res['data']['file'];
+// TODO: CLX-3401: Return the correct path ("/relative/to/filesystem.ext")
+// The file path is bogus; like,
+//  '/tmp/session_11bab28b7e95ef5146e45b01c706e7c8/test.txt'
+// Even worse if the file already existed; the new file is actually
+// renamed as, e.g., 'text_1.txt'.
+// And, if the original path contained slashes, these have been replaced by
+// underscores.
+// For any one of the above reasons, this won't work:
+//        $file = $mediaSource->getFileSystem()->getFileFromPath($file);
+// Temporary, incorrect hack; just so that something resembling the
+// expected value is returned:
+// The response will contain, i.e.,
+//  'data":{"filename":"access\/photo_test.txt"}'
+// even if the file has been moved to access/photo/test_1.txt'.
+        $file = $this->getIdentifier() . '/' . basename($file);
+        return [
+            static::IDENTIFIER_FIELD_NAME => $file
+        ];
     }
 
     /**
@@ -330,17 +358,20 @@ class MediaSource extends DataSource {
      * @param array $data Field=>value-type array. Not all fields are required.
      * @throws \Exception If something did not go as planned
      */
-    public function update($elementId, $data) {
+    public function update(array $elementId, array $data): array
+    {
         $this->remove($elementId);
         return $this->add($data);
     }
 
     /**
      * Drops an entry from this DataSource
-     * @param array $elementId field=>value-type condition array identifying an entry
-     * @throws \Exception If something did not go as planned
+     * @param   array   $elementId  field=>value-type condition array identifying an entry
+     * @return  array
+     * @throws  \Exception          on invalid or missing file
      */
-    public function remove($elementId) {
+    public function remove(array $elementId): array
+    {
         $mediaSource = $this->getMediaSource();
         $fs = $mediaSource->getFileSystem();
         $filename = '/' . implode('/', $elementId);
@@ -348,6 +379,11 @@ class MediaSource extends DataSource {
         if (!$file) {
             throw new \Exception('File "' . $filename . '" not found!');
         }
-        return $fs->removeFile($file);
+        // TODO: Should return something the caller is able to interpret,
+        // like a boolean, instead of the "(un-)success" message from
+        // the FileSystem.
+        return [
+            static::IDENTIFIER_FIELD_NAME => $fs->removeFile($file)
+        ];
     }
 }

@@ -282,12 +282,12 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
      * @return array Two dimensional array (/table) of results (array($row=>array($fieldName=>$value)))
      */
     public abstract function get(
-        $elementId = array(),
-        $filter = array(),
-        $order = array(),
-        $limit = 0,
-        $offset = 0,
-        $fieldList = array()
+        array $elementId = array(),
+        array $filter = array(),
+        array $order = array(),
+        int $limit = 0,
+        int $offset = 0,
+        array $fieldList = array()
     );
 
     /**
@@ -295,7 +295,7 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
      * @param array $data Field=>value-type array. Not all fields may be required.
      * @throws \Exception If something did not go as planned
      */
-    public abstract function add($data);
+    public abstract function add(array $data): array;
 
     /**
      * Updates an existing entry of this DataSource
@@ -303,12 +303,12 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
      * @param array $data Field=>value-type array. Not all fields are required.
      * @throws \Exception If something did not go as planned
      */
-    public abstract function update($elementId, $data);
+    public abstract function update(array $elementId, array $data): array;
 
     /**
      * Drops an entry from this DataSource
      * @param array $elementId field=>value-type condition array identifying an entry
      * @throws \Exception If something did not go as planned
      */
-    public abstract function remove($elementId);
+    public abstract function remove(array $elementId): array;
 }
