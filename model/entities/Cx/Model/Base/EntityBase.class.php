@@ -209,13 +209,24 @@ class EntityBase {
     }
 
     /**
-     * Route methods like getName(), getType(), getDirectory(), etc.
-     * @param string $methodName Name of method to call
-     * @param array $arguments List of arguments for the method to call
-     * @throws \Exception If __call() nesting level reaches 20
-     * @return mixed Return value of the method to call
+     * Route method calls to the ComponentController
+     *
+     * This magic is applied to any call to nonexistent methods in this
+     * or its subclasses.
+     * Note that method names must begin with "get".
+     * @param   string      $methodName Name of method to call
+     * @param   array       $arguments  List of arguments for the method call
+     * @return  mixed                   Return value of the method call
+     * @throws  \Exception              If __call() nesting level reaches 20,
+     *                                  or on prohibited method names
      */
     public function __call($methodName, $arguments) {
+        if (substr($methodName, 0, 3) !== 'get') {
+            throw new \Exception(
+                'Only getters may be called; intercepted call to method '
+                . $methodName . '()'
+            );
+        }
         if (static::$nestingCount >= 20) {
             throw new \Exception('Stopped nesting at method ' . $methodName . '()');
         }
