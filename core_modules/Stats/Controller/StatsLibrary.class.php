@@ -133,15 +133,11 @@ class StatsLibrary
             //JS::activate('jquery');
             $searchTerm = '';
             $searchTermPlain = '';
+            $searchTermNoScript = '';
             if (isset($_REQUEST['term']) && !empty($_REQUEST['term']) && $_REQUEST['section'] == "Search") {
                 $searchTerm = "&amp;searchTerm=".urlencode($_REQUEST['term'])."' + '";
+                $searchTermNoScript = "&amp;searchTerm=".urlencode($_REQUEST['term']);
                 $searchTermPlain = contrexx_addslashes($_REQUEST['term']);
-            }
-
-            if (isset($_SERVER['HTTP_REFERER'])) {
-                $referer = urlencode($_SERVER['HTTP_REFERER']);
-            } else {
-                $referer = "";
             }
 
             $ascms_core_module_web_path = $this->cx->getCodeBaseCoreModuleWebPath();
@@ -150,8 +146,9 @@ class StatsLibrary
                 '[CORE_MODULE_URL]' => $ascms_core_module_web_path,
                 '[PAGEID]'          => $pageId,
                 '[SEARCHTERM]'      => $searchTerm,
+                '[SEARCHTERM_NOSCRIPT]'=> $searchTermNoScript,
                 '[SEARCHTERM_PLAIN]'=> $searchTermPlain,
-                '[REFERER]'         => $referer,
+                '[REFERER]'         => '$url_encode($(HTTP_REFERER))',
             );
             foreach ($replaces as $from => $to) {
                 $counterTag = str_replace($from, $to, $counterTag);
@@ -211,7 +208,8 @@ class StatsLibrary
             $spiderIp = $_SERVER['REMOTE_ADDR'];
         }
 
-        $spiderHost = @gethostbyaddr($spiderIp);
+        $net = $this->cx->getComponent('Net');
+        $spiderHost = $net->getHostByAddr($spiderIp);
         if ($spiderHost == $spiderIp) {
            $spiderHost = '';
         }
@@ -299,7 +297,7 @@ class StatsLibrary
         if ($uriString == "") { // only uninteresting vars in uri (faked?)
             return "/index.php";
         } else {
-            return "/index.php?".mysql_escape_string(stripslashes(substr($uriString,1)));
+            return "/index.php?" . contrexx_input2db(substr($uriString, 1));
         }
     }
 
@@ -713,6 +711,8 @@ class StatsLibrary
     /**
      * Get the HTTP client's IP address
      *
+     * IMPORTANT: Do not store the return value of this method in order to
+     * comply with the data privacy act GDPR!
      * In case the client is connecting through a proxy,
      * this method will try the fetch the client's original
      * IP address and will return that one instead of the
@@ -760,7 +760,8 @@ class StatsLibrary
     function _getProxyInformations() {
         if (isset($_SERVER['HTTP_VIA']) && $_SERVER['HTTP_VIA']) { // client does use a proxy
             $this->arrProxy['ip'] = $_SERVER['REMOTE_ADDR'];
-            $this->arrProxy['host'] = @gethostbyaddr($this->arrProxy['ip']);
+            $net = $this->cx->getComponent('Net');
+            $this->arrProxy['host'] = $net->getHostByAddr($this->arrProxy['ip']);
             $proxyUseragent = trim(addslashes(urldecode(strstr($_SERVER['HTTP_VIA'],' '))));
             $startPos = strpos($proxyUseragent,"(");
             $this->arrProxy['useragent'] = substr($proxyUseragent,$startPos+1);
@@ -1534,24 +1535,30 @@ class StatsLibrary
                     $month     = date('M', $timestamp);
                     $year      = date('Y', $timestamp);
                     foreach ($first as $day) {
-                        $arrRange[$day]['tick'] = $day.' '.$month;
-                        $arrRange[$day]['timestamp'] = strtotime($day.' '.$month.' '.$year);
+                        $arrRange[$day] = array(
+                            'tick'      => $day . ' ' . $month,
+                            'timestamp' => strtotime($day . ' ' . $month . ' ' . $year),
+                        );
                     }
 
                     $second = range(1, $rangeEnd);
                     $month  = date('M');
                     $year   = date('Y');
                     foreach ($second as $day) {
-                        $arrRange[$day]['tick']      = $day.' '.$month;
-                        $arrRange[$day]['timestamp'] = strtotime($day.' '.$month.' '.$year);
+                        $arrRange[$day] = array(
+                            'tick'      => $day . ' ' . $month,
+                            'timestamp' => strtotime($day . ' ' . $month . ' ' . $year),
+                        );
                     }
                 } else {
                     $arrDays = range($rangeStart, $rangeEnd);
                     $month = date('M');
                     $year  = date('Y');
                     foreach ($arrDays as $day) {
-                        $arrRange[$day]['tick']      = $day.' '.$month;
-                        $arrRange[$day]['timestamp'] = strtotime($day.' '.$month.' '.$year);
+                        $arrRange[$day] = array(
+                            'tick'      => $day . ' ' . $month,
+                            'timestamp' => strtotime($day . ' ' . $month . ' ' . $year),
+                        );
                     }
                 }
                 break;
@@ -1564,29 +1571,35 @@ class StatsLibrary
                     $first = range($rangeStart, 12);
                     $year  = date('Y', strtotime('-2 years'));
                     foreach ($first as $month) {
-                        $monthName = date('M', mktime(0, 0, 0, $month));
-                        $month     = date('m', mktime(0, 0, 0, $month));
-                        $arrRange[$month.'-'.$year]['tick']      = $monthName.' '.$year;
-                        $arrRange[$month.'-'.$year]['timestamp'] = strtotime($monthName.' '.$year);
+                        $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                        $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
+                        $arrRange[$month . '-' . $year] = array(
+                            'tick'      => $monthName . ' ' . $year,
+                            'timestamp' => strtotime($monthName . ' ' . $year),
+                        );
                     }
                 }
 
                 $second = range(1, 12);
                 $year   = date('Y', strtotime('last year'));
                 foreach ($second as $month) {
-                    $monthName = date('M', mktime(0, 0, 0, $month));
-                    $month     = date('m', mktime(0, 0, 0, $month));
-                    $arrRange[$month.'-'.$year]['tick']      = $monthName.' '.$year;
-                    $arrRange[$month.'-'.$year]['timestamp'] = strtotime($monthName.' '.$year);
+                    $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                    $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
+                    $arrRange[$month . '-' . $year] = array(
+                        'tick'      => $monthName . ' ' . $year,
+                        'timestamp' => strtotime($monthName . ' ' . $year),
+                    );
                 }
 
                 $third = range(1, $rangeEnd);
                 $year  = date('Y');
                 foreach ($third as $month) {
-                    $monthName = date('M', mktime(0, 0, 0, $month));
-                    $month     = date('m', mktime(0, 0, 0, $month));
-                    $arrRange[$month.'-'.$year]['tick']      = $monthName.' '.$year;
-                    $arrRange[$month.'-'.$year]['timestamp'] = strtotime($monthName.' '.$year);
+                    $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                    $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
+                    $arrRange[$month . '-' . $year] = array(
+                        'tick'      => $monthName . ' ' . $year,
+                        'timestamp' => strtotime($monthName . ' ' . $year),
+                    );
                 }
                 break;
             case 'year':
@@ -1601,8 +1614,10 @@ class StatsLibrary
                 if ($objResult !== false) {
                     while (!$objResult->EOF) {
                         $year = date('Y', $objResult->fields['timestamp']);
-                        $arrRange[$year]['tick']      = $year;
-                        $arrRange[$year]['timestamp'] = $objResult->fields['timestamp'];
+                        $arrRange[$year] = array(
+                            'tick'      => $year,
+                            'timestamp' => $objResult->fields['timestamp'],
+                        );
                         $objResult->MoveNext();
                     }
                     ksort($arrRange);
@@ -1610,8 +1625,10 @@ class StatsLibrary
 
                 if (empty($arrRange)) {
                     $year = date('Y');
-                    $arrRange[$year]['tick']      = $year;
-                    $arrRange[$year]['timestamp'] = strtotime('now');
+                    $arrRange[$year] = array(
+                        'tick'      => $year,
+                        'timestamp' => strtotime('now'),
+                    );
                 }
                 break;
             case 'hour':
@@ -1628,8 +1645,12 @@ class StatsLibrary
                     $year      = date('Y', $timestamp);
                     foreach ($first as $hour) {
                         $hour = date('H', mktime($hour));
-                        $arrRange[$hour]['tick']      = $hour.':00';
-                        $arrRange[$hour]['timestamp'] = strtotime($day.' '.$month.' '.$year.' '.$hour.':00');
+                        $arrRange[$hour] = array(
+                            'tick'      => $hour . ':00',
+                            'timestamp' => strtotime(
+                                $day . ' ' . $month . ' ' . $year . ' ' . $hour . ':00'
+                            ),
+                        );
                     }
 
                     $second = range(0, $rangeEnd);
@@ -1638,8 +1659,12 @@ class StatsLibrary
                     $year   = date('Y');
                     foreach ($second as $hour) {
                         $hour = date('H', mktime($hour));
-                        $arrRange[$hour]['tick']      = $hour.':00';
-                        $arrRange[$hour]['timestamp'] = strtotime($day.' '.$month.' '.$year.' '.$hour.':00');
+                        $arrRange[$hour] = array(
+                            'tick'      => $hour.':00',
+                            'timestamp' => strtotime(
+                                $day . ' ' . $month . ' ' . $year .' '. $hour . ':00'
+                            ),
+                        );
                     }
                 } else {
                     $arrHours = range($rangeStart, $rangeEnd);
@@ -1648,8 +1673,12 @@ class StatsLibrary
                     $year     = date('Y');
                     foreach ($arrHours as $hour) {
                         $hour = date('H', mktime($hour));
-                        $arrRange[$hour]['tick']      = $hour.':00';
-                        $arrRange[$hour]['timestamp'] = strtotime($day.' '.$month.' '.$year.' '.$hour.':00');
+                        $arrRange[$hour] = array(
+                            'tick'      => $hour.':00',
+                            'timestamp' => strtotime(
+                                $day . ' ' . $month . ' ' . $year . ' ' . $hour . ':00'
+                            ),
+                        );
                     }
                 }
                 break;
@@ -1716,7 +1745,7 @@ class StatsLibrary
         ';
         $objResult = $objDatabase->Execute($query);
 
-        $arrVisitory = array();
+        $arrVisitors = array();
         if ($objResult !== false) {
             if ($param == 'month') {
                 while (!$objResult->EOF) {
@@ -1766,4 +1795,3 @@ class StatsLibrary
         );
     }
 }
-?>

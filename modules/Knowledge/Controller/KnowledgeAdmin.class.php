@@ -88,7 +88,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
      */
     private $languageId = 1;
 
-        private $act = '';
+    private $act = '';
 
     /**
     * Constructor Create the module-menu and an internal template-object
@@ -112,20 +112,22 @@ class KnowledgeAdmin extends KnowledgeLibrary
         $this->tpl->setErrorHandling(PEAR_ERROR_DIE);
 
          $this->languageId = $objInit->userFrontendLangId;
-
     }
-        private function setNavigation()
-        {
+
+    /**
+     * Parse the navigation
+     */
+    private function setNavigation()
+    {
         global $objTemplate, $_ARRAYLANG;
 
-        $objTemplate->setVariable("CONTENT_NAVIGATION","
-            <a href=\"index.php?cmd=Knowledge".MODULE_INDEX."&amp;section=articles\" class='".($this->act == 'articles' ? 'active' : '')."'>".$_ARRAYLANG['TXT_KNOWLEDGE_ARTICLES']."</a>
-            <a href=\"index.php?cmd=Knowledge".MODULE_INDEX."&amp;section=categories\" class='".($this->act == 'categories' ? 'active' : '')."'>".$_ARRAYLANG['TXT_KNOWLEDGE_CATEGORIES']."</a>
-            <a href=\"index.php?cmd=Knowledge".MODULE_INDEX."&amp;section=settings\" class='".($this->act == 'settings' ? 'active' : '')."'>".$_ARRAYLANG['TXT_KNOWLEDGE_SETTINGS']."</a>
-                                                           ");
-        }
-
-
+        $objTemplate->setVariable(
+            'CONTENT_NAVIGATION',
+            '<a href="index.php?cmd=Knowledge' . MODULE_INDEX . '&amp;act=articles" class="' . ($this->act == 'articles' ? 'active' : '') . '">' . $_ARRAYLANG['TXT_KNOWLEDGE_ARTICLES'] . '</a>
+             <a href="index.php?cmd=Knowledge' . MODULE_INDEX . '&amp;act=categories" class="' . ($this->act == 'categories' ? 'active' : '') . '">' . $_ARRAYLANG['TXT_KNOWLEDGE_CATEGORIES'] . '</a>
+             <a href="index.php?cmd=Knowledge' . MODULE_INDEX . '&amp;act=settings" class="' . ($this->act == 'settings' ? 'active' : '') . '">' . $_ARRAYLANG['TXT_KNOWLEDGE_SETTINGS'] . '</a>'
+        );
+    }
 
     /**
      * Return the page depending on the $_GET-params
@@ -138,15 +140,13 @@ class KnowledgeAdmin extends KnowledgeLibrary
     {
         global $objPerm, $objTemplate, $_ARRAYLANG;
 
-        if(!isset($_GET['act'])) {
-            $_GET['act']='';
-        }
+        $_GET['tpl'] = !empty($_GET['tpl']) ? contrexx_input2raw($_GET['tpl']) : '';
+        $_GET['act'] = !empty($_GET['act']) ? contrexx_input2raw($_GET['act']) : '';
 
-        $_GET['section'] = (empty($_GET['section'])) ? "" :  $_GET['section'];
-        switch ($_GET['section']) {
+        switch ($_GET['act']) {
             // The categories
             case 'categories':
-                switch ($_GET['act']) {
+                switch ($_GET['tpl']) {
                     case 'add':
                         \Permission::checkAccess(ACCESS_ID_EDIT_CATEGORIES, 'static');
                         $content = $this->editCategory(true);
@@ -160,12 +160,12 @@ class KnowledgeAdmin extends KnowledgeLibrary
                     case 'update':
                         \Permission::checkAccess(ACCESS_ID_EDIT_CATEGORIES, 'static');
                         $id = $this->updateCategory();
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=Knowledge".MODULE_INDEX."&section=categories&act=overview&highlight=".$id);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Knowledge' . MODULE_INDEX . '&act=categories&tpl=overview&highlight=' . $id);
                         break;
                     case 'insert':
                         \Permission::checkAccess(ACCESS_ID_EDIT_CATEGORIES, 'static');
                         $id = $this->insertCategory();
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=Knowledge".MODULE_INDEX."&section=categories&act=overview&highlight=".$id);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Knowledge' . MODULE_INDEX . '&act=categories&tpl=overview&highlight=' . $id);
                         break;
                     case 'delete':
                         \Permission::checkAccess(ACCESS_ID_EDIT_CATEGORIES, 'static');
@@ -191,7 +191,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
 
             // The articles
             case 'articles':
-                switch ($_GET['act']) {
+                switch ($_GET['tpl']) {
                     case 'add':
                         \Permission::checkAccess(ACCESS_ID_EDIT_ARTICLES, 'static');
                         $content = $this->editArticle(true);
@@ -212,7 +212,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
                         \Permission::checkAccess(ACCESS_ID_EDIT_ARTICLES, 'static');
                         $id = $this->updateArticle();
                         $content = $this->articleOverview();
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=Knowledge".MODULE_INDEX."&section=articles&act=edit&id=".$id."&updated=true");
+                        \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Knowledge' . MODULE_INDEX . '&act=articles&tpl=edit&id=' . $id . '&updated=true');
                         break;
                     case 'getArticles':
                         \Permission::checkAccess(ACCESS_ID_OVERVIEW, 'static');
@@ -245,7 +245,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
                 break;
             case 'settings':
                 \Permission::checkAccess(ACCESS_ID_SETTINGS, 'static');
-                switch ($_GET['act']) {
+                switch ($_GET['tpl']) {
                     case 'tidyTags':
                         $this->tidyTags();
                         break;
@@ -276,17 +276,17 @@ class KnowledgeAdmin extends KnowledgeLibrary
                 $this->settings($content, $active);
                 break;
             default:
-                \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=Knowledge".MODULE_INDEX."&section=articles");
+                \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Knowledge' . MODULE_INDEX . '&act=articles');
         }
 
         $objTemplate->setVariable(array(
             'CONTENT_TITLE'                => $this->pageTitle,
-            'CONTENT_OK_MESSAGE'        => $this->okMessage,
-            'CONTENT_STATUS_MESSAGE'    => $this->errorMessage,
+            'CONTENT_OK_MESSAGE'           => $this->okMessage,
+            'CONTENT_STATUS_MESSAGE'       => $this->errorMessage,
             'ADMIN_CONTENT'                => $this->tpl->get()
         ));
 
-        $this->act = $_REQUEST['section'];
+        $this->act = $_REQUEST['act'];
         $this->setNavigation();
     }
 
@@ -339,7 +339,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
 
         $this->tpl->setVariable(array(
             "CATEGORIES_FILE"       => $content,
-            "ACTIVE_".strtoupper($active) => "class=\"subnavbar_active\""
+            "ACTIVE_".strtoupper($active) => 'class="active"'
         ));
 
         $this->tpl->setVariable(array(
@@ -802,7 +802,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
 
         $this->tpl->setVariable(array(
             "ARTICLES_FILE"                 => $content,
-            "ACTIVE_".strtoupper($active)   => "class=\"subnavbar_active\""
+            "ACTIVE_".strtoupper($active)   => 'class="active"'
         ));
 
         $this->tpl->setVariable(array(
@@ -901,7 +901,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
      * @param $category Category information
      * @return String
      */
-    private function parseArticleList($articles, $categoryname="", $count, $position, $standalone=false)
+    private function parseArticleList($articles, $categoryname="", $count = null, $position = null, $standalone=false)
     {
         global $_LANGID, $_ARRAYLANG, $_CORELANG;
 
@@ -1246,7 +1246,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
         die();
 
         print $_GET['order'];
-        $order = explode("articlelist\[\]=", $_GET['order']);
+        $order = explode("articlelist[]=", $_GET['order']);
 
         foreach ($order as $sort => $id) {
             $id = intval($id);
@@ -1339,7 +1339,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
 
         $this->tpl->setVariable(array(
             "SETTINGS_FILE"                 => $content,
-            "ACTIVE_".strtoupper($active)   => "class=\"subnavbar_active\""
+            "ACTIVE_".strtoupper($active)   => 'class="active"'
         ));
 
         $this->tpl->setVariable(array(

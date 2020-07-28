@@ -93,6 +93,7 @@ class IndustryType
         $arrIndustries = array();
         $whereParentId = '';
         $whereActive   = '';
+        $langId = !empty($_LANGID) ? $_LANGID : FRONTEND_LANG_ID;
 
         if (!empty($intIndustryId)) {
             $whereParentId = '';
@@ -119,7 +120,7 @@ class IndustryType
                                                  FROM `".DBPREFIX."module_{$this->moduleName}_industry_types` AS Intype
                                                  LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_industry_type_local` AS Inloc
                                                     ON Intype.id = Inloc.entry_id
-                                                 WHERE Inloc.lang_id = ".$_LANGID."
+                                                 WHERE Inloc.lang_id = ".$langId."
                                                  $whereParentId
                                                  $whereActive
                                                  $sortOrder

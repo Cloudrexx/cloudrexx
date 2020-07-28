@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -24,10 +22,9 @@ namespace Doctrine\ORM\Tools;
 /**
  * Class to generate entity repository classes
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ *
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Benjamin Eberlei <kontakt@beberlei.de>
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
@@ -38,7 +35,7 @@ class EntityRepositoryGenerator
     protected static $_template =
 '<?php
 
-namespace <namespace>;
+<namespace>
 
 use Doctrine\ORM\EntityRepository;
 
@@ -50,20 +47,46 @@ use Doctrine\ORM\EntityRepository;
  */
 class <className> extends EntityRepository
 {
-}';
+}
+';
 
+    /**
+     * @param string $fullClassName
+     *
+     * @return string
+     */
     public function generateEntityRepositoryClass($fullClassName)
     {
-        $namespace = substr($fullClassName, 0, strrpos($fullClassName, '\\'));
         $className = substr($fullClassName, strrpos($fullClassName, '\\') + 1, strlen($fullClassName));
 
         $variables = array(
-            '<namespace>' => $namespace,
+            '<namespace>' => $this->generateEntityRepositoryNamespace($fullClassName),
             '<className>' => $className
         );
+
         return str_replace(array_keys($variables), array_values($variables), self::$_template);
     }
 
+    /**
+     * Generates the namespace statement, if class do not have namespace, return empty string instead.
+     * 
+     * @param string $fullClassName The full repository class name.
+     *
+     * @return string $namespace
+     */
+    private function generateEntityRepositoryNamespace($fullClassName)
+    {
+        $namespace = substr($fullClassName, 0, strrpos($fullClassName, '\\'));
+        
+        return $namespace ? 'namespace ' . $namespace . ';' : '';
+    }
+
+    /**
+     * @param string $fullClassName
+     * @param string $outputDirectory
+     *
+     * @return void
+     */
     public function writeEntityRepositoryClass($fullClassName, $outputDirectory)
     {
         $code = $this->generateEntityRepositoryClass($fullClassName);
@@ -73,11 +96,12 @@ class <className> extends EntityRepository
         $dir = dirname($path);
 
         if ( ! is_dir($dir)) {
-            mkdir($dir, 0777, true);
+            mkdir($dir, 0775, true);
         }
 
         if ( ! file_exists($path)) {
             file_put_contents($path, $code);
+            chmod($path, 0664);
         }
     }
 }

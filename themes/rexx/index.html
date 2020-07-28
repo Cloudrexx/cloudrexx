@@ -1,0 +1,263 @@
+<!doctype html>
+<!--[if lt IE 7 ]><html class="no-js ie6" lang="en"><![endif]-->
+<!--[if IE 7 ]>   <html class="no-js ie7" lang="en"><![endif]-->
+<!--[if IE 8 ]>   <html class="no-js ie8" lang="en"><![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html class="no-js" lang="en">
+    <!--<![endif]-->
+    <head>
+        <title>{GLOBAL_TITLE} - {METATITLE} - powered by {VERSION}</title>
+        <meta name="generator" content="{VERSION}" />
+        <meta name="keywords" content="{METAKEYS}" />
+        <meta name="robots" content="{METAROBOTS}" />
+        <meta name="description" content="{METADESC}" />
+        <meta charset="{CHARSET}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta property="og:site_name" content="{GLOBAL_TITLE}" />
+        <meta property="og:title" content="{METATITLE}" />
+        <meta property="og:description" content="{METADESC}" />
+        <meta property="og:url" content="http://{DOMAIN_URL}{CURRENT_URL}" />
+        <meta property="og:image" content="{BASE_URL}/themes/rexx/images/og_logo_social_media.jpg" />
+        <meta name="twitter:title" content="{METATITLE}" />
+        <meta name="twitter:description" content="{METADESC}" />
+        <meta name="twitter:image" content="{BASE_URL}/themes/rexx/images/logo_social_media.jpg" />
+        <link type="images/x-icon" rel="icon" href="themes/rexx/images/favicon.ico" />
+        <link rel="apple-touch-icon" href="/themes/rexx/images/logo_social_media.jpg" />
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="themes/rexx/layout.css" />
+        <link type="text/css" rel="stylesheet" href="themes/rexx/style.css" />
+        {JAVASCRIPT}
+        {STYLE_FILE}
+        {LOGIN_INCLUDE}
+        <link type="text/css" rel="stylesheet" href="themes/rexx/modules.css" />
+        <link type="text/css" rel="stylesheet" href="themes/rexx/text.css" />
+        <script type="text/javascript" src="themes/rexx/modernizr.js"></script>
+        <script type="text/javascript" src="themes/rexx/jquery.cycle.js"></script>
+        <script type="text/javascript" src="themes/rexx/javascript.js"></script>
+        <script>
+            var ss = document.createElement("link");
+            ss.type = "text/css";
+            ss.rel = "stylesheet";
+            ss.href = "https://fonts.googleapis.com/css?family="
+                       +cx.variables.get('font_family_header', 'TemplateEditor').activeChoice.replace(' ', '+')+
+                    "|"+cx.variables.get('font_family_body', 'TemplateEditor').activeChoice.replace(' ', '+')+
+                    "|"+cx.variables.get('font_family_navigation', 'TemplateEditor').activeChoice.replace(' ', '+');
+            document.getElementsByTagName("head")[0].appendChild(ss);
+        </script>
+        <style>
+            h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, #breadcrumb, #breadcrumb a {
+                font-family: {TEMPLATE_EDITOR_FONT_FAMILY_HEADER},Arial,Helvetica,sans-serif;
+            }
+
+            body, p, a {
+                font-family: {TEMPLATE_EDITOR_FONT_FAMILY_BODY},Arial,Helvetica,sans-serif;
+            }
+
+            .header li a {
+                font-family: {TEMPLATE_EDITOR_FONT_FAMILY_NAVIGATION},Arial,Helvetica,sans-serif;
+            }
+            
+            body a,
+            .navigation li a:hover,
+            #metanavigation li a:hover,
+            .slider-text,
+            #language-navigation li a:hover,
+            .modal-nav button:hover,
+            form fieldset .ui-tabs .ui-tabs-nav li a {
+                text-decoration:none;
+                color: {TEMPLATE_EDITOR_LINK_COLOR};
+            }
+
+            #home-page h1 {
+                color: {TEMPLATE_EDITOR_SECONDARY_COLOR};
+            }
+
+            .sidebar-block-title,
+            #page-right h3,
+            #back-top:hover,
+            .head, .sidebar-block, table th,
+            form fieldset .ui-tabs .ui-tabs-nav li.ui-state-active a,
+            #shop figure a h3 ,
+            #shop button.details-button  ,
+            #shop button.add-to-cart,
+            #tag-filter,
+            #cartlist #th_bg,
+            .item h1 {
+                background: {TEMPLATE_EDITOR_SECONDARY_COLOR};
+            }
+
+            .item h1 span,
+            .item h1 font,
+            .item h1  {
+                color: #fff !important;
+            }
+
+            #shop button.details-button:hover,
+            #shop button.add-to-cart:hover {
+                background: {TEMPLATE_EDITOR_SECONDARY_COLOR_SUBTRACT_20};
+            }
+
+            .home-box,
+            form fieldset .ui-tabs .ui-tabs-nav li.ui-state-active  {
+                border-color:{TEMPLATE_EDITOR_SECONDARY_COLOR};
+            }
+
+            body a:focus,
+            body a:active,
+            body a:hover,
+            #subnavigation li a:hover,
+            #subnavigation li a.active  {
+                color: {TEMPLATE_EDITOR_LINK_COLOR_SUBTRACT_50};
+            }
+
+            .header {
+                background: {TEMPLATE_EDITOR_MAIN_COLOR};
+            }
+
+            #subnavigation li a:before {
+                border-color: transparent transparent transparent {TEMPLATE_EDITOR_LINK_COLOR_SUBTRACT_100};
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                border-color: {TEMPLATE_EDITOR_LINK_COLOR_ADD_100};
+                outline: 0;
+                -webkit-box-shadow: inset 0 1px 1px {TEMPLATE_EDITOR_LINK_COLOR_ADD_150}, 0 0 8px {TEMPLATE_EDITOR_LINK_COLOR_ADD_100};
+                box-shadow: inset 0 1px 1px {TEMPLATE_EDITOR_LINK_COLOR_ADD_150}, 0 0 8px {TEMPLATE_EDITOR_LINK_COLOR_ADD_100};
+            }
+
+            ::-moz-selection {
+                color: #fff;
+                background: {TEMPLATE_EDITOR_SECONDARY_COLOR_SUBTRACT_20};
+            }
+
+            ::selection {
+                color: #fff;
+                background: {TEMPLATE_EDITOR_SECONDARY_COLOR_SUBTRACT_20};
+            }
+
+            #footer {
+                color: #fff;
+                background: {TEMPLATE_EDITOR_SECONDARY_COLOR};
+            }
+
+            #footer a,
+            #footer .horizontal-list i {
+                color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="header">
+                <div class="container-fluid">
+                    <div class="row">
+                        <a id="logo" href="{NODE_HOME}">
+
+                            <img src="{TEMPLATE_EDITOR_LOGO_IMAGE}" alt="images"/>
+
+                        </a>
+                        <div class="visible-lg" id="navigation-wrapper">{NAVBAR_FILE}</div>
+                        <div class="nav-right visible-lg" id="metanavigation">
+                            <ul>
+                                <li class="modal-nav">
+                                    <!-- BEGIN access_logged_out -->
+                                    <button class="open" data-toggle="modal" data-target="#myModal">Login</button>
+                                    <a href="{NODE_ACCESS_SIGNUP}">Registrieren</a>
+                                    <!-- END access_logged_out -->
+                                    <!-- BEGIN access_logged_in -->
+                                    <a href="{NODE_ACCESS_SETTINGS_PROFILE}">{ACCESS_USER_USERNAME}</a>
+                                    <a href="{LOGOUT_URL}">Logout</a>
+                                    <!-- END access_logged_in -->
+                                </li>
+                                <!--<li></li>-->
+                                <li>
+                                    <form id="search-form" action="{NODE_SEARCH}" method="get">
+                                        <input id="search-input" type="text" name="term" value=""  />
+                                        <input type="submit" id="search-icon" value=""/>
+                                    </form>
+                                </li>
+                                <li id="select-language">{LANGUAGE_NAVBAR_SHORT}</li>
+                            </ul>
+                        </div>
+                        <div class="navbar-header hidden-lg">
+                            <a class="mobile-reg" href="{NODE_ACCESS_SIGNUP}"></a>
+                            <a class="mobile-login" href="{NODE_LOGIN}"></a>
+                            <button class="navbar-toggle btn-navbar">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section id="content-wrapper">
+                {CONTENT_FILE}
+            </section>
+            <footer id="footer" class="inner">
+                <div class="inner container">
+                    <div id="footer-bottom" class="row">
+                        <div class="footer-left center-block">&copy; {DATE_YEAR} <a href="https://www.cloudrexx.com" target="_blank">Cloudrexx &reg;</a> Standard Theme</div>
+                        <div class="footer-right center-block">
+                            <ul class="horizontal-list">
+                                <li><a href="{NODE_CONTACT_1}">Kontakt</a></li>
+                                <li><a href="{NODE_PRIVACY}">Rechtliche Hinweise</a></li>
+                                <li><a href="{NODE_SITEMAP}">Inhaltsverzeichnis</a></li>
+                                <li><a href="{NODE_IMPRINT}">Impressum</a></li>
+                                <li class="last">{LOGIN_URL}</li>
+                            </ul>
+                        </div>
+                        <div class="social-foot center-block">
+                            <ul class="horizontal-list no-bg">
+                                <li><a target="_blank" href="https://twitter.com/cloudrexx"><i class="fa fa-twitter"></i></a></li>
+                                <li><a target="_blank" href="https://www.facebook.com/cloudrexx"><i class="fa fa-facebook"></i></a></li>
+                                <li><a target="_blank" href="https://plus.google.com/+Contrexx"><i class="fa fa-google-plus"></i></a></li>
+                                <li class="last"><a target="_blank" href="/feed/news_de.xml"><i class="fa fa-rss"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+            <div class="mobile-nav">
+                <ul id="lang-bar"><li>{LANGUAGE_NAVBAR_SHORT}</li></ul>
+                {NAVBAR2_FILE}
+            </div>
+        </div>
+
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h1>Anmelden</h1>
+                        <div class="left">
+                            <a href="{NODE_LOGIN}?provider=facebook" class="facebook loginbutton btn-social btn-facebook"><i class="fa fa-facebook-square"></i>Facebook-Anmeldung</a>
+                            <a href="{NODE_LOGIN}?provider=google" class="google loginbutton btn-social btn-google-plus"><i class="fa fa-google-plus"></i>Mit Google amelden</a>
+                            <a href="{NODE_LOGIN}?provider=twitter" class="twitter loginbutton btn-social btn-twitter"><i class="fa fa-twitter"></i>Mit Twitter anmelden</a>
+                        </div>
+                        <div class="right">
+                            <form method="post" action="{NODE_LOGIN}">
+                                <input name="USERNAME" placeholder="E-Mail-Adresse oder Benutzername" type="text"/>
+                                <input name="PASSWORD" placeholder="Passwort" type="password"/>
+                                <input type="submit" value="Anmelden" name="login">
+                                <input type="checkbox" id="remember_me" class="remember_me" name="remember_me" value="1">
+                                <label class="remember_me" for="remember_me">Merken</label>
+                            </form>
+                        </div>
+                        <div class="modal-foot">
+                            <a href="{NODE_LOGIN_LOSTPW}">Passwort vergessen?</a><br />
+                            <a href="{NODE_ACCESS_SIGNUP}">Benutzeraccount erstellen</a>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {LOGIN_CONTENT}
+        {COUNTER}
+    </body>
+</html>

@@ -55,9 +55,9 @@ Tags.prototype.getTags = function(sort)
     var ref = this;
     new Ajax.Request('index.php', {
         method: "get",
-        parameters : {  cmd : "Knowledge",
-                        section : "articles",
-                        act : "getTags",
+        parameters : {  cmd  : "Knowledge",
+                        act  : "articles",
+                        tpl  : "getTags",
                         sort : sort,
                         lang : ref.lang
         },

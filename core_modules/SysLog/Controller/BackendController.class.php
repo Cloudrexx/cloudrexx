@@ -58,7 +58,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template Backend template for this page
      * @param array $cmd Supplied CMD
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         $em = $this->cx->getDb()->getEntityManager();
         $logRepo = $em->getRepository('Cx\Core_Modules\SysLog\Model\Entity\Log');
 
@@ -69,11 +69,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         if (!isset($_GET['order'])) {
             $_GET['order'] = 'timestamp/DESC';
         }
-        $parseObject = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(array());
-        // setDataType is used to make the ViewGenerator load the proper options if $parseObject is empty
-        $parseObject->setDataType('Cx\Core_Modules\SysLog\Model\Entity\Log');
         // configure view
-        $viewGenerator = new \Cx\Core\Html\Controller\ViewGenerator($parseObject, $this->getAllViewGeneratorOptions());
+        $viewGenerator = new \Cx\Core\Html\Controller\ViewGenerator('Cx\Core_Modules\SysLog\Model\Entity\Log', $this->getAllViewGeneratorOptions());
         $template->setVariable('ENTITY_VIEW', $viewGenerator);
     }
 
@@ -83,9 +80,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @access protected
      * @global $_ARRAYLANG
      * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used for better partition
      * @return array with options
      */
-    protected function getViewGeneratorOptions($entityClassName) {
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts = explode('\\', $entityClassName);

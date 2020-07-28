@@ -64,8 +64,6 @@ define('ASCMS_CUSTOMIZING_PATH',            ASCMS_INSTANCE_PATH.ASCMS_INSTANCE_O
 // Cx::getWebsiteCustomizingWebPath()
 define('ASCMS_CUSTOMIZING_WEB_PATH',        ASCMS_INSTANCE_OFFSET.'/customizing');
 
-require_once ASCMS_DOCUMENT_ROOT.'/config/settings.php';
-
 if (
     isset($_CONFIG['useCustomizings']) && $_CONFIG['useCustomizings'] == 'on' &&
     file_exists(ASCMS_CUSTOMIZING_PATH.'/config/SetCustomizableConstants.php')

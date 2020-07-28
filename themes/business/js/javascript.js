@@ -17,19 +17,19 @@
 $(window).load(function() {
   var Image_height = $('#mediadir .reference img').height();
     if (Image_height > 0) {
-    $J("#mediadir .reference.graybox_entry").css("height",Image_height);
-    $J("#mediadir .reference.graybox_entry").show();
+    $("#mediadir .reference.graybox_entry").css("height",Image_height);
+    $("#mediadir .reference.graybox_entry").show();
 }
 }).resize(function() {
   var Image_height = $('#mediadir .reference img').height();
     if (Image_height > 0) {
-    $J("#mediadir .reference.graybox_entry").css("height",Image_height);
-    $J("#mediadir .reference.graybox_entry").show();
+    $("#mediadir .reference.graybox_entry").css("height",Image_height);
+    $("#mediadir .reference.graybox_entry").show();
 }
 }); */
 
         /* add div for every three child in mediadirectory overview page  */
-        var entries = $J("#mediadir").children('.reference');
+        var entries = $("#mediadir").children('.reference');
 
         for (var i = 0; i < entries.length; i += 4) {
             entries.slice(i, i + 4).wrapAll('<div class="full-width"></div>');
@@ -123,7 +123,7 @@ $(window).load(function() {
         });
 
         jQuery('#sidr-menu').click(function() {
-            $J('body').css('overflow-y', 'hidden');
+            $('body').css('overflow-y', 'hidden');
         });
 
 

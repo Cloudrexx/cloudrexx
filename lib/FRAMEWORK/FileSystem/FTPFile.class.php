@@ -306,17 +306,14 @@ class FTPFile implements FileInterface
 
     private function openTempFileHandler()
     {
-        global $sessionObj;
-
         // try memory first
         if (($this->tempFileHandler = fopen("php://memory", 'r+')) === false) {
             // unable to use memory as temporary storage location,
             // try to create file in the session temp path
-            if (empty($sessionObj)) { //session hasn't been initialized so far
-                $sessionObj = \cmsSession::getInstance();
-            }
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $session = $cx->getComponent('Session')->getSession();
 
-            $sessionTempPath = $_SESSION->getTempPath();
+            $sessionTempPath = $session->getTempPath();
             $pathInfo = pathinfo($this->file);
             $tempFile = $sessionTempPath.'/'.$pathInfo['basename'];
             $idx = 1;

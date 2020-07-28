@@ -344,16 +344,27 @@ function contrexx_raw2encodedUrl($source, $encodeDash=false)
         return $arr;
     }
     $cutHttp = false;
+    $https = false;
     if (!$encodeDash && substr($source, 0, 7) == 'http://') {
         $source = substr($source, 7);
         $cutHttp = true;
+    } else if (!$encodeDash && substr($source, 0, 8) == 'https://') {
+        $source = substr($source, 8);
+        $cutHttp = true;
+        $https = true;
     }
     $source = array_map('rawurlencode', explode('/', $source));
     if ($encodeDash) {
         $source = str_replace('-', '%2D', $source);
     }
     $result = implode('/', $source);
-    if ($cutHttp) $result = 'http://'.$result;
+    if ($cutHttp) {
+        $protocol = 'http';
+        if ($https) {
+            $protocol .= 's';
+        }
+        $result = $protocol . '://' . $result;
+    }
     return $result;
 }
 
@@ -380,6 +391,26 @@ function contrexx_remove_script_tags($raw)
     return $result;
 }
 
+/**
+ * Decode [X]HTML entities to raw plaintext string
+ *
+ * Note that arrays may be nested, and all scalar (leaf) elements are treated
+ * the same way.  Array keys are preserved.
+ * @param   mixed     $xhtml      The raw string or array
+ * @return  mixed               The raw decoded string or array
+ * @author  Thomas Däppen <thomas.daeppen@cloudrexx.com>
+ */
+function contrexx_xhtml2raw($xhtml)
+{
+    if (is_array($xhtml)) {
+        $arr = array();
+        foreach ($xhtml as $i => $_xhtml) {
+            $arr[$i] = contrexx_xhtml2raw($_xhtml);
+        }
+        return $arr;
+    }
+    return html_entity_decode($xhtml, ENT_QUOTES, CONTREXX_CHARSET);
+}
 
 /**
  * Extracts the plaintext out of a html code

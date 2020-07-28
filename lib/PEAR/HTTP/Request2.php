@@ -159,6 +159,7 @@ class HTTP_Request2 implements SplSubject
 
         'ssl_verify_peer'   => true,
         'ssl_verify_host'   => true,
+        'ssl_peer_name'     => null,
         'ssl_cafile'        => null,
         'ssl_capath'        => null,
         'ssl_local_cert'    => null,

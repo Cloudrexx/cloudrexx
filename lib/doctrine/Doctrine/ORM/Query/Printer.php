@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,8 +13,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
- * <http://www.phpdoctrine.org>.
+ * and is licensed under the MIT license. For more information, see
+ * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Query;
@@ -28,7 +26,6 @@ namespace Doctrine\ORM\Query;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        http://www.phpdoctrine.org
  * @since       2.0
- * @version     $Revision$
  */
 class Printer
 {
@@ -62,7 +59,9 @@ class Printer
      *
      * This method is called before executing a production.
      *
-     * @param string $name production name
+     * @param string $name Production name.
+     *
+     * @return void
      */
     public function startProduction($name)
     {
@@ -74,6 +73,8 @@ class Printer
      * Decreases indentation level by one and prints a closing parenthesis.
      *
      * This method is called after executing a production.
+     *
+     * @return void
      */
     public function endProduction()
     {
@@ -84,7 +85,9 @@ class Printer
     /**
      * Prints text indented with spaces depending on current indentation level.
      *
-     * @param string $str text
+     * @param string $str The text.
+     *
+     * @return void
      */
     public function println($str)
     {

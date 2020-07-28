@@ -29,6 +29,10 @@ class Invoice extends \Payrexx\Models\Base
     protected $purpose = '';
     protected $amount = 0;
     protected $currency = '';
+    protected $preAuthorization = false;
+
+    protected $successRedirectUrl;
+    protected $failedRedirectUrl;
 
     protected $subscriptionState = false;
     protected $subscriptionInterval = '';
@@ -36,6 +40,7 @@ class Invoice extends \Payrexx\Models\Base
     protected $subscriptionPeriodMinAmount = '';
     protected $subscriptionCancellationInterval = '';
     protected $fields = array();
+    protected $concardisOrderId = '';
 
     /**
      * @return string
@@ -104,7 +109,7 @@ class Invoice extends \Payrexx\Models\Base
     /**
      * Set the payment service provider to use, a
      * list of available payment service providers (short psp)
-     * can be found here: http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * can be found here: http://developers.payrexx.com/docs/miscellaneous
      *
      * @param int $psp
      */
@@ -181,13 +186,70 @@ class Invoice extends \Payrexx\Models\Base
     /**
      * Set the corresponding payment currency for the amount.
      * You can use the ISO Code.
-     * A list of available currencies you can find on http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * A list of available currencies you can find on http://developers.payrexx.com/docs/miscellaneous
      *
      * @param string $currency
      */
     public function setCurrency($currency)
     {
         $this->currency = $currency;
+    }
+
+    /**
+     * @access  public
+     * @return  bool
+     */
+    public function getPreAuthorization()
+    {
+        return $this->preAuthorization;
+    }
+
+    /**
+     *  Whether charge payment manually at a later date.
+     *  Note: Subscription and pre-authorization can not be combined.
+     *
+     * @access  public
+     * @param   bool    $preAuthorization
+     */
+    public function setPreAuthorization($preAuthorization)
+    {
+        $this->preAuthorization = $preAuthorization;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuccessRedirectUrl()
+    {
+        return $this->successRedirectUrl;
+    }
+
+    /**
+     * Set the URL to redirect to after a successful payment
+     *
+     * @param string $successRedirectUrl
+     */
+    public function setSuccessRedirectUrl($successRedirectUrl)
+    {
+        $this->successRedirectUrl = $successRedirectUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFailedRedirectUrl()
+    {
+        return $this->failedRedirectUrl;
+    }
+
+    /**
+     * Set the url to redirect to after a failed payment
+     *
+     * @param string $failedRedirectUrl
+     */
+    public function setFailedRedirectUrl($failedRedirectUrl)
+    {
+        $this->failedRedirectUrl = $failedRedirectUrl;
     }
 
     /**
@@ -202,6 +264,7 @@ class Invoice extends \Payrexx\Models\Base
      * Set whether the payment should be a recurring payment (subscription)
      * If you set to TRUE, you should provide a
      * subscription interval, period and cancellation interval
+     * Note: Subscription and pre-authorization can not be combined.
      *
      * @param boolean $subscriptionState
      */
@@ -308,7 +371,7 @@ class Invoice extends \Payrexx\Models\Base
      * @param string $type the type of field
      *                     can be: title, forename, surname, company, street, postcode,
      *                     place, phone, country, email, date_of_birth, terms, custom_field_1,
-     *                     custom_field_2, custom_field_3
+     *                     custom_field_2, custom_field_3, custom_field_4, custom_field_5
      * @param boolean $mandatory TRUE if the field has to be filled out for payment
      * @param string $defaultValue the default value. This value will be editable for the client.
      *                             for the title of a customer you can set mister / miss
@@ -322,6 +385,23 @@ class Invoice extends \Payrexx\Models\Base
             'mandatory' => $mandatory,
             'defaultValue' => $defaultValue,
         );
+    }
+
+    /**
+     * @return string
+     */
+    public function getConcardisOrderId()
+    {
+        return $this->concardisOrderId;
+    }
+
+    /**
+     * Define an ORDER ID which should be used for the Concardis PSPs
+     * @param string $concardisOrderId
+     */
+    public function setConcardisOrderId($concardisOrderId)
+    {
+        $this->concardisOrderId = $concardisOrderId;
     }
 
     /**

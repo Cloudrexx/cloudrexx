@@ -69,6 +69,10 @@
             <td>[[NEWS_TEASER]]</td>
             <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
         </tr>
+        <tr class="row2">
+            <td>[[NEWS_TEASER_TEXT]]</td>
+            <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
+        </tr>
         <tr class="row1">
             <td>[[NEWS_TITLE]]</td>
             <td>{TXT_NEWS_TITLE_DESCRIPTION}</td>
@@ -101,17 +105,127 @@
             <td>[[NEWS_CATEGORY]]</td>
             <td>{TXT_NEWS_CATEGORY_DESCRIPTION}</td>
         </tr>
+        <tr class="row2">
+            <td>[[NEWS_CATEGORY_NAME]]</td>
+            <td>{TXT_NEWS_CATEGORY_NAME_DESCRIPTION}</td>
+        </tr>
         <tr class="row1">
             <td>[[NEWS_AUTHOR]]</td>
             <td>{TXT_NEWS_AUTHOR_DESCRIPTION}</td>
         </tr>
-        <tr class="row1">
+        <tr class="row2">
             <td>[[NEWS_PUBLISHER]]</td>
             <td>{TXT_NEWS_PUBLISHER_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_SOURCE]]</td>
+            <td>{TXT_NEWS_SOURCE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_LASTUPDATE]]</td>
+            <td>{TXT_NEWS_LASTUPDATE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_URL]]</td>
+            <td>{TXT_NEWS_URL_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_comments_count --&gt;</td>
         </tr>
         <tr class="row2">
             <td>[[NEWS_COUNT_COMMENTS]]</td>
             <td>{TXT_NEWS_COUNT_COMMENTS_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- END news_comments_count --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_author --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_AUTHOR_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_AUTHOR_USERNAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_AUTHOR_PROFILE_ATTRIBUTE_*]]</td>
+            <td>{TXT_NEWS_USER_PROFILE_ATTRIBUTE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_author --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_publisher --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_PUBLISHER_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PUBLISHER_USERNAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PUBLISHER_PROFILE_ATTRIBUTE_*]]</td>
+            <td>{TXT_NEWS_USER_PROFILE_ATTRIBUTE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_publisher --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_category --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_CATEGORY_TITLE]]</td>
+            <td>{TXT_NEWS_CATEGORY_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_CATEGORY_ID]]</td>
+            <td>{TXT_NEWS_CATEGORY_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_category --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_use_teaser_text --&gt;</td>
+            <td>{TXT_NEWS_TEASER_TEXT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TEASER_TEXT]]</td>
+            <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_use_teaser_text --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_text --&gt;</td>
+            <td>{TXT_NEWS_TEXT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TEXT]]</td>
+            <td>{TXT_NEWS_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_text --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_redirect --&gt;</td>
+            <td>{TXT_NEWS_REDIRECT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">[[TXT_NEWS_REDIRECT_INSTRUCTION]]</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">[[NEWS_REDIRECT_URL]]</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">[[NEWS_REDIRECT_NAME]]</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_redirect --&gt;</td>
         </tr>
         <tr class="row1">
             <td>[[NEWS_IMAGE]]</td>
@@ -178,32 +292,162 @@
             <td>{TXT_NEWSROW_DESCRIPTION}</td>
         </tr>
         <tr class="row3">
-            <td colspan="2"><b>{TXT_NEWS_PREVIOUS_NEXT_LINKS}</b></td>
+            <td colspan="2">{TXT_NEWS_COMMENTS}</td>
         </tr>
 
         <tr class="row1">
-            <td><b>[[NEWS_PREVIOUS_LINK]]</b></td>
-            <td>{TXT_NEWS_PREVIOUS_LINK_DESCRITION}</td>
+            <td>&lt;!-- BEGIN news_comment_list --&gt;<br />&lt;!-- END news_comment_list --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_LIST}</td>
         </tr>
 
         <tr class="row2">
-            <td><b>[[NEWS_PREVIOUS_TITLE]]</b></td>
-            <td>{TXT_NEWS_PREVIOUS_TITLE_DESCRITION}</td>
+            <td>[[TXT_NEWS_COMMENTS]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_LIST_TITLE}</td>
         </tr>
 
         <tr class="row1">
-            <td><b>[[NEWS_NEXT_LINK]]</b></td>
-            <td>{TXT_NEWS_NEXT_LINK_DESCRITION}</td>
+            <td>&lt;!-- BEGIN news_comment --&gt;<br />&lt;!-- END news_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT}</td>
         </tr>
 
         <tr class="row2">
-            <td><b>[[NEWS_NEXT_TITLE]]</b></td>
-            <td>{TXT_NEWS_NEXT_TITLE_DESCRITION}</td>
+            <td>[[NEWS_COMMENTS_CSS]]</td>
+            <td>{TXT_NEWS_CSS_DESCRIPTION}</td>
         </tr>
 
         <tr class="row1">
-            <td>&lt;!-- previousNextLink --&gt;</td>
-            <td>{TXT_NEWS_PREVIOUS_NEXT_LINK_ROW_DESCRIPTION}</td>
+            <td>[[NEWS_COMMENTS_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_MESSAGE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TEXT}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_LONG_DATE]]</td>
+            <td>{TXT_NEWS_LONG_DATE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_DATE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_DATE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_TIME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TIME}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_comments_poster --&gt;<br />&lt;!-- END news_comments_poster --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_POSTER}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_POSTER_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_POSTER_NAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_no_comment --&gt;<br />&lt;!-- END news_no_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_NO_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_COMMENTS_NONE_EXISTING]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_NO_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment --&gt;<br />&lt;!-- END news_add_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_ADD_COMMENT]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment_error --&gt;<br />&lt;!-- END news_add_comment_error --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_ERROR}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_ADD_COMMENT_ERROR]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_ERROR_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_VALUE_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_COMMENT]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_MESSAGE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_VALUE_COMMENT}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment_name --&gt;<br />&lt;!-- END news_add_comment_name --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_NAME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENT_NAME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME_VALUE}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_add_comment_captcha --&gt;<br />&lt;!-- END news_add_comment_captcha --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_CAPTCHA]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_CAPTCHA_CODE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA_CODE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_ADD]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_BUTTON}</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="2">{TXT_NEWS_TAGS}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_tags_container --&gt;</td>
+            <td>{TXT_NEWS_TAGS_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_TAG_NAME]]</td>
+            <td>{TXT_NEWS_TAG_NAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TAG_LINK]]</td>
+            <td>{TXT_NEWS_TAG_LINK_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- END news_tags_container --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_no_tags --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_NO_TAGS_FOUND]]</td>
+            <td>{TXT_NEWS_NO_TAGS_FOUND}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_no_tags --&gt;</td>
         </tr>
     </table>
     <br />
@@ -240,15 +484,6 @@
                 <b>[[NEWS_PAGING]]</b>&lt;br&nbsp;/&gt;<br />
                 &lt;br&nbsp;/&gt;
                 <br />
-                <b>&lt;!-- BEGIN previousNextLink --&gt;</b><br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- BEGIN previousNewsLink --&gt;</b><br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="[[NEWS_PREVIOUS_LINK]]" title="[[NEWS_PREVIOUS_TITLE]]">[[NEWS_PREVIOUS_TITLE]]&lt;/a&gt;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- END previousNewsLink --&gt;</b><br />
-
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- BEGIN nextNewsLink --&gt;</b><br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="[[NEWS_NEXT_LINK]]" title="[[NEWS_NEXT_TITLE]]">[[NEWS_NEXT_TITLE]]&lt;/a&gt;<br />
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- END nextNewsLink --&gt;</b><br />
-                <b>&lt;!-- END previousNextLink --&gt;</b><br />
             </td>
         </tr>
     </table>
@@ -313,7 +548,7 @@
             <td>{TXT_NEWS_COUNT_COMMENTS_DESCRIPTION}</td>
         </tr>
         <tr class="row2">
-            <td colspan="2">&lt;-- BEGIN news_category --&gt;</td>
+            <td colspan="2">&lt;!-- BEGIN news_category --&gt;</td>
         </tr>
         <tr class="row1">
             <td>[[NEWS_CATEGORY_TITLE]]</td>
@@ -324,7 +559,7 @@
             <td>{TXT_NEWS_CATEGORY_ID_DESCRIPTION}</td>
         </tr>
         <tr class="row1">
-            <td colspan="2">&lt;-- END news_category --&gt;</td>
+            <td colspan="2">&lt;!-- END news_category --&gt;</td>
         </tr>
         <tr class="row2">
             <td>[[NEWS_IMAGE]]</td>
@@ -427,11 +662,11 @@
         </tr>
         <tr>
             <td>[[NEWS_COMMENTS_POSTER_ID]]</td>
-            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_POSTER_ID}</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
         </tr>
         <tr>
             <td>[[NEWS_COMMENTS_POSTER_NAME]]</td>
-            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_POSTER_NAME}</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
         </tr>
         <tr>
             <td>&lt;!-- BEGIN news_no_comment --&gt;<br />&lt;!-- END news_no_comment --&gt;</td>
@@ -501,6 +736,198 @@
             <td>[[TXT_NEWS_ADD]]</td>
             <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_BUTTON}</td>
         </tr>
+        <tr class="row3">
+            <td colspan="2">{TXT_NEWS_TAGS}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_tags_container --&gt;</td>
+            <td>{TXT_NEWS_TAGS_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_TAG_NAME]]</td>
+            <td>{TXT_NEWS_TAG_NAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TAG_LINK]]</td>
+            <td>{TXT_NEWS_TAG_LINK_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- END news_tags_container --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_no_tags --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_NO_TAGS_FOUND]]</td>
+            <td>{TXT_NEWS_NO_TAGS_FOUND}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_no_tags --&gt;</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="2"><b>{TXT_NEWS_PREVIOUS_NEXT_LINKS}</b></td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PREVIOUS_LINK]]</td>
+            <td>{TXT_NEWS_PREVIOUS_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_PREVIOUS_TITLE]]</td>
+            <td>{TXT_NEWS_PREVIOUS_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PREVIOUS_SRC]]</td>
+            <td>{TXT_NEWS_PREVIOUS_SRC_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_NEXT_LINK]]</td>
+            <td>{TXT_NEWS_NEXT_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_NEXT_TITLE]]</td>
+            <td>{TXT_NEWS_NEXT_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_NEXT_SRC]]</td>
+            <td>{TXT_NEWS_NEXT_SRC_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- news_details_previous_next_links --&gt;</td>
+            <td>{TXT_NEWS_PREVIOUS_NEXT_LINK_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="2"><b>{TXT_NEWS_RELATED_NEWS}</b></td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_details_related_news_block --&gt;<br />&lt;!-- END news_details_related_news_block --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_RELATED_NEWS]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_BLOCK_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_details_related_news --&gt;<br />&lt;!-- BEGIN news_details_related_news --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_DETAIL_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_ID]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_ID_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_URL]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_URL_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_LINK]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_TITLE]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_TITLE_SHORT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TITLE_SHORT_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_TITLE_LINK]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TITLE_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_TEXT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TEXT_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_TEXT_SHORT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TEXT_SHORT_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_AUTHOR]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_AUTHOR_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_PUBLISHER]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_PUBLISHER_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_CATEGORY_NAMES]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_CATEGORY_NAMES_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_LONG_DATE]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_LONG_DATE_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_DATE]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_DATE_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_TIME]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TIME_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_related_comments_count --&gt;<br />&lt;!-- END news_related_comments_count --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_COMMENTS_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_COUNT_COMMENTS]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_COMMENTS_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_related_news_use_teaser_text --&gt;<br />&lt;!-- END news_related_news_use_teaser_text --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TEASER_TEXT_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_TEASER_TEXT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_TEASER_TEXT_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_related_news_image --&gt;<br />&lt;!-- END news_related_news_image --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_IMAGE]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_ALT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_LINK]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_SRC]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_SRC_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_related_news_image_thumb --&gt;<br />&lt;!-- END news_related_news_image_thumb --&gt;</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_BLOCK_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_THUMB]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_THUMB_ALT]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_TITLE_DESCRITION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_THUMB_LINK]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_LINK_DESCRITION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_RELATED_NEWS_IMAGE_THUMB_SRC]]</td>
+            <td>{TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_SRC_DESCRITION}</td>
+        </tr>
     </table>
     <br />
     <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
@@ -514,7 +941,27 @@
                 <b>[[NEWS_TEXT]]</b>&lt;br /&gt;<br />
                 <b>[[NEWS_SOURCE]]</b>&lt;br /&gt;<br />
                 <b>[[NEWS_URL]]</b>&lt;br /&gt;<br />
-                <b>[[NEWS_LASTUPDATE]]</b>&lt;br /&gt;
+                <b>[[NEWS_LASTUPDATE]]</b>&lt;br /&gt;<br />
+                <b>&lt;!-- BEGIN news_details_related_news_block --&gt;</b><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>[[TXT_NEWS_RELATED_NEWS]]</b>&lt;br /&gt;<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- BEGIN news_details_related_news --&gt;</b><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[NEWS_RELATED_NEWS_TITLE_LINK]]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[NEWS_RELATED_NEWS_AUTHOR]]&nbsp;[[NEWS_RELATED_NEWS_PUBLISHER]]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- END news_details_related_news --&gt;</b><br />
+                <b>&lt;!-- END news_details_related_news_block --&gt;</b><br />
+                <b>&lt;!-- BEGIN news_details_previous_next_links --&gt;</b><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- BEGIN news_details_previous_link --&gt;</b><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[NEWS_PREVIOUS_LINK]]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="[[NEWS_PREVIOUS_SRC]]" title="[[NEWS_PREVIOUS_TITLE]]">[[NEWS_PREVIOUS_TITLE]]&lt;/a&gt;<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- END news_details_previous_link --&gt;</b><br />
+
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- BEGIN news_details_next_link --&gt;</b><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[NEWS_NEXT_LINK]]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or)<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="[[NEWS_NEXT_SRC]]" title="[[NEWS_NEXT_TITLE]]">[[NEWS_NEXT_TITLE]]&lt;/a&gt;<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>&lt;!-- END news_details_next_link --&gt;</b><br />
+                <b>&lt;!-- END news_details_previous_next_links --&gt;</b><br />
                 <!-- TODO: example for comments (add and list) -->
             </td>
         </tr>
@@ -564,6 +1011,10 @@
             <td>[[NEWS_TEASER]]</td>
             <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
         </tr>
+        <tr class="row1">
+            <td>[[NEWS_TEASER_TEXT]]</td>
+            <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
+        </tr>
         <tr class="row2">
             <td>[[NEWS_LINK_TITLE]]</td>
             <td>{TXT_NEWS_LINK_TITLE_DESCRIPTION}</td>
@@ -572,17 +1023,136 @@
             <td>[[NEWS_LINK]]</td>
             <td>{TXT_NEWS_LINK_DESCRIPTION}</td>
         </tr>
-        <tr class="row2">
+        <tr class="row1">
             <td>[[NEWS_LINK_URL]]</td>
             <td>{TXT_NEWS_LINK_URL_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_CATEGORY]]</td>
+            <td>{TXT_NEWS_CATEGORY_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_CATEGORY_NAME]]</td>
+            <td>{TXT_NEWS_CATEGORY_NAME_DESCRIPTION}</td>
         </tr>
         <tr class="row2">
             <td>[[NEWS_AUTHOR]]</td>
             <td>{TXT_NEWS_AUTHOR_DESCRIPTION}</td>
         </tr>
-        <tr class="row2">
+        <tr class="row1">
             <td>[[NEWS_PUBLISHER]]</td>
             <td>{TXT_NEWS_PUBLISHER_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_SOURCE]]</td>
+            <td>{TXT_NEWS_SOURCE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_LASTUPDATE]]</td>
+            <td>{TXT_NEWS_LASTUPDATE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_URL]]</td>
+            <td>{TXT_NEWS_URL_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_comments_count --&gt;</td>
+            <td>{TXT_NEWS_NEWS_COMMENT_COUNT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COUNT_COMMENTS]]</td>
+            <td>{TXT_NEWS_COUNT_COMMENTS_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- END news_comments_count --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_author --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_AUTHOR_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_AUTHOR_USERNAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_AUTHOR_PROFILE_ATTRIBUTE_*]]</td>
+            <td>{TXT_NEWS_USER_PROFILE_ATTRIBUTE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_author --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_publisher --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_PUBLISHER_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PUBLISHER_USERNAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_PUBLISHER_PROFILE_ATTRIBUTE_*]]</td>
+            <td>{TXT_NEWS_USER_PROFILE_ATTRIBUTE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_publisher --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- BEGIN news_category --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_CATEGORY_TITLE]]</td>
+            <td>{TXT_NEWS_CATEGORY_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_CATEGORY_ID]]</td>
+            <td>{TXT_NEWS_CATEGORY_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_category --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_use_teaser_text --&gt;</td>
+            <td>{TXT_NEWS_TEASER_TEXT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TEASER_TEXT]]</td>
+            <td>{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_use_teaser_text --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_text --&gt;</td>
+            <td>{TXT_NEWS_TEXT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TEXT]]</td>
+            <td>{TXT_NEWS_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_text --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_redirect --&gt;</td>
+            <td>{TXT_NEWS_REDIRECT_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">[[TXT_NEWS_REDIRECT_INSTRUCTION]]</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">[[NEWS_REDIRECT_URL]]</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">[[NEWS_REDIRECT_NAME]]</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_redirect --&gt;</td>
         </tr>
         <tr class="row1">
             <td>[[NEWS_IMAGE]]</td>
@@ -651,6 +1221,159 @@
         <tr class="row2">
             <td>&lt;-- news_image_thumbnail --&gt;</td>
             <td>{TXT_NEWS_IMAGE_THUMBNAIL_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="2">{TXT_NEWS_COMMENTS}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_comment_list --&gt;<br />&lt;!-- END news_comment_list --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_LIST}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_COMMENTS]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_LIST_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_comment --&gt;<br />&lt;!-- END news_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_CSS]]</td>
+            <td>{TXT_NEWS_CSS_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_MESSAGE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TEXT}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_LONG_DATE]]</td>
+            <td>{TXT_NEWS_LONG_DATE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_DATE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_DATE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_TIME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_TIME}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_comments_poster --&gt;<br />&lt;!-- END news_comments_poster --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_COMMENT_POSTER}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENTS_POSTER_ID]]</td>
+            <td>{TXT_NEWS_USER_ID_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENTS_POSTER_NAME]]</td>
+            <td>{TXT_NEWS_USERNAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_no_comment --&gt;<br />&lt;!-- END news_no_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_NO_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_COMMENTS_NONE_EXISTING]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_NO_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment --&gt;<br />&lt;!-- END news_add_comment --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_ADD_COMMENT]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment_error --&gt;<br />&lt;!-- END news_add_comment_error --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_ERROR}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_ADD_COMMENT_ERROR]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_ERROR_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_TITLE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_VALUE_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_COMMENT]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_COMMENT}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_MESSAGE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_VALUE_COMMENT}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_add_comment_name --&gt;<br />&lt;!-- END news_add_comment_name --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TXT_NEWS_NAME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME_TITLE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_COMMENT_NAME]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_NAME_VALUE}</td>
+        </tr>
+        <tr class="row2">
+            <td>&lt;!-- BEGIN news_add_comment_captcha --&gt;<br />&lt;!-- END news_add_comment_captcha --&gt;</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_CAPTCHA]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA_TITLE}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_COMMENT_CAPTCHA_CODE]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_CONTACT_FORM_CAPTCHA_CODE}</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_ADD]]</td>
+            <td>{TXT_NEWS_COMMENT_BLOCK_ADD_COMMENT_TITLE_BUTTON}</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="2">{TXT_NEWS_TAGS}</td>
+        </tr>
+        <tr class="row1">
+            <td>&lt;!-- BEGIN news_tags_container --&gt;</td>
+            <td>{TXT_NEWS_TAGS_ROW_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[NEWS_TAG_NAME]]</td>
+            <td>{TXT_NEWS_TAG_NAME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[NEWS_TAG_LINK]]</td>
+            <td>{TXT_NEWS_TAG_LINK_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_tag_list --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td colspan="2">&lt;!-- END news_tags_container --&gt;</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- BEGIN news_no_tags --&gt;</td>
+        </tr>
+        <tr class="row1">
+            <td>[[TXT_NEWS_NO_TAGS_FOUND]]</td>
+            <td>{TXT_NEWS_NO_TAGS_FOUND}</td>
+        </tr>
+        <tr class="row2">
+            <td colspan="2">&lt;!-- END news_no_tags --&gt;</td>
         </tr>
         <tr class="row1">
             <td>&lt;-- headlines_row --&gt;</td>

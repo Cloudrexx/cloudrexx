@@ -1,20 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
-		<loc>http://trunk/subfolder/de/Meine-Produkte</loc>
-		<lastmod>2015-01-23</lastmod>
+		<loc>http://localhost/de/Willkommen</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/Erste-Schritte</loc>
+		<lastmod>2014-09-01</lastmod>
 		<changefreq>weekly</changefreq>
 		<priority>0.5</priority>
 	</url>
 	<url>
-		<loc>http://trunk/subfolder/de/Mein-Profil</loc>
-		<lastmod>2015-01-23</lastmod>
+		<loc>http://localhost/de/Erste-Schritte/Uebersicht-Anwendungen</loc>
+		<lastmod>2014-09-01</lastmod>
 		<changefreq>weekly</changefreq>
 		<priority>0.5</priority>
 	</url>
 	<url>
-		<loc>http://trunk/subfolder/de/Invoices</loc>
-		<lastmod>2015-01-23</lastmod>
+		<loc>http://localhost/de/Erste-Schritte/Erste-Schritte</loc>
+		<lastmod>2014-09-01</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/Erste-Schritte/Cloudrexx-Support</loc>
+		<lastmod>2014-09-01</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/Erste-Schritte/Beispiele</loc>
+		<lastmod>2014-09-01</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/Erste-Schritte/Inhaltscontainer-bearbeiten</loc>
+		<lastmod>2014-09-01</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/News</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/News/News-hinzufuegen</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/News/News-Feed</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/News/Newsmeldung</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/News/Archiv</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/Sitemap</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/Rechtliche-Hinweise</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/Impressum</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/AGBs</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/Registrieren</loc>
+		<lastmod>2018-06-22</lastmod>
+		<changefreq>hourly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>http://localhost/de/System/Suchen</loc>
+		<lastmod>2018-06-22</lastmod>
 		<changefreq>hourly</changefreq>
 		<priority>0.5</priority>
 	</url>

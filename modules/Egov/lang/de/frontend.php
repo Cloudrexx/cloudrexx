@@ -74,3 +74,4 @@ $_ARRAYLANG['TXT_EGOV_POSTFINANCE_CITY'] = "Ort";
 $_ARRAYLANG['TXT_EGOV_POSTFINANCE'] = "PostFinance";
 $_ARRAYLANG['TXT_ORDER_LINK_PREPARED'] = "Die Bestellung ist nun für die Zahlung vorbereitet. Klicken Sie auf den untenstehenden Link, um zum Zahlungs Gateway zu gelangen und dort Ihre Zahlung zu tätigen.";
 $_ARRAYLANG['TXT_EGOV_POSTFINANCE'] = "PostFinance";
+$_ARRAYLANG['TXT_EGOV_CAPTCHA_ERROR'] = "Der eingegebene Sicherheitscode war falsch.";

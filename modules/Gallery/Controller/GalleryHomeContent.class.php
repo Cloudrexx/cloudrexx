@@ -226,7 +226,7 @@ class GalleryHomeContent extends GalleryLibrary
                                             LIMIT       1
                                         ');
 
-        if ($objResult->RecordCount() == 1) {
+        if ($objResult !== false && $objResult->RecordCount() == 1) {
             $objPaging = $objDatabase->SelectLimit("SELECT value FROM ".DBPREFIX."module_gallery_settings WHERE name='paging'", 1);
             $paging = $objPaging->fields['value'];
 

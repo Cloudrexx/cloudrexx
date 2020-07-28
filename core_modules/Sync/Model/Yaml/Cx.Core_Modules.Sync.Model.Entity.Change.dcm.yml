@@ -1,0 +1,56 @@
+Cx\Core_Modules\Sync\Model\Entity\Change:
+  type: entity
+  table: core_module_sync_change
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    eventType:
+      type: string
+      length: 6
+      column: event_type
+    condition:
+      type: string
+      length: 7
+      column: `condition`
+    entityIndexData:
+      type: array
+      column: entity_index_data
+    originEntityIndexData:
+      type: array
+      column: origin_entity_index_data
+    contents:
+      type: array
+      column: contents
+  manyToOne:
+    sync:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+      inversedBy: changes
+      joinColumn:
+        name: sync_id
+        referencedColumnName: id
+        nullable: false
+    originSync:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+      inversedBy: originChanges
+      joinColumn:
+        name: origin_sync_id
+        referencedColumnName: id
+        nullable: false
+  manyToMany:
+    hosts:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Host
+      inversedBy: changes
+      joinTable:
+        name: core_module_sync_change_host
+        joinColumns:
+          change_id:
+            referencedColumnName: id
+            nullable: false
+        inverseJoinColumns:
+          host_id:
+            referencedColumnName: id
+            nullable: false
+

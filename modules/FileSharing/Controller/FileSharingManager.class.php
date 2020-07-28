@@ -206,6 +206,8 @@ class FileSharingManager extends FileSharingLib
          */
         $oldFilesharingPermission = \Cx\Core\Setting\Controller\Setting::getValue('permission','FileSharing');
         $objFWUser = \FWUser::getFWUserObject();
+        $arrAssociatedGroups = array();
+        $arrAssociatedGroupOptions = array();
 
         if (!is_numeric($oldFilesharingPermission)) {
             // Get all groups
@@ -218,7 +220,6 @@ class FileSharingManager extends FileSharingLib
             $arrAssociatedGroups = $objGroup->getLoadedGroupIds();
         }
 
-
         $objGroup = $objFWUser->objGroup->getGroups();
         while (!$objGroup->EOF) {
             $option = '<option value="' . $objGroup->getId() . '">' . htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET) . ' [' . $objGroup->getType() . ']</option>';
@@ -227,30 +228,6 @@ class FileSharingManager extends FileSharingLib
                 $arrAssociatedGroupOptions[] = $option;
             } else {
                 $arrNotAssociatedGroupOptions[] = $option;
-            }
-
-            $objGroup->next();
-        }
-
-        if (!is_numeric($mediaManageSetting)) {
-            // Get all groups
-            $objGroup = $objFWUser->objGroup->getGroups();
-        } else {
-            // Get access groups
-            $objGroup = $objFWUser->objGroup->getGroups(
-                array('dynamic' => $mediaManageSetting)
-            );
-            $arrAssociatedManageGroups = $objGroup->getLoadedGroupIds();
-        }
-
-        $objGroup = $objFWUser->objGroup->getGroups();
-        while (!$objGroup->EOF) {
-            $option = '<option value="' . $objGroup->getId() . '">' . htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET) . ' [' . $objGroup->getType() . ']</option>';
-
-            if (in_array($objGroup->getId(), $arrAssociatedManageGroups)) {
-                $arrAssociatedGroupManageOptions[] = $option;
-            } else {
-                $arrNotAssociatedGroupManageOptions[] = $option;
             }
 
             $objGroup->next();
@@ -274,14 +251,16 @@ class FileSharingManager extends FileSharingLib
         /**
          * save mailtemplates
          */
-        foreach ($_POST["filesharingMail"] as $lang => $inputs) {
-            $objMailTemplate = $objDatabase->Execute("SELECT `subject`, `content` FROM " . DBPREFIX . "module_filesharing_mail_template WHERE `lang_id` = " . intval($lang));
+        if (isset($_POST["filesharingMail"])) {
+            foreach ($_POST["filesharingMail"] as $lang => $inputs) {
+                $objMailTemplate = $objDatabase->Execute("SELECT `subject`, `content` FROM " . DBPREFIX . "module_filesharing_mail_template WHERE `lang_id` = " . intval($lang));
 
-            $content = str_replace(array('{', '}'), array('[[', ']]'), contrexx_input2db($inputs["content"]));
-            if ($objMailTemplate === false or $objMailTemplate->RecordCount() == 0) {
-                $objDatabase->Execute("INSERT INTO " . DBPREFIX . "module_filesharing_mail_template (`subject`, `content`, `lang_id`) VALUES ('" . contrexx_input2db($inputs["subject"]) . "', '" . contrexx_raw2db($content) . "', '" . contrexx_raw2db($lang) . "')");
-            } else {
-                $objDatabase->Execute("UPDATE " . DBPREFIX . "module_filesharing_mail_template SET `subject` = '" . contrexx_input2db($inputs["subject"]) . "', `content` = '" . contrexx_raw2db($content) . "' WHERE `lang_id` = '" . contrexx_raw2db($lang) . "'");
+                $content = str_replace(array('{', '}'), array('[[', ']]'), contrexx_input2raw($inputs["content"]));
+                if ($objMailTemplate === false or $objMailTemplate->RecordCount() == 0) {
+                    $objDatabase->Execute("INSERT INTO " . DBPREFIX . "module_filesharing_mail_template (`subject`, `content`, `lang_id`) VALUES ('" . contrexx_input2db($inputs["subject"]) . "', '" . contrexx_raw2db($content) . "', '" . intval($lang) . "')");
+                } else {
+                    $objDatabase->Execute("UPDATE " . DBPREFIX . "module_filesharing_mail_template SET `subject` = '" . contrexx_input2db($inputs["subject"]) . "', `content` = '" . contrexx_raw2db($content) . "' WHERE `lang_id` = '" . intval($lang) . "'");
+                }
             }
         }
 
@@ -315,6 +294,7 @@ class FileSharingManager extends FileSharingLib
                 \Permission::setAccess($newFilesharingSetting, 'dynamic', $accessGroups);
             }
         }
+
         // save new setting
         \Cx\Core\Setting\Controller\Setting::set('permission', $newFilesharingSetting);
         \Cx\Core\Setting\Controller\Setting::updateAll();

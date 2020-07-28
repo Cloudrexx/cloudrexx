@@ -45,10 +45,37 @@ namespace Cx\Core\ClassLoader;
  * @subpackage  core_classloader
  */
 class ClassLoader {
+
     private $basePath;
     private $customizingPath;
     private $legacyClassLoader = null;
     private $cx = null;
+
+    /**
+     * Local connection to Memcached server
+     * @var \Memcached
+     */
+    protected $memcached = null;
+
+    /**
+     * List of loaded classes and their path
+     * in the file system
+     * @var array
+     */
+    protected $classMap = array();
+
+    /**
+     * Prefix to be used for class-map-key
+     * @var string
+     */
+    const classMapPrefix = 'CxClassMap_';
+
+    /**
+     * Key to be used to identify the cached class map
+     * in Memcached server
+     * @var string
+     */
+    protected $classMapKey = '';
 
     /**
      * To use LegacyClassLoader config.php and set_constants.php must be loaded
@@ -63,6 +90,9 @@ class ClassLoader {
         $this->cx = $cx;
         $this->basePath = $cx->getCodeBaseDocumentRootPath();
         $this->customizingPath = $customizingPath;
+
+        // set key to be used for storing the paths of the loaded classes in memcached
+        $this->classMapKey = static::classMapPrefix . md5($this->basePath);
 
         // Check if there is already an other instance of the Cloudrexx ClassLoader running.
         // If so, we shall unregister it.
@@ -86,23 +116,154 @@ class ClassLoader {
      * @return type void
      */
     public function autoload($name) {
-        //print $name."<br>";
+        // init cache to skip resolving class paths
+        $this->initClassMapCache();
+
+        // try to fetch class path from class map cache
+        if ($this->loadClassFromClassMapCache($name)) {
+            return;
+        }
+
         if ($this->load($name, $path)) {
             return;
         }
-        if ($path) {
-            //echo '<b>' . $name . ': ' . $path . '</b><br />';
-        }
+
         $this->loadLegacy($name);
     }
 
+    /**
+     * Try to load a PHP class from cache.
+     *
+     * @param   $name   string The name of the class to be loaded
+     * @return  boolean TRUE if the class specified by $name was loaded from
+     *                  cache. Otherwise FALSE
+     */
+    protected function loadClassFromClassMapCache($name) {
+        // try to fetch class path from class map cache
+        if (!isset($this->memcached)) {
+            return false;
+        }
+
+        // fetch the class map from cache (if not yet done)
+        if (!isset($this->classMap[$this->classMapKey])) {
+            $this->classMap[$this->classMapKey] = array();
+            $this->classMap[$this->classMapKey] = $this->memcached->get(
+                $this->classMapKey
+            );
+        }
+
+        if (!isset($this->classMap[$this->classMapKey][$name])) {
+            return false;
+        }
+
+        $path = $this->classMap[$this->classMapKey][$name];
+        require_once($path);
+
+        return true;
+    }
+
+    /**
+     * Initialize the class map cache
+     *
+     * This method does initialize the Memcached cache in case
+     * it has been enabled as user cache engine.
+     *
+     * @global  $_CONFIG    array   The basic configuration data. We're not
+     *                              using the Setting component here, as this
+     *                              method usually gets called before the
+     *                              postInit hook.
+     */
+    protected function initClassMapCache() {
+        global $_CONFIG;
+
+        if ($this->memcached) {
+            return;
+        }
+
+        if (!isset($_CONFIG['cacheDbStatus']) ||
+            $_CONFIG['cacheDbStatus'] != 'on'
+        ) {
+            return;
+        }
+
+        if (!isset($_CONFIG['cacheUserCache'])) {
+            return;
+        }
+
+        // note: we can't use the cache engines constats of Cache component here
+        // as the Cache component has not yet been loaded at this stage
+        switch ($_CONFIG['cacheUserCache']) {
+            case 'memcached':
+                // default memcached configuration
+                $ip = '127.0.0.1';
+                $port = '11211';
+
+                // load stored memcached configuration
+                if (!empty($_CONFIG['cacheUserCacheMemcachedConfig'])){
+                    $settings = json_decode($_CONFIG['cacheUserCacheMemcachedConfig'], true);
+                    $ip = $settings['ip'];
+                    $port = $settings['port'];
+                }
+
+                $memcachedConfiguration = array('ip' => $ip, 'port' => $port);
+
+                // verify that memcached is installed
+                if (!extension_loaded('memcached')) {
+                    break;
+                }
+
+                // verify that memcached is loaded
+                if (!class_exists('\Memcached', false)) {
+                    break;
+                }
+
+                // connect to memcached server
+                $memcached = new \Memcached();
+                if (!@$memcached->addServer($memcachedConfiguration['ip'], $memcachedConfiguration['port'])) {
+                    break;
+                }
+                $this->memcached = $memcached;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Flushes cached entries from usercache
+     *
+     * This does not drop the cache files!
+     */
+    public function flushCache() {
+        if (!$this->memcached) {
+            return;
+        }
+        $this->memcached->delete($this->classMapKey);
+    }
+
     private function load($name, &$resolvedPath) {
+        $requestedName = $name;
         if (substr($name, 0, 1) == '\\') {
             $name = substr($name, 1);
         }
         $parts = explode('\\', $name);
         // new classes should be in namespace \Cx\something
-        if (!in_array(current($parts), array('Cx', 'Doctrine', 'Gedmo', 'DoctrineExtension', 'Symfony')) || count($parts) < 2) {
+        // TODO: Use Composer's class autoloading for libraries
+        if (
+            !in_array(
+                current($parts),
+                array(
+                    'Cx',
+                    'Doctrine',
+                    'Gedmo',
+                    'DoctrineExtension', // /model/extensions
+                    'DoctrineExtensions', // /lib/doctrine/beberlei/doctrineextensions/src
+                    'Symfony',
+                )
+            ) ||
+            count($parts) < 2
+        ) {
             return false;
         }
         if (substr($name, 0, 8) == 'PHPUnit_') {
@@ -118,6 +279,8 @@ class ClassLoader {
                     $third = 'events';
                 }
                 if ($parts[2] == 'Proxies') {
+                    $tmpPart = implode('', array_slice($parts, 3));
+                    $parts   = array('Cx', 'Model', 'Proxies', $tmpPart);
                     $third = 'proxies';
                     $suffix = '';
                 }
@@ -136,6 +299,19 @@ class ClassLoader {
             $suffix = '';
             $parts = array_merge(array('Cx', 'Lib', 'doctrine'), $parts);
             //$parts = array_merge(array('Cx', 'Model', 'entities'), $parts);
+        } else if ($parts[0] == 'DoctrineExtensions') {
+            $suffix = '';
+            $parts = array_merge(
+                array(
+                    'Cx',
+                    'Lib',
+                    'doctrine',
+                    'beberlei',
+                    strtolower(array_shift($parts)),
+                    'src'
+                ),
+                $parts
+            );
         } else if ($parts[0] == 'Doctrine') {
             $suffix = '';
             if ($parts[1] == 'ORM') {
@@ -170,26 +346,77 @@ class ClassLoader {
         }
 
         $resolvedPath = $path . '/' . $className . $suffix . '.php';
-        if (preg_match('/Exception/', $className) && !$this->loadFile($resolvedPath)) {
+        if (preg_match('/Exception/', $className) && !$this->loadFile($resolvedPath, $requestedName)) {
             $className = preg_replace('/Exception/', '', $className);
             $resolvedPath = $path . '/' . $className . $suffix . '.php';
         }
-        if ($this->loadFile($resolvedPath)) {
+        if ($this->loadFile($resolvedPath, $requestedName)) {
             return true;
-        } else if ($this->loadFile($path.'/'.$className.'.interface.php')) {
+        } else if ($this->loadFile($path.'/'.$className.'.interface.php', $requestedName)) {
             return true;
         }
         //echo '<span style="color: red;">' . implode('\\', $parts) . '</span>';
         return false;
     }
 
-    public function loadFile($path) {
+    /**
+     * Try to load the file specified by $path
+     *
+     * @param   $path   string  Path to the file to be loaded
+     * @param   $name   string  Optional filename of the file to be loaded.
+     *                          If provided, the path of the file will be
+     *                          cached, so that the next time the file will
+     *                          be requested by the autoloading functionality
+     *                          of PHP, it can be loaded way faster.
+     * @return  boolean TRUE, if file was loaded. Otherwise FALSE, if file
+     *                  could not be located.
+     */
+    public function loadFile($path, $name = '') {
+        // Try to identify recursive autoloading.
+        // If $resolveCount is greater than 1, then the autoloader has been
+        // re-called while already performing an other autoload call.
+        // Such case indicates that the system got into an infinite recursive
+        // autoload loop. To prevent a memory overflow, we must abort the
+        // execution in such a case.
+        // Note: as the threshold is just 1, one might consider of just using
+        // a boolean instead. The latter might just be alright at this point
+        // in time. However, as we are not yet sure if there might actually
+        // be a legitimate case where a greater count of 1 is valid, we shell
+        // keep this variable as an integer as of for now.
+        static $resolveCount = 0;
+        if ($resolveCount > 1) {
+            throw new \Exception('ClassLoader: Recursive loading aborted');
+        }
+
+        // before trying to resolve the path, we do increase the resolveCount
+        $resolveCount++;
 
         $path = $this->getFilePath($path);
+
+        // If this point is reached, then the resolving has been completed
+        // without calling a recursive call. Therefore, we can reduce the
+        // resolveCount by one again.
+        $resolveCount--;
+
+        // abort in case the path does not exist
         if (!$path) {
             return false;
         }
+
         require_once($path);
+
+        // cache updated class map
+        if ($name && $this->memcached) {
+            if (!isset($this->classMap[$this->classMapKey])) {
+                $this->classMap[$this->classMapKey] = array();
+            }
+            $this->classMap[$this->classMapKey][$name] = $path;
+            $this->memcached->set(
+                $this->classMapKey,
+                $this->classMap[$this->classMapKey]
+            );
+        }
+
         return true;
     }
 
@@ -239,6 +466,8 @@ class ClassLoader {
      *                                  $file contains the character '?' or '#',
      *                                  then the result of this method is
      *                                  unknown.
+     * @param \Cx\Core\View\Model\Entity\Theme $theme (optional) Theme to get
+     *                                  file from. Defaults to current theme (if set)
      * @return  mixed                   Returns the path (either absolute file
      *                                  system path or relativ web path, based
      *                                  on $webPath) to a customized version of
@@ -246,7 +475,7 @@ class ClassLoader {
      *                                  customized version of the file does
      *                                  exist, then FALSE is being returned.
      */
-    public function getFilePath($file, &$isCustomized = false, &$isWebsite = false, $webPath = false) {
+    public function getFilePath($file, &$isCustomized = false, &$isWebsite = false, $webPath = false, $theme = null) {
         // make lookup algorithm work on Windows by replacing backslashes by forward slashes
         $file = preg_replace('#\\\\#', '/', $file);
 
@@ -271,7 +500,7 @@ class ClassLoader {
         $isWebsite = false;
 
         // 1. check if a customized version exists in the currently loaded theme
-        $path = $this->getFileFromTheme($file, $webPath);
+        $path = $this->getFileFromTheme($file, $webPath, $theme);
         if ($path) return $path;
 
         // 2. check if a customized version exists in the /customizing folder
@@ -282,13 +511,61 @@ class ClassLoader {
         $path = $this->getFileFromWebsiteRepository($file, $webPath, $isWebsite);
         if ($path) return $path;
 
-        // 4. check if original file exists in code base
+        // 4. check if file exists in a MediaSource (shared repository)
+        $path = $this->getFileFromMediaSource($file, $webPath);
+        if ($path) return $path;
+
+        // 5. check if original file exists in code base
         if (file_exists($this->basePath.$file)) {
             return ($webPath ? $this->cx->getCodeBaseOffsetPath() : $this->basePath) . $file;
         }
 
         // lookup of file failed -> file does not exist
         return false;
+    }
+
+    /**
+     * Get file path with filename from registered MediaSource filesystems.
+     *
+     * @param   string  $file       Path of file, it should be located
+     *                              in /images, /media or /themes.
+     * @param   boolean $webPath    Whether or not to return the absolute file
+     *                              path or MediaSource file system path.
+     * @return  mixed               Returns absolute file path or MediaSource
+     *                              file path or FALSE if none exists.
+     */
+    public function getFileFromMediaSource($file, $webPath = false) {
+        // media source files may only be located in /images, /media or /themes
+        $cxClassName = get_class($this->cx);
+        if (!preg_match('#^(?:' . preg_quote($cxClassName::FOLDER_NAME_IMAGES, '#') . '|' . preg_quote($cxClassName::FOLDER_NAME_MEDIA, '#') . '|' . preg_quote($cxClassName::FOLDER_NAME_THEMES, '#') . ')/#', $file)) {
+            return false;
+        }
+
+        // check if Env has been initialized yet
+        if (!class_exists('Env', false)) {
+            return false;
+        }
+
+        // check if InitCMS has been initialized yet 
+        $objInit = \Env::get('init');
+        if (!$objInit) {
+            return false;
+        }
+        $mediaSourceManager = $this->cx->getMediaSourceManager();
+        if (!$mediaSourceManager) {
+            return false;
+        }
+
+        // check if file exists in any of the registered MediaSource filesystems
+        $mediaSourceFile = $mediaSourceManager->getMediaSourceFileFromPath($file);
+        if (!$mediaSourceFile) {
+            return false;
+        }
+
+        if ($webPath) {
+            return $file;
+        }
+        return $mediaSourceFile->getFileSystem()->getFullPath($mediaSourceFile) . $mediaSourceFile->getFullName();
     }
 
     /**
@@ -300,12 +577,21 @@ class ClassLoader {
      * @param   boolean $webPath    Whether or not to return the relative web
      *                              path instead of the absolute file system
      *                              path (default).
+     * @param \Cx\Core\View\Model\Entity\Theme $theme (optional) Theme to get
+     *                              file from. Defaults to current theme (if set)
      * @return  mixed               Path (as string) to customized version of
      *                              file or FALSE if none exists.
      */
-    public function getFileFromTheme($file, $webPath = false) {
+    public function getFileFromTheme($file, $webPath = false, $theme = null) {
         // custom themed files are only available in frontend
-        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+        if (
+            $this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND &&
+            !$theme &&
+            (
+                !$this->cx->getResponse() ||
+                !$this->cx->getResponse()->getTheme()
+            )
+        ) {
             return false;
         }
 
@@ -319,14 +605,14 @@ class ClassLoader {
             return false;
         }
 
-        // check if InitCMS has been initialized yet
-        $objInit = \Env::get('init');
-        if (!$objInit) {
+        // check if frontend theme has been loaded yet
+        if (!$theme) {
+            $theme = $this->cx->getResponse()->getTheme();
+        }
+        if (!$theme) {
             return false;
         }
-
-        // check if frontend theme has been loaded yet
-        $currentThemesPath = $objInit->getCurrentThemesPath();
+        $currentThemesPath = $theme->getFoldername();
         if (!$currentThemesPath) {
             return false;
         }

@@ -111,6 +111,19 @@
       <td><input type="checkbox" name="recipientWebsite" class="recipientAcive" id="recipientWebsite" value="1" {NEWSLETTER_RECIPIENT_WEBSITE} /><label for="recipientWebsite">{TXT_ACTIVE}</label></td>
       <td><div class="recipientWebsite" style="display: {NEWSLETTER_RECIPIENT_WEBSITE_MANTOTRY_DISPLAY}" ><input type="checkbox" id="requiredWebsite" name="requiredWebsite" value="1" {NEWSLETTER_RECIPIENT_WEBSITE_REQUIRED} /><label for="requiredWebsite">{TXT_NEWSLETTER_MANDATORY_FIELD}</label></div></td>
     </tr>
+    <tr class="row1">
+      <td width="15%">{TXT_NEWSLETTER_CAPTCHA}</td>
+      <td>
+          <input type="checkbox" name="captcha" class="captchaAcive" id="captcha" value="1" {NEWSLETTER_CAPTCHA} />
+          <label for="captcha">{TXT_ACTIVE}</label>
+      </td>
+      <td>
+          <div class="captcha" style="display: none;" >
+              <input type="checkbox" id="requiredCaptcha" name="requiredCaptcha" value="1" {NEWSLETTER_CAPTCHA_REQUIRED} />
+              <label for="requiredCaptcha">{TXT_NEWSLETTER_MANDATORY_FIELD}</label>
+          </div>
+      </td>
+    </tr>
 </table>
     <br />
 <input type="submit" name="interfaceSettings" value="{TXT_SAVE}" />

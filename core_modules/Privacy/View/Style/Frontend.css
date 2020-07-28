@@ -1,0 +1,13 @@
+div#cookie-note {
+    background-color: white;
+    color: black;
+    box-shadow: 0 0 5px 2px rgba(0,0,0,0.2);
+    display: block;
+    right: 20px;
+    bottom: 20px;
+    position: fixed;
+    height: auto;
+    width: 25em;
+    z-index: 1337;
+    padding: 10px;
+}

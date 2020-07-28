@@ -66,31 +66,43 @@ class Uploader extends EntityBase
     /**
      * @var Array
      */
-    protected $options = array();
+    protected $options = array(
+        'pl-Max-File-Size' => '',
+    );
 
     /**
      * @var Cx
      */
     protected $cx;
 
-    function __construct()
-    {
+    public function __construct($id = '') {
         $this->cx = Cx::instanciate();
         $this->getComponentController()->addUploader($this);
+        $this->getComponent('Session')->getSession();
         if (!isset($_SESSION['uploader'])) {
             $_SESSION['uploader'] = array();
         }
         if (!isset($_SESSION['uploader']['handlers'])) {
             $_SESSION['uploader']['handlers'] = array();
         }
-        $i       = self::generateId();
-        $_SESSION['uploader']['handlers'][$i] = array('active' => true);
-        $this->id = $i;
+
+        // generate a new unique ID in case non has been supplied
+        // or it is not valid
+        if (
+            empty($id) ||
+            !static::isValidId($id)
+        ) {
+            $id = static::generateId();
+        }
+
+        $_SESSION['uploader']['handlers'][$id] = array('active' => true);
+        $this->id = $id;
         $this->options = array(
             'data-pl-upload',
             'data-uploader-id' => $this->id,
             'class' => 'uploader-button button',
-            'uploader-type' => self::UPLOADER_TYPE_MODAL
+            'uploader-type' => self::UPLOADER_TYPE_MODAL,
+            'pl-Max-File-Size' => '',
         );
     }
 
@@ -185,6 +197,17 @@ class Uploader extends EntityBase
      */
     function getXHtml($buttonName = 'Upload')
     {
+        // set system upload file size limit,
+        // if no file size limit has been set
+        if (!$this->getMaxFileSize()) {
+            $uploadFileSizeLimit =
+                \Cx\Core\Setting\Controller\Setting::getValue(
+                    'uploadFileSizeLimit',
+                    'Config'
+                );
+            $this->setMaxFileSize($uploadFileSizeLimit);
+        }
+
         $inline = '';
         if ($this->options['uploader-type'] == self::UPLOADER_TYPE_INLINE){
             $this->addClass('uploader-button-hidden');
@@ -292,15 +315,28 @@ class Uploader extends EntityBase
         $this->options['pl-Max-File-Size'] = $type;
     }
 
-    public static function generateId(){
+    /**
+     * Get the currently set upload file size limit
+     *
+     * @return  string  Set upload file size limit
+     */
+    public function getMaxFileSize() {
+        return $this->options['pl-Max-File-Size'];
+    }
+
+    /**
+     * Generate a new unique ID within the user's session
+     * @return  string  Unique new ID
+     */
+    protected static function generateId(){
         $uploaders = $_SESSION['uploader']['handlers'];
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randstring = '';
         for ($i = 0; $i < 10; $i++) {
-            $randstring .= $characters[rand(0, strlen($characters))];
+            $randstring .= $characters[rand(0, strlen($characters) - 1)];
         }
         if (array_key_exists($randstring, $uploaders)){
-            return self::generateId();
+            return static::generateId();
         }
         return $randstring;
     }
@@ -313,5 +349,29 @@ class Uploader extends EntityBase
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Verifies that the ID $id is a valid upload ID
+     * of the current user's session
+     * @return  boolean TRUE if the ID $id is valid, otherwise FALSE.
+     */
+    public static function isValidId($id) {
+        return isset($_SESSION['uploader']['handlers'][$id]);
+    }
+
+    /**
+     * Drop the upload instance (it's session data) identified by ID $id.
+     * This should be called after the upload was successful and will no
+     * longer be used.
+     *
+     * @param   string  $id The ID of the upload instance to drop
+     */
+    public static function destroy($id) {
+        if (!static::isValidId($id)) {
+            return;
+        }
+
+        unset($_SESSION['uploader']['handlers'][$id]);
     }
 }

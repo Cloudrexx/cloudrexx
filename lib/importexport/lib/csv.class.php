@@ -63,7 +63,7 @@ class CsvLib
             $this->separator = "\t";
         }
 
-        if (strlen($_POST['import_options']) == 1) {
+        if (isset($_POST['import_options']) && strlen($_POST['import_options']) == 1) {
             $this->enclosure = $_POST['import_options_csv_enclosure'];
         }
     }
@@ -120,9 +120,27 @@ class CsvLib
         // try to convert the file to the system charset CONTREXX_CHARSET if required
         if(function_exists("mb_detect_encoding")) {
             $content = file_get_contents($file);
-            $encoding = mb_detect_encoding($content, CONTREXX_CHARSET, true);
-            if($encoding != CONTREXX_CHARSET) {
-                $content = mb_convert_encoding($content, CONTREXX_CHARSET);
+
+            // Initialize the encoding order list.
+            // Add CONTREXX_CHARSET at first position of the encoding list
+            $encodings = preg_grep(
+                '/^' . preg_quote(CONTREXX_CHARSET, '/') . '$/',
+                mb_list_encodings(),
+                PREG_GREP_INVERT
+            );
+            array_unshift($encodings, CONTREXX_CHARSET);
+
+            // try to detect the encoding
+            $encoding = mb_detect_encoding($content, $encodings, true);
+
+            // fix encoding in case it differs from CONTREXX_CHARSET
+            if(
+                // only proceed in case an encoding was detected
+                $encoding !== false &&
+                $encoding != CONTREXX_CHARSET
+            ) {
+                // finally, convert the file to CONTREXX_CHARSET
+                $content = mb_convert_encoding($content, CONTREXX_CHARSET, $encoding);
                 file_put_contents($file, $content);
             }
         }

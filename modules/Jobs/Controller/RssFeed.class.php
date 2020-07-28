@@ -79,8 +79,7 @@ class RssFeed
 
         $this->langId=$objInit->userFrontendLangId;
 
-        $query = "SELECT lang FROM ".DBPREFIX."languages WHERE id='$this->langId'";
-        $objResult = $objDatabase->Execute($query);
+        $langShort = \FWLanguage::getLanguageParameter($this->langId, 'lang');
 
         $this->xmlType = "headlines";
         $this->filePath = \Env::get('cx')->getWebsiteFeedPath();
@@ -88,10 +87,10 @@ class RssFeed
         $this->channelCopyright = ASCMS_PROTOCOL."://".$_SERVER['SERVER_NAME'];
         $this->channelGenerator = $_CONFIG['coreCmsName'];
         $this->channelWebMaster = $_CONFIG['coreAdminEmail'];
-        $this->channelLanguage  = $objResult->fields['lang'];
+        $this->channelLanguage  = $langShort;
         $this->itemLink = ASCMS_PROTOCOL."://".$_SERVER['SERVER_NAME']."/index.php?section=Jobs&amp;cmd=details&amp;id=";
-        $this->fileName[1] = 'jobs_headlines_'.$objResult->fields['lang'].'.xml';
-        $this->fileName[2] = 'jobs_'.$objResult->fields['lang'].'.xml';
+        $this->fileName[1] = 'jobs_headlines_'.$langShort.'.xml';
+        $this->fileName[2] = 'jobs_'.$langShort.'.xml';
 
         $this->limit=20;
         if($this->limit<1 OR $this->limit>100){

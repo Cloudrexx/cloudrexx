@@ -63,7 +63,9 @@ class MediaDirectoryInputfieldMail extends \Cx\Modules\MediaDir\Controller\Media
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
+
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -89,7 +91,7 @@ class MediaDirectoryInputfieldMail extends \Cx\Modules\MediaDir\Controller\Media
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[$_LANGID]) ? $arrValue[$_LANGID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 }
 
@@ -190,15 +192,42 @@ class MediaDirectoryInputfieldMail extends \Cx\Modules\MediaDir\Controller\Media
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+
+        $strValueName = $strValue;
+        $strValueHref = $strValue;
+
+        if (substr($strValueHref, 0,7) != "mailto:") {
+            $strValueHref = "mailto:".$strValueHref;
+        }
+
+        //make hyperlink with <a> tag
+        $strValueLink = '<a href="'.$strValueHref.'" class="'.$this->moduleNameLC.'InputfieldMail">'.$strValueName.'</a>';
+
+        if(!empty($strValue)) {
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValueLink;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_HREF'] = $strValueHref;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strValueName;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
 
-        $intLangId = $_LANGID;
+        $intLangId = $langId;
         if ($this->arrSettings['settingsTranslationStatus'] == 1) {
-            $intLangId = (in_array($_LANGID, $arrTranslationStatus)) ? $_LANGID : $intEntryDefaultLang;
+            $intLangId = (in_array($langId, $arrTranslationStatus)) ? $langId : $intEntryDefaultLang;
         }
 
         $objInputfieldValue = $objDatabase->Execute("
@@ -231,28 +260,7 @@ class MediaDirectoryInputfieldMail extends \Cx\Modules\MediaDir\Controller\Media
             ");
         }
 
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
-
-        $strValueName = $strValue;
-        $strValueHref = $strValue;
-
-        if (substr($strValueHref, 0,7) != "mailto:") {
-            $strValueHref = "mailto:".$strValueHref;
-        }
-
-        //make hyperlink with <a> tag
-        $strValueLink = '<a href="'.$strValueHref.'" class="'.$this->moduleNameLC.'InputfieldMail">'.$strValueName.'</a>';
-
-        if(!empty($strValue)) {
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValueLink;
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_HREF'] = $strValueHref;
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strValueName;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
 
 

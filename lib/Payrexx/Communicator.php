@@ -20,6 +20,7 @@ class Communicator
      */
     protected static $methods = array(
         'create' => 'POST',
+        'charge' => 'POST',
         'cancel' => 'DELETE',
         'delete' => 'DELETE',
         'update' => 'PUT',
@@ -86,7 +87,7 @@ class Communicator
         $params['ApiSignature'] =
             base64_encode(hash_hmac('sha256', http_build_query($params, null, '&'), $this->apiSecret, true));
         $params['instance'] = $this->instance;
-        
+
         $id = isset($params['id']) ? $params['id'] : 0;
         $response = $this->communicationHandler->requestApi(
             sprintf(self::API_URL, self::VERSION, $params['model'], $id),
@@ -95,14 +96,14 @@ class Communicator
         );
 
         $convertedResponse = array();
-        if (!isset($response['data']) || !is_array($response['data'])) {
-            if (!isset($response['message'])) {
-                throw new \Payrexx\PayrexxException('Payrexx PHP: Configuration is wrong! Check instance name and API secret');
+        if (!isset($response['body']['data']) || !is_array($response['body']['data'])) {
+            if (!isset($response['body']['message'])) {
+                throw new \Payrexx\PayrexxException('Payrexx PHP: Configuration is wrong! Check instance name and API secret', $response['info']['http_code']);
             }
-            throw new \Payrexx\PayrexxException($response['message']);
+            throw new \Payrexx\PayrexxException($response['body']['message'], $response['info']['http_code']);
         }
 
-        foreach ($response['data'] as $object) {
+        foreach ($response['body']['data'] as $object) {
             $responseModel = $model->getResponseModel();
             $convertedResponse[] = $responseModel->fromArray($object);
         }

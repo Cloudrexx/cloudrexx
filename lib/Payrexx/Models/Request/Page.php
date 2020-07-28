@@ -84,7 +84,7 @@ class Page extends \Payrexx\Models\Base
     /**
      * Set the payment service provider to use, a
      * list of available payment service providers (short psp)
-     * can be found here: http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * can be found here: http://developers.payrexx.com/docs/miscellaneous
      *
      * @param int $psp
      */
@@ -161,7 +161,7 @@ class Page extends \Payrexx\Models\Base
     /**
      * Set the corresponding payment currency for the amount.
      * You can use the ISO Code.
-     * A list of available currencies you can find on http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * A list of available currencies you can find on http://developers.payrexx.com/docs/miscellaneous
      *
      * @param string $currency
      */
@@ -288,7 +288,7 @@ class Page extends \Payrexx\Models\Base
      * @param string $type the type of field
      *                     can be: title, forename, surname, company, street, postcode,
      *                     place, phone, country, email, date_of_birth, terms, custom_field_1,
-     *                     custom_field_2, custom_field_3
+     *                     custom_field_2, custom_field_3, custom_field_4, custom_field_5
      * @param boolean $mandatory TRUE if the field has to be filled out for payment
      * @param string $defaultValue the default value. This value will be editable for the client.
      * @param string $name the name of the field, (this is only available for the fields custom_field_\d

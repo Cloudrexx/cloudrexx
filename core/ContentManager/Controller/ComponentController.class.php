@@ -48,25 +48,6 @@ namespace Cx\Core\ContentManager\Controller;
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
 
-    public function __construct(\Cx\Core\Core\Model\Entity\SystemComponent $systemComponent, \Cx\Core\Core\Controller\Cx $cx) {
-        parent::__construct($systemComponent, $cx);
-        $evm = $cx->getEvents();
-        $pageListener = new \Cx\Core\ContentManager\Model\Event\PageEventListener();
-        $evm->addModelListener(\Doctrine\ORM\Events::prePersist, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::postPersist, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::preUpdate, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::postUpdate, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::preRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::postRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
-
-        $nodeListener = new \Cx\Core\ContentManager\Model\Event\NodeEventListener();
-        $evm->addModelListener(\Doctrine\ORM\Events::preRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Node', $nodeListener);
-        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\Node', $nodeListener);
-
-        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\LogEntry', new \Cx\Core\ContentManager\Model\Event\LogEntryEventListener());
-    }
-
     public function preResolve(\Cx\Core\Routing\Url $request) {
         $evm = \Cx\Core\Core\Controller\Cx::instanciate()->getEvents();
         $evm->addEvent('wysiwygCssReload');
@@ -78,14 +59,55 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array
      */
     public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('EsiWidget');
     }
+
+    /**
+     * Get JsonAdapter classes
+     *
+     * @return array
+     */
     public function getControllersAccessableByJson() {
         return array(
-            'JsonNode', 'JsonPage', 'JsonContentManager',
+            'JsonNode',
+            'JsonPage',
+            'JsonContentManager',
+            'EsiWidgetController'
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        foreach (
+            array(
+                'TITLE',
+                'METATITLE',
+                'NAVTITLE',
+                'METAKEYS',
+                'METADESC',
+                'METAROBOTS',
+                'METAIMAGE',
+                'METAIMAGE_WIDTH',
+                'METAIMAGE_HEIGHT',
+                'CONTENT_TITLE',
+                //'CONTENT_TEXT',
+                'CSS_NAME',
+                'TXT_CORE_LAST_MODIFIED_PAGE',
+                'LAST_MODIFIED_PAGE',
+                'CANONICAL_LINK',
+            ) as $widgetName
+        ) {
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName
+                )
+            );
+        }
     }
 
     /**
@@ -116,11 +138,61 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Do something for search the content
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
+     * Registers event listeners
      */
-    public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        $this->cx->getEvents()->addEventListener('SearchFindContent', new \Cx\Core\ContentManager\Model\Event\PageEventListener());
-   }
+    public function registerEventListeners() {
+        $evm = $this->cx->getEvents();
+        $pageListener = new \Cx\Core\ContentManager\Model\Event\PageEventListener();
+        $evm->addModelListener(\Doctrine\ORM\Events::prePersist, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::postPersist, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::preUpdate, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::postUpdate, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::preRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::postRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\Page', $pageListener);
+
+        $nodeListener = new \Cx\Core\ContentManager\Model\Event\NodeEventListener();
+        $evm->addModelListener(\Doctrine\ORM\Events::preRemove, 'Cx\\Core\\ContentManager\\Model\\Entity\\Node', $nodeListener);
+        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\Node', $nodeListener);
+
+        $evm->addModelListener(\Doctrine\ORM\Events::onFlush, 'Cx\\Core\\ContentManager\\Model\\Entity\\LogEntry', new \Cx\Core\ContentManager\Model\Event\LogEntryEventListener());
+
+        // Event register for search content
+        $evm->addEventListener('SearchFindContent', $pageListener);
+    }
+
+    /**
+     * Get the set canonical-link of this request
+     *
+     * @param   \Cx\Core\Routing\Model\Entity\Response  $response Response
+     *                                          object of current request
+     * @return  \Cx\Core\Html\Model\Entity\HtmlElement  Instance of type link
+     * @throws  \Exeception In case no canonical-link has been set so far
+     */
+    public function fetchAlreadySetCanonicalLink($response) {
+        $headers = $response->getHeaders();
+        $linkHeader = '';
+        if (isset($headers['Link'])) {
+            $linkHeader = $headers['Link'];
+        } else {
+            // TODO: as the resolver does itself set his own headers
+            // we have to check them as well as fallback.
+            // This code code be removed once all headers are only
+            // set on the instance of \Cx\Core\Routing\Model\Entity\Response
+            $headers = \Env::get('Resolver')->getHeaders();
+            if (isset($headers['Link'])) {
+                $linkHeader = $headers['Link'];
+            }
+        }
+
+        if (!preg_match('/^<([^>]+)>;\s+rel="canonical"/', $linkHeader, $matches)) {
+            throw new \Exception('no canonical-link header set');
+        }
+
+        $canonicalLink = $matches[1];
+        $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
+        $link->setAttribute('rel', 'canonical');
+        $link->setAttribute('href', $canonicalLink);
+        return $link;
+    }
 }

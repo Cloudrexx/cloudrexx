@@ -57,7 +57,7 @@ class ApiKey extends \Cx\Model\Base\EntityBase {
     protected $apiKey;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $dataAccessApiKeys;
 
@@ -94,6 +94,29 @@ class ApiKey extends \Cx\Model\Base\EntityBase {
     public function getApiKey()
     {
         return $this->apiKey;
+    }
+
+    /**
+     * Add dataAccessApiKeys
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
+     * @return ApiKey
+     */
+    public function addDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+        $this->dataAccessApiKeys[] = $dataAccessApiKeys;
+
+        return $this;
+    }
+
+    /**
+     * Remove dataAccessApiKeys
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
+     */
+    public function removeDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+        $this->dataAccessApiKeys->removeElement($dataAccessApiKeys);
     }
 
     /**

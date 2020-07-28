@@ -44,28 +44,47 @@ namespace Cx\Modules\Livecam\Controller;
  * @package     cloudrexx
  * @subpackage  module_livecam
  */
-class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+class ComponentController
+    extends \Cx\Core\Core\Model\Entity\SystemComponentController
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController');
     }
 
      /**
      * Load your component.
      *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page The resolved page
      */
-    public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+    public function load(\Cx\Core\ContentManager\Model\Entity\Page $page)
+    {
         global $_CORELANG, $subMenuTitle, $objTemplate;
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $objLivecam = new Livecam(\Env::get('cx')->getPage()->getContent());
+                $objLivecam = new Livecam(
+                    \Env::get('cx')->getPage()->getContent()
+                );
                 \Env::get('cx')->getPage()->setContent($objLivecam->getPage());
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
-                $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
+                $this->cx->getTemplate()->addBlockfile(
+                    'CONTENT_OUTPUT',
+                    'content_master',
+                    'LegacyContentMaster.html'
+                );
                 $objTemplate = $this->cx->getTemplate();
 
                 \Permission::checkAccess(82, 'static');
@@ -74,5 +93,30 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $objLivecam->getPage();
                 break;
         }
+    }
+
+    /**
+     * Do something after system initialization
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'LIVECAM_CURRENT_IMAGE_B64',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_PLACEHOLDER
+        );
+        $widget->setEsiVariables(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_PAGE
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
     }
 }

@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -22,71 +22,76 @@ namespace Doctrine\DBAL\Schema;
 use \Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * Schema Diff
+ * Schema Diff.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
+ * @link      www.doctrine-project.org
  * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
- * @since   2.0
- * @version $Revision$
- * @author  Benjamin Eberlei <kontakt@beberlei.de>
+ * @license   http://ez.no/licenses/new_bsd New BSD License
+ * @since     2.0
+ * @author    Benjamin Eberlei <kontakt@beberlei.de>
  */
 class SchemaDiff
 {
     /**
-     * All added tables
+     * @var \Doctrine\DBAL\Schema\Schema
+     */
+    public $fromSchema;
+
+    /**
+     * All added tables.
      *
-     * @var array(string=>ezcDbSchemaTable)
+     * @var \Doctrine\DBAL\Schema\Table[]
      */
     public $newTables = array();
 
     /**
-     * All changed tables
+     * All changed tables.
      *
-     * @var array(string=>ezcDbSchemaTableDiff)
+     * @var \Doctrine\DBAL\Schema\TableDiff[]
      */
     public $changedTables = array();
 
     /**
-     * All removed tables
+     * All removed tables.
      *
-     * @var array(string=>Table)
+     * @var \Doctrine\DBAL\Schema\Table[]
      */
     public $removedTables = array();
 
     /**
-     * @var array
+     * @var \Doctrine\DBAL\Schema\Sequence[]
      */
     public $newSequences = array();
 
     /**
-     * @var array
+     * @var \Doctrine\DBAL\Schema\Sequence[]
      */
     public $changedSequences = array();
 
     /**
-     * @var array
+     * @var \Doctrine\DBAL\Schema\Sequence[]
      */
     public $removedSequences = array();
 
     /**
-     * @var array
+     * @var \Doctrine\DBAL\Schema\ForeignKeyConstraint[]
      */
     public $orphanedForeignKeys = array();
 
     /**
      * Constructs an SchemaDiff object.
      *
-     * @param array(string=>Table)      $newTables
-     * @param array(string=>TableDiff)  $changedTables
-     * @param array(string=>bool)       $removedTables
+     * @param \Doctrine\DBAL\Schema\Table[]     $newTables
+     * @param \Doctrine\DBAL\Schema\TableDiff[] $changedTables
+     * @param \Doctrine\DBAL\Schema\Table[]     $removedTables
+     * @param \Doctrine\DBAL\Schema\Schema|null $fromSchema
      */
-    public function __construct($newTables = array(), $changedTables = array(), $removedTables = array())
+    public function __construct($newTables = array(), $changedTables = array(), $removedTables = array(), Schema $fromSchema = null)
     {
-        $this->newTables = $newTables;
+        $this->newTables     = $newTables;
         $this->changedTables = $changedTables;
         $this->removedTables = $removedTables;
+        $this->fromSchema    = $fromSchema;
     }
 
     /**
@@ -98,7 +103,8 @@ class SchemaDiff
      *
      * This way it is ensured that assets are deleted which might not be relevant to the metadata schema at all.
      *
-     * @param AbstractPlatform $platform
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     *
      * @return array
      */
     public function toSaveSql(AbstractPlatform $platform)
@@ -107,7 +113,8 @@ class SchemaDiff
     }
 
     /**
-     * @param AbstractPlatform $platform
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     *
      * @return array
      */
     public function toSql(AbstractPlatform $platform)
@@ -116,8 +123,9 @@ class SchemaDiff
     }
 
     /**
-     * @param AbstractPlatform $platform
-     * @param bool $saveMode
+     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
+     * @param boolean                                   $saveMode
+     *
      * @return array
      */
     protected function _toSql(AbstractPlatform $platform, $saveMode = false)
@@ -125,37 +133,36 @@ class SchemaDiff
         $sql = array();
 
         if ($platform->supportsForeignKeyConstraints() && $saveMode == false) {
-            foreach ($this->orphanedForeignKeys AS $orphanedForeignKey) {
+            foreach ($this->orphanedForeignKeys as $orphanedForeignKey) {
                 $sql[] = $platform->getDropForeignKeySQL($orphanedForeignKey, $orphanedForeignKey->getLocalTableName());
             }
         }
 
         if ($platform->supportsSequences() == true) {
-            foreach ($this->changedSequences AS $sequence) {
-                $sql[] = $platform->getDropSequenceSQL($sequence);
-                $sql[] = $platform->getCreateSequenceSQL($sequence);
+            foreach ($this->changedSequences as $sequence) {
+                $sql[] = $platform->getAlterSequenceSQL($sequence);
             }
 
             if ($saveMode === false) {
-                foreach ($this->removedSequences AS $sequence) {
+                foreach ($this->removedSequences as $sequence) {
                     $sql[] = $platform->getDropSequenceSQL($sequence);
                 }
             }
 
-            foreach ($this->newSequences AS $sequence) {
+            foreach ($this->newSequences as $sequence) {
                 $sql[] = $platform->getCreateSequenceSQL($sequence);
             }
         }
 
         $foreignKeySql = array();
-        foreach ($this->newTables AS $table) {
+        foreach ($this->newTables as $table) {
             $sql = array_merge(
                 $sql,
                 $platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES)
             );
 
             if ($platform->supportsForeignKeyConstraints()) {
-                foreach ($table->getForeignKeys() AS $foreignKey) {
+                foreach ($table->getForeignKeys() as $foreignKey) {
                     $foreignKeySql[] = $platform->getCreateForeignKeySQL($foreignKey, $table);
                 }
             }
@@ -163,12 +170,12 @@ class SchemaDiff
         $sql = array_merge($sql, $foreignKeySql);
 
         if ($saveMode === false) {
-            foreach ($this->removedTables AS $table) {
+            foreach ($this->removedTables as $table) {
                 $sql[] = $platform->getDropTableSQL($table);
             }
         }
 
-        foreach ($this->changedTables AS $tableDiff) {
+        foreach ($this->changedTables as $tableDiff) {
             $sql = array_merge($sql, $platform->getAlterTableSQL($tableDiff));
         }
 

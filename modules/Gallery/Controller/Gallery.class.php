@@ -139,304 +139,117 @@ class Gallery
      */
     function showPictureNoPop($intPicId)
     {
-        global $objDatabase, $_ARRAYLANG, $_CONFIG, $_CORELANG;
+        global $objDatabase, $_ARRAYLANG;
 
-        $arrPictures = array();
         $intPicId    = intval($intPicId);
-// Never used
-//        $intCatId    = intval($_GET['cid']);
         $this->_objTpl->setTemplate($this->pageContent);
-
 
         // we need to read the category id out of the database to prevent abusement
         $intCatId = $this->getCategoryId($intPicId);
-        $categoryProtected = $this->categoryIsProtected($intCatId);
-        if ($categoryProtected > 0) {
-            if (!\Permission::checkAccess($categoryProtected, 'dynamic', true)) {
-                    $link=base64_encode($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
-                    \Cx\Core\Csrf\Controller\Csrf::header ("Location: ".CONTREXX_DIRECTORY_INDEX."?section=Login&cmd=noaccess&redirect=".$link);
-                    exit;
-            }
+        if (!$intCatId) {
+            return;
         }
+        $this->checkAccessToCategory($intCatId);
 
         // hide category list
         $this->_objTpl->hideBlock('galleryCategories');
 
-        // get category description
-        $query = "SELECT value FROM ".DBPREFIX."module_gallery_language ".
-            "WHERE gallery_id=$intCatId AND lang_id=$this->langId AND name='desc' ".
-            "LIMIT 1";
-        $objResult = $objDatabase->Execute($query);
-// Never used
-//        $strCategoryComment = $objResult->fields['value'];
-
-        $boolComment = $this->categoryAllowsComments($intCatId);
-        $boolVoting = $this->categoryAllowsVoting($intCatId);
-
         // get picture informations
-        $objResult = $objDatabase->Execute(
-            "SELECT id, path, link, size_show FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE id=$intPicId");
-
-        $query = "SELECT p.name, p.desc FROM ".DBPREFIX."module_gallery_language_pics p ".
-            "WHERE picture_id=$intPicId AND lang_id=$this->langId LIMIT 1";
-        $objSubResult = $objDatabase->Execute($query);
-// while? -> if!
-        while (!$objResult->EOF) {
-            $imageReso = getimagesize($this->strImagePath.$objResult->fields['path']);
-            $strImagePath = $this->strImageWebPath.$objResult->fields['path'];
-            $imageName = $objSubResult->fields['name'];
-            $imageDesc = $objSubResult->fields['desc'];
-            //show image size based on the settings of "Show image size"
-            $showImageSize   = $this->arrSettings['show_image_size'] == 'on' && $objResult->fields['size_show'];
-            $imageSize       = ($showImageSize) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
-            $strImageWebPath = ASCMS_PROTOCOL .'://'.$_CONFIG['domainUrl'].CONTREXX_SCRIPT_PATH.'?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicId;
-            $objResult->MoveNext();
+        $picture = $objDatabase->Execute('SELECT
+                                            p.`id`,
+                                            p.`path`,
+                                            p.`link`,
+                                            p.`size_show`,
+                                            pl.`name`,
+                                            pl.`desc`
+                                        FROM
+                                            `'. DBPREFIX .'module_gallery_pictures` AS p
+                                        LEFT JOIN
+                                            `'. DBPREFIX .'module_gallery_language_pics` AS pl
+                                        ON
+                                            p.`id` = pl.`picture_id` AND pl.`lang_id` = '. $this->langId .'
+                                        WHERE
+                                            `id` = '. $intPicId);
+        if (!$picture) {
+            return;
         }
+        $imagePath       = $this->strImagePath . $picture->fields['path'];
+        $imageReso       = getimagesize($imagePath);
+        $strImagePath    = $this->strImageWebPath.$picture->fields['path'];
+        $imageName       = $picture->fields['name'];
+        $imageDesc       = $picture->fields['desc'];
+        //show image size based on the settings of "Show image size"
+        $showImageSize   = $this->arrSettings['show_image_size'] == 'on' && $picture->fields['size_show'];
+        $imageSize       = ($showImageSize) ? round(filesize($imagePath)/1024, 2) : '';
 
-        // get pictures of the current category
-        $objResult = $objDatabase->Execute(
-            "SELECT id FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE status='1' AND validated='1' AND catid=$intCatId ".
-            "ORDER BY sorting, id");
-        while (!$objResult->EOF) {
-            array_push($arrPictures,$objResult->fields['id']);
-            $objResult->MoveNext();
-        }
-
-        // get next picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)+1,$arrPictures)) {
-            $intPicIdNext = $arrPictures[array_search($intPicId,$arrPictures)+1];
-        } else {
-            $intPicIdNext = $arrPictures[0];
-        }
-
-        // get previous picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)-1,$arrPictures)) {
-            $intPicIdPrevious = $arrPictures[array_search($intPicId,$arrPictures)-1];
-        } else {
-            $intPicIdPrevious = end($arrPictures);
-        }
-
-        // set language variables
-        $this->_objTpl->setVariable(array(
-            'TXT_GALLERY_PREVIOUS_IMAGE'        => $_ARRAYLANG['TXT_PREVIOUS_IMAGE'],
-            'TXT_GALLERY_NEXT_IMAGE'            => $_ARRAYLANG['TXT_NEXT_IMAGE'],
-            'TXT_GALLERY_BACK_OVERVIEW'         => $_ARRAYLANG['TXT_GALLERY_BACK_OVERVIEW'],
-            'TXT_GALLERY_CURRENT_IMAGE'         => $_ARRAYLANG['TXT_GALLERY_CURRENT_IMAGE'],
-        ));
-
+        list($previousPicture, $nextPicture) = $this->getPreviousAndNextPicture($intCatId, $intPicId);
         $intImageWidth  = '';
         $intImageHeigth = '';
         if ($this->arrSettings['image_width'] < $imageReso[0]) {
-            $resizeFactor = $this->arrSettings['image_width'] / $imageReso[0];
-            $intImageWidth = $imageReso[0] * $resizeFactor;
+            $resizeFactor   = $this->arrSettings['image_width'] / $imageReso[0];
+            $intImageWidth  = $imageReso[0] * $resizeFactor;
             $intImageHeigth = $imageReso[1] * $resizeFactor;
-
         }
         if (empty($imageDesc)) {
             $imageDesc = '-';
         }
 
-        $strImageTitle = substr(strrchr($strImagePath, '/'), 1);
-        // chop the file extension if the settings tell us to do so
-        if ($this->arrSettings['show_ext'] == 'off') {
-            $strImageTitle = substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
+        $strImageTitle = '';
+        $showFileName  = $this->arrSettings['show_file_name'] == 'on';
+        if ($showFileName) {
+            $strImageTitle = substr(strrchr($strImagePath, '/'), 1);
+            // chop the file extension if the settings tell us to do so
+            if ($this->arrSettings['show_ext'] == 'off') {
+                $strImageTitle = substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
+            }
         }
 
-        if ($this->arrSettings['show_file_name'] == 'off') {
-            $strImageTitle = "";
-            $imageSize="";
-            $kB="";
-            $openBracket="";
-            $closeBracket="";
-            //substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
-        }
-        else {
-            $openBracket="(";
-            $closeBracket=")";
-            $kB=" kB";
-        }
-
-        // set variables
         $this->_objTpl->setVariable(array(
             'GALLERY_PICTURE_ID'        => $intPicId,
             'GALLERY_CATEGORY_ID'       => $intCatId,
             'GALLERY_IMAGE_TITLE'       => $strImageTitle,
             'GALLERY_IMAGE_PATH'        => $strImagePath,
-            'GALLERY_IMAGE_PREVIOUS'    => '?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicIdPrevious,
-            'GALLERY_IMAGE_NEXT'        => '?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicIdNext,
+            'GALLERY_IMAGE_PREVIOUS'    => $this->getPictureDetailLink($intCatId, $previousPicture),
+            'GALLERY_IMAGE_NEXT'        => $this->getPictureDetailLink($intCatId, $nextPicture),
             'GALLERY_IMAGE_WIDTH'       => $intImageWidth,
             'GALLERY_IMAGE_HEIGHT'      => $intImageHeigth,
-            'GALLERY_IMAGE_LINK'        => $strImageWebPath,
+            'GALLERY_IMAGE_LINK'        => $this->getPictureDetailLink($intCatId, $intPicId),
             'GALLERY_IMAGE_NAME'        => $imageName,
             'GALLERY_IMAGE_DESCRIPTION' => $imageDesc,
-            'GALLERY_IMAGE_FILESIZE'    => ($showImageSize) ? $openBracket.$imageSize.$kB.$closeBracket : '',
+            'GALLERY_IMAGE_FILESIZE'    => ($showImageSize && $showFileName) ? '('. $imageSize .' kB)' : '',
+
+            'TXT_GALLERY_PREVIOUS_IMAGE' => $_ARRAYLANG['TXT_PREVIOUS_IMAGE'],
+            'TXT_GALLERY_NEXT_IMAGE'     => $_ARRAYLANG['TXT_NEXT_IMAGE'],
+            'TXT_GALLERY_BACK_OVERVIEW'  => $_ARRAYLANG['TXT_GALLERY_BACK_OVERVIEW'],
+            'TXT_GALLERY_CURRENT_IMAGE'  => $_ARRAYLANG['TXT_GALLERY_CURRENT_IMAGE'],
         ));
 
-        if ($this->arrSettings['header_type'] == 'hierarchy') {
-            $this->_objTpl->setVariable(array(
-                'GALLERY_CATEGORY_TREE'     => $this->getCategoryTree(),
-                'TXT_GALLERY_CATEGORY_HINT' => $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_HIERARCHY'],
-            ));
-        } else {
-            $this->_objTpl->setVariable(array(
-                'GALLERY_CATEGORY_TREE'     => $this->getSiblingList(),
-                'TXT_GALLERY_CATEGORY_HINT' => $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_FLAT'],
-            ));
-        }
+        $this->parseCategoryTree($this->_objTpl);
 
         //voting
-        if ($this->_objTpl->blockExists('votingTab')) {
-            if ($this->arrSettings['show_voting'] == 'on' && $boolVoting) {
-                $this->_objTpl->setVariable(array(
-                    'TXT_VOTING_TITLE'        => $_ARRAYLANG['TXT_VOTING_TITLE'],
-                    'TXT_VOTING_STATS_ACTUAL' => $_ARRAYLANG['TXT_VOTING_STATS_ACTUAL'],
-                    'TXT_VOTING_STATS_WITH'   => $_ARRAYLANG['TXT_VOTING_STATS_WITH'],
-                    'TXT_VOTING_STATS_VOTES'  => $_ARRAYLANG['TXT_VOTING_STATS_VOTES'],
-                ));
-                if (isset($_COOKIE['Gallery_Voting_'.$intPicId])) {
-                    $this->_objTpl->hideBlock('showVotingBar');
-                    $this->_objTpl->setVariable(array(
-                        'TXT_VOTING_ALREADY_VOTED'  => $_ARRAYLANG['TXT_VOTING_ALREADY_VOTED'],
-                        'VOTING_ALREADY_VOTED_MARK' => intval($_COOKIE['Gallery_Voting_'.$intPicId])
-                    ));
-                } else {
-                    $this->_objTpl->setVariable(array(
-                        'TXT_VOTING_ALREADY_VOTED'  => '',
-                        'VOTING_ALREADY_VOTED_MARK' => ''
-                    ));
-                    for ($i=1;$i<=10;$i++) {
-                        $this->_objTpl->setVariable(array(
-                            'VOTING_BAR_SRC'   => ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/voting/'.$i.'.gif',
-                            'VOTING_BAR_ALT'   => $_ARRAYLANG['TXT_VOTING_RATE'].': '.$i,
-                            'VOTING_BAR_MARK'  => $i,
-                            'VOTING_BAR_CID'   => $intCatId,
-                            'VOTING_BAR_PICID' => $intPicId
-                        ));
-                        $this->_objTpl->parse('showVotingBar');
-                    }
-                }
-
-                $objResult = $objDatabase->Execute(
-                    "SELECT mark FROM ".DBPREFIX."module_gallery_votes ".
-                    "WHERE picid=$intPicId");
-                if ($objResult->RecordCount() > 0) {
-                    $intCount = 0;
-                    $intMark  = 0;
-                    while (!$objResult->EOF) {
-                        $intCount++;
-                        $intMark = $intMark + intval($objResult->fields['mark']);
-                        $objResult->MoveNext();
-                    }
-                    $this->_objTpl->setVariable(array(
-                        'VOTING_STATS_MARK'  => number_format(round($intMark / $intCount,1),1,'.','\''),
-                        'VOTING_STATS_VOTES' => $intCount
-                    ));
-                } else {
-                    $this->_objTpl->setVariable(array(
-                        'VOTING_STATS_MARK'  => 0,
-                        'VOTING_STATS_VOTES' => 0
-                    ));
-                }
-            } else {
-                $this->_objTpl->hideBlock('votingTab');
-            }
-        }
+        $this->parsePictureVotingTab($this->_objTpl, $intCatId, $intPicId);
 
         // comments
-        if ($this->arrSettings['show_comments'] == 'on' && $boolComment) {
-            $objResult = $objDatabase->Execute(
-                "SELECT date, name, email, www, comment FROM ".DBPREFIX."module_gallery_comments ".
-                "WHERE picid=$intPicId ORDER BY date ASC");
-
-            $this->_objTpl->setVariable(array(
-                'TXT_COMMENTS_TITLE'        => $objResult->RecordCount().'&nbsp;'.$_ARRAYLANG['TXT_COMMENTS_TITLE'],
-                'TXT_COMMENTS_ADD_TITLE'    => $_ARRAYLANG['TXT_COMMENTS_ADD_TITLE'],
-                'TXT_COMMENTS_ADD_NAME'     => $_ARRAYLANG['TXT_COMMENTS_ADD_NAME'],
-                'TXT_COMMENTS_ADD_EMAIL'    => $_ARRAYLANG['TXT_COMMENTS_ADD_EMAIL'],
-                'TXT_COMMENTS_ADD_HOMEPAGE' => $_ARRAYLANG['TXT_COMMENTS_ADD_HOMEPAGE'],
-                'TXT_COMMENTS_ADD_TEXT'     => $_ARRAYLANG['TXT_COMMENTS_ADD_TEXT'],
-                'TXT_COMMENTS_ADD_SUBMIT'   => $_ARRAYLANG['TXT_COMMENTS_ADD_SUBMIT'],
-            ));
-
-//            $this->_objTpl->setVariable(array(
-//                'TXT_COMMENTS_ADD_CAPTCHA'   => $_CORELANG['TXT_CORE_CAPTCHA'],
-//                'GALLERY_COMMENTS_ADD_CAPTCHA_CODE'  => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getCode(),
-//            ));
-
-            if ($objResult->RecordCount() == 0) { // no comments, hide the block
-                $this->_objTpl->hideBlock('showComments');
-            } else {
-                $i=0;
-                while (!$objResult->EOF) {
-                    if ($i % 2 == 0) {
-                        $intRowClass = '1';
-                    } else {
-                        $intRowClass = '2';
-                    }
-
-                    if ($objResult->fields['www'] != '') {
-                        $strWWW = '<a href="'.$objResult->fields['www'].'"><img alt="'.$objResult->fields['www'].'" src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/www.gif" align="baseline" border="0" /></a>';
-                    } else {
-                        $strWWW = '<img src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/pixel.gif" width="16" height="16" alt="" align="baseline" border="0" />';
-                    }
-                    if ($objResult->fields['email'] != '') {
-                        $strEmail = '<a href="mailto:'.$objResult->fields['email'].'"><img alt="'.$objResult->fields['email'].'" src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/email.gif" align="baseline" border="0" /></a>';
-                    } else {
-                        $strEmail = '<img src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/pixel.gif" width="16" height="16" alt="" align="baseline" border="0" />';
-                    }
-                    $this->_objTpl->setVariable(array(
-                        'COMMENTS_NAME'     => html_entity_decode($objResult->fields['name']),
-                        'COMMENTS_DATE'     => date($_ARRAYLANG['TXT_COMMENTS_DATEFORMAT'],$objResult->fields['date']),
-                        'COMMENTS_WWW'      => $strWWW,
-                        'COMMENTS_EMAIL'    => $strEmail,
-                        'COMMENTS_TEXT'     => nl2br($objResult->fields['comment']),
-                        'COMMENTS_ROWCLASS' => $intRowClass
-                    ));
-
-                    $this->_objTpl->parse('showComments');
-                    $objResult->MoveNext();
-                    $i++;
-                }
-            }
-        } else {
-            $this->_objTpl->hideBlock('commentTab');
-        }
-
-// Undefined
-//        if($_CONFIG['corePagingLimit'] < $count) {
-//          $this->_objTpl->setVariable("GALLERY_FRONTEND_PAGING", $paging);
-//        }
-        //$this->_objTpl->parse('galleryImage');
+        $this->parsePictureCommentsTab($this->_objTpl, $intCatId, $intPicId);
     }
 
     /**
     * Show the picture with the id $intPicId (with popup)
     *
-    * @global    ADONewConnection
-    * @global    array
-    * @param     integer        $intPicId: The id of the picture which should be shown
+    * @param     integer        $intPicId The id of the picture which should be shown
     */
     function showPicture($intPicId)
     {
         global $objDatabase, $_ARRAYLANG;
 
-        $arrPictures = array();
         $intPicId    = intval($intPicId);
-// Never used
-//        $intCatId    = intval($_GET['cid']);
 
         // we need to read the category id out of the database to prevent abusement
         $intCatId = $this->getCategoryId($intPicId);
-        $categoryProtected = $this->categoryIsProtected($intCatId);
-        if ($categoryProtected > 0) {
-            if (!\Permission::checkAccess($categoryProtected, 'dynamic', true)) {
-                    $link=base64_encode($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
-                    \Cx\Core\Csrf\Controller\Csrf::header ("Location: ".CONTREXX_DIRECTORY_INDEX."?section=Login&cmd=noaccess&redirect=".$link);
-                    exit;
-            }
+        if (!$intCatId) {
+            die();
         }
+        $this->checkAccessToCategory($intCatId);
 
         // POPUP Code
         $objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Gallery/View/Template/Backend');
@@ -452,62 +265,36 @@ class Gallery
             $strCategoryComment = $objResult->fields['value'];
         }
 
-        $objResult = $objDatabase->Execute(
-            "SELECT comment, voting ".
-            "FROM ".DBPREFIX."module_gallery_categories ".
-            "WHERE id=$intCatId");
-        $boolComment = '';
-        $boolVoting = '';
-        if ($objResult && $objResult->RecordCount()) {
-            $boolComment = $objResult->fields['comment'];
-            $boolVoting = $objResult->fields['voting'];
-        }
-
         // get picture informations
-        $objResult = $objDatabase->Execute(
-            "SELECT id, path, link, size_show ".
-            "FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE id=$intPicId");
-        $objSubResult = $objDatabase->Execute(
-            "SELECT p.name, p.desc FROM ".DBPREFIX."module_gallery_language_pics p ".
-            "WHERE picture_id=$intPicId AND lang_id=$this->langId LIMIT 1");
-        while (!$objResult->EOF) {
-            $imageReso = getimagesize($this->strImagePath.$objResult->fields['path']);
-            $strImagePath = $this->strImageWebPath.$objResult->fields['path'];
-            $imageName = $objSubResult->fields['name'];
-            $imageDesc = $objSubResult->fields['desc'];
-            //show image size based on the settings of "Show image size"
-            $showImageSize = $this->arrSettings['show_image_size'] == 'on' && $objResult->fields['size_show'];
-            $imageSize = ($showImageSize) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
-            $strImageWebPath = ASCMS_PROTOCOL .'://'.$_SERVER['SERVER_NAME'].CONTREXX_SCRIPT_PATH.'?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicId;
-            $objResult->MoveNext();
+        $picture = $objDatabase->Execute('SELECT
+                                            p.`id`,
+                                            p.`path`,
+                                            p.`link`,
+                                            p.`size_show`,
+                                            pl.`name`,
+                                            pl.`desc`
+                                        FROM
+                                            `'. DBPREFIX .'module_gallery_pictures` AS p
+                                        LEFT JOIN
+                                            `'. DBPREFIX .'module_gallery_language_pics` AS pl
+                                        ON
+                                            p.`id` = pl.`picture_id` AND pl.`lang_id` = '. $this->langId .'
+                                        WHERE
+                                            `id` = '. $intPicId);
+        if (!$picture) {
+            die;
         }
+        $imagePath       = $this->strImagePath . $picture->fields['path'];
+        $imageReso       = getimagesize($imagePath);
+        $strImagePath    = $this->strImageWebPath.$picture->fields['path'];
+        $imageName       = $picture->fields['name'];
+        $imageDesc       = $picture->fields['desc'];
+        //show image size based on the settings of "Show image size"
+        $showImageSize   = $this->arrSettings['show_image_size'] == 'on' && $picture->fields['size_show'];
+        $imageSize       = ($showImageSize) ? round(filesize($imagePath)/1024, 2) : '';
 
         // get pictures of the current category
-        $objResult = $objDatabase->Execute(
-            "SELECT id FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE status='1' AND validated='1' AND catid=$intCatId ".
-            "ORDER BY sorting, id");
-        if ($objResult && $objResult->RecordCount()) {
-            while (!$objResult->EOF) {
-                array_push($arrPictures,$objResult->fields['id']);
-                $objResult->MoveNext();
-            }
-        }
-
-        // get next picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)+1,$arrPictures)) {
-            $intPicIdNext = $arrPictures[array_search($intPicId,$arrPictures)+1];
-        } else {
-            $intPicIdNext = $arrPictures[0];
-        }
-
-        // get previous picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)-1,$arrPictures)) {
-            $intPicIdPrevious = $arrPictures[array_search($intPicId,$arrPictures)-1];
-        } else {
-            $intPicIdPrevious = end($arrPictures);
-        }
+        list($previousPicture, $nextPicture) = $this->getPreviousAndNextPicture($intCatId, $intPicId);
 
         $strImageTitle = substr(strrchr($strImagePath, '/'), 1);
         // chop the file extension if the settings tell us to do so
@@ -515,156 +302,114 @@ class Gallery
             $strImageTitle = substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
         }
 
-        // set language variables
-        $objTpl->setVariable(array(
-            'TXT_CLOSE_WINDOW'    => $_ARRAYLANG['TXT_CLOSE_WINDOW'],
-            'TXT_ZOOM_OUT'        => $_ARRAYLANG['TXT_ZOOM_OUT'],
-            'TXT_ZOOM_IN'         => $_ARRAYLANG['TXT_ZOOM_IN'],
-            'TXT_CHANGE_BG_COLOR' => $_ARRAYLANG['TXT_CHANGE_BG_COLOR'],
-            'TXT_PRINT'           => $_ARRAYLANG['TXT_PRINT'],
-            'TXT_PREVIOUS_IMAGE'  => $_ARRAYLANG['TXT_PREVIOUS_IMAGE'],
-            'TXT_NEXT_IMAGE'      => $_ARRAYLANG['TXT_NEXT_IMAGE'],
-            'TXT_USER_DEFINED'    => $_ARRAYLANG['TXT_USER_DEFINED']
-        ));
-
-        $imageSize     = ($showImageSize) ? $_ARRAYLANG['TXT_FILESIZE'].': '.$imageSize.' kB<br />' : '';
         // set variables
         $objTpl->setVariable(array(
-            'CONTREXX_CHARSET'        => CONTREXX_CHARSET,
+            'CONTREXX_CHARSET'      => CONTREXX_CHARSET,
             'GALLERY_WINDOW_WIDTH'  => $imageReso[0] < 420 ? 500 : $imageReso[0]+80,
             'GALLERY_WINDOW_HEIGHT' => $imageReso[1]+120,
             'GALLERY_PICTURE_ID'    => $intPicId,
             'GALLERY_CATEGORY_ID'   => $intCatId,
             'GALLERY_TITLE'         => $strCategoryComment,
             'IMAGE_THIS'            => $strImagePath,
-            'IMAGE_PREVIOUS'        => '?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicIdPrevious,
-            'IMAGE_NEXT'            => '?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicIdNext,
+            'IMAGE_PREVIOUS'        => $this->getPictureDetailLink($intCatId, $previousPicture),
+            'IMAGE_NEXT'            => $this->getPictureDetailLink($intCatId, $nextPicture),
             'IMAGE_WIDTH'           => $imageReso[0],
             'IMAGE_HEIGHT'          => $imageReso[1],
-            'IMAGE_LINK'            => $strImageWebPath,
+            'IMAGE_LINK'            => $this->getPictureDetailLink($intCatId, $intPicId),
             'IMAGE_NAME'            => $strImageTitle, //$imageName,
             'IMAGE_DESCRIPTION'     => $_ARRAYLANG['TXT_IMAGE_NAME'].': '.$imageName.'<br />'
-                                       . $imageSize
+                                       . (($showImageSize) ? $_ARRAYLANG['TXT_FILESIZE'].': '.$imageSize.' kB<br />' : '')
                                        . $_ARRAYLANG['TXT_RESOLUTION'].': '.$imageReso[0].'x'.$imageReso[1].' Pixel',
             'IMAGE_DESC'            => (!empty($imageDesc)) ? $imageDesc.'<br /><br />' : '',
-        ));
 
+            'TXT_CLOSE_WINDOW'      => $_ARRAYLANG['TXT_CLOSE_WINDOW'],
+            'TXT_ZOOM_OUT'          => $_ARRAYLANG['TXT_ZOOM_OUT'],
+            'TXT_ZOOM_IN'           => $_ARRAYLANG['TXT_ZOOM_IN'],
+            'TXT_CHANGE_BG_COLOR'   => $_ARRAYLANG['TXT_CHANGE_BG_COLOR'],
+            'TXT_PRINT'             => $_ARRAYLANG['TXT_PRINT'],
+            'TXT_PREVIOUS_IMAGE'    => $_ARRAYLANG['TXT_PREVIOUS_IMAGE'],
+            'TXT_NEXT_IMAGE'        => $_ARRAYLANG['TXT_NEXT_IMAGE'],
+            'TXT_USER_DEFINED'      => $_ARRAYLANG['TXT_USER_DEFINED']
+        ));
+        
         $objTpl->setGlobalVariable('CONTREXX_DIRECTORY_INDEX', CONTREXX_DIRECTORY_INDEX);
 
         //voting
-        if ($objTpl->blockExists('votingTab')) {
-            if ($this->arrSettings['show_voting'] == 'on'    && $boolVoting) {
-                $objTpl->setVariable(array(
-                    'TXT_VOTING_TITLE'        => $_ARRAYLANG['TXT_VOTING_TITLE'],
-                    'TXT_VOTING_STATS_ACTUAL' => $_ARRAYLANG['TXT_VOTING_STATS_ACTUAL'],
-                    'TXT_VOTING_STATS_WITH'   => $_ARRAYLANG['TXT_VOTING_STATS_WITH'],
-                    'TXT_VOTING_STATS_VOTES'  => $_ARRAYLANG['TXT_VOTING_STATS_VOTES'],
-                ));
-                if (isset($_COOKIE["Gallery_Voting_$intPicId"])) {
-                    $objTpl->hideBlock('showVotingBar');
+        $this->parsePictureVotingTab($objTpl, $intCatId, $intPicId);
+        // comments
+        $this->parsePictureCommentsTab($objTpl, $intCatId, $intPicId);
 
-                    $objTpl->setVariable(array(
-                        'TXT_VOTING_ALREADY_VOTED'  => $_ARRAYLANG['TXT_VOTING_ALREADY_VOTED'],
-                        'VOTING_ALREADY_VOTED_MARK' => intval($_COOKIE['Gallery_Voting_'.$intPicId])
-                    ));
-                } else {
-                    $objTpl->setVariable(array(
-                        'TXT_VOTING_ALREADY_VOTED'  => '',
-                        'VOTING_ALREADY_VOTED_MARK' => ''
-                    ));
-                    for ($i=1;$i<=10;$i++) {
-                            $objTpl->setVariable(array(
-                                'VOTING_BAR_SRC'   => ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/voting/'.$i.'.gif',
-                                'VOTING_BAR_ALT'   => $_ARRAYLANG['TXT_VOTING_RATE'].': '.$i,
-                                'VOTING_BAR_MARK'  => $i,
-                                'VOTING_BAR_CID'   => $intCatId,
-                                'VOTING_BAR_PICID' => $intPicId
-                            ));
-                        $objTpl->parse('showVotingBar');
-                    }
-                }
-
-                $objResult = $objDatabase->Execute(
-                    "SELECT mark FROM ".DBPREFIX."module_gallery_votes ".
-                    "WHERE picid=$intPicId");
-                if ($objResult->RecordCount() > 0) {
-                    $intCount = 0;
-                    $intMark = 0;
-                    while (!$objResult->EOF) {
-                        $intCount++;
-                        $intMark = $intMark + intval($objResult->fields['mark']);
-                        $objResult->MoveNext();
-                    }
-                    $objTpl->setVariable(array(
-                        'VOTING_STATS_MARK'  => number_format(round($intMark / $intCount,1),1,'.','\''),
-                        'VOTING_STATS_VOTES' => $intCount
-                    ));
-                } else {
-                    $objTpl->setVariable(array(
-                        'VOTING_STATS_MARK'  => 0,
-                        'VOTING_STATS_VOTES' => 0
-                    ));
-                }
-            } else {
-                $objTpl->hideBlock('votingTab');
-            }
-        }
-        //comments
-        if ($this->arrSettings['show_comments'] == 'on' && $boolComment) {
-            $objResult = $objDatabase->Execute(
-                "SELECT date, name, email, www, comment FROM ".DBPREFIX."module_gallery_comments ".
-                "WHERE picid=$intPicId ORDER BY date ASC");
-
-            $objTpl->setVariable(array(
-                'TXT_COMMENTS_TITLE'        => $objResult->RecordCount().'&nbsp;'.$_ARRAYLANG['TXT_COMMENTS_TITLE'],
-                'TXT_COMMENTS_ADD_TITLE'    => $_ARRAYLANG['TXT_COMMENTS_ADD_TITLE'],
-                'TXT_COMMENTS_ADD_NAME'     => $_ARRAYLANG['TXT_COMMENTS_ADD_NAME'],
-                'TXT_COMMENTS_ADD_EMAIL'    => $_ARRAYLANG['TXT_COMMENTS_ADD_EMAIL'],
-                'TXT_COMMENTS_ADD_HOMEPAGE' => $_ARRAYLANG['TXT_COMMENTS_ADD_HOMEPAGE'],
-                'TXT_COMMENTS_ADD_TEXT'     => $_ARRAYLANG['TXT_COMMENTS_ADD_TEXT'],
-                'TXT_COMMENTS_ADD_SUBMIT'   => $_ARRAYLANG['TXT_COMMENTS_ADD_SUBMIT'],
-            ));
-
-            if ($objResult->RecordCount() == 0) { // no comments, hide the block
-                $objTpl->hideBlock('showComments');
-            } else {
-                $i=0;
-                while (!$objResult->EOF) {
-                    if ($i % 2 == 0) {
-                        $intRowClass = '1';
-                    } else {
-                        $intRowClass = '2';
-                    }
-
-                    if ($objResult->fields['www'] != '') {
-                        $strWWW = '<a href="'.$objResult->fields['www'].'"><img alt="'.$objResult->fields['www'].'" src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/www.gif" align="baseline" border="0" /></a>';
-                    } else {
-                        $strWWW = '<img src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/pixel.gif" width="16" height="16" alt="" align="baseline" border="0" />';
-                    }
-                    if ($objResult->fields['email'] != '') {
-                        $strEmail = '<a href="mailto:'.$objResult->fields['email'].'"><img alt="'.$objResult->fields['email'].'" src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/email.gif" align="baseline" border="0" /></a>';
-                    } else {
-                        $strEmail = '<img src="'.ASCMS_MODULE_WEB_PATH.'/Gallery/View/Media/pixel.gif" width="16" height="16" alt="" align="baseline" border="0" />';
-                    }
-                    $objTpl->setVariable(array(
-                        'COMMENTS_NAME'     => html_entity_decode($objResult->fields['name']),
-                        'COMMENTS_DATE'     => date($_ARRAYLANG['TXT_COMMENTS_DATEFORMAT'],$objResult->fields['date']),
-                        'COMMENTS_WWW'      => $strWWW,
-                        'COMMENTS_EMAIL'    => $strEmail,
-                        'COMMENTS_TEXT'     => nl2br($objResult->fields['comment']),
-                        'COMMENTS_ROWCLASS' => $intRowClass
-                    ));
-
-                    $objTpl->parse('showComments');
-                    $objResult->MoveNext();
-                    $i++;
-                }
-            }
-        } else {
-            $objTpl->hideBlock('commentTab');
-        }
         $objTpl->show();
         die;
+    }
+
+    /**
+     * Get Page title and description
+     *
+     * @return array returns pagetitle and metadescription as array
+     */
+    public function getPageAttributes()
+    {
+        global $objDatabase;
+
+        $picId = 0;
+        if (!empty($_GET['pId'])) {
+            $picId = contrexx_input2int($_GET['pId']);
+            $catId = $this->getCategoryId($picId);
+        } else {
+            $catId = contrexx_input2int($_GET['cmd']);
+            if (isset($_GET['cid'])) {
+                $catId = contrexx_input2int($_GET['cid']);
+            }
+        }
+
+        if (!$catId) {
+            return;
+        }
+        //check category protected or not
+        $categoryProtected = $this->categoryIsProtected($catId);
+        if (
+            $categoryProtected &&
+            !\Permission::checkAccess($categoryProtected, 'dynamic', true)
+        ) {
+            return;
+        }
+
+        if ($picId) {
+            $picture = $objDatabase->Execute('
+                SELECT
+                        `name`,
+                        `desc`
+                    FROM ' . DBPREFIX . 'module_gallery_language_pics
+                    WHERE
+                        `picture_id`=' . $picId . ' AND
+                        `lang_id`   =' . $this->langId . '
+                    LIMIT 1
+            ');
+            $title = $picture->fields['name'];
+            $desc  = $picture->fields['desc'];
+        } else {
+            $query = '
+                SELECT
+                        `value`
+                    FROM ' . DBPREFIX . 'module_gallery_language
+                    WHERE
+                        `gallery_id`=' . $catId . ' AND
+                        `lang_id`   =' . $this->langId . ' AND
+                        `name`      =';
+            // name of requested category
+            $nameResult = $objDatabase->SelectLimit($query . '\'name\'', 1);
+            $title = html_entity_decode($nameResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
+
+            // description of requested category
+            $descResult = $objDatabase->SelectLimit($query . '\'desc\'', 1);
+            $desc = html_entity_decode($descResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
+        }
+        //Consider title as description, if description is empty
+        if (empty($desc)) {
+            $desc = $title;
+        }
+        return array('title' => $title, 'desc' => $desc);
     }
 
     /**
@@ -703,9 +448,9 @@ class Gallery
 
             if (isset($strCategory2)) { // this is a subcategory
                 $strOutput .= ' / <a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$intParentId.'" title="'.$strCategory2.'" target="_self">'.$strCategory2.'</a>';
-                $strOutput .= ' / <a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$intCatId.'" title="'.$strCategory1.'" target="_self">'.$strCategory1.'</a>';
+                $strOutput .= ' / <a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$intCatId.'" title="'.$strCategory1.'" target="_self" rel="nofollow">'.$strCategory1.'</a>';
             } else {
-                $strOutput .= ' / <a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$intCatId.'" title="'.$strCategory1.'" target="_self">'.$strCategory1.'</a>';
+                $strOutput .= ' / <a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$intCatId.'" title="'.$strCategory1.'" target="_self" rel="nofollow">'.$strCategory1.'</a>';
             }
         }
         return $strOutput;
@@ -747,52 +492,9 @@ class Gallery
 
 
     /**
-     * Returns the name of the currently visible top level gallery
-     * @return  string          The gallery name, or '' if not applicable
-     */
-    function getTopGalleryName()
-    {
-        global $objDatabase;
-
-        if (isset($_GET['cid'])) {
-            $intCatId = intval($_GET['cid']);
-
-            $running = true;
-            while ($running) {
-                $query = "SELECT pid FROM ".DBPREFIX."module_gallery_categories ".
-                    "WHERE id=$intCatId";
-                $objResult = $objDatabase->Execute($query);
-                if ($objResult) {
-                    if ($objResult->fields['pid'] != 0) {
-                        $intCatId = $objResult->fields['pid'];
-                    } else {
-                        $running = false;
-                    }
-                }
-            }
-
-            $query = "SELECT value FROM ".DBPREFIX."module_gallery_language ".
-                "WHERE gallery_id=$intCatId AND lang_id=$this->langId ".
-                "AND name='name' LIMIT 1";
-            $objResult = $objDatabase->Execute($query);
-            if ($objResult) {
-                $galleryName = $objResult->fields['value'];
-                return $galleryName;
-            }
-        }
-        // category is not set
-        // we're not inside a subgallery nor showing a picture yet.
-        return '';
-    }
-
-
-    /**
      * Shows the Overview of categories
      *
-     * @global  ADONewConnection
-     * @global  array
-     * @global  array
-     * @param   var     $intParentId
+     * @param integer $intParentId
      */
     function showCategoryOverview($intParentId=0)
     {
@@ -814,41 +516,21 @@ class Gallery
             $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
         }
 
-        $categoryProtected = $this->categoryIsProtected($intParentId);
-        if ($categoryProtected > 0) {
-            if (!\Permission::checkAccess($categoryProtected, 'dynamic', true)) {
-                    $link=base64_encode($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
-                    \Cx\Core\Csrf\Controller\Csrf::header ("Location: ".CONTREXX_DIRECTORY_INDEX."?section=Login&cmd=noaccess&redirect=".$link);
-                    exit;
-            }
-        }
-
-        // hide image detail block
-        // $this->_objTpl->hideBlock('galleryImage');
-
-        if ($this->arrSettings['header_type'] == 'hierarchy') {
-            $this->_objTpl->setVariable(array(
-                'GALLERY_CATEGORY_TREE'     => $this->getCategoryTree(),
-                'TXT_GALLERY_CATEGORY_HINT' => $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_HIERARCHY'],
-            ));
-        } else {
-            $this->_objTpl->setVariable(array(
-                'GALLERY_CATEGORY_TREE'     => $this->getSiblingList(),
-                'TXT_GALLERY_CATEGORY_HINT' => $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_FLAT'],
-            ));
-        }
+        $this->checkAccessToCategory($intParentId);
+        $this->parseCategoryTree($this->_objTpl);
 
         $objResult = $objDatabase->Execute(
             "SELECT id, catid, path FROM ".DBPREFIX."module_gallery_pictures ".
             "ORDER BY catimg ASC, sorting ASC, id ASC");
-
+        
         $showImageSizeOverview   = $this->arrSettings['show_image_size'] == 'on';
         while (!$objResult->EOF) {
-            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
-            $arrstrImagePaths[$objResult->fields['catid']][$objResult->fields['id']] = $this->strThumbnailWebPath.$objResult->fields['path'];
+            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : 0;
+            $arrstrImagePaths[$objResult->fields['catid']][$objResult->fields['id']] = $objResult->fields['path'];
             $objResult->MoveNext();
         }
 
+        $arrCategorySizes = array();
         if (isset($arrImageSizes) && isset($arrstrImagePaths)) {
             foreach ($arrImageSizes as $keyCat => $valueCat) {
                 $arrCategorySizes[$keyCat] = 0;
@@ -877,7 +559,7 @@ class Gallery
                                                     status="1"
                                         ');
         $this->_objTpl->setVariable(array(
-            'GALLERY_CATEGORY_PAGING'     => getPaging($objResult->fields['countValue'], $intPos, '&section=Gallery&cid='.$intParentId.$this->strCmd, '<b>'.$_ARRAYLANG['TXT_GALLERY'].'</b>',false,intval($_CONFIG['corePagingLimit']))
+            'GALLERY_CATEGORY_PAGING'     => getPaging($objResult->fields['countValue'], $intPos, '&cid='.$intParentId.$this->strCmd, '<b>'.$_ARRAYLANG['TXT_GALLERY'].'</b>',false,intval($_CONFIG['corePagingLimit']))
             ));
         //end category-paging
 
@@ -907,29 +589,71 @@ class Gallery
                     $objSubResult->MoveNext();
                 }
 
-                if (empty($arrCategoryImages[$objResult->fields['id']])) {
-                    // no pictures in this gallery, show the empty-image
-                    $strName     = $arrCategoryLang['name'];
-                    $strDesc    = $arrCategoryLang['desc'];
-                    $strImage     = '<a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$objResult->fields['id'].$this->strCmd.'" target="_self">';
-                    $strImage     .= '<img border="0" alt="'.$arrCategoryLang['name'].'" src="modules/Gallery/View/Media/no_images.gif" /></a>';
-                    $strInfo     = $_ARRAYLANG['TXT_IMAGE_COUNT'].': 0';
-                    $strInfo    .= $showImageSizeOverview ? '<br />'.$_CORELANG['TXT_SIZE'].': 0kB' : '';
-                } else {
-                    $strName    = $arrCategoryLang['name'];
-                    $strDesc    = $arrCategoryLang['desc'];
-                    $strImage     = '<a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery&amp;cid='.$objResult->fields['id'].$this->strCmd.'" target="_self">';
-                    $strImage     .= '<img border="0" alt="'.$arrCategoryLang['name'].'" src="'.$arrCategoryImages[$objResult->fields['id']].'" /></a>';
-                    $strInfo     = $_ARRAYLANG['TXT_IMAGE_COUNT'].': '.$arrCategoryImageCounter[$objResult->fields['id']];
-                    $strInfo    .= $showImageSizeOverview ? '<br />'.$_CORELANG['TXT_SIZE'].': '.$arrCategorySizes[$objResult->fields['id']].'kB' : '';
+                // set default category image
+                $imageSrc =
+                    $imageThumbnailSrc =
+                        'modules/Gallery/View/Media/no_images.gif';
+                $imageCount = 0;
+                $size = 0;
+                if (!empty($arrCategoryImages[$objResult->fields['id']])) {
+                    $imageSrc =
+                        $this->strImageWebPath .
+                        $arrCategoryImages[$objResult->fields['id']];
+                    $imageThumbnailSrc =
+                        $this->strThumbnailWebPath .
+                        $arrCategoryImages[$objResult->fields['id']];
+                    $imageCount =
+                        $arrCategoryImageCounter[$objResult->fields['id']];
+                    $size = $arrCategorySizes[$objResult->fields['id']];
+                }
+
+                $image = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                $image->setAttributes(array(
+                    'border'    => '0',
+                    'alt'       => $arrCategoryLang['name'],
+                    'src'       => $imageThumbnailSrc,
+                ));
+
+                $cmd = '';
+                if (!empty($_GET['cmd'])) {
+                    $cmd = intval($_GET['cmd']);
+                }
+                $url = \Cx\Core\Routing\Url::fromModuleAndCmd(
+                    'Gallery',
+                    $cmd,
+                    '',
+                    array('cid' => $objResult->fields['id'])
+                );
+
+                $categoryLink = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+                $categoryLink->setAttributes(array(
+                    'href'    => $url,
+                    'target'  => '_self',
+                ));
+                $categoryImageLink = clone $categoryLink;
+                $categoryImageLink->addChild($image);
+                $categoryTitle = new \Cx\Core\Html\Model\Entity\TextElement(
+                    $arrCategoryLang['name']
+                );
+                $categoryLink->addChild($categoryTitle);
+
+                $strInfo  = $_ARRAYLANG['TXT_IMAGE_COUNT'] . ': ' . $imageCount;
+                if ($showImageSizeOverview) {
+                    $strInfo .= '<br />' . $_CORELANG['TXT_SIZE'] .
+                        ': ' . $size . 'kB';
                 }
 
                 $this->_objTpl->setVariable(array(
                     'GALLERY_STYLE'                => ($i % 2)+1,
-                    'GALLERY_CATEGORY_NAME'        => $strName,
-                    'GALLERY_CATEGORY_IMAGE'       => $strImage,
+                    'GALLERY_CATEGORY_ID'          => $objResult->fields['id'],
+                    'GALLERY_CATEGORY_NAME'        => $arrCategoryLang['name'],
+                    'GALLERY_CATEGORY_IMAGE'       => $categoryImageLink,
+                    'GALLERY_CATEGORY_IMAGE_PATH'  => $imageSrc,
+                    'GALLERY_CATEGORY_IMAGE_THUMBNAIL_PATH'=> $imageThumbnailSrc,
                     'GALLERY_CATEGORY_INFO'        => $strInfo,
-                    'GALLERY_CATEGORY_DESCRIPTION' => nl2br($strDesc)
+                    'GALLERY_CATEGORY_DESCRIPTION' => nl2br($arrCategoryLang['desc']),
+                    'GALLERY_CATEGORY_LINK'        => $categoryLink,
+                    'GALLERY_CATEGORY_LINK_SRC'    => $url,
                 ));
                 $this->_objTpl->parse('galleryCategoryList');
                 $i++;
@@ -943,10 +667,17 @@ class Gallery
             'GALLERY_JAVASCRIPT'    =>    $this->getJavascript()
             ));
 
-        $objResult = $objDatabase->Execute(
-            "SELECT value FROM ".DBPREFIX."module_gallery_language ".
-            "WHERE gallery_id=$intParentId AND lang_id=$this->langId AND name='desc'");
-        $strCategoryComment = nl2br($objResult->fields['value']);
+        $strCategoryComment = '';
+
+        // set requested page's meta data based on requested category
+        if ($intParentId) {
+            // description of requested category
+            $objResult = $objDatabase->SelectLimit(
+                "SELECT value FROM ".DBPREFIX."module_gallery_language ".
+                "WHERE gallery_id=$intParentId AND lang_id=$this->langId AND name='desc'", 1);
+            $description = $objResult->fields['value'];
+            $strCategoryComment = nl2br($description);
+        }
 
         $objResult = $objDatabase->Execute(
             "SELECT comment,voting FROM ".DBPREFIX."module_gallery_categories ".
@@ -962,193 +693,245 @@ class Gallery
             "ORDER BY sorting");
         $intCount = $objResult->RecordCount();
         $this->_objTpl->setVariable(array(
-            'GALLERY_PAGING'     => getPaging($intCount, $intPos, '&section=Gallery&cid='.$intParentId.$this->strCmd, '<b>'.$_ARRAYLANG['TXT_IMAGES'].'</b>', false, intval($this->arrSettings["paging"]))
+            'GALLERY_PAGING'     => getPaging($intCount, $intPos, '&cid='.$intParentId.$this->strCmd, '<b>'.$_ARRAYLANG['TXT_IMAGES'].'</b>', false, intval($this->arrSettings["paging"]))
         ));
         // end paging
+        $this->_objTpl->setVariable('GALLERY_CATEGORY_COMMENT', $strCategoryComment);
 
         $objResult = $objDatabase->SelectLimit(
-            "SELECT id, path, link, size_show FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE status='1' AND validated='1' AND catid=$intParentId ".
-            "ORDER BY sorting", intval($this->arrSettings["paging"]), $intPos);
+                        'SELECT
+                            p.`id`,
+                            p.`path`,
+                            p.`link`,
+                            p.`size_show`,
+                            pl.`name`,
+                            pl.`desc`
+                        FROM
+                            `'.DBPREFIX.'module_gallery_pictures` AS p
+                        LEFT JOIN
+                            `'. DBPREFIX .'module_gallery_language_pics` AS pl
+                        ON
+                            p.`id` = pl.`picture_id` AND pl.`lang_id` = '. $this->langId .'
+                        WHERE
+                            p.`status`="1" AND p.`validated`="1" AND p.`catid`=' .$intParentId .'
+                        ORDER BY sorting',
+                        intval($this->arrSettings["paging"]),
+                        $intPos);
         if ($objResult->RecordCount() == 0) {
             // No images in the category
             if (empty($strCategoryComment)) {
                 $this->_objTpl->hideBlock('galleryImageBlock');
-            } else {
-                $this->_objTpl->setVariable(array('GALLERY_CATEGORY_COMMENT' =>    $strCategoryComment));
             }
-        } else {
-            $this->_objTpl->setVariable(array('GALLERY_CATEGORY_COMMENT' =>    $strCategoryComment));
-            $intFillLastRow = 1;
-            while (!$objResult->EOF) {
-                $imageVotingOutput = '';
-                $imageCommentOutput = '';
-                $objSubResult = $objDatabase->Execute(
-                    "SELECT p.name, p.desc FROM ".DBPREFIX."module_gallery_language_pics p ".
-                    "WHERE picture_id=".$objResult->fields['id']." AND lang_id=$this->langId LIMIT 1");
 
-// Never used
-//                $imageReso = getimagesize($this->strImagePath.$objResult->fields['path']);
-                $strImagePath = $this->strImageWebPath.$objResult->fields['path'];
-                $imageThumbPath = $this->strThumbnailWebPath.$objResult->fields['path'];
-                $imageFileName = $this->arrSettings['show_file_name'] == 'on' ? $objResult->fields['path'] : '';
-                $imageName = $this->arrSettings['show_names'] == 'on' ? $objSubResult->fields['name'] : '';
-                $imageTitle = $this->arrSettings['show_names'] == 'on' ? $objSubResult->fields['name'] : ($this->arrSettings['show_file_name'] == 'on' ? $objResult->fields['path'] : '');
-                $imageLinkName = $objSubResult->fields['desc'];
-                $imageLink = $objResult->fields['link'];
-                $showImageSize = $this->arrSettings['show_image_size'] == 'on' && $objResult->fields['size_show'];
-                $imageFileSize = ($showImageSize) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
-                $imageLinkOutput = '';
-                $imageSizeOutput = '';
-                $imageTitleTag = '';
+            // ensure detail image block is not parsed
+            if ($this->_objTpl->blockExists('galleryImage')) {
+                $this->_objTpl->hideBlock('galleryImage');
+            }
 
+            return;
+        }
+
+        $placeholders = array(
+            'GALLERY_IMAGE',
+            'GALLERY_IMAGE_LINK',
+            'GALLERY_IMAGE_ID',
+            'GALLERY_IMAGE_TITLE',
+            'GALLERY_IMAGE_PATH',
+            'GALLERY_IMAGE_WIDTH',
+            'GALLERY_IMAGE_HEIGHT',
+            'GALLERY_IMAGE_DETAIL_LINK',
+            'GALLERY_IMAGE_NAME',
+            'GALLERY_IMAGE_DESCRIPTION',
+            'GALLERY_IMAGE_FILESIZE'
+        );
+        $availableImagePlaceholders = array();
+        for ($intPlaceholder = 1;$intPlaceholder <= 10;$intPlaceholder++) {
+            foreach ($placeholders as $placeholder) {
+                if ($this->_objTpl->placeholderExists($placeholder . $intPlaceholder)) {
+                    $availableImagePlaceholders[] = $intPlaceholder;
+                    continue 2;
+                }
+            }
+        }
+        if (!$availableImagePlaceholders) {
+            return;
+        }
+        $intFillPlaceholder   = 1;
+        $fillPlaceholderCount = count($availableImagePlaceholders);
+        while (!$objResult->EOF) {
+            $imageVotingOutput = '';
+            $imageCommentOutput = '';
+
+            $imageReso       = getimagesize($this->strImagePath.$objResult->fields['path']);
+            $strImagePath    = $this->strImageWebPath.$objResult->fields['path'];
+            $imageThumbPath  = $this->strThumbnailWebPath.$objResult->fields['path'];
+            $imageFileName   = $this->arrSettings['show_file_name'] == 'on' ? $objResult->fields['path'] : '';
+            $imageName       = $this->arrSettings['show_names'] == 'on' ? $objResult->fields['name'] : '';
+            $imageLinkName   = $objResult->fields['desc'];
+            $imageDesc       = !empty($objResult->fields['desc']) ? $objResult->fields['desc'] : '-';
+            $imageLink       = $objResult->fields['link'];
+            $showImageSize   = $this->arrSettings['show_image_size'] == 'on' && $objResult->fields['size_show'];
+            $imageFileSize   = ($showImageSize) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
+            $imageSizeOutput = '';
+            $imageTitleTag   = '';
+
+            $intImageHeigth = $intImageWidth  = '';
+            if ($this->arrSettings['image_width'] < $imageReso[0]) {
+                $resizeFactor   = $this->arrSettings['image_width'] / $imageReso[0];
+                $intImageWidth  = $imageReso[0] * $resizeFactor;
+                $intImageHeigth = $imageReso[1] * $resizeFactor;
+            }
+
+            $strImageTitle = '';
+            $showFileName  = $this->arrSettings['show_file_name'] == 'on';
+            if ($showFileName) {
+                $strImageTitle = substr(strrchr($strImagePath, '/'), 1);
                 // chop the file extension if the settings tell us to do so
                 if ($this->arrSettings['show_ext'] == 'off') {
-                    $imageFileName = substr($imageFileName, 0, strrpos($imageFileName, '.'));
+                    $strImageTitle = substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
                 }
+            }
 
-                  if ($this->arrSettings['slide_show'] == 'slideshow') {
-                      $optionValue="slideshowDelay:".$this->arrSettings['slide_show_seconds'];
-                }
-                else {
-                    $optionValue="counterType:'skip',continuous:true,animSequence:'sync'";
-                }
-                //calculation starts here
-                $numberOfChars="60";
-                if($imageLinkName!="") {
-                    if(strlen($imageLinkName) > $numberOfChars) {
-                        $descriptionString="&nbsp;&nbsp;&nbsp;".substr($imageLinkName,0,$numberOfChars);
-                        $descriptionString.=" ...";
-                    }
-                    else {
-                        $descriptionString="&nbsp;&nbsp;&nbsp;".$imageLinkName;
-                    }
-                }
-                else {
-                    $descriptionString="";
-                }
-                //Ends here
+            // chop the file extension if the settings tell us to do so
+            if ($this->arrSettings['show_ext'] == 'off') {
+                $imageFileName = substr($imageFileName, 0, strrpos($imageFileName, '.'));
+            }
 
-                if ($this->arrSettings['show_names'] == 'on' || $this->arrSettings['show_file_name'] == 'on') {
-                    $imageSizeOutput = $imageName;
-                    $imageTitleTag   = $imageName;
-                    if ($this->arrSettings['show_file_name'] == 'on' || $showImageSize) {
-                        $imageData = array();
-                        if ($this->arrSettings['show_file_name'] == 'on') {
-                            if ($this->arrSettings['show_names'] == 'off') {
-                                $imageSizeOutput .= $imageFileName;
-                                $imageTitleTag   .= $imageFileName;
-                            } else {
-                                $imageData[] = $imageFileName;
-                            }
-                        }
+            if ($this->arrSettings['slide_show'] == 'slideshow') {
+                $optionValue = 'slideshowDelay:'. $this->arrSettings['slide_show_seconds'];
+            } else {
+                $optionValue = 'counterType:\'skip\',continuous:true,animSequence:\'sync\'';
+            }
 
-                        if (!empty($imageData)) {
-                            $imageTitleTag .= ' ('.join(' ', $imageData).')';
-                        }
-                        if ($showImageSize) {
-                            // the size of the file has to be shown
-                            $imageData[] = $imageFileSize.' kB';
-                        }
-                        if (!empty($imageData)) {
-                            $imageSizeOutput .= ' ('.join(' ', $imageData).')<br />';
-                        }
-                    }
-                }
-
-                if ($this->arrSettings['enable_popups'] == "on") {
-
-                        $strImageOutput =
-                        '<a rel="shadowbox['.$intParentId.'];options={'.$optionValue.
-                        '}"  title="'.$imageTitleTag.'" href="'.
-                        $strImagePath.'"><img title="'.$imageTitleTag.'" src="'.
-                        $imageThumbPath.'" alt="'.$imageTitleTag.'" /></a>';
-                    /*
-                    $strImageOutput =
-                        '<a rel="shadowbox['.$intParentId.'];options={'.$optionValue.
-                        '}" description="'.$imageLinkName.'" title="'.$titleLink.'" href="'.
-                        $strImagePath.'"><img title="'.$imageName.'" src="'.
-                        $imageThumbPath.'" alt="'.$imageName.'" /></a>';
-                        */
-                } else {
-                    $strImageOutput =
-                        '<a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery'.
-                        $this->strCmd.'&amp;cid='.$intParentId.'&amp;pId='.
-                        $objResult->fields['id'].'">'.'<img  title="'.
-                        $imageTitleTag.'" src="'.$imageThumbPath.'"'.
-                        'alt="'.$imageTitleTag.'" /></a>';
-                }
-
-                if ($this->arrSettings['show_comments'] == 'on' && $boolComment) {
-                    $objSubResult = $objDatabase->Execute(
-                        "SELECT id FROM ".DBPREFIX."module_gallery_comments ".
-                        "WHERE picid=".$objResult->fields['id']);
-                    if ($objSubResult->RecordCount() > 0) {
-                        if ($objSubResult->RecordCount() == 1) {
-                            $imageCommentOutput = '1 '.$_ARRAYLANG['TXT_COMMENTS_ADD_TEXT'].'<br />';
+            if ($this->arrSettings['show_names'] == 'on' || $this->arrSettings['show_file_name'] == 'on') {
+                $imageSizeOutput = $imageName;
+                $imageTitleTag   = $imageName;
+                if ($this->arrSettings['show_file_name'] == 'on' || $showImageSize) {
+                    $imageData = array();
+                    if ($this->arrSettings['show_file_name'] == 'on') {
+                        if ($this->arrSettings['show_names'] == 'off') {
+                            $imageSizeOutput .= $imageFileName;
+                            $imageTitleTag   .= $imageFileName;
                         } else {
-                            $imageCommentOutput = $objSubResult->RecordCount().' '.$_ARRAYLANG['TXT_COMMENTS_ADD_COMMENTS'].'<br />';
+                            $imageData[] = $imageFileName;
                         }
                     }
-                }
 
-                if ($this->arrSettings['show_voting'] == 'on' && $boolVoting) {
-                    $objSubResult = $objDatabase->Execute(
-                        "SELECT mark FROM ".DBPREFIX."module_gallery_votes ".
-                        "WHERE picid=".$objResult->fields["id"]);
-                    if ($objSubResult->RecordCount() > 0) {
-                        $intMark = 0;
-                        while (!$objSubResult->EOF) {
-                            $intMark = $intMark + $objSubResult->fields['mark'];
-                            $objSubResult->MoveNext();
-                        }
-                        $imageVotingOutput = $_ARRAYLANG['TXT_VOTING_SCORE'].'&nbsp;&Oslash;'.number_format(round($intMark / $objSubResult->RecordCount(),1),1,'.','\'').'<br />';
+                    if (!empty($imageData)) {
+                        $imageTitleTag .= ' ('.join(' ', $imageData).')';
+                    }
+                    if ($showImageSize) {
+                        // the size of the file has to be shown
+                        $imageData[] = $imageFileSize.' kB';
+                    }
+                    if (!empty($imageData)) {
+                        $imageSizeOutput .= ' ('.join(' ', $imageData).')<br />';
                     }
                 }
+            }
 
-                if (!empty($imageLinkName)) {
-                    if (!empty($imageLink)) {
-                        $imageLinkOutput = '<a href="'.$imageLink.'" target="_blank">'.$imageLinkName.'</a>';
+            if ($this->arrSettings['enable_popups'] == "on") {
+
+                    $strImageOutput =
+                    '<a rel="shadowbox['.$intParentId.'];options={'.$optionValue.
+                    '}"  title="'.$imageTitleTag.'" href="'.
+                    $strImagePath.'"><img title="'.$imageTitleTag.'" src="'.
+                    $imageThumbPath.'" alt="'.$imageTitleTag.'" /></a>';
+                /*
+                $strImageOutput =
+                    '<a rel="shadowbox['.$intParentId.'];options={'.$optionValue.
+                    '}" description="'.$imageLinkName.'" title="'.$titleLink.'" href="'.
+                    $strImagePath.'"><img title="'.$imageName.'" src="'.
+                    $imageThumbPath.'" alt="'.$imageName.'" /></a>';
+                    */
+            } else {
+                $strImageOutput =
+                    '<a href="'.CONTREXX_DIRECTORY_INDEX.'?section=Gallery'.
+                    $this->strCmd.'&amp;cid='.$intParentId.'&amp;pId='.
+                    $objResult->fields['id'].'">'.'<img  title="'.
+                    $imageTitleTag.'" src="'.$imageThumbPath.'"'.
+                    'alt="'.$imageTitleTag.'" /></a>';
+            }
+
+            if ($this->arrSettings['show_comments'] == 'on' && $boolComment) {
+                $objSubResult = $objDatabase->Execute(
+                    "SELECT id FROM ".DBPREFIX."module_gallery_comments ".
+                    "WHERE picid=".$objResult->fields['id']);
+                if ($objSubResult->RecordCount() > 0) {
+                    if ($objSubResult->RecordCount() == 1) {
+                        $imageCommentOutput = '1 '.$_ARRAYLANG['TXT_COMMENTS_ADD_TEXT'].'<br />';
                     } else {
-                        $imageLinkOutput = $imageLinkName;
-                    }
-                } else {
-                    if (!empty($imageLink)) {
-                        $imageLinkOutput = '<a href="'.$imageLink.'" target="_blank">'.$imageLink.'</a>';
+                        $imageCommentOutput = $objSubResult->RecordCount().' '.$_ARRAYLANG['TXT_COMMENTS_ADD_COMMENTS'].'<br />';
                     }
                 }
+            }
 
-                $this->_objTpl->setVariable(array(
-                    'GALLERY_IMAGE_LINK'.$intFillLastRow => $imageSizeOutput.$imageCommentOutput.$imageVotingOutput.$imageLinkOutput,
-                    'GALLERY_IMAGE'.$intFillLastRow      => $strImageOutput
-                    ));
-
-                if ($intFillLastRow == 3) {
-                    // Parse the data after every third image
-                    $this->_objTpl->parse('galleryShowImages');
-                    $intFillLastRow = 1;
-                } else {
-                    $intFillLastRow++;
+            if ($this->arrSettings['show_voting'] == 'on' && $boolVoting) {
+                $objSubResult = $objDatabase->Execute(
+                    "SELECT mark FROM ".DBPREFIX."module_gallery_votes ".
+                    "WHERE picid=".$objResult->fields["id"]);
+                if ($objSubResult->RecordCount() > 0) {
+                    $intMark = 0;
+                    while (!$objSubResult->EOF) {
+                        $intMark = $intMark + $objSubResult->fields['mark'];
+                        $objSubResult->MoveNext();
+                    }
+                    $imageVotingOutput = $_ARRAYLANG['TXT_VOTING_SCORE'].'&nbsp;&Oslash;'.number_format(round($intMark / $objSubResult->RecordCount(),1),1,'.','\'').'<br />';
                 }
+            }
+            $imageLinkOutput = '';
+            if (!empty($imageLink)) {
+                $imageLinkOutput = '<a href="'.$imageLink.'" target="_blank">'. (!empty($imageLinkName) ? $imageLinkName : $imageLink) .'</a>';
+            } elseif (!empty($imageLinkName)) {
+                $imageLinkOutput = $imageLinkName;
+            }
+
+            if (!$availableImagePlaceholders) {
                 $objResult->MoveNext();
+                continue;
             }
-            if ($intFillLastRow == 2) {
-                $this->_objTpl->setVariable(array(
-                    'GALLERY_IMAGE'.$intFillLastRow      => '',
-                    'GALLERY_IMAGE_LINK'.$intFillLastRow => ''
-                ));
-                $intFillLastRow++;
-            }
-            if ($intFillLastRow == 3) {
-                $this->_objTpl->setVariable(array(
-                    'GALLERY_IMAGE'.$intFillLastRow      => '',
-                    'GALLERY_IMAGE_LINK'.$intFillLastRow => ''
-                ));
+
+            $placeholderNumber = $availableImagePlaceholders[$intFillPlaceholder - 1];
+            $this->_objTpl->setVariable(array(
+                'GALLERY_IMAGE_LINK'.$placeholderNumber         => $imageSizeOutput.$imageCommentOutput.$imageVotingOutput.$imageLinkOutput,
+                'GALLERY_IMAGE'.$placeholderNumber              => $strImageOutput,
+
+                'GALLERY_IMAGE_ID'.$placeholderNumber           => contrexx_raw2xhtml($objResult->fields['id']),
+                'GALLERY_IMAGE_TITLE'.$placeholderNumber        => $strImageTitle,
+                'GALLERY_IMAGE_PATH'.$placeholderNumber         => contrexx_raw2xhtml($strImagePath),
+                'GALLERY_IMAGE_THUMBNAIL_PATH'.$placeholderNumber=>contrexx_raw2xhtml($imageThumbPath),
+                'GALLERY_IMAGE_WIDTH'.$placeholderNumber        => $intImageWidth,
+                'GALLERY_IMAGE_HEIGHT'.$placeholderNumber       => $intImageHeigth,
+                'GALLERY_IMAGE_DETAIL_LINK'.$placeholderNumber  => $this->getPictureDetailLink($intParentId, $objResult->fields['id']),
+                'GALLERY_IMAGE_NAME'.$placeholderNumber         => contrexx_raw2xhtml($objResult->fields['name']),
+                'GALLERY_IMAGE_DESCRIPTION'.$placeholderNumber  => contrexx_raw2xhtml($imageDesc),
+                'GALLERY_IMAGE_FILESIZE'.$placeholderNumber     => ($showImageSize && $showFileName) ? '('. $imageFileSize .' kB)' : '',
+            ));
+
+            if ($intFillPlaceholder == $fillPlaceholderCount) {
+                // Parse the data after current increment reaches placeholder count
                 $this->_objTpl->parse('galleryShowImages');
+                $intFillPlaceholder = 1;
+            } else {
+                $intFillPlaceholder++;
             }
+            $objResult->MoveNext();
+        }
+
+        if (   $intFillPlaceholder != 1 // $intFillPlaceholder == 1, when image count equals to placeholder count
+            && $intFillPlaceholder <= $fillPlaceholderCount
+        ) {
+            // The galleryShowImages block not parsed for the last entry,
+            // so we are calling parse function here
+            $this->_objTpl->parse('galleryShowImages');
         }
 
         $this->_objTpl->parse('galleryCategories');
+
+        // ensure detail image block is not parsed
+        if ($this->_objTpl->blockExists('galleryImage')) {
+            $this->_objTpl->hideBlock('galleryImage');
+        }
     }
 
     /**
@@ -1232,7 +1015,7 @@ END;
     */
     function addComment()
     {
-        global $objDatabase, $objCache;
+        global $objDatabase;
 
         $intPicId    = intval($_POST['frmGalComAdd_PicId']);
         $categoryId = $this->getCategoryId($intPicId);
@@ -1260,7 +1043,7 @@ END;
             $strWWW = '';
         }
 
-        if (!ereg("^.+@.+\\..+$", $strEmail)) {
+        if (!preg_match("/^.+@.+\\..+$/", $strEmail)) {
             $strEmail = '';
         } else {
             $strEmail = htmlspecialchars(strip_tags($strEmail), ENT_QUOTES, CONTREXX_CHARSET);
@@ -1272,9 +1055,9 @@ END;
         {
             $objDatabase->Execute(
                 'INSERT INTO '.DBPREFIX.'module_gallery_comments '.
-                'SET picid='.$intPicId.', date='.time().', ip="'.$_SERVER['REMOTE_ADDR'].'", '.
+                'SET picid='.$intPicId.', date='.time().', '.
                 'name="'.$strName.'", email="'.$strEmail.'", www="'.$strWWW.'", comment="'.$strComment.'"');
-            $objCache->deleteAllFiles();
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteAllFiles();
         }
     }
 
@@ -1310,7 +1093,7 @@ END;
 
         $objResult = $objDatabase->Execute(
             "SELECT id FROM ".DBPREFIX."module_gallery_votes ".
-            "WHERE ip='".$_SERVER['REMOTE_ADDR']."' AND md5='".$strMd5.
+            "WHERE md5='".$strMd5.
             "' AND date > $intVotingCheckTime AND picid=$intPicId LIMIT 1");
         if ($objResult->RecordCount() == 1) {
             $boolIpCheck = false;
@@ -1326,7 +1109,7 @@ END;
             !isset($_COOKIE['Gallery_Voting_'.$intPicId])) {
             $objDatabase->Execute(
                 "INSERT INTO ".DBPREFIX."module_gallery_votes ".
-                "SET picid=$intPicId, date=".time().", ip='".$_SERVER['REMOTE_ADDR']."', ".
+                "SET picid=$intPicId, date=".time().", ".
                 "md5='".$strMd5."', mark=$intMark");
             setcookie('Gallery_Voting_'.$intPicId,$intMark,$intCookieTime, ASCMS_PATH_OFFSET.'/');
             $pageId = \Cx\Core\Core\Controller\Cx::instanciate()->getPage()->getId();
@@ -1404,6 +1187,248 @@ END;
         $objRs = $objDatabase->Execute($query);
         return $objRs->fields['catid'];
     }
+
+    /**
+     * Parse the voting details of the given picture
+     *
+     * @param \Cx\Core\Html\Sigma   $template       Template instance
+     * @param integer               $categoryId     Category id
+     * @param integer               $pictureId      Picture id
+     *
+     * @return null
+     */
+    public function parsePictureVotingTab(\Cx\Core\Html\Sigma $template, $categoryId, $pictureId)
+    {
+        global $_ARRAYLANG, $objDatabase;
+
+        if (!$template->blockExists('votingTab')) {
+            return;
+        }
+        $boolVoting = $this->categoryAllowsVoting($categoryId);
+        if ($this->arrSettings['show_voting'] != 'on' || !$boolVoting) {
+            $template->hideBlock('votingTab');
+            return;
+        }
+
+        $isAlreadyVoted = isset($_COOKIE['Gallery_Voting_'.$pictureId]);
+        if (!$isAlreadyVoted) {
+            for ($i=1;$i<=10;$i++) {
+                $template->setVariable(array(
+                    'VOTING_BAR_SRC'   => \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath() . '/Gallery/View/Media/voting/'.$i.'.gif',
+                    'VOTING_BAR_ALT'   => $_ARRAYLANG['TXT_VOTING_RATE'].': '.$i,
+                    'VOTING_BAR_MARK'  => $i,
+                    'VOTING_BAR_CID'   => $categoryId,
+                    'VOTING_BAR_PICID' => $pictureId
+                ));
+                $template->parse('showVotingBar');
+            }
+        } else {
+            $template->hideBlock('showVotingBar');
+        }
+        $template->setVariable(array(
+            'TXT_VOTING_ALREADY_VOTED'  => $isAlreadyVoted ? $_ARRAYLANG['TXT_VOTING_ALREADY_VOTED'] : '',
+            'VOTING_ALREADY_VOTED_MARK' => $isAlreadyVoted ? contrexx_input2int($_COOKIE['Gallery_Voting_'.$pictureId]) : '',
+        ));
+
+        $objResult = $objDatabase->Execute('SELECT
+                                               `mark`
+                                            FROM
+                                                `'. DBPREFIX .'module_gallery_votes`
+                                            WHERE
+                                                `picid` = '.$pictureId);
+        $intCount = 0;
+        $intMark  = 0;
+        if ($objResult && $objResult->RecordCount() > 0) {
+            while (!$objResult->EOF) {
+                $intCount++;
+                $intMark = $intMark + intval($objResult->fields['mark']);
+                $objResult->MoveNext();
+            }
+        }
+        $template->setVariable(array(
+            'VOTING_STATS_MARK'  => $intCount
+                                      ? number_format(round($intMark / $intCount, 1) ,1, '.', '\'')
+                                      : 0,
+            'VOTING_STATS_VOTES' => $intCount
+        ));
+
+        $template->setVariable(array(
+            'TXT_VOTING_TITLE'        => $_ARRAYLANG['TXT_VOTING_TITLE'],
+            'TXT_VOTING_STATS_ACTUAL' => $_ARRAYLANG['TXT_VOTING_STATS_ACTUAL'],
+            'TXT_VOTING_STATS_WITH'   => $_ARRAYLANG['TXT_VOTING_STATS_WITH'],
+            'TXT_VOTING_STATS_VOTES'  => $_ARRAYLANG['TXT_VOTING_STATS_VOTES'],
+        ));
+    }
+
+    /**
+     * Parse the comment details of the given picture
+     *
+     * @param \Cx\Core\Html\Sigma   $template       Template instance
+     * @param integer               $categoryId     Category id
+     * @param integer               $pictureId      Picture id
+     *
+     * @return null
+     */
+    public function parsePictureCommentsTab(\Cx\Core\Html\Sigma $template, $categoryId, $pictureId)
+    {
+        global $_ARRAYLANG, $objDatabase;
+
+        if (!$template->blockExists('commentTab')) {
+            return;
+        }
+        $boolComment = $this->categoryAllowsComments($categoryId);
+        if ($this->arrSettings['show_comments'] != 'on' || !$boolComment) {
+            $template->hideBlock('commentTab');
+        }
+        $objResult = $objDatabase->Execute('SELECT
+                                                `date`,
+                                                `name`,
+                                                `email`,
+                                                `www`,
+                                                `comment`
+                                            FROM
+                                                `'. DBPREFIX .'module_gallery_comments`
+                                            WHERE
+                                                `picid` = '. contrexx_input2int($pictureId) .'
+                                            ORDER BY `date` ASC');
+
+        if (!$objResult) {
+            return;
+        }
+        $commentsCount = $objResult->RecordCount();
+        $template->setVariable(array(
+            'TXT_COMMENTS_TITLE'        => $commentsCount .'&nbsp;'. $_ARRAYLANG['TXT_COMMENTS_TITLE'],
+            'TXT_COMMENTS_ADD_TITLE'    => $_ARRAYLANG['TXT_COMMENTS_ADD_TITLE'],
+            'TXT_COMMENTS_ADD_NAME'     => $_ARRAYLANG['TXT_COMMENTS_ADD_NAME'],
+            'TXT_COMMENTS_ADD_EMAIL'    => $_ARRAYLANG['TXT_COMMENTS_ADD_EMAIL'],
+            'TXT_COMMENTS_ADD_HOMEPAGE' => $_ARRAYLANG['TXT_COMMENTS_ADD_HOMEPAGE'],
+            'TXT_COMMENTS_ADD_TEXT'     => $_ARRAYLANG['TXT_COMMENTS_ADD_TEXT'],
+            'TXT_COMMENTS_ADD_SUBMIT'   => $_ARRAYLANG['TXT_COMMENTS_ADD_SUBMIT'],
+        ));
+
+        if (!$commentsCount) { // no comments, hide the block
+            $template->hideBlock('showComments');
+            return;
+        }
+        $i     = 0;
+        $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
+        $image = '<img alt="%1$s" src="'. $cx->getCodeBaseModuleWebPath() .'/Gallery/View/Media/%2$s" width="16" height="16" alt="" align="baseline" border="0" />';
+        $pixelImage = sprintf($image, '', 'pixel.gif');
+        while (!$objResult->EOF) {
+            $strWWW   = !empty($objResult->fields['www'])
+                          ? '<a href="'.$objResult->fields['www'].'">'. (sprintf($image, $objResult->fields['www'], 'www.gif')) .'</a>'
+                          : $pixelImage;
+            $strEmail = !empty($objResult->fields['email'])
+                          ? '<a href="mailto:'.$objResult->fields['email'].'">'. (sprintf($image, $objResult->fields['email'], 'email.gif')) .'</a>'
+                          : $pixelImage;
+            $template->setVariable(array(
+                'COMMENTS_NAME'     => html_entity_decode($objResult->fields['name']),
+                'COMMENTS_DATE'     => date($_ARRAYLANG['TXT_COMMENTS_DATEFORMAT'], $objResult->fields['date']),
+                'COMMENTS_WWW'      => $strWWW,
+                'COMMENTS_EMAIL'    => $strEmail,
+                'COMMENTS_TEXT'     => nl2br($objResult->fields['comment']),
+                'COMMENTS_ROWCLASS' => ($i % 2 == 0) ? 1 : 2,
+            ));
+
+            $template->parse('showComments');
+            $objResult->MoveNext();
+            $i++;
+        }
+    }
+
+    /**
+     * Check whether logged user has access to te given category, Redirect to no access when not having access
+     */
+    public function checkAccessToCategory($categoryId)
+    {
+        $categoryProtected = $this->categoryIsProtected($categoryId);
+        if (!$categoryProtected) {
+            return;
+        }
+        if (!\Permission::checkAccess($categoryProtected, 'dynamic', true)) {
+            $link = base64_encode($_SERVER['PHP_SELF'] .'?'. $_SERVER['QUERY_STRING']);
+            \Cx\Core\Csrf\Controller\Csrf::header("Location: ".CONTREXX_DIRECTORY_INDEX."?section=Login&cmd=noaccess&redirect=".$link);
+            exit;
+        }
+    }
+
+    /**
+     * Get the previous and next picture id's
+     *
+     * @param integer $categoryId Category Id
+     * @param integer $pictureId  Picture Id
+     *
+     * @return array Return's the previous and next picture of the given id
+     */
+    public function getPreviousAndNextPicture($categoryId, $pictureId)
+    {
+        $db = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $arrPictures = array();
+
+        // get pictures of the current category
+        $objResult = $db->Execute('
+            SELECT id FROM '.DBPREFIX.'module_gallery_pictures
+            WHERE status=\'1\' AND validated=\'1\' AND catid=' . intval($categoryId) . '
+            ORDER BY sorting, id
+		');
+        while (!$objResult->EOF) {
+            array_push($arrPictures, $objResult->fields['id']);
+            $objResult->MoveNext();
+        }
+        // get next picture id
+        if (array_key_exists(array_search($pictureId, $arrPictures) + 1, $arrPictures)) {
+            $next = $arrPictures[array_search($pictureId, $arrPictures) + 1];
+        } else {
+            $next = $arrPictures[0];
+        }
+        // get previous picture id
+        if (array_key_exists(array_search($pictureId, $arrPictures) - 1, $arrPictures)) {
+            $previous = $arrPictures[array_search($pictureId, $arrPictures) - 1];
+        } else {
+            $previous = end($arrPictures);
+        }
+
+        return array($previous, $next);
+    }
+
+    /**
+     * Parse the category tree into the given page template
+     *
+     * @param \Cx\Core\Html\Sigma $template Template instance
+     */
+    public function parseCategoryTree(\Cx\Core\Html\Sigma $template)
+    {
+        global $_ARRAYLANG;
+
+        if ($this->arrSettings['header_type'] == 'hierarchy') {
+            $categoryTree    = $this->getCategoryTree();
+            $txtCategoryHint = $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_HIERARCHY'];
+        } else {
+            $categoryTree    = $this->getSiblingList();
+            $txtCategoryHint = $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_FLAT'];
+        }
+        $template->setVariable(array(
+            'GALLERY_CATEGORY_TREE'     => $categoryTree,
+            'TXT_GALLERY_CATEGORY_HINT' => $txtCategoryHint,
+        ));
+    }
+
+    /**
+     * Get picture details link of the picture
+     *
+     * @param integer $categoryId Category id
+     * @param integer $pictureId  Picture id
+     *
+     * @return string Link to the picture detail
+     */
+    public function getPictureDetailLink($categoryId, $pictureId)
+    {
+        return \Cx\Core\Routing\Url::fromModuleAndCmd(
+                     'Gallery',
+                     $this->strCmd,
+                     '',
+                     array('cid' => $categoryId, 'pId' => $pictureId)
+                 )->toString();
+    }
 }
 
-?>

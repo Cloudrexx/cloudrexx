@@ -47,13 +47,64 @@ namespace Cx\Core\DataSource\Model\Entity;
 class LegacyDatabaseRepository extends DataSource {
 
     /**
+     * Field list cache
+     * @var array List of fields
+     */
+    protected $fieldList = array();
+
+    /**
+     * Identifier field list cache
+     * @var array List of fields
+     */
+    protected $identifierFieldList = array();
+
+    /**
+     * Returns a list of field names this DataSource consists of
+     * @return array List of field names
+     */
+    public function listFields() {
+        if (!count($this->fieldList)) {
+            $this->initializeFields();
+        }
+        return $this->fieldList;
+    }
+
+    /**
+     * Initialize field caches
+     */
+    protected function initializeFields() {
+        $tableName = DBPREFIX . $this->getIdentifier();
+        $result = $this->cx->getDb()->getAdoDb()->query(
+            'SHOW COLUMNS FROM `' . $tableName . '`'
+        );
+        while (!$result->EOF) {
+            $this->fieldList[] = $result->fields['Field'];
+            if ($result->fields['Key'] == 'PRI') {
+                $this->identifierFieldList[] = $result->fields['Field'];
+            }
+            $result->MoveNext();
+        }
+        return $this->fieldList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        if (!count($this->identifierFieldList)) {
+            $this->initializeFields();
+        }
+        return $this->identifierFieldList;
+    }
+
+    /**
      * Gets one or more entries from this DataSource
      *
      * If an argument is not provided, no restriction is made for this argument.
      * So if this is called without any arguments, all entries of this
      * DataSource are returned.
      * If no entry is found, an empty array is returned.
-     * @param string $elementId (optional) ID of the element if only one is to be returned
+     * @param array $elementId (optional) field=>value-type condition array identifying an entry
      * @param array $filter (optional) field=>value-type condition array, only supports = for now
      * @param array $order (optional) field=>order-type array, order is either "ASC" or "DESC"
      * @param int $limit (optional) If set, no more than $limit results are returned
@@ -63,7 +114,7 @@ class LegacyDatabaseRepository extends DataSource {
      * @return array Two dimensional array (/table) of results (array($row=>array($fieldName=>$value)))
      */
     public function get(
-        $elementId = null,
+        $elementId = array(),
         $filter = array(),
         $order = array(),
         $limit = 0,
@@ -71,21 +122,29 @@ class LegacyDatabaseRepository extends DataSource {
         $fieldList = array()
     ) {
         $tableName = DBPREFIX . $this->getIdentifier();
-
-        // $elementId
         $whereList = array();
-        if (isset($elementId)) {
-            $whereList[] = '`id` = "' . contrexx_raw2db($elementId) . '"';
-        }
 
         // $filter
-        if (count($filter)) {
-            foreach ($filter as $field => $value) {
+        foreach ($filter as $field => $filterExpr) {
+            foreach ($filterExpr as $operation=>$value) {
+                if ($operation != 'eq') {
+                    throw new \InvalidArgumentException(
+                        'Operation "' . $operation . '" is not supported'
+                    );
+                }
                 if (count($fieldList) && !in_array($field, $fieldList)) {
                     continue;
                 }
                 $whereList[] = '`' . contrexx_raw2db($field) . '` = "' . contrexx_raw2db($value) . '"';
             }
+        }
+
+        // $elementId
+        foreach ($elementId as $field => $value) {
+            if (count($fieldList) && !in_array($field, $fieldList)) {
+                continue;
+            }
+            $whereList[] = '`' . contrexx_raw2db($field) . '` = "' . contrexx_raw2db($value) . '"';
         }
 
         // $order
@@ -158,6 +217,7 @@ class LegacyDatabaseRepository extends DataSource {
     /**
      * Updates an existing entry of this DataSource
      * @param string $elementId ID of the element to update
+     * @param array $elementId field=>value-type condition array identifying an entry
      * @param array $data Field=>value-type array. Not all fields are required.
      * @throws \BadMethodCallException ALWAYS! Legacy is not intended to be used for write access!
      */
@@ -167,7 +227,7 @@ class LegacyDatabaseRepository extends DataSource {
 
     /**
      * Drops an entry from this DataSource
-     * @param string $elementId ID of the element to update
+     * @param array $elementId field=>value-type condition array identifying an entry
      * @throws \BadMethodCallException ALWAYS! Legacy is not intended to be used for write access!
      */
     public function remove($elementId) {

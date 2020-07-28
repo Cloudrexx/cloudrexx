@@ -46,107 +46,120 @@ namespace Cx\Core_Modules\Captcha\Controller;
  * @subpackage  coremodule_captcha
  */
 class ReCaptcha implements CaptchaInterface {
-    private $public_key;
-    private $private_key;
+    /**
+     * @var string
+     */
+    private $site_key;
+
+    /**
+     * @var string
+     */
+    private $secret_key;
+
+    /**
+     * @var string
+     */
     private $error = '';
 
-    public function __construct($config)
+    /**
+     * Stores status of CAPTCHA has been successfully validated or not
+     * @var boolean
+     */
+    protected $securityCheck;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-
-        /**
-         * @ignore
-         */
-        \Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/reCAPTCHA/recaptchalib.php');
-
-        $captchaConfig = json_decode($config['coreCaptchaLibConfig'], true);
-
-        if (!isset($captchaConfig['ReCaptcha'])) {
-            return;
-        }
-
-        $reCAPTCHAConfig = $captchaConfig['ReCaptcha'];
-        if (!isset($reCAPTCHAConfig['domains'][$config['domainUrl']])) {
-            return;
-        }
-
-        $reCAPTCHAKeys = $reCAPTCHAConfig['domains'][$config['domainUrl']];
-        $this->public_key = $reCAPTCHAKeys['public_key'];
-        $this->private_key = $reCAPTCHAKeys['private_key'];
+        \Cx\Core\Setting\Controller\Setting::init('Config', 'security');
+        $this->site_key   = \Cx\Core\Setting\Controller\Setting::getValue('recaptchaSiteKey', 'Config');
+        $this->secret_key = \Cx\Core\Setting\Controller\Setting::getValue('recaptchaSecretKey', 'Config');
     }
 
+    /**
+     * Get captcha code
+     *
+     * @param integer $tabIndex
+     *
+     * @return string
+     */
     public function getCode($tabIndex = null)
     {
         $tabIndexAttr = '';
         if (isset($tabIndex)) {
-            $tabIndexAttr = "tabindex=\"$tabIndex\"";
+            $tabIndexAttr = "data-tabindex=\"$tabIndex\"";
         }
 
-        $widget = <<<HTML
-<div id="recaptcha_widget" style="display:none">
-
-    <div id="recaptcha_image"></div>
-    <div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrect please try again</div>
-
-    <span class="recaptcha_only_if_image">Enter the words above:</span>
-    <span class="recaptcha_only_if_audio">Enter the numbers you hear:</span>
-
-    <input type="text" id="recaptcha_response_field" name="recaptcha_response_field" $tabIndexAttr />
-
-    <div>
-        <div>
-            <a title="Get a new challenge" href="javascript:Recaptcha.reload()" id="recaptcha_reload_btn">
-                <img src="http://www.google.com/recaptcha/api/img/clean/refresh.png" id="recaptcha_reload" alt="Get a new challenge" height="18" width="25">
-            </a>
-        </div>
-        <div class="recaptcha_only_if_image">
-            <a title="Get an audio challenge" href="javascript:Recaptcha.switch_type('audio');" id="recaptcha_switch_audio_btn" class="recaptcha_only_if_image">
-                <img src="http://www.google.com/recaptcha/api/img/clean/audio.png" id="recaptcha_switch_audio" alt="Get an audio challenge" height="15" width="25">
-            </a>
-        </div>
-        <div class="recaptcha_only_if_audio">
-            <a title="Get a visual challenge" href="javascript:Recaptcha.switch_type('image');" id="recaptcha_switch_img_btn" class="recaptcha_only_if_audio">
-                <img src="http://www.google.com/recaptcha/api/img/clean/text.png" id="recaptcha_switch_img" alt="Get a visual challenge" height="15" width="25">
-            </a>
-        </div>
-        <div>
-            <a href="javascript:Recaptcha.showhelp()"title="Help" target="_blank" id="recaptcha_whatsthis_btn">
-                <img alt="Help" src="http://www.google.com/recaptcha/api/img/clean/help.png" id="recaptcha_whatsthis" height="16" width="25">
-            </a>
-        </div>
-    </div>
-
-</div>
-
-<script type="text/javascript" src= "http://www.google.com/recaptcha/api/challenge?k=%1\$s"></script>
-<noscript>
-    <iframe src="http://www.google.com/recaptcha/api/noscript?k=%1\$s" height="300" width="500" frameborder="0"></iframe><br />
-    <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
-    <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
-</noscript>
+        $lang   = \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID);
+        $code   = <<<HTML
+<div id="captcha" class="g-recaptcha" data-sitekey="{$this->site_key}" $tabIndexAttr></div>
+<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=$lang"></script>
 HTML;
-        $lang = \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID);
-        //\JS::registerCode("var RecaptchaOptions = { lang : '$lang', theme : 'clean' }");
-        \JS::registerCode("var RecaptchaOptions = { lang : '$lang', theme : 'custom', custom_theme_widget: 'recaptcha_widget' }");
-        //\JS::registerCSS("lib/reCAPTCHA/recaptcha.widget.clean.css");
-        $code = sprintf($widget, $this->public_key);
-        //$code = recaptcha_get_html($this->public_key, $this->error);
         return $code;
     }
 
+    /*
+     * Get captcha validation code
+     *
+     * @return string Returns JS code
+     */
+    public function getJSValidationFn()
+    {
+        $captchaValidationCode = <<<JSCaptchaValidation
+        if (\$J('#captcha').length) {
+            var response = grecaptcha.getResponse();
+            if (response.length == 0) {
+                isCaptchaOk = false;
+            }
+        }
+JSCaptchaValidation;
+        return $captchaValidationCode;
+    }
+
+    /**
+     * Check the captcha code
+     *
+     * @return boolean
+     */
     public function check()
     {
-        $resp = recaptcha_check_answer($this->private_key,
-                                       $_SERVER["REMOTE_ADDR"],
-                                       $_POST["recaptcha_challenge_field"],
-                                       $_POST["recaptcha_response_field"]);
+        if (isset($this->securityCheck)) {
+            return $this->securityCheck;
+        }
 
-        if ($resp->is_valid) {
+        if (function_exists('curl_init')) {
+            $requestMethod = new \ReCaptcha\RequestMethod\CurlPost();
+        } elseif (function_exists('fsockopen')) {
+            $requestMethod = new \ReCaptcha\RequestMethod\SocketPost();
+        } else {
+            $requestMethod = new \ReCaptcha\RequestMethod\Post();
+        }
+
+        $reCaptcha = new \ReCaptcha\ReCaptcha($this->secret_key, $requestMethod);
+        $resp = $reCaptcha->verify($_POST['g-recaptcha-response'], $_SERVER['REMOTE_ADDR']);
+
+        if ($resp->isSuccess()) {
+            $this->securityCheck = true;
             return true;
         }
 
         // set error message
-        $this->error = $resp->error;
+        foreach ($resp->getErrorCodes() as $errorCode) {
+            $this->error .= $errorCode;
+        }
+
+        $this->securityCheck = false;
         return false;
     }
 
+    /**
+     * Disable the captcha check
+     *
+     * @return void
+     */
+    public function disable()
+    {
+        $this->securityCheck = true;
+    }
 }

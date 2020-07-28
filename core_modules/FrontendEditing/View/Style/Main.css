@@ -62,9 +62,9 @@
     position: absolute;
     left: 12px;
     top: 14px;
-    width: 137px;
+    width: 140px;
     height: 25px;
-    background: url("../../../../core/Core/View/Media/login_contrexx_logo.png") no-repeat;
+    background: url("../../../../core/Core/View/Media/login_cloudrexx_logo.png") no-repeat;
     outline: 0;
 }
 
@@ -78,7 +78,6 @@
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     font-size: 13px;
-    height: 20px;
 }
 
 #fe_toolbar_load_draft,

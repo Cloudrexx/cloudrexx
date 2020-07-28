@@ -49,12 +49,20 @@ function accessChangeProtection(triggerLink, nodeId, lang, backend)
 #site-tree .publishing {
     margin-top: 0;
 }
+#modifyGroup2 th.wysiwyg-head {
+	display: none;
+}
+#modifyGroup2 .row3.wysiwyg-title-txt {
+    display: table-row;
+}
+#modifyGroup2 > div > div:last-child > table th,
+cke_editor-basic
 </style>
 <ul id="tabmenu">
 <li><a id="groupTab_modifyGroup1" class="active" href="javascript:void(0);" onclick="selectTab('modifyGroup1')" title="{TXT_ACCESS_GENERAL}">{TXT_ACCESS_GENERAL}</a></li>
 <li><a id="groupTab_modifyGroup2" href="javascript:void(0);" onclick="selectTab('modifyGroup2')" title="{TXT_ACCESS_PERMISSIONS}">{TXT_ACCESS_PERMISSIONS}</a></li>
 </ul>
-<form action="?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" method="post" id="access_group_form" onsubmit="accessSelectAllGroups(document.getElementById('access_group_associated_users'));">
+<form action="?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" method="post" id="access_group_form" onsubmit="accessSelectAllGroups(document.getElementById('access_group_associated_users'));" name="acess_group_form">
 <input type="hidden" name="access_change_protection" value="1" />
 <input type="hidden" name="access_group_type" value="{ACCESS_GROUP_TYPE}" />
   <!-- start modifyGroup1 div -->
@@ -136,6 +144,9 @@ function accessChangeProtection(triggerLink, nodeId, lang, backend)
             <a id="permissionTab_modifyPermission{ACCESS_TAB_NR}" href="javascript:void(0);" onclick="selectTab('modifyPermission{ACCESS_TAB_NR}')" title="{ACCESS_TAB_NAME}">{ACCESS_TAB_NAME}</a>
           </li>
         <!-- END access_permission_tab_menu -->
+        <li>
+            <a id="permissionTab_modifyPermission{ACCESS_WYSIWYG_TAB_NR}" href="javascript:void(0);" onclick="selectTab('modifyPermission{ACCESS_WYSIWYG_TAB_NR}')" title="{TXT_ACCESS_TOOLBARCONFIGURATOR}">{TXT_ACCESS_TOOLBARCONFIGURATOR}</a>
+        </li>
       </ul>
       <!-- END access_permission_tabs_menu -->
       <div id="modifyPermission0" class="permissionTab" style="display:block; clear:left;">
@@ -197,12 +208,17 @@ function accessChangeProtection(triggerLink, nodeId, lang, backend)
           <br />
         </div>
       <!-- END access_permission_tabs -->
+    <!-- BEGIN access_permission_tab_wysiwyg -->
+        <div id="modifyPermission{ACCESS_WYSIWYG_TAB_NR}" class="permissionTab" style="display:none; clear:left;">
+            {ACCESS_PERMISSION_WYSIWYG_TOOLBAR}
+        </div>
+    <!-- END access_permission_tab_wysiwyg -->
     </div>
   </div>
   <div style="clear:left;">
     <br />
     <input type="button" value="{TXT_ACCESS_CANCEL}" name="access_cancel" onclick="window.location.href='index.php?cmd=Access&{CSRF_PARAM}&amp;act=group'" />
-    <input type="submit" name="access_save_group" value="{TXT_ACCESS_SAVE}" />
+    <input type="submit" name="access_save_group" value="{TXT_ACCESS_SAVE}" onclick="prepareConfiguration('acess_group_form')" />
   </div>
 </form>
 <!-- end module_access_group_modify.html -->

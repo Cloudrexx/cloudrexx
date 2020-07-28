@@ -884,6 +884,18 @@ class Attributes
                 $option_name = '';
                 // Valid indices are: 'value', 'price', 'order'
                 $option_price = $arrOptions[$option_id]['price'];
+                if (
+                    in_array(
+                        $objAttribute->getType(),
+                        array(
+                            Attribute::TYPE_UPLOAD_MANDATORY,
+                            Attribute::TYPE_UPLOAD_OPTIONAL
+                        )
+                    )
+                ) {
+                    $option = current($arrOptions);
+                    $option_price = $option['price'];
+                }
                 // Note that this *MUST NOT* test for is_integer()
                 // (which $option_id isn't -- it's either an arbitrary
                 // string, or one that represents a positive integer),

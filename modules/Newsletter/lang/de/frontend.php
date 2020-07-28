@@ -92,6 +92,7 @@ $_ARRAYLANG['TXT_NEWSLETTER_MONTHS_ARRAY'] = "Januar,Februar,März,April,Mai,Jun
 $_ARRAYLANG['TXT_NEWSLETTER_YOUR_DATE_SUCCESSFULLY_UPDATED'] = "Ihre Daten wurden erfolgreich aktualisiert.";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_UPDATE_YOUR_DATA'] = "Beim aktualisieren Ihrer Daten trat ein Fehler auf!";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_ADDING_YOU'] = "Beim hinzufügen zum Newsletter-System trat ein Fehler auf!";
+$_ARRAYLANG['TXT_NEWSLETTER_FAILED_CAPTCHA'] = "Bitte geben Sie den Sicherheitscode ein!";
 $_ARRAYLANG['TXT_NEWSLETTER_AUTHENTICATION_FAILED'] = "Authentifizierung fehlgeschlagen!";
 $_ARRAYLANG['TXT_NEWSLETTER_SUBSCRIPTION_CANCELED_BY_EMAIL'] = "Der Anmeldevorgang wurde abgebrochen, da das Aktivierungsemail nicht gesendet werden konnte!";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_REMOVING_FROM_SYSTEM'] = "Beim löschen Ihrer E-Mail Adresse aus dem Newsletter System trat ein Fehler auf!";
@@ -130,4 +131,5 @@ $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_DATE'] = "Tag";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_MONTH'] = "Monat";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_YEAR'] = "Jahr";
 $_ARRAYLANG['TXT_NEWSLETTER_UNSUBSCRIBE_IF_ONLY_ONE_LIST_ACTIVE'] = "Sie müssen mindestens eine Newsletter-Liste selektieren! Wenn Sie keine Newsletter mehr empfangen möchten, dann können Sie sich vom %s.";
-?>
+$_ARRAYLANG['TXT_NEWSLETTER_NOT_CONFIRM_MSG'] = 'Der Bestätigungslink ist abgelaufen. Bitte melden Sie sich erneut an und öffnen Sie den neuen Bestätigungslink.';
+$_ARRAYLANG['TXT_NEWSLETTER_MAILING_CONFIRM_SUCCESSFUL'] = 'Ihre Zustimmung für den Empfang von E-Mail-Kampagnen wurde gespeichert.';

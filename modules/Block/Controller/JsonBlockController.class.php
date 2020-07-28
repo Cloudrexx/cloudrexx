@@ -102,7 +102,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
      */
     public function getDefaultPermissions()
     {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get'), true);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission();
     }
 
     /**
@@ -115,11 +115,11 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             'getCountries',
             'getBlocks',
             'getBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
-                array('get', 'cli'),
+                array(),
+                array('get', 'cli', 'post'),
                 false
             ),
-            'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('post'), true)
+            'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array('post'))
         );
     }
 
@@ -147,7 +147,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
                 'countries' => $countries
             );
         }
-        $arrCountries = \Cx\Core\Country\Controller\Country::searchByName($term);
+        $arrCountries = \Cx\Core\Country\Controller\Country::searchByName($term,null,false);
         foreach ($arrCountries as $country) {
             $countries[] = array(
                 'id'    => $country['id'],
@@ -198,20 +198,41 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
     public function getBlockContent($params) {
         global $_CORELANG, $objDatabase;
 
+        // whether or not widgets within the block
+        // shall get parsed
+        $parsing = true;
+        if (
+            isset($params['get']['parsing']) &&
+            $params['get']['parsing'] == 'false'
+        ) {
+            $parsing = false;
+        }
+
         // check for necessary arguments
-        if (empty($params['get']['block']) || empty($params['get']['lang'])) {
+        if (
+            empty($params['get']) ||
+            empty($params['get']['block']) ||
+            empty($params['get']['lang'])
+        ) {
             throw new NotEnoughArgumentsException('not enough arguments');
         }
 
         // get id and langugage id
         $id = intval($params['get']['block']);
         $lang = \FWLanguage::getLanguageIdByCode($params['get']['lang']);
+        if (!defined('FRONTEND_LANG_ID')) {
+            if (!$lang) {
+                $lang = 1;
+            }
+            define('FRONTEND_LANG_ID', $lang);
+        }
         if (!$lang) {
             $lang = FRONTEND_LANG_ID;
         }
 
         // database query to get the html content of a block by block id and
         // language id
+        $now = time();
         $query = "SELECT
                       c.content
                   FROM
@@ -221,6 +242,9 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
                   ON c.block_id = b.id
                   WHERE
                       b.id = ".$id."
+                  AND b.`active` = 1
+                  AND (b.`start` <= " . $now . " OR b.`start` = 0)
+                  AND (b.`end` >= " . $now . " OR b.`end` = 0)
                   AND
                       (c.lang_id = ".$lang." AND c.active = 1)";
 
@@ -228,14 +252,47 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
 
         // nothing found
         if ($result === false || $result->RecordCount() == 0) {
-            throw new NoBlockFoundException('no block content found with id: ' . $id);
+            // if we would throw an exception here, then deactivated blocks are not cached
+            return array('content' => '');
+        }
+
+        $content = $result->fields['content'];
+        // abort for returning raw data
+        if (!$parsing) {
+            return $content;
         }
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->parseGlobalPlaceholders($content);
+        $template = new \Cx\Core_Modules\Widget\Model\Entity\Sigma();
+        $template->setTemplate($content);
+        $this->getComponent('Widget')->parseWidgets(
+            $template,
+            'Block',
+            'Block',
+            $id
+        );
+        $content = $template->get();
+
+        // abort for returning raw data
+        if (!$parsing) {
+            return $content;
+        }
+
+        $page = null;
+        if (isset($params['get']['page'])) {
+            $em = $cx->getDb()->getEntityManager();
+            $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+            $page = $pageRepo->find($params['get']['page']);
+        }
+
+        \Cx\Modules\Block\Controller\Block::setBlocks($content, $page);
+
+        \LinkGenerator::parseTemplate($content);
         $ls = new \LinkSanitizer(
             $cx,
             $cx->getCodeBaseOffsetPath() . \Env::get('virtualLanguageDirectory') . '/',
-            $result->fields['content']
+            $content
         );
         return array('content' => $ls->replace());
     }

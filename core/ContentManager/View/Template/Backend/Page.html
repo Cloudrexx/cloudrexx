@@ -57,7 +57,7 @@
                 <span class="icon-info tooltip-trigger hidable_nofallback"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_FALLBACK_INFO}</span>
             </div>
         </div>
-        <div id="type_toggle" class="toggle {TYPE_TOGGLE_CLASS}"><div class="indicator"></div><label>{TXT_CORE_CM_TYPE}</label></div>
+        <div id="type_toggle" class="toggle {TYPE_TOGGLE_CLASS} wysiwyg"><div class="indicator"></div><label>{TXT_CORE_CM_TYPE}</label></div>
         <div id="type_container" class="container" style="{TYPE_DISPLAY_STYLE}">
             <div class="container type_symlink type_hidable">
                 <div class="line small_space">
@@ -69,7 +69,7 @@
                         <a id="page_target_text_symlink" class="page_target_text" href="#" target="_blank"></a>
                     </div>
                     <input type="hidden" id="page_target_backup_symlink" class="page_target_backup" />
-                    {CM_MEDIABROWSER_BUTTON}
+                    {CM_MEDIABROWSER_BUTTON_SYMLINK}
                 </div>
             </div>
             <div class="container type_redirect type_hidable">
@@ -132,8 +132,17 @@
                 <label for="page_metakeys">{TXT_CORE_CM_METAKEYS}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_METAKEYS_INFO}</span>
             </div>
-            <div class="line big_space last">
+            <div class="line big_space">
                 <textarea id="page_metakeys" name="page[metakeys]"></textarea>
+            </div>
+
+            <div class="line small_space">
+                <label for="page_metaimage">{TXT_CORE_CM_METAIMAGE}</label>
+                <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_METAIMAGE_INFO}</span>
+            </div>
+            <div class="line big_space last">
+                <input type="text" maxlength="255" name="page[metaimage]" id="page_metaimage"/>
+                {CORE_CM_METAIMAGE_BUTTON}
             </div>
         </div>
     </div>

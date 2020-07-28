@@ -61,9 +61,10 @@ class MediaDirectoryInputfieldClassification extends \Cx\Modules\MediaDir\Contro
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         $intId = intval($arrInputfield['id']);
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -87,11 +88,11 @@ class MediaDirectoryInputfieldClassification extends \Cx\Modules\MediaDir\Contro
                 }
 
                 if(empty($strValue)) {
-                    $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                    $strValue = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
                 }
 
                 if(!empty($arrInputfield['info'][0])){
-                    $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
+                    $strInfoValue = empty($arrInputfield['info'][$langId]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$langId].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
                 } else {
                     $strInfoValue = null;
@@ -133,27 +134,32 @@ class MediaDirectoryInputfieldClassification extends \Cx\Modules\MediaDir\Contro
                 break;
             case 2:
                 //search View
-                $strValue = $_GET[$intId];
-                $strImagePath = \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath().'/'.$this->moduleName.'/View/Media/';
+                $strValue = isset($_GET[$intId]) ? intval($_GET[$intId]) : null;
                 $intNumPoints = $this->arrSettings['settingsClassificationPoints'];
                 $strFieldName = $this->moduleName."Classification_";
                 $strImageName = $this->moduleName."rClassificationImage_";
+
+                $pathImgClassificationOn = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getWebFilePath(
+                    \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/'.$this->moduleName.'/View/Media/classification_on.png'
+                );
+                $pathImgClassificationOff = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getWebFilePath(
+                    \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/'.$this->moduleName.'/View/Media/classification_off.png'
+                );
 
                 $strInputfield = <<<EOF
 <script type="text/javascript">
 /* <![CDATA[ */
 function classification_$intId(num) {
     var intFieldId = $intId;
-    var strImagePath = '$strImagePath';
     var intNumPoints = $intNumPoints;
     var elmInput = document.getElementById('$strFieldName' + intFieldId);
     var intActualVaule = elmInput.value;
 
     for (i=1;i<=intNumPoints;i++) {
         if(i <= num && intActualVaule != num) {
-            var strImage = strImagePath + 'classification_on.png';
+            var strImage = '$pathImgClassificationOn';
         } else {
-            var strImage = strImagePath + 'classification_off.png';
+            var strImage = '$pathImgClassificationOff';
         }
 
         var elmImage = document.getElementById('$strImageName' + intFieldId + '_' + i);
@@ -172,12 +178,12 @@ EOF;
 
                 for ($i=1;$i<=$intNumPoints;$i++){
                     if($i <= $strValue) {
-                        $strImage = 'classification_on.png';
+                        $strImage = $pathImgClassificationOn;
                     } else {
-                        $strImage = 'classification_off.png';
+                        $strImage = $pathImgClassificationOff;
                     }
 
-                    $strInputfield .= '<img id="'.$this->moduleName.'ClassificationImage_'.$intId.'_'.$i.'" src="'.$strImagePath.$strImage.'" title="'.$arrInputfield['name'][0].' - '.$intValue.'" alt="'.$arrInputfield['name'][0].' - '.$intValue.'" style="cursor: pointer;" onclick="classification_'.$intId.'('.$i.');" />';
+                    $strInputfield .= '<img id="'.$this->moduleName.'ClassificationImage_'.$intId.'_'.$i.'" src="'.$strImage.'" title="'.$arrInputfield['name'][0].' - '.$i.'" alt="'.$arrInputfield['name'][0].' - '.$i.'" style="cursor: pointer;" onclick="classification_'.$intId.'('.$i.');" />';
                 }
 
 
@@ -214,6 +220,38 @@ EOF;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
+        $value = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $intValue = intval($value);
+
+        $pathImgClassificationOn = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getWebFilePath(
+            \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/'.$this->moduleName.'/View/Media/classification_on.png'
+        );
+        $pathImgClassificationOff = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getWebFilePath(
+            \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/'.$this->moduleName.'/View/Media/classification_off.png'
+        );
+
+        $strValue = '';
+        for ($i=1;$i<=$this->arrSettings['settingsClassificationPoints'];$i++){
+            if($i <= $intValue) {
+                $strImage = $pathImgClassificationOn;
+            } else {
+                $strImage = $pathImgClassificationOff;
+            }
+
+            $strValue .= '<img src="'.$strImage.'" title="'.$arrInputfield['name'][0].' - '.$intValue.'" alt="'.$arrInputfield['name'][0].' - '.$intValue.'" />';
+        }
+
+        if(!empty($strValue)) {
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
         global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
@@ -229,27 +267,7 @@ EOF;
             LIMIT 1
         ");
 
-        $intValue = intval($objInputfieldValue->fields['value']);
-
-
-        for ($i=1;$i<=$this->arrSettings['settingsClassificationPoints'];$i++){
-            if($i <= $intValue) {
-                $strImage = 'classification_on.png';
-            } else {
-                $strImage = 'classification_off.png';
-            }
-
-            $strValue .= '<img src="'.\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath().'/'.$this->moduleName.'/View/Media/'.$strImage.'" title="'.$arrInputfield['name'][0].' - '.$intValue.'" alt="'.$arrInputfield['name'][0].' - '.$intValue.'" />';
-        }
-
-        if(!empty($strValue)) {
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
 
 

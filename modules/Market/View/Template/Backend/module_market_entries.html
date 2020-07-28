@@ -50,10 +50,10 @@ function selectMultiAction()
         <th colspan="10">{TXT_CORE_MARKET_TITLE}</th>
     </tr>
   <tr class="row3">
-     <td width="1%" style="text-align: center;">#</th>
+    <td width="1%" style="text-align: center;">#</td>
     <td width="1%" style="text-align: center;"><a href="index.php?cmd=Market&amp;act=entries&amp;sort=id{ENTRY_SORT_ID}" target="_self">ID</a></td>
     <td width="1%" style="text-align: center;"><a href="index.php?cmd=Market&amp;act=entries&amp;sort=status{ENTRY_SORT_ID}" target="_self">{TXT_STATUS}</a></td>
-        <td width="1%">{TXT_CORE_SORTING_ORDER}</td>
+    <td width="1%">{TXT_CORE_SORTING_ORDER}</td>
     <td><a href="index.php?cmd=Market&amp;act=entries&amp;sort=title{ENTRY_SORT_ID}" target="_self">{TXT_MARKET_TITLE}</a></td>
     <td>{TXT_DESC}</td>
     <td><a href="index.php?cmd=Market&amp;act=entries&amp;sort=type{ENTRY_SORT_ID}" target="_self">{TXT_TYP}</a></td>
@@ -63,10 +63,10 @@ function selectMultiAction()
   </tr>
   <!-- BEGIN showEntries -->
   <tr class="row{ENTRY_ROWCLASS}">
-      <td><input type="checkbox" name="selectedEntryId[]" id="selectedEntryId" value="{ENTRY_ID}"></td>
+    <td><input type="checkbox" name="selectedEntryId[]" id="selectedEntryId" value="{ENTRY_ID}"></td>
     <td style="text-align: center;">{ENTRY_ID}</td>
     <td style="text-align: center;"><a href="index.php?cmd=Market&amp;act=statusEntry&amp;id={ENTRY_ID},{ENTRY_STATUS}{ENTRY_SORT_ID_STATUS}" target="_self"><img src="../core/Core/View/Media/icons/{ENTRY_ICON}.gif" border="0" alt="" /></a></td>
-        <td><input type="text" name="entrySortNr[{ENTRY_ID}]" value="{ENTRY_SORT_ORDER}" style="width: 40px;" /></td>
+    <td><input type="text" name="entrySortNr[{ENTRY_ID}]" value="{ENTRY_SORT_ORDER}" style="width: 40px;" /></td>
     <td nowrap="nowrap">{ENTRY_TITLE}</td>
     <td>{ENTRY_DESCRIPTION}</td>
     <td nowrap="nowrap">{ENTRY_TYPE}</td>

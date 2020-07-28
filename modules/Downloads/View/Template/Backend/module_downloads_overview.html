@@ -38,6 +38,15 @@ function downloadsCategoryDoAction(action)
 /* ]]> */
 </script>
 
+<style>
+    #downloads_category_form span:after {
+        content: ' > ';
+    }
+    #downloads_category_form span:last-of-type:after {
+        content: '';
+    }
+</style>
+
 <table width="100%" class="adminlist">
     <tr>
         <th>{TXT_DOWNLOADS_DOWNLOADS}</th>
@@ -47,7 +56,7 @@ function downloadsCategoryDoAction(action)
             <form action="index.php" method="get">
                 <input type="hidden" name="cmd" value="Downloads" />
                 <input type="hidden" name="act" value="downloads" />
-                <input type="text" class="search" name="search_term" value="{DOWNLOADS_SEARCH_TERM}" onfocus="if(this.value=='{TXT_DOWNLOADS_SEARCH_DOWNLOAD}'){this.value='';}" onblur="if(this.value==''){this.value='{TXT_DOWNLOADS_SEARCH_DOWNLOAD}';}" style="width: 240px;" />
+                <input type="text" class="search" name="search_term" placeholder="{TXT_DOWNLOADS_SEARCH_DOWNLOAD}" value="{DOWNLOADS_SEARCH_TERM}" style="width: 240px;" />
                 {DOWNLOADS_CATEGORY_MENU}
                 <input type="submit" value="{TXT_DOWNLOADS_SEARCH}" />
             </form>
@@ -64,7 +73,7 @@ function downloadsCategoryDoAction(action)
                 {TXT_DOWNLOADS_CATEGORIES}
                 {TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY}
                 <!-- BEGIN downloads_category_frontend_link -->
-                <a href="{DOWNLOADS_CATEGORY_FRONTEND_URI}" title="{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}" target="_blank" style="background: url(../core/Core/View/Media/icons/blue_arrow_up.png) no-repeat left center; padding: 1px 0 1px 18px; margin: 0 0 0 20px;">{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}</a>
+                <a href="{DOWNLOADS_CATEGORY_FRONTEND_URI}" title="{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}" target="_blank" style="background: url(../core/Core/View/Media/icons/blue_arrow_up.png) no-repeat left center; padding: 1px 0 1px 18px; margin: 0 0 0 20px; float: right">{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}</a>
                 <!-- END downloads_category_frontend_link -->
             </th>
         </tr>

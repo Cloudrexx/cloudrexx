@@ -77,6 +77,12 @@ class LinkSanitizer {
             # but only those who's values don't start with a slash..
             (?=[^\/])
 
+            # ..and neither start with a SSI-tag
+            (?!<!--\#[a-z]+\s+)
+
+            # ..and neither start with a ESI-tag
+            (?!<esi:)
+
             # ..and neither start with a protocol (http:, ftp:, javascript:, mailto:, etc)
             (?![a-zA-Z]+:)
 
@@ -95,7 +101,7 @@ class LinkSanitizer {
 
         if (!empty($_GET['preview']) || (isset($_GET['appview']) && ($_GET['appview'] == 1))) {
             $content = preg_replace_callback("/
-                (\<(?:a|form)[^>]*?\s+(?:href|action)\s*=\s*)
+                (\<(?:a|form|iframe)[^>]*?\s+(?:href|action|src)\s*=\s*)
                 (['\"])
                 (?!\#)
                 ((?![a-zA-Z]+?:|\\\\).+?)
@@ -121,8 +127,8 @@ class LinkSanitizer {
         // fix empty urls like empty form-action tags
         if (empty($matches[\LinkSanitizer::FILE_PATH])) {
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $this->cx->getRequest()->getUrl() .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $this->cx->getRequest()->getUrl() .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         }
         $testPath = explode('?', $matches[\LinkSanitizer::FILE_PATH], 2);
         if ($testPath[0] == 'index.php' || $testPath[0] == '' || $testPath[0] == './') {
@@ -132,12 +138,20 @@ class LinkSanitizer {
             }
             $ret .= '/';
             if (isset($testPath[1])) {
-                $args = preg_split('/&(amp;)?/', $testPath[1]);
-                $params = array();
-                foreach ($args as $arg) {
-                    $split = explode('=', $arg, 2);
-                    $params[$split[0]] = $split[1];
+                // split it up into the query string and the anchor
+                $qsParts = explode('#', $testPath[1], 2);
+                $anchor = '';
+                if (isset($qsParts[1])) {
+                    $anchor = $qsParts[1];
                 }
+
+                // fix wrong encoding
+                $qs = str_replace('&amp;', '&', $qsParts[0]);
+
+                // parse query string into an array
+                $params = array();
+                parse_str($qs, $params);
+
                 // frontend case
                 if (isset($params['section'])) {
                     $cmd = '';
@@ -148,12 +162,13 @@ class LinkSanitizer {
                     $ret = \Cx\Core\Routing\Url::fromModuleAndCmd($params['section'], $cmd);
                     unset($params['section']);
                     $ret->setParams($params);
+                    $ret->setAnchor($anchor);
                     return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-                    $ret .
-                    $matches[\LinkSanitizer::CLOSE_QUOTE];
-
+                        $ret .
+                        $matches[\LinkSanitizer::CLOSE_QUOTE];
+                } else
                 // backend case
-                } else if (isset($params['cmd'])) {
+                if (isset($params['cmd'])) {
                     $ret .= $params['cmd'];
                     unset($params['cmd']);
                     if (isset($params['act'])) {
@@ -161,19 +176,20 @@ class LinkSanitizer {
                         unset($params['act']);
                     }
                 }
+
+                // re-add query string
                 if (count($params)) {
-                    array_walk(
-                        $params,
-                        function(&$value, $key) {
-                            $value = $key . '=' . $value;
-                        }
-                    );
-                    $ret .= '?' . implode('&', $params);
+                    $ret .= '?' . http_build_query($params, null, '&', PHP_QUERY_RFC3986);
+                }
+
+                // re-add anchor
+                if ($anchor != '') {
+                    $ret .= '#' . $anchor;
                 }
             }
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $ret .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $ret .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else if (
             $localFile = $this->cx->getClassLoader()->getWebFilePath(
                 $this->cx->getCodeBaseDocumentRootPath() . '/' .
@@ -182,14 +198,14 @@ class LinkSanitizer {
         ) {
             // this is an existing file, do not add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $localFile .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $localFile . (isset($testPath[1]) ? '?' . $testPath[1] : '') .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else {
             // this is a link to a page, add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $this->offset .
-            $matches[\LinkSanitizer::FILE_PATH] .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $this->offset .
+                $matches[\LinkSanitizer::FILE_PATH] .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         }
     }
 
@@ -202,14 +218,14 @@ class LinkSanitizer {
      * @return  bool     true if the file exists, otherwise false
      */
     private function fileExists($filePath) {
-        if (file_exists($filePath)) {
+        if (\Env::get('ClassLoader')->getFilePath($filePath)) {
             return true;
         }
 
         $arrUrl = parse_url($filePath);
         if (!empty($arrUrl['path'])
             && substr($arrUrl['path'], -4) !== '.php'
-            && file_exists($arrUrl['path'])) {
+            && \Env::get('ClassLoader')->getFilePath($arrUrl['path'])) {
             return true;
         }
 
@@ -230,7 +246,15 @@ class LinkSanitizer {
         $after  = $matches[4];
 
         if (strpos($value, '?') !== false) {
-            list($path, $query) = explode('?', $value);
+            list($path, $query) = explode('?', $value, 2);
+            // TODO: this is basically wrong as question marks are valid
+            // characters within a query string. See rfc for reference:
+            // https://tools.ietf.org/html/rfc3986#section-3.4
+            // However, this is probably a workaround to fix javascript
+            // code, that wrongly produces infinite redirect loops in
+            // combination with the 'preview' URL argument.
+            // See CLX-1780
+            $query = str_replace('?', '&', $query);
             $query = \Cx\Core\Routing\Url::params2array($query);
         } else {
             $path = $value;

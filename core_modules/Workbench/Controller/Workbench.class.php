@@ -54,15 +54,8 @@ class Workbench {
      */
     public function getFileList() {
         return array(
-            '/core/Core/Data/Skeleton',
-            '/core/Core/Model/Entity/ReflectionComponent.class.php',
             '/core_modules/Workbench',
             '/lib/behat',
-            '/workbench.config',
-            '/workbench',
-            '/workbench.sh',
-            '/workbench.bat',
-            '/testing',
         );
     }
 

@@ -1,0 +1,29 @@
+<h3>{TXT_SHOP_CATEGORIES}</h3>
+<ul id="shop-categories" class="shop-box">
+    <!-- BEGIN shopNavbar -->
+    <li class="{SHOP_CATEGORY_STYLE}">
+        <a href="{NODE_SHOP}?catId={SHOP_CATEGORY_ID}">{SHOP_CATEGORY_NAME}</a>
+    </li>
+    <!-- END shopNavbar -->
+</ul>
+
+<h3>{TXT_SHOP_CART}</h3>
+<ul id="shopJsCart" class="shop-box">
+<!-- BEGIN shopJsCart -->
+    <!-- BEGIN shopJsCartProducts -->
+    <li>{TXT_SHOP_CART_JS_FORMAT_PRODUCT}</li>
+    <!-- END shopJsCartProducts -->
+    <!-- BEGIN shopJsCartTotal -->
+    <li class="total">{TXT_SHOP_CART_JS_FORMAT_TOTAL}</li>
+    <li class="link cart"><a href="{NODE_SHOP_CART}" title="{TXT_SHOP_MAKE_ORDER}">{TXT_SHOP_SHOW_CART}</a></li>
+    <li class="link destroy"><a href="{NODE_SHOP}?act=destroy" title="{TXT_SHOP_NEW_ORDER}">{TXT_SHOP_EMPTY_CART}</a></li>
+    <!-- END shopJsCartTotal -->
+<!-- END shopJsCart -->
+</ul>
+
+<h3>{TXT_SHOP_CURRENCIES}</h3>
+<!-- BEGIN shopCurrencies -->
+<div id="shop-currencies" class="shop-box">
+    {SHOP_CURRENCIES}
+</div>
+<!-- END shopCurrencies -->

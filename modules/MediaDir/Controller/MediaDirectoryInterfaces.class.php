@@ -56,7 +56,7 @@ class MediaDirectoryInterfaces extends MediaDirectoryLibrary
 
     function showImport($step, $objTpl)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_INTERFACES_CONTENT', 'interfaces_content', 'module_'.$this->moduleNameLC.'_interfaces_import.html');
 
@@ -123,7 +123,7 @@ class MediaDirectoryInterfaces extends MediaDirectoryLibrary
 
     function showExport($step, $objTpl)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_INTERFACES_CONTENT', 'interfaces_content', 'module_'.$this->moduleNameLC.'_interfaces_export.html');
 

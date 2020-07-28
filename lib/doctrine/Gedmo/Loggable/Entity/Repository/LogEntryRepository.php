@@ -2,6 +2,8 @@
 
 namespace Gedmo\Loggable\Entity\Repository;
 
+use Doctrine\ORM\Query;
+use Gedmo\Tool\Wrapper\EntityWrapper;
 use Doctrine\ORM\EntityRepository;
 use Gedmo\Loggable\LoggableListener;
 
@@ -10,9 +12,6 @@ use Gedmo\Loggable\LoggableListener;
  * to interact with log entries.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Loggable\Entity\Repository
- * @subpackage LogEntryRepository
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class LogEntryRepository extends EntityRepository
@@ -25,15 +24,16 @@ class LogEntryRepository extends EntityRepository
     private $listener;
 
     /**
-     * Loads all log entries for the
-     * given $entity
+     * Loads all log entries for the given entity
      *
      * @param object $entity
+     *
      * @return array
      */
     public function getLogEntries($entity)
     {
         $q = $this->getLogEntriesQuery($entity);
+
         return $q->getResult();
     }
 
@@ -41,22 +41,23 @@ class LogEntryRepository extends EntityRepository
      * Get the query for loading of log entries
      *
      * @param object $entity
+     *
      * @return Query
      */
     public function getLogEntriesQuery($entity)
     {
-        $objectClass = get_class($entity);
-        $objectMeta = $this->_em->getClassMetadata($objectClass);
+        $wrapped = new EntityWrapper($entity, $this->_em);
+        $objectClass = $wrapped->getMetadata()->name;
         $meta = $this->getClassMetadata();
         $dql = "SELECT log FROM {$meta->name} log";
         $dql .= " WHERE log.objectId = :objectId";
         $dql .= " AND log.objectClass = :objectClass";
         $dql .= " ORDER BY log.version DESC";
 
-        $identifierField = $objectMeta->getSingleIdentifierFieldName();
-        $objectId = $objectMeta->getReflectionProperty($identifierField)->getValue($entity);
+        $objectId = $wrapped->getIdentifier();
         $q = $this->_em->createQuery($dql);
-        $q->setParameters(compact('objectId', 'objectClass', 'order'));
+        $q->setParameters(compact('objectId', 'objectClass'));
+
         return $q;
     }
 
@@ -66,15 +67,18 @@ class LogEntryRepository extends EntityRepository
      * After this operation you will need to
      * persist and flush the $entity.
      *
-     * @param object $entity
+     * @param object  $entity
      * @param integer $version
+     *
      * @throws \Gedmo\Exception\UnexpectedValueException
+     *
      * @return void
      */
     public function revert($entity, $version = 1)
     {
-        $objectClass = get_class($entity);
-        $objectMeta = $this->_em->getClassMetadata($objectClass);
+        $wrapped = new EntityWrapper($entity, $this->_em);
+        $objectMeta = $wrapped->getMetadata();
+        $objectClass = $objectMeta->name;
         $meta = $this->getClassMetadata();
         $dql = "SELECT log FROM {$meta->name} log";
         $dql .= " WHERE log.objectId = :objectId";
@@ -82,8 +86,7 @@ class LogEntryRepository extends EntityRepository
         $dql .= " AND log.version <= :version";
         $dql .= " ORDER BY log.version ASC";
 
-        $identifierField = $objectMeta->getSingleIdentifierFieldName();
-        $objectId = $objectMeta->getReflectionProperty($identifierField)->getValue($entity);
+        $objectId = $wrapped->getIdentifier();
         $q = $this->_em->createQuery($dql);
         $q->setParameters(compact('objectId', 'objectClass', 'version'));
         $logs = $q->getResult();
@@ -100,20 +103,18 @@ class LogEntryRepository extends EntityRepository
                                 $mapping = $objectMeta->getAssociationMapping($field);
                                 $value = $value ? $this->_em->getReference($mapping['targetEntity'], $value) : null;
                             }
-                            $objectMeta->getReflectionProperty($field)->setValue($entity, $value);
+                            $wrapped->setPropertyValue($field, $value);
                             unset($fields[array_search($field, $fields)]);
                         }
                     }
                 }
                 $filled = count($fields) === 0;
             }
-            /* // This needn't throw an exception, see #163 in DoctrineExtensions github 
-            if (count($fields)) {
-                throw new \Gedmo\Exception\UnexpectedValueException('Cound not fully revert the entity to version: '.$version);
-            }
-            */
+            /*if (count($fields)) {
+                throw new \Gedmo\Exception\UnexpectedValueException('Could not fully revert the entity to version: '.$version);
+            }*/
         } else {
-            throw new \Gedmo\Exception\UnexpectedValueException('Count not find any log entries under version: '.$version);
+            throw new \Gedmo\Exception\UnexpectedValueException('Could not find any log entries under version: '.$version);
         }
     }
 
@@ -121,6 +122,7 @@ class LogEntryRepository extends EntityRepository
      * Get the currently used LoggableListener
      *
      * @throws \Gedmo\Exception\RuntimeException - if listener is not found
+     *
      * @return LoggableListener
      */
     private function getLoggableListener()
@@ -142,6 +144,7 @@ class LogEntryRepository extends EntityRepository
                 throw new \Gedmo\Exception\RuntimeException('The loggable listener could not be found');
             }
         }
+
         return $this->listener;
     }
 }

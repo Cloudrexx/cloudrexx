@@ -29,7 +29,7 @@
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Cx\Core\User\Model\Entity\ProfileTitle
+ * \Cx\Core\User\Model\Entity\ProfileTitle
  */
 class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
@@ -48,7 +48,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     private $orderId;
 
     /**
-     * @var Cx\Core\User\Model\Entity\UserProfile
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $userProfile;
 
@@ -110,7 +110,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
      * Add userProfile
      *
-     * @param Cx\Core\User\Model\Entity\UserProfile $userProfile
+     * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
      */
     public function addUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
     {
@@ -118,9 +118,19 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove userProfile
+     *
+     * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
+     */
+    public function removeUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
+    {
+        $this->userProfile->removeElement($userProfile);
+    }
+
+    /**
      * Get userProfile
      *
-     * @return Doctrine\Common\Collections\Collection $userProfile
+     * @return \Doctrine\Common\Collections\Collection $userProfile
      */
     public function getUserProfile()
     {

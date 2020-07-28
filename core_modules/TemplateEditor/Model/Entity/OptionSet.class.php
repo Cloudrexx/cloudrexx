@@ -34,7 +34,7 @@ use Cx\Core_Modules\TemplateEditor\Model\PresetRepositoryException;
 use Cx\Core_Modules\TemplateEditor\Model\Repository\PresetRepository;
 use Cx\Core_Modules\TemplateEditor\Model\YamlSerializable;
 use Cx\Core\Html\Sigma;
-use Symfony\Component\Yaml\ParserException;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
  * Class ThemeOptionNotFoundException
@@ -125,7 +125,7 @@ class OptionSet extends \Cx\Model\Base\EntityBase implements YamlSerializable
             );
         } catch (PresetRepositoryException $e) {
             $this->activePreset = $this->presetRepository->getByName('Default');
-        } catch (ParserException $e) {
+        } catch (ParseException $e) {
             $this->activePreset = $this->presetRepository->getByName('Default');
         }
 
@@ -308,7 +308,7 @@ class OptionSet extends \Cx\Model\Base\EntityBase implements YamlSerializable
         $data = $this->data;
         foreach ($data['options'] as &$emptyOption) {
             if ($presetOption = $preset->getOption($emptyOption['name'])) {
-                if (!is_array($emptyOption['specific'])) {
+                if (!isset($emptyOption['specific']) || !is_array($emptyOption['specific'])) {
                     $emptyOption['specific'] = array();
                 }
                 $emptyOption['specific'] = array_merge(

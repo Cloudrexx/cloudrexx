@@ -20,10 +20,10 @@ var switchState = function(id, obj, action, type)
         },
         success: function() {
             if (action) {
-                path = '../core/Core/View/Media/icons/status_green.gif';
+                path = cx.variables.get('basePath', 'contrexx') + 'core/Core/View/Media/icons/status_green.gif';
                 action = 0;
             } else {
-                path = '../core/Core/View/Media/icons/status_red.gif';
+                path = cx.variables.get('basePath', 'contrexx') + 'core/Core/View/Media/icons/status_red.gif';
                 action = 1;
             }
             $J(obj).children('img:first').attr('src', path);

@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
 
 
 </script>
-<form name="formEntry" enctype="multipart/form-data" method="post" action="?cmd=Market&amp;act={FORM_ACTION}" onsubmit="return CheckForm()">
+<form name="formEntry" enctype="multipart/form-data" method="post" action="index.php?cmd=Market&amp;act={FORM_ACTION}" onsubmit="return CheckForm()">
 <input type="hidden" name="id" value="{ENTRY_ID}">
 <input type="hidden" name="picOld" value="{ENTRY_PICTURE_OLD}">
 <input type="hidden" name="userid" value="{ENTRY_ADDEDBY_ID}">
@@ -90,7 +90,7 @@ jQuery(document).ready(function ($) {
       <td><input type="text" name="title" style="width: 300px;" maxlength="100" value="{ENTRY_TITLE}" ></td>
     </tr>
     <tr valign="top" class="row1">
-      <td nowrap="nowrap" width="150">{TXT_MARKET_COLOR}</font></td>
+      <td nowrap="nowrap" width="150">{TXT_MARKET_COLOR}</td>
       <td><input type="text" name="color" style="width: 300px;" maxlength="100" value="{ENTRY_COLOR}" ></td>
     </tr>
     <tr valign="top" class="row2">
@@ -103,41 +103,49 @@ jQuery(document).ready(function ($) {
         <input type="button" id='file_upload' value="{TXT_MARKET_CHOOSE_FILE}"/>
         <input type="hidden" value="{MARKET_UPLOADER_ID}" name="marketUploaderId" />
       </td>
+	</tr>
     <tr valign="top" class="row2">
       <td nowrap="nowrap" width="150">{TXT_CATEGORIE}<font color="red"> *</font></td>
       <td><select name="cat"  style="width: 305px;">{CATEGORIES}</select></td>
+	</tr>
     <tr valign="top" class="row1">
       <td nowrap="nowrap" width="150">{TXT_PRICE}<font color="red"> *</font></td>
       <td><input type="text" name="price" style="width: 58px;" maxlength="100" value="{ENTRY_PRICE}">&nbsp;&nbsp;<input type="checkbox" name="forfree" value="1" {ENTRY_FOR_FREE}/>&nbsp;{TXT_FOR_FREE}&nbsp;<input type="checkbox" name="agreement" value="1" {ENTRY_AGREEMENT}/>&nbsp;{TXT_AGREEMENT}</td>
+	</tr>
     <!-- BEGIN end_date_dropdown -->
     <tr valign="top" class="row2">
       <td nowrap="nowrap" width="150">{TXT_END_DATE}<font color="red"> *</font></td>
       <td><select name="days" style="width: 60px;">{DAYS_ONLINE}</select>&nbsp;&nbsp;{TXT_DAYS}</td>
+	</tr>
     <!-- END end_date_dropdown -->
     <tr valign="top" class="row1">
       <td nowrap="nowrap" width="150">{TXT_PREMIUM}</td>
       <td><input type="checkbox" name="premium" value="1" {ENTRY_PREMIUM} /></td>
+	</tr>
     <tr valign="top" class="row2">
       <td nowrap="nowrap" width="150">{TXT_ADDED_BY}<font color="red"> *</font></td>
       <td><input type="text" name="addedby" style="width: 300px;" maxlength="100" value="{ENTRY_ADDEDBY}"></td>
+	</tr>
     <tr valign="top" class="row1">
       <td nowrap="nowrap" width="150">{TXT_NAME}<font color="red"> *</font></td>
       <td><input type="text" name="name" style="width: 300px;" maxlength="100" value="{ENTRY_NAME}"></td>
+    </tr>
     <tr valign="top" class="row2">
       <td nowrap="nowrap" width="150">{TXT_MARKET_EMAIL}<font color="red"> *</font></td>
       <td><input type="text" name="email" style="width: 300px;" maxlength="100" value="{ENTRY_E-MAIL}"></td>
+	</tr>
     <tr valign="top" class="row1">
       <td nowrap="nowrap" width="150">{TXT_USER_DETAIL}<font color="red"> *</font></td>
       <td>
         <input type="radio" name="userdetails" value="1" {ENTRY_USERDETAILS_ON} />&nbsp;{TXT_DETAIL_SHOW}
         <input type="radio" name="userdetails" value="0" {ENTRY_USERDETAILS_OFF} />&nbsp;{TXT_DETAIL_HIDE}
       </td>
-    </td>
+    </tr>
     <!-- BEGIN spez_fields -->
     <tr valign="top" class="{SPEZ_FIELD_ROW_CLASS}">
       <td nowrap="nowrap" width="150">{TXT_SPEZ_FIELD_NAME}</td>
       <td>{SPEZ_FIELD_INPUT}</td>
-    </td>
+    </tr>
     <!-- END spez_fields -->
   </table>
   <br />

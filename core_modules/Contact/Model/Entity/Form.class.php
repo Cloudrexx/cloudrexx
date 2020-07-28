@@ -84,6 +84,11 @@ class Form {
     /**
      * @var bool
      */
+    protected $sendMultipleReply;
+
+    /**
+     * @var bool
+     */
     protected $useEmailOfSender;
 
     /**
@@ -114,6 +119,7 @@ class Form {
         $this->useCustomStyle = false;
         $this->saveDataInCrm = false;
         $this->sendCopy = false;
+        $this->sendMultipleReply = false;
         $this->useEmailOfSender = false;
         $this->htmlMail = true;
         $this->sendAttachment = false;
@@ -181,6 +187,15 @@ class Form {
      */
     public function setSendCopy($sendCopy) {
         $this->sendCopy = $sendCopy;
+    }
+
+    /**
+     * Set sendMultipleReply
+     *
+     * @param boolean $sendMultipleReply
+     */
+    public function setSendMultipleReply($sendMultipleReply) {
+        $this->sendMultipleReply = $sendMultipleReply;
     }
 
     /**
@@ -271,6 +286,15 @@ class Form {
      */
     public function getSendCopy() {
         return $this->sendCopy;
+    }
+
+    /**
+     * Get sendMultipleReply
+     *
+     * return boolean $sendMultipleReply
+     */
+    public function getSendMultipleReply() {
+        return $this->sendMultipleReply;
     }
 
     /**

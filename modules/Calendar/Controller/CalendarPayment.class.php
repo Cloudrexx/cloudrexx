@@ -65,7 +65,12 @@ class CalendarPayment {
             'CURRENCY'  => $data['currency'],
             'PARAMPLUS' => "section=Calendar&cmd=success&handler=yellowpay",
         );
-        $arrSettings = array();
+        $arrSettings = array(
+            'postfinance_shop_id'            => array(),
+            'postfinance_hash_signature_in'  => array(),
+            'postfinance_authorization_type' => array(),
+            'postfinance_use_testserver'     => array(),
+        );
         $arrSettings['postfinance_shop_id']['value']            = $arrCalendarSettings['paymentYellowpayPspid'];
         $arrSettings['postfinance_hash_signature_in']['value']  = $arrCalendarSettings['paymentYellowpayShaIn'];
         $arrSettings['postfinance_authorization_type']['value'] = $arrCalendarSettings['paymentYellowpayAuthorization'] == 0 ? 'SAL' : 'RES';

@@ -257,12 +257,12 @@ class Login
     *
     * @access private
     * @global array
-    * @see cmsSession::cmsSessionStatusUpdate(), contrexx_strip_tags, \Cx\Core\Html\Sigma::get()
+    * @see \Cx\Core\Session\Model\Entity\Session::cmsSessionStatusUpdate(), contrexx_strip_tags, \Cx\Core\Html\Sigma::get()
     * @return string \Cx\Core\Html\Sigma::get()
     */
     function _login()
     {
-        global $_CORELANG, $sessionObj;
+        global $_CORELANG;
 
         $objFWUser = \FWUser::getFWUserObject();
 
@@ -289,7 +289,8 @@ class Login
             ) {
                 $objFWUser->objUser->reset();
                 $objFWUser->logoutAndDestroySession();
-                $sessionObj = \cmsSession::getInstance();
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $cx->getComponent('Session')->getSession();
             } elseif (isset($_POST['login'])) {
                 $_GET['relogin'] = 'true';
             }
@@ -339,8 +340,21 @@ class Login
             'TXT_LOGIN_REMEMBER_ME' => $_CORELANG['TXT_CORE_REMEMBER_ME'],
             'TXT_PASSWORD_LOST'     => $_CORELANG['TXT_PASSWORD_LOST'],
             'LOGIN_REDIRECT'        => $redirect,
-            'LOGIN_STATUS_MESSAGE'  => $this->_statusMessage,
         ));
+        if ($this->_objTpl->blockExists('login_status_message')) {
+            if (empty($this->_statusMessage)) {
+                $this->_objTpl->hideBlock('login_status_message');
+            } else {
+                $this->_objTpl->setVariable(
+                    'LOGIN_STATUS_MESSAGE', $this->_statusMessage
+                );
+                $this->_objTpl->parse('login_status_message');
+            }
+        } else {
+            $this->_objTpl->setVariable(
+                'LOGIN_STATUS_MESSAGE', $this->_statusMessage
+            );
+        }
         return $this->_objTpl->get();
     }
 

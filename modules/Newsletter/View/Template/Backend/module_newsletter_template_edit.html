@@ -96,7 +96,7 @@ function newsImportDirectoryDisplay(selected) {
     </tr>
     <tr class="row2">
       <td width="15%">{TXT_NEWSLETTER_COUNTRY}</td>
-      <td width="85%">[[country]]</td>
+      <td width="85%">[[country]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
     </tr>
     <tr class="row1">
       <td width="15%">{TXT_NEWSLETTER_PHONE}</td>
@@ -104,7 +104,7 @@ function newsImportDirectoryDisplay(selected) {
     </tr>
     <tr class="row2">
       <td width="15%">{TXT_NEWSLETTER_BIRTHDAY}</td>
-      <td width="85%">[[birthday]]</td>
+      <td width="85%">[[birthday]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
     </tr>
     <tr class="row1">
       <td colspan="2">&nbsp;</td>
@@ -171,8 +171,16 @@ function newsImportDirectoryDisplay(selected) {
       <td width="85%">[[profile_setup]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
     </tr>
     <tr class="row1">
+      <td width="15%" nowrap>{TXT_NEWSLETTER_PROFILE_SETUP} (URL)</td>
+      <td width="85%">[[profile_setup_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+    </tr>
+    <tr class="row2">
       <td width="15%" nowrap>{TXT_NEWSLETTER_UNSUBSCRIBE} (Link)</td>
       <td width="85%">[[unsubscribe]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+    </tr>
+    <tr class="row1">
+      <td width="15%" nowrap>{TXT_NEWSLETTER_UNSUBSCRIBE} (URL)</td>
+      <td width="85%">[[unsubscribe_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
     </tr>
     <tr class="row2">
       <td width="15%" nowrap>{TXT_NEWSLETTER_DATE}</td>

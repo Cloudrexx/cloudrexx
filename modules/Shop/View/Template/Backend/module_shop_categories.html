@@ -24,6 +24,7 @@
   style="display:{SHOP_CATEGORY_LIST_DISPLAY};">
   <form name="selectCat" method="post"
       action="index.php?cmd=Shop{MODULE_INDEX}&amp;act=categories">
+    <input type="hidden" name="delete_products" id="shop_delete_products" value="0" />
     <table width="100%" cellspacing="0" cellpadding="2" border="0" class="adminlist">
       <tr>
         <th colspan="6">{TXT_CATEGORIES}&nbsp;({TXT_TOTAL}&nbsp;{SHOP_TOTAL_CATEGORIES})</th>
@@ -186,6 +187,15 @@
       </tr>
       <tr class="row1">
         <td>
+          <label for="short">{TXT_SHOP_CATEGORY_SHORT_DESCRIPTION}</label>
+        </td>
+        <td>
+          <textarea rows="5" id="short" name="short" style="width: 300px;"
+          >{SHOP_CATEGORY_SHORT_DESCRIPTION}</textarea>
+        </td>
+      </tr>
+      <tr class="row1">
+        <td>
           <label for="desc">{TXT_SHOP_CATEGORY_DESCRIPTION}</label>
         </td>
         <td>
@@ -215,8 +225,10 @@
 <script type="text/javascript">
 // <![CDATA[
 function deleteCategory(id) {
-  if (confirm('{TXT_CONFIRM_DELETE_SHOP_CATEGORIES}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-    window.location.replace("index.php?{CSRF_PARAM}&cmd=Shop{MODULE_INDEX}&act=categories&delete_category_id="+id);
+    if (confirm('{TXT_SHOP_CONFIRM_DELETE_CATEGORY}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+        var delAssociatedProducts = cx.ui.confirm('{TXT_SHOP_CONFIRM_DELETE_ASSOCIATED_PRODUCTS}');
+        window.location.replace("index.php?{CSRF_PARAM}&cmd=Shop{MODULE_INDEX}&act=categories&delete_category_id="+id+"&delete_products="+(delAssociatedProducts ? '1' : '0'));
+    }
 }
 function toggleCategory(id) {
   window.location.replace("index.php?{CSRF_PARAM}&cmd=Shop{MODULE_INDEX}&act=categories&toggle_category_id="+id);
@@ -225,7 +237,9 @@ function shopCatDoAction(strForm, strCheckbox, objSelect, strAct) {
   if (checkboxIsChecked(strForm, strCheckbox)) {
     switch (strAct) {
       case 'del':
-        if (confirm('{TXT_CONFIRM_DELETE_SHOP_CATEGORIES}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+        if (confirm('{TXT_SHOP_CONFIRM_DELETE_CATEGORIES}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+            var delAssociatedProducts = cx.ui.confirm('{TXT_SHOP_CONFIRM_DELETE_ASSOCIATED_PRODUCTS}');
+            jQuery('#shop_delete_products').val(delAssociatedProducts ? '1' : '0');
 //          document.forms[strForm].action = "index.php?cmd=Shop{MODULE_INDEX}&act=categories";
           document.forms[strForm].submit();
         }

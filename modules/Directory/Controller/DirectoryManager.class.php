@@ -58,9 +58,6 @@ class DirectoryManager extends DirectoryLibrary
     var $strOkMessage = '';
     var $_selectedLang;
     var $langId;
-    var $categories = array();
-    var $getLevels = array();
-    var $getCategories = array();
     var $getPlatforms = array();
     var $getLanguages = array();
     var $getCantons = array();
@@ -145,11 +142,9 @@ class DirectoryManager extends DirectoryLibrary
         // general module access check
         \Permission::checkAccess(59, 'static');
 
-        if (!isset($_GET['act'])) {
-            $_GET['act']="";
-        }
+        $this->act = isset($_GET['act']) ? $_GET['act'] : '';
 
-        switch($_GET['act']) {
+        switch($this->act) {
             case "add":
                 \Permission::checkAccess(97, 'static');
                 $this->addCategorie();
@@ -189,7 +184,9 @@ class DirectoryManager extends DirectoryLibrary
                 break;
             case "files":
                 \Permission::checkAccess(96, 'static');
-                $this->showFiles(intval($_GET['cat']), intval($_GET['level']));
+                $catId   = isset($_GET['cat']) ? contrexx_input2int($_GET['cat']) : 0;
+                $levelId = isset($_GET['level']) ? contrexx_input2int($_GET['level']) : 0;
+                $this->showFiles($catId, $levelId);
                 break;
             case "delfile":
                 \Permission::checkAccess(94, 'static');
@@ -268,7 +265,7 @@ class DirectoryManager extends DirectoryLibrary
             'ADMIN_CONTENT'             => $this->_objTpl->get(),
             'CONTENT_TITLE'             => $this->pageTitle,
         ));
-        $this->act = $_REQUEST['act'];
+
         $this->setNavigation();
         return $this->_objTpl->get();
     }
@@ -820,6 +817,7 @@ class DirectoryManager extends DirectoryLibrary
         $i= 0;
         $parentId= 0;
 
+        $padding = 0;
         //shows all level 1 categories
         if (in_array(0, $this->categories['parentid'])) {
             foreach($this->categories['name'] as $catKey => $catName) {
@@ -1053,8 +1051,8 @@ class DirectoryManager extends DirectoryLibrary
         $catCategorie       = intval($_POST['category']);
         $catName            = contrexx_strip_tags($_POST['name']);
         $catDescription     = contrexx_strip_tags($_POST['description']);
-        $catMetadesc        = contrexx_strip_tags($_POST['metadesc']);
-        $catMetakeys        = contrexx_strip_tags($_POST['metakeys']);
+        $catMetadesc        = isset($_POST['metadesc']) ? contrexx_strip_tags($_POST['metadesc']) : '';
+        $catMetakeys        = isset($_POST['metakeys']) ? contrexx_strip_tags($_POST['metakeys']) : '';
         $catShowEntries     = contrexx_strip_tags($_POST['showentries']);
 
         //insert into database
@@ -1916,15 +1914,16 @@ EOF;
             }
         }
 
+        $db   = '';
+        $term = isset($_REQUEST['term']) ? htmlspecialchars($_REQUEST['term'], ENT_QUOTES, CONTREXX_CHARSET) : '';
         if ($catId != '') {
             $where  = " AND files.id = rel_cat.dir_id AND rel_cat.cat_id = '".$catId."'";
             $db     = DBPREFIX."module_directory_rel_dir_cat AS rel_cat,";
         } elseif ($levelId != '') {
             $where=" AND files.id = rel_level.dir_id AND rel_level.level_id = '".$levelId."'";
             $db     = DBPREFIX."module_directory_rel_dir_level AS rel_level,";
-        } elseif ($_REQUEST['term']) {
+        } elseif (!empty($term)) {
             //search term
-            $term= htmlspecialchars($_REQUEST['term'], ENT_QUOTES, CONTREXX_CHARSET);
             $where.=" AND (files.title LIKE '%".$term."%' OR files.searchkeys LIKE '%".$term."%' OR files.description LIKE '%".$term."%') ";
         }
         else {
@@ -1948,7 +1947,7 @@ EOF;
         $pagingLimit    = intval($this->settings['pagingLimit']['value']);
         $objResult      = $objDatabase->Execute($query);
         $count          = $objResult->RecordCount();
-        $pos            = intval($_GET['pos']);
+        $pos            = isset($_GET['pos']) ? contrexx_input2int($_GET['pos']) : 0;
         $paging         = getPaging($count, $pos, "&cmd=Directory&act=files&term=".$term.$catIdSort.$levelIdSort, "<b>".$_ARRAYLANG['TXT_DIRECTORY_FEEDS']."</b>", true, $pagingLimit);
         ////// paging end /////////
 
@@ -1957,16 +1956,18 @@ EOF;
 
         $i=0;
         if ($objResult !== false) {
-            while (!$objResult->EOF)
-            {
-                $file_array[$i]['filename']=$objResult->fields['filename'];
-                $file_array[$i]['title']=$objResult->fields['title'];
-                $file_array[$i]['id']=$objResult->fields['id'];
-                $file_array[$i]['description']=$objResult->fields['description'];
-                $file_array[$i]['hits']=$objResult->fields['hits'];
-                $file_array[$i]['spez']=$objResult->fields['spezial'];
-                $file_array[$i]['date']=$objResult->fields['date'];
-                $file_array[$i]['addedby']=$objResult->fields['addedby'];
+            $file_array = array();
+            while (!$objResult->EOF) {
+                $file_array[$i] = array(
+                    'filename' => $objResult->fields['filename'],
+                    'title'    => $objResult->fields['title'],
+                    'id'       => $objResult->fields['id'],
+                    'description' => $objResult->fields['description'],
+                    'hits'     => $objResult->fields['hits'],
+                    'spez'     => $objResult->fields['spezial'],
+                    'date'     => $objResult->fields['date'],
+                    'addedby'  => $objResult->fields['addedby'],
+                );
                 $i++;
                 $objResult->MoveNext();
             }
@@ -1976,12 +1977,13 @@ EOF;
         $this->_objTpl->setCurrentBlock('filesRow');
         if (!empty($file_array))
         {
+            $catName = '';
             //show files
             foreach ($file_array as $file)
             {
 
                 //get categorie name
-                $catId          = $file['catid'];
+                $catId          = isset($file['catid']) ? $file['catid'] : '';
 
                 $objResult_Name = $objDatabase->Execute("SELECT id, name FROM ".DBPREFIX."module_directory_categories WHERE id='".$catId."'");
                 if ($objResult_Name !== false) {
@@ -2130,9 +2132,6 @@ EOF;
             'CATEGORY_SELECTED'         => $categorieSe,
             'LEVEL_DESELECTED'          => $levelDe,
             'LEVEL_SELECTED'            => $levelSe,
-            'OS'                        => $platforms,
-            'IP'                        => $dirIp,
-            'HOST'                      => $dirProvider,
             'ID'                        => $id,
             'TXT_DIRECTORY_SPEZ_SORT'   => $_ARRAYLANG['TXT_DIRECTORY_SPEZ_SORT'],
             'TXT_DIRECTORY_SORT'        => $_ARRAYLANG['TXT_DIRECTORY_SORT'],
@@ -2215,7 +2214,8 @@ EOF;
 
         // Sort
         if (isset($_GET['sort']) || empty($_SESSION['order'])) {
-            switch ($_GET['sort'])
+            $getSort = isset($_GET['sort']) ? $_GET['sort'] : '';
+            switch ($getSort)
             {
                 case 'date':
                 $_SESSION['order']=($_SESSION['order']=="files.date desc")? "files.date asc" : "files.date desc";
@@ -2236,7 +2236,7 @@ EOF;
 
         if (isset($catId)) {
             $where=" AND catid=".$catId;
-        } elseif ($_POST['term']) {
+        } elseif (isset($_POST['term'])) {
             //check search term
             $term= htmlspecialchars($_POST['term'], ENT_QUOTES, CONTREXX_CHARSET);
             $where.=" AND (title LIKE '%".$term."%' OR filename LIKE '%".$term."%' OR description LIKE '%".$term."%') ";
@@ -2267,15 +2267,18 @@ EOF;
         //get files
         $i=0;
         if ($objResult !== false) {
+            $file_array = array();
             while (!$objResult->EOF) {
-                $file_array[$i]['title']=$objResult->fields['title'];
-                $file_array[$i]['id']=$objResult->fields['id'];
-                $file_array[$i]['description']=$objResult->fields['description'];
-                $file_array[$i]['catid']=$objResult->fields['catid'];
-                $file_array[$i]['addedby']=$objResult->fields['addedby'];
-                $file_array[$i]['language']=$objResult->fields['language'];
-                $file_array[$i]['platform']=$objResult->fields['platform'];
-                $file_array[$i]['date']=$objResult->fields['date'];
+                $file_array[$i] = array(
+                    'title'       => $objResult->fields['title'],
+                    'id'          => $objResult->fields['id'],
+                    'description' => $objResult->fields['description'],
+                    'catid'       => $objResult->fields['catid'],
+                    'addedby'     => $objResult->fields['addedby'],
+                    'language'    => $objResult->fields['language'],
+                    'platform'    => $objResult->fields['platform'],
+                    'date'        => $objResult->fields['date'],
+                );
                 $i++;
                 $objResult->MoveNext();
             }
@@ -2436,10 +2439,6 @@ EOF;
                 $this->showSettings_inputs();
                 break;
 
-            case 'google':
-                $this->showSettings_google();
-                break;
-
             case 'headlines':
                 $this->showSettings_headlines();
                 break;
@@ -2535,7 +2534,7 @@ EOF;
             ':</td><td> <input style="width: 148px;" type="text" name="inputValue[city]" value="" /></td></tr><tr><td>'.
             $_ARRAYLANG['TXT_DIR_F_COUNTRY'].
             ':</td><td> <select style="width: 148px;" name="inputValue[country]">'.
-            $this->getCountryMenuoptions().'</select></td></tr></table><br />'.
+            $this->getCountryMenuoptions('').'</select></td></tr></table><br />'.
             '<input type="button" onclick="getAddress();" value="'.
             $_ARRAYLANG['TXT_DIR_SEARCH_ADDRESS'].'" /><br /><br />'.
             $_ARRAYLANG['TXT_DIR_LON'].
@@ -2590,67 +2589,6 @@ EOF;
         $this->_objTpl->parse('requests_block');
         $this->_objTpl->parse('direcoryGoogleMapJavascript');
     }
-
-
-    function showSettings_google()
-    {
-        global $_CONFIG, $objDatabase, $_ARRAYLANG;
-
-        // initialize variables
-        $this->_objTpl->addBlockfile('SYSTEM_REQUESTS_CONTENT', 'requests_block', 'module_directory_settings_google.html');
-
-        $this->_objTpl->setVariable(array(
-            'TXT_GOOGLE_SETTINGS'               => $_ARRAYLANG['TXT_DIRECTORY_GOOGLE_SETTINGS'],
-            'TXT_DESCRIPTION'                   => $_ARRAYLANG['TXT_DIR_DESCRIPTION'],
-            'TXT_VALUE'                         => $_ARRAYLANG['TXT_DIR_SYSTEM_VAlUE'],
-            'TXT_SAVE_CHANGES'                  => $_ARRAYLANG['TXT_DIR_CHANGES_SAVE'],
-        ));
-
-        //get settings
-        $i=0;
-        $objResult = $objDatabase->Execute("SELECT setid,setname,setvalue,settyp FROM ".DBPREFIX."module_directory_settings_google ORDER BY setid");
-        if ($objResult !== false) {
-            while(!$objResult->EOF) {
-                $this->_objTpl->setCurrentBlock('settingsOutput');
-                if ($objResult->fields['settyp']== 1) {
-                    $setValueField =
-                        "<input type=\"text\" name=\"setvalue[".
-                        $objResult->fields['setid']."]\" value=\"".
-                        $objResult->fields['setvalue'].
-                        "\" size='90' maxlength='250' />";
-                } elseif ($objResult->fields['settyp']== 2) {
-                    $true = "";
-                    $false = "";
-                    if ($objResult->fields['setvalue'] == 1) {
-                        $true = "checked";
-                    } else {
-                        $false = "checked";
-                    }
-                    $setValueField =
-                        "<input type=\"radio\" name=\"setvalue[".
-                        $objResult->fields['setid']."]\" value=\"1\" ".$true.
-                        " />&nbsp;true&nbsp;<input type=\"radio\" name=\"setvalue[".
-                        $objResult->fields['setid']."]\" value=\"0\"".$false.
-                        " />&nbsp;false&nbsp;";
-                }
-
-                ($i % 2)? $class = "row2" : $class = "row1";
-
-                // initialize variables
-                $this->_objTpl->setVariable(array(
-                    'SETTINGS_ROWCLASS'     => $class,
-                    'SETTINGS_SETVALUE'     => $setValueField,
-                    'SETTINGS_DESCRIPTION'  => $_ARRAYLANG['TXT_'.strtoupper($objResult->fields['setname'])],
-                ));
-                $this->_objTpl->parseCurrentBlock('settingsOutput');
-                $i++;
-                $objResult->MoveNext();
-            }
-        }
-
-        $this->_objTpl->parse('requests_block');
-    }
-
 
     function showSettings_inputs()
     {
@@ -2923,17 +2861,16 @@ EOF;
 
     function showSettings_homecontent()
     {
-        global $_CONFIG, $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
         // initialize variables
         $this->_objTpl->addBlockfile('SYSTEM_REQUESTS_CONTENT', 'requests_block', 'module_directory_settings_homecontent.html');
 
         //get settings
-        $objResult = $objDatabase->Execute("SELECT setvalue FROM ".DBPREFIX."settings WHERE setid = '49'");
-        if ($objResult !== false) {
-            $homeContent = $objResult->fields['setvalue'];
-        }
-
+        $homeContent = \Cx\Core\Setting\Controller\Setting::getValue(
+            'directoryHomeContent',
+            'Config'
+        );
         if ($homeContent == 1) {
             $selectDeactivate   = '';
             $selectActivate     = 'checked="checked"';
@@ -2996,16 +2933,6 @@ EOF;
             }
             $this->strOkMessage = $_ARRAYLANG['TXT_DIR_SETTINGS_SUCCESFULL_SAVE'];
         }
-
-        if (isset($_POST['set_google_submit'])) {
-            //get post data
-            foreach ($_POST['setvalue'] as $id => $value) {
-                //update settings
-                $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_directory_settings_google SET setvalue='".contrexx_addslashes($value)."' WHERE setid=".intval($id));
-            }
-            $this->strOkMessage = $_ARRAYLANG['TXT_DIR_SETTINGS_SUCCESFULL_SAVE'];
-        }
-
 
         if (isset($_POST['set_homecontent_submit'])) {
             //update settings
@@ -3156,12 +3083,13 @@ EOF;
 
             $this->strOkMessage = $_ARRAYLANG['TXT_DIR_SETTINGS_SUCCESFULL_SAVE'];
         }
-        if ($_POST['inputValue']['zoom'] != "") {
+        $zoom = isset($_POST['inputValue']['zoom']) ? $_POST['inputValue']['zoom'] : '';
+        if ($zoom != "") {
             $googleStartPoint  = intval($_POST['inputValue']['lat']);
             $googleStartPoint .= '.'.intval($_POST['inputValue']['lat_fraction']);
             $googleStartPoint .= ':'.intval($_POST['inputValue']['lon']);
             $googleStartPoint .= '.'.intval($_POST['inputValue']['lon_fraction']);
-            $googleStartPoint .= ':'.intval($_POST['inputValue']['zoom']);
+            $googleStartPoint .= ':'.contrexx_input2int($zoom);
             $objDatabase->Execute("UPDATE ".DBPREFIX."module_directory_settings SET setvalue='".$googleStartPoint."' WHERE setname='googlemap_start_location'");
         }
     }

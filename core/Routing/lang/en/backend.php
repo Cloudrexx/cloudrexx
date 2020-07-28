@@ -45,7 +45,7 @@ $_ARRAYLANG['regularExpression'] = 'Regular expression';
 $_ARRAYLANG['TXT_CORE_ROUTING_REGULAR_EXPRESSION_TOOLTIP'] = '<a href="http://en.wikipedia.org/wiki/Regular_expression" target="_blank">Regular expression</a> that is used to rewrite the request URL to the target URL. Example: <b>#/shop\.example\.com/#/example.com/en/Shop/#</b>.';
 $_ARRAYLANG['orderNo'] = 'Order number';
 $_ARRAYLANG['rewriteStatusCode'] = 'Redirection HTTP Statuscode';
-$_ARRAYLANG['TXT_CORE_ROUTING_REWRITE_STATUS_CODE_TOOLTIP'] = 'Choose 302 if the request address remains valid, otherwise 301. <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection" target="_blank">More information</a>';
+$_ARRAYLANG['TXT_CORE_ROUTING_REWRITE_STATUS_CODE_TOOLTIP'] = 'Choose 302 if the request address remains valid, otherwise 301. <a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection" target="_blank">More information</a><br />Choose "Intern" if you wan\'t to keep the requested URL in the address bar.';
 $_ARRAYLANG['continueOnMatch'] = 'Continue after match';
 $_ARRAYLANG['TXT_CORE_ROUTING_CONTINUE_ON_MATCH_TOOLTIP'] = 'Should the next rules (if any) still be processed if this rule matches?';
 

@@ -30,7 +30,7 @@ namespace Cx\Core_Modules\TemplateEditor\Model;
 
 use Symfony\Component\Yaml\Exception;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\ParserException;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -61,7 +61,7 @@ class OptionSetFileStorage implements Storable
      * @param String $name
      *
      * @return array
-     * @throws ParserException
+     * @throws ParseException
      */
     public function retrieve($name)
     {
@@ -70,7 +70,7 @@ class OptionSetFileStorage implements Storable
             . '/' . $name . '/options/options.yml'
         );
         if (!$file) {
-            throw new ParserException(
+            throw new ParseException(
                 "File" . $this->path
                 . '/' . $name . '/options/options.yml not found'
             );
@@ -78,7 +78,7 @@ class OptionSetFileStorage implements Storable
 
         $content = file_get_contents($file);
         if (!$content) {
-            throw new ParserException(
+            throw new ParseException(
                 "File" . $this->path
                 . '/' . $name . '/options/options.yml not found'
             );
@@ -87,11 +87,11 @@ class OptionSetFileStorage implements Storable
         try {
             $yaml = new Parser();
             return $yaml->parse($content);
-        } catch (ParserException $e) {
+        } catch (ParseException $e) {
             preg_match(
                 "/line (?P<line>[0-9]+)/", $e->getMessage(), $matches
             );
-            throw new ParserException($e->getMessage(), $matches['line']);
+            throw new ParseException($e->getMessage(), $matches['line']);
         }
     }
 

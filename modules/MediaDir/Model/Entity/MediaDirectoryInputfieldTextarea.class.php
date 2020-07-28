@@ -64,9 +64,10 @@ class MediaDirectoryInputfieldTextarea extends \Cx\Modules\MediaDir\Controller\M
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         $intId = intval($arrInputfield['id']);
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -90,7 +91,7 @@ class MediaDirectoryInputfieldTextarea extends \Cx\Modules\MediaDir\Controller\M
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[$_LANGID]) ? $arrValue[$_LANGID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 } else {
                     $arrValue = null;
@@ -190,20 +191,42 @@ class MediaDirectoryInputfieldTextarea extends \Cx\Modules\MediaDir\Controller\M
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
+        $strValueAllowTags = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags($strValueAllowTags);
+
+        if(!empty($strValue)) {
+            if (strlen($strValue) > 200) {
+                $strShortValue = preg_replace('/[^ ]*$/', '', substr($strValue, 0, 200)) . ' [...]';
+            } else {
+                $strShortValue = $strValue;
+            }
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = contrexx_raw2xml($arrInputfield['name'][0]);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = nl2br(contrexx_raw2xml($strValue));
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_SHORT'] = nl2br(contrexx_raw2xml($strShortValue));
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_ALLOW_TAGS'] = $strValueAllowTags;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
 
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            if(in_array($_LANGID, $arrTranslationStatus)) {
-                $intLangId = $_LANGID;
+            if(in_array($langId, $arrTranslationStatus)) {
+                $intLangId = $langId;
             } else {
                 $intLangId = $intEntryDefaultLang;
             }
         } else {
-            $intLangId = $_LANGID;
+            $intLangId = $langId;
         }
 
         $objInputfieldValue = $objDatabase->Execute("
@@ -236,24 +259,7 @@ class MediaDirectoryInputfieldTextarea extends \Cx\Modules\MediaDir\Controller\M
             ");
         }
 
-        $strValue = strip_tags($objInputfieldValue->fields['value']);
-        $strValueAllowTags = $objInputfieldValue->fields['value'];
-
-        if(!empty($strValue)) {
-            if (strlen($strValue) > 200) {
-                $strShortValue = preg_replace('/[^ ]*$/', '', substr($strValue, 0, 200)) . ' [...]';
-            } else {
-                $strShortValue = $strValue;
-            }
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = contrexx_raw2xml($arrInputfield['name'][0]);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = nl2br(contrexx_raw2xml($strValue));
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_SHORT'] = nl2br(contrexx_raw2xml($strShortValue));
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_ALLOW_TAGS'] = $strValueAllowTags;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
 
 

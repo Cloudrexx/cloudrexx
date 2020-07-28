@@ -338,28 +338,17 @@ class CrmLibrary
     /**
      * Creates an array containing all frontend-languages. Example: $arrValue[$langId]['short'] or $arrValue[$langId]['long']
      *
-     * @global  ADONewConnection $objDatabase
-     *
      * @return  array $arrReturn
      */
     function createLanguageArray()
     {
-        global $objDatabase;
-
         $arrReturn = array();
 
-        $objResult = $objDatabase->Execute('SELECT      id,
-                                                        lang,
-                                                        name
-                                            FROM        '.DBPREFIX.'languages
-                                            WHERE       frontend=1
-                                            ORDER BY    id
-                                        ');
-        while (!$objResult->EOF) {
-            $arrReturn[$objResult->fields['id']] = array(   'short' =>  stripslashes($objResult->fields['lang']),
-                    'long'  =>  htmlentities(stripslashes($objResult->fields['name']), ENT_QUOTES, CONTREXX_CHARSET)
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            $arrReturn[$frontendLanguage['id']] = array(
+                'short' =>  stripslashes($frontendLanguage['lang']),
+                'long'  =>  htmlentities(stripslashes($frontendLanguage['name']), ENT_QUOTES, CONTREXX_CHARSET)
             );
-            $objResult->MoveNext();
         }
 
         return $arrReturn;
@@ -466,6 +455,7 @@ class CrmLibrary
 
         $objResult = $objDatabase->Execute("SELECT * FROM `".DBPREFIX."module_{$this->moduleNameLC}_task_types` ORDER BY `sorting`");
 
+        $sorto = 'ASC';
         if (isset($_GET['sortf']) && isset($_GET['sorto'])) {
             $sortf = ($_GET['sortf'] == 1)? 'name':'sorting';
             $sorto = ($_GET['sorto'] == 'ASC')? 'DESC' : 'ASC';
@@ -738,6 +728,77 @@ class CrmLibrary
             $objTpl->parse($block);
             $objResult->MoveNext();
         }
+    }
+
+    /**
+     * Get company size name by id
+     *
+     * @param integer $companySizeId
+     *
+     * @return string name of the company size
+     */
+    public function getCompanySizeNameById($companySizeId)
+    {
+        global $objDatabase;
+
+        if (empty($companySizeId)) {
+            return false;
+        }
+
+        $objResult = $objDatabase->Execute('SELECT `company_size`
+                                                FROM `' . DBPREFIX . 'module_' . $this->moduleNameLC . '_company_size`
+                                                WHERE `id` = "' . contrexx_raw2db($companySizeId) .
+                                                '" LIMIT 0, 1');
+
+        return ($objResult && $objResult->RecordCount()) ? $objResult->fields['company_size'] : '';
+    }
+
+    /**
+     * Get customer type name by id
+     *
+     * @param integer $customerTypeId customer type id
+     *
+     * @return string name of the customer type
+     */
+    public function getCustomerTypeNameById($customerTypeId)
+    {
+        global $objDatabase;
+
+        if (empty($customerTypeId)) {
+            return false;
+        }
+
+        $objResult = $objDatabase->Execute('SELECT `label`
+                                                FROM `' . DBPREFIX . 'module_' . $this->moduleNameLC . '_customer_types`
+                                                WHERE `id` = "' . contrexx_raw2db($customerTypeId) .
+                                                '" LIMIT 0, 1');
+
+        return ($objResult && $objResult->RecordCount()) ? $objResult->fields['label'] : '';
+    }
+
+    /**
+     * Get industry type name by id
+     *
+     * @param integer $industryId industry type id
+     *
+     * @return string name of the industry type
+     */
+    public function getIndustryTypeNameById($industryId)
+    {
+        global $objDatabase;
+
+        if (empty($industryId)) {
+            return false;
+        }
+
+        $query = 'SELECT ind_loc.`value` FROM `' . DBPREFIX . 'module_' . $this->moduleNameLC . '_industry_type_local` As ind_loc
+                    LEFT JOIN `' . DBPREFIX . 'module_' . $this->moduleNameLC . '_industry_types` As ind
+                        ON (ind_loc.entry_id = ind.id)
+                    WHERE ind.id = "' . contrexx_raw2db($industryId) . '" LIMIT 0, 1';
+
+        $objResult = $objDatabase->Execute($query);
+
+        return ($objResult && $objResult->RecordCount()) ? $objResult->fields['value'] : '';
     }
 
     /**
@@ -1372,7 +1433,11 @@ class CrmLibrary
             $where[] = " (c.customer_type = '".intval($filter['customer_type'])."')";
         }
         if (isset($filter['filter_membership']) && !empty($filter['filter_membership'])) {
-            $where[] = " mem.membership_id = '".intval($filter['filter_membership'])."'";
+            $where[] = " mem.membership_id IN(" . 
+                implode(
+                    ',', 
+                    contrexx_input2int($filter['filter_membership'])
+                ) . ")";
         }
 
         $orderBy = '';
@@ -1404,6 +1469,7 @@ class CrmLibrary
                 $filter['term'] = '"'.$filter['term'].'*"';
                 break;
             }
+            $genderQuery = '';
             if (!empty($gender)) {
                 $genderQuery = "OR (SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_contacts` WHERE id = c.id AND gender = '".$gender."' LIMIT 1)";
             }
@@ -1419,7 +1485,6 @@ class CrmLibrary
                             OR MATCH (t.label) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE)
                             OR (select 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_membership` as m JOIN `".DBPREFIX."module_{$this->moduleNameLC}_membership_local` As ml ON (ml.entry_id=m.membership_id AND ml.lang_id = '".$_LANGID."') WHERE c.id = m.contact_id AND MATCH (ml.value) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE) LIMIT 1)
                             OR MATCH (Inloc.value) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE)
-                            OR MATCH (lang.name) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE)
                             OR MATCH (cur.name) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE)
                             OR MATCH (cmpySize.company_size) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE)
                             OR (SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` WHERE c.id = contact_id AND MATCH (address, city, state, zip, country) AGAINST ('".contrexx_raw2db($filter['term'])."' IN BOOLEAN MODE) LIMIT 1) {$genderQuery})";
@@ -1431,7 +1496,7 @@ class CrmLibrary
             $filters = " WHERE ".implode(' AND ', $where);
         }
 
-        $sortingFields = array("c.customer_name" ,  "activities", "c.added_date");
+        $sortingFields = array("c.customer_name", "activities", "c.added_date", "c.contact_familyname",);
         $sortOrder = (isset ($filter['sorto'])) ? (((int) $filter['sorto'] == 0) ? 'DESC' : 'ASC') : 'DESC';
         $sortField = (isset ($filter['sortf']) && $filter['sortf'] != '' && in_array($sortingFields[$filter['sortf']], $sortingFields)) ? $sortingFields[$filter['sortf']] : 'c.id';
 
@@ -1445,6 +1510,7 @@ class CrmLibrary
                        c.contact_customer AS contactCustomerId,
                        c.status,
                        c.added_date,
+                       c.profile_picture,
                        con.customer_name AS contactCustomer,
                        email.email,
                        phone.phone,
@@ -1461,8 +1527,6 @@ class CrmLibrary
                      ON (cur.id=c.customer_currency)
                    LEFT JOIN `".DBPREFIX."module_{$this->moduleNameLC}_company_size` As cmpySize
                      ON (cmpySize.id=c.company_size)
-                   LEFT JOIN `".DBPREFIX."languages` As lang
-                     ON (lang.id=c.contact_language)
                    LEFT JOIN ".DBPREFIX."module_{$this->moduleNameLC}_customer_types AS t
                      ON c.customer_type = t.id
                    LEFT JOIN `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_emails` as email
@@ -2178,7 +2242,7 @@ class CrmLibrary
      *
      * @return null
      */
-    function getOverviewMembershipDropdown($objTpl, $modelMembership, $selected = 0, $block = "memberships", $options = array())
+    function getOverviewMembershipDropdown($objTpl, $modelMembership, $selected = array(), $block = "memberships", $options = array())
     {
         $data = array(
                 'status = 1'
@@ -2192,7 +2256,7 @@ class CrmLibrary
                 $objTpl->setVariable(array(
                         "CRM_MEMBERSHIP_ID"         => (int) $result->fields['id'],
                         "CRM_MEMBERSHIP_VALUE"      => contrexx_raw2xhtml($result->fields['value']),
-                        "CRM_MEMBERSHIP_SELECTED"   => ($result->fields['id'] == $selected) ? "selected='selected'" : '',
+                        "CRM_MEMBERSHIP_SELECTED"   => (in_array($result->fields['id'], $selected)) ? "selected='selected'" : '',
                 ));
                 $objTpl->parse($block);
                 $result->MoveNext();
@@ -2289,16 +2353,19 @@ class CrmLibrary
 
         //update/insert additional fields
         //company
+        $company = '';
         if (!empty($result['company'])) {
             $company = $objDatabase->getOne("SELECT customer_name FROM `".DBPREFIX."module_{$this->moduleNameLC}_contacts` WHERE id = '".$result['company']."'");
         }
         //get default website
+        $website = '';
         foreach ($result['contactwebsite'] as $value) {
             if (!empty($value['value']) && $value['primary'] == '1') {
                 $website = contrexx_raw2db($value['value']);
             }
         }
         //get default phone
+        $phone = '';
         foreach ($result['contactphone'] as $value) {
             if (!empty($value['value']) && $value['primary'] == '1')
                 $phone = contrexx_input2db($value['value']);
@@ -2317,6 +2384,8 @@ class CrmLibrary
             'firstname'    => array(0 => $this->contact->customerName),
             'lastname'     => array(0 => $this->contact->family_name),
             'gender'       => array(0 => $gender),
+            'title'        => array(0 => $this->contact->salutation),
+            'designation'  => array(0 => $this->contact->contact_title),
             'website'      => array(0 => $website),
             'company'      => array(0 => $company),
             'phone_office' => array(0 => $phone),
@@ -2729,12 +2798,23 @@ class CrmLibrary
                 $this->contact->load($id);
                 $this->contact->customerName   = !empty ($arrFormData['firstname'][0]) ? contrexx_input2raw($arrFormData['firstname'][0]) : '';
                 $this->contact->family_name    = !empty ($arrFormData['lastname'][0]) ? contrexx_input2raw($arrFormData['lastname'][0]) : '';
+                $this->contact->contact_title  = !empty ($arrFormData['designation'][0]) ? contrexx_input2raw($arrFormData['designation'][0]) : '';
+                $this->contact->salutation     = !empty ($arrFormData['title'][0]) ? contrexx_input2raw($arrFormData['title'][0]) : 0;
                 $this->contact->contact_language = !empty ($frontendLanguage) ? (int) $frontendLanguage : $_LANGID;
                 $this->contact->contact_gender = !empty ($arrFormData['gender'][0]) ? ($arrFormData['gender'][0] == 'gender_female' ? 1 : ($arrFormData['gender'][0] == 'gender_male' ? 2 : '')) : '';
 
                 $this->contact->contactType    = 2;
                 $this->contact->datasource     = 2;
                 $this->contact->account_id     = $userAccountId;
+
+                $oldEmail = '';
+                // set new email address
+                if (!empty($arrFormData['email'])) {
+                    // remember old email address
+                    $oldEmail = $this->contact->email;
+
+                    $this->contact->email = $arrFormData['email'];
+                }
 
                 //set profile picture
                 if (!empty ($arrFormData['picture'][0])) {
@@ -2769,7 +2849,7 @@ class CrmLibrary
                     $customerType = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_type','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if ($customerType !== false) {
                         $crmCompany->customerType = $customerType;
                     }
@@ -2777,7 +2857,7 @@ class CrmLibrary
                     $companySize = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_company_size','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if($companySize !== false){
                         $crmCompany->companySize = $companySize;
                     }
@@ -2785,13 +2865,9 @@ class CrmLibrary
                     $industryType = $arrFormData[
                                         \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_industry_type','Crm')
                                     ]
-                                    [0];
+                                    [0] ?? false;
                     if($industryType !== false){
                         $crmCompany->industryType = $industryType;
-                    }
-
-                    if(isset($arrFormData["phone_office"])){
-                        $crmCompany->phone = $arrFormData["phone_office"];
                     }
 
                     // store/update the company profile
@@ -2800,15 +2876,72 @@ class CrmLibrary
                     // setting & storing the primary email address must be done after
                     // the company has been saved for the case where the company is
                     // being added as a new object without having an ID yet
-                    if (empty($crmCompany->email)) {
+                    if (
+                        // set email in case the company has no email set yet
+                        empty($crmCompany->email) ||
+                        // or in case the email changed and the company used
+                        // the same old email address
+                        $crmCompany->email == $oldEmail
+                    ) {
                         $crmCompany->email = $this->contact->email;
-                        $crmCompany->storeEMail();
+                        $crmCompany->updatePrimaryEmail(1);
                     }
 
+                    // update primary address in case it was the same
+                    if (
+                        isset($arrFormData['address'][0]) &&
+                        isset($arrFormData['city'][0]) &&
+                        isset($arrFormData['zip'][0]) &&
+                        isset($arrFormData['country'][0]) && (
+                            (
+                                trim($this->contact->address) == trim($crmCompany->address) &&
+                                trim($this->contact->city) == trim($crmCompany->city) &&
+                                trim($this->contact->state) == trim($crmCompany->state) &&
+                                trim($this->contact->zip) == trim($crmCompany->zip) &&
+                                trim($this->contact->country) == trim($crmCompany->country)
+                            ) || (
+                                empty(trim($crmCompany->address)) &&
+                                empty(trim($crmCompany->city)) &&
+                                empty(trim($crmCompany->state)) &&
+                                empty(trim($crmCompany->zip)) &&
+                                empty(trim($crmCompany->country))
+                            )
+                        )
+                    ) {
+                        $crmCompany->address = $arrFormData['address'][0] ?? $crmCompany->address;
+                        $crmCompany->city = $arrFormData['city'][0] ?? $crmCompany->city;
+                        $crmCompany->state = $arrFormData['state'][0] ?? $crmCompany->state;
+                        $crmCompany->zip = $arrFormData['zip'][0] ?? $crmCompany->zip;
+                        $country = \Cx\Core\Country\Controller\Country::getById($arrFormData['country'][0]);
+                        $crmCompany->country = $country['name'] ?? $crmCompany->country;
+                        $crmCompany->updatePrimaryAddress();
+                    }
+
+                    // set primary phone
+                    if (
+                        isset($arrFormData['phone_office'][0]) && (
+                            $this->contact->phone == $crmCompany->phone ||
+                            empty($crmCompany->phone)
+                        )
+                    ) {
+                        $crmCompany->phone = $arrFormData['phone_office'][0];
+                        $crmCompany->updatePrimaryPhone();
+                    }
+
+                    // assign company to person
                     $this->contact->contact_customer = $crmCompany->id;
                 }
 
                 if ($this->contact->save()) {
+                    // set primary email
+                    if (
+                        isset($arrFormData['email']) &&
+                        $arrFormData['email'] != $this->contact->email
+                    ) {
+                        // re-set email again as it has been reset by CrmContact::save()
+                        $this->contact->email = $arrFormData['email'];
+                        $this->contact->updatePrimaryEmail(0);
+                    }
 
                     // insert website
                     if (!empty ($arrFormData['website'][0])) {
@@ -2827,48 +2960,30 @@ class CrmLibrary
                         $db = $objDatabase->Execute($query);
                     }
 
-                    //insert address
-                    if (!empty ($arrFormData['address'][0]) || !empty ($arrFormData['city'][0]) || !empty ($arrFormData['zip'][0]) || !empty ($arrFormData['country'][0])) {
-                        $addressExists = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` WHERE is_primary = '1' AND contact_id = '{$this->contact->id}'");
+                    // set primary address
+                    if (
+                        isset($arrFormData['address'][0]) ||
+                        isset($arrFormData['city'][0]) ||
+                        isset($arrFormData['state'][0]) ||
+                        isset($arrFormData['zip'][0]) ||
+                        isset($arrFormData['country'][0])
+                    ) {
                         $country = \Cx\Core\Country\Controller\Country::getById($arrFormData['country'][0]);
-                        if ($addressExists && $addressExists->RecordCount()) {
-                            $query = "UPDATE `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` SET
-                                    address      = '". contrexx_input2db($arrFormData['address'][0]) ."',
-                                    city         = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    zip          = '". contrexx_input2db($arrFormData['zip'][0]) ."',
-                                    country      = '". $country['name'] ."',
-                                    Address_Type = '2'
-                                 WHERE is_primary   = '1' AND contact_id   = '{$this->contact->id}'";
-                        } else {
-                            $query = "INSERT INTO `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_address` SET
-                                    address      = '". contrexx_input2db($arrFormData['address'][0]) ."',
-                                    city         = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    state        = '". contrexx_input2db($arrFormData['city'][0]) ."',
-                                    zip          = '". contrexx_input2db($arrFormData['zip'][0]) ."',
-                                    country      = '". $country['name'] ."',
-                                    Address_Type = '2',
-                                    is_primary   = '1',
-                                    contact_id   = '{$this->contact->id}'";
-                        }
-                        $objDatabase->Execute($query);
+                        $this->contact->address = $arrFormData['address'][0] ?? $this->contact->address;
+                        $this->contact->city = $arrFormData['city'][0] ?? $this->contact->city;
+                        $this->contact->state = $arrFormData['state'][0] ?? $this->contact->state;
+                        $this->contact->zip = $arrFormData['zip'][0] ?? $this->contact->zip;
+                        $this->contact->country = $country['name'] ?? $this->contact->country;
+                        $this->contact->updatePrimaryAddress();
                     }
 
-                    // insert Phone
-                    $contactPhone = array();
-                    if (!empty($arrFormData['phone_office'][0])) {
-                        $phoneExists = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_contact_phone` WHERE is_primary = '1' AND contact_id = '{$this->contact->id}'");
-                        $fields = array(
-                            'phone'         => $arrFormData['phone_office'][0],
-                            'phone_type'    => '1',
-                            'is_primary'    => '1',
-                            'contact_id'    => $this->contact->id
-                        );
-                        if ($phoneExists && $phoneExists->RecordCount()) {
-                            $query  = \SQL::update("module_{$this->moduleNameLC}_customer_contact_phone", $fields, array('escape' => true))." WHERE is_primary = '1' AND `contact_id` = {$this->contact->id}";
-                        } else {
-                            $query  = \SQL::insert("module_{$this->moduleNameLC}_customer_contact_phone", $fields, array('escape' => true));
-                        }
-                        $objDatabase->Execute($query);
+                    // set primary phone
+                    if (
+                        isset($arrFormData['phone_office'][0]) &&
+                        $arrFormData['phone_office'][0] != $this->contact->phone
+                    ) {
+                        $this->contact->phone = $arrFormData['phone_office'][0];
+                        $this->contact->updatePrimaryPhone();
                     }
                 }
                 \Cx\Core\Setting\Controller\Setting::init($prevSection, $prevGroup, $prevEngine);
@@ -2918,7 +3033,14 @@ class CrmLibrary
             $objImage = new \ImageManager();
         }
         if (empty($arrSettings)) {
-            $arrSettings = array();
+            $arrSettings = array(
+                'profile_thumbnail_pic_width'   => array(),
+                'profile_thumbnail_pic_height'  => array(),
+                'profile_thumbnail_scale_color' => array(),
+                'profile_thumbnail_method'      => array(),
+                'max_profile_pic_width'         => array(),
+                'max_profile_pic_height'        => array(),
+            );
             $arrSettings['profile_thumbnail_pic_width']['value'] = 80;
             $arrSettings['profile_thumbnail_pic_height']['value'] = 60;
             $arrSettings['profile_thumbnail_scale_color']['value'] = '';
@@ -3040,7 +3162,7 @@ class CrmLibrary
             $uploader->setData($data);
 
             if (empty($buttonText)) {
-                $buttonText = $_ARRAYLANG['TXT_MEDIA_UPLOAD_FILES'];
+                $buttonText = $_ARRAYLANG['TXT_CRM_UPLOAD_FILES'];
             }
             return $uploader->getXHtml($buttonText);
         } catch (Exception $e) {
@@ -3055,12 +3177,11 @@ class CrmLibrary
      * @throws ContactException
      */
     protected static function getTemporaryUploadPath($submissionId, $fieldId, $dir) {
-        global $sessionObj;
+        $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
+        $session = $cx->getComponent('Session')->getSession();
 
-        if (!isset($sessionObj)) $sessionObj = \cmsSession::getInstance();
-
-        $tempPath = $_SESSION->getTempPath();
-        $tempWebPath = $_SESSION->getWebTempPath();
+        $tempPath = $session->getTempPath();
+        $tempWebPath = $session->getWebTempPath();
         if($tempPath === false || $tempWebPath === false)
             throw new \Cx\Core_Modules\Contact\Controller\ContactException('could not get temporary session folder');
 
@@ -3329,10 +3450,7 @@ class CrmLibrary
      *
      * @param String $query
      *
-     * @global array $_ARRAYLANG
-     * @global object $objDatabase
-     *
-     * @return true
+     * @return integer
      */
     function countRecordEntries($query)
     {
@@ -3340,6 +3458,10 @@ class CrmLibrary
 
         $objEntryResult = $objDatabase->Execute('SELECT  COUNT(*) AS numberOfEntries
                                                     FROM    ('.$query.') AS num');
+
+        if (!$objEntryResult) {
+            return 0;
+        }
 
         return intval($objEntryResult->fields['numberOfEntries']);
     }

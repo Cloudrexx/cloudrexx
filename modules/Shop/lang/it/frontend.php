@@ -95,7 +95,6 @@ $_ARRAYLANG['TXT_COMMENTS'] = "Comments";
 $_ARRAYLANG['TXT_ID'] = "ID";
 $_ARRAYLANG['TXT_ADDRESS_CUSTOMER'] = "Customer address";
 $_ARRAYLANG['TXT_TAC'] = "Terms and conditions";
-$_ARRAYLANG['TXT_ACCEPT_TAC'] = "I confirm the correctness of the entered data and I know the <a href=\"index.php?section=Agb\" target=\"_blank\">terms and conditions</a> and accept them.";
 $_ARRAYLANG['TXT_TOTAL_PRICE'] = "Total price";
 $_ARRAYLANG['TXT_ORDER_INFOS'] = "Order informations";
 $_ARRAYLANG['TXT_ORDER_PREPARED'] = "The order is now prepared for the payment.";
@@ -215,7 +214,6 @@ $_ARRAYLANG['TXT_SHOP_ACCOUNT_NOTE'] = "Durch Ihre Anmeldung bei uns sind Sie in
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_NOTE_NO_REGISTRATION'] = "Sie sind momentan nicht angemeldet und können ohne Registrierung bestellen.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_EXISTING_CUSTOMER'] = "Ich bin bereits Kunde.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_LOGIN'] = "Anmelden &gt;&gt;";
-$_ARRAYLANG['TXT_SHOP_CATEGORIES'] = "Kategorien:";
 $_ARRAYLANG['TXT_PRODUCTS_IN_CATEGORY'] = "Produkte in der Kategorie";
 $_ARRAYLANG['TXT_SHOP_GO_TO_CATEGORY'] = "Weiter zur Kategorie";
 $_ARRAYLANG['TXT_SHOP_LSV_EE_FIRST_NAME'] = "Vorname";

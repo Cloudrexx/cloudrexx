@@ -471,9 +471,6 @@ body a:hover {text-decoration: none;}
     background-image: url('images/nav-3-inactive.png');
     background-position: 30px 7px;
 }
-#menubuilder3 {
-    padding-top: 0;
-}
 #subnavigation li.level-1 > a {
     display: none;
 }

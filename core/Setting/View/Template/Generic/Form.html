@@ -16,6 +16,7 @@
 <!-- BEGIN core_setting_tab_div -->
 <div id="tab-{CORE_SETTING_TAB_INDEX}" class="setting" style="display: {CORE_SETTING_TAB_DISPLAY};">
   <form name="formSettings-{CORE_SETTING_TAB_INDEX}" method="post" action="{URI_BASE}"{CORE_SETTING_ENCTYPE}>
+  <input type="hidden" name="settingGroup" value="{CORE_SETTING_GROUP}" />
 <!-- BEGIN core_setting_sections -->
 <!-- BEGIN core_setting_section -->
     <table class="adminlist" border="0" cellspacing="0" cellpadding="2" width="100%" summary="">
@@ -76,6 +77,3 @@
 </div>
 <!-- END core_setting_tab_div_external -->
 <!-- end setting.html -->
-<script>
-    hideDuplicateTab('{CORE_SETTING_CURRENT_TAB}');
-</script>

@@ -48,6 +48,20 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
  */
 class DownloadsEventListener extends DefaultEventListener
 {
+    /**
+     * Global search event listener
+     * Appends the Downloads search results to the search object
+     *
+     * @param array $search \Cx\Core_Modules\Search\Controller\Search
+     */
+    public function SearchFindContent($search) {
+        $result = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+            $this->getComponent('Downloads')->getDownloadsForSearchComponent(
+                $search->getTerm()
+            )
+        );
+        $search->appendResult($result);
+    }
 
     public function mediasourceLoad(
         MediaSourceManager $mediaBrowserConfiguration
@@ -59,6 +73,4 @@ class DownloadsEventListener extends DefaultEventListener
         ),array(141));
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
-
-
 }

@@ -23,6 +23,14 @@ Cx\Core_Modules\Sync\Model\Entity\Host:
     urlTemplate:
       type: string
       column: url_template
+    state:
+      type: integer
+      length: 1
+    lastUpdate:
+      type: timestamp
+      column: last_update
+      options:
+        default: "CURRENT_TIMESTAMP"
   uniqueConstraints:
       host_UNIQUE:
         columns: [ host ]
@@ -30,3 +38,8 @@ Cx\Core_Modules\Sync\Model\Entity\Host:
       hostEntities:
         targetEntity: Cx\Core_Modules\Sync\Model\Entity\HostEntity
         mappedBy: host
+  manyToMany:
+    changes:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Change
+      mappedBy: hosts
+

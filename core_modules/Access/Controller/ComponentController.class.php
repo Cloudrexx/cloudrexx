@@ -35,7 +35,6 @@
  */
 
 namespace Cx\Core_Modules\Access\Controller;
-use Cx\Core_Modules\Access\Model\Event\AccessEventListener;
 
 /**
  * Main controller for Access
@@ -46,13 +45,80 @@ use Cx\Core_Modules\Access\Model\Event\AccessEventListener;
  * @subpackage  coremodule_access
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+
+    /**
+     * Returns all Controller class names for this component (except this)
+     *
+     * Be sure to return all your controller classes if you add your own
+     * @return array List of Controller class names (without namespace)
+     */
     public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('EsiWidget', 'RandomEsiWidget');
     }
 
-     /**
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * The array values might be a class name without namespace. In that case
+     * the namespace \Cx\{component_type}\{component_name}\Controller is used.
+     * If the array value starts with a backslash, no namespace is added.
+     *
+     * Avoid calculation of anything, just return an array!
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson() {
+        return array('EsiWidgetController', 'RandomEsiWidgetController');
+    }
+
+    /**
+     * Returns a list of command mode commands provided by this component
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode() {
+        return array('Access');
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     * @param string $command The name of the command to fetch the description from
+     * @param boolean $short Wheter to return short or long description
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false) {
+        switch ($command) {
+            case 'Access':
+                if ($short) {
+                    return 'Provides cleanup functions for user profiles';
+                }
+                return './cx Access removeUselessProfileImages
+
+Drops all no-longer required profile images';
+                break;
+        }
+        return '';
+    }
+
+    /**
+     * Execute one of the commands listed in getCommandsForCommandMode()
+     * @see getCommandsForCommandMode()
+     * @param string $command Name of command to execute
+     * @param array $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     * @return void
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
+        switch ($command) {
+            case 'Access':
+                switch (current($arguments)) {
+                    case 'removeUselessProfileImages':
+                        \Cx\Core_Modules\Access\Controller\AccessLib::removeUselessImages();
+                        break;
+                }
+                break;
+        }
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -82,114 +148,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Do something before content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $content = \Env::get('cx')->getPage()->getContent();
-                \FWUser::parseLoggedInOutBlocks($content);
-                \Env::get('cx')->getPage()->setContent($content);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
-    /**
-     * Do something after content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                $objTemplate = $this->cx->getTemplate();
-
-                // ACCESS: parse access_logged_in[1-9] and access_logged_out[1-9] blocks
-                \FWUser::parseLoggedInOutBlocks($objTemplate);
-
-                // currently online users
-                $objAccessBlocks = false;
-                if ($objTemplate->blockExists('access_currently_online_member_list')) {
-                    if (\FWUser::showCurrentlyOnlineUsers() && ( $objTemplate->blockExists('access_currently_online_female_members') || $objTemplate->blockExists('access_currently_online_male_members') || $objTemplate->blockExists('access_currently_online_members'))) {
-                            $objAccessBlocks = new AccessBlocks();
-                        if ($objTemplate->blockExists('access_currently_online_female_members'))
-                            $objAccessBlocks->setCurrentlyOnlineUsers('female');
-                        if ($objTemplate->blockExists('access_currently_online_male_members'))
-                            $objAccessBlocks->setCurrentlyOnlineUsers('male');
-                        if ($objTemplate->blockExists('access_currently_online_members'))
-                            $objAccessBlocks->setCurrentlyOnlineUsers();
-                    } else {
-                        $objTemplate->hideBlock('access_currently_online_member_list');
-                    }
-                }
-
-                // last active users
-                if ($objTemplate->blockExists('access_last_active_member_list')) {
-                    if (\FWUser::showLastActivUsers() && ( $objTemplate->blockExists('access_last_active_female_members') || $objTemplate->blockExists('access_last_active_male_members') || $objTemplate->blockExists('access_last_active_members'))) {
-                        if (!$objAccessBlocks)
-                            $objAccessBlocks = new AccessBlocks();
-                        if ($objTemplate->blockExists('access_last_active_female_members'))
-                            $objAccessBlocks->setLastActiveUsers('female');
-                        if ($objTemplate->blockExists('access_last_active_male_members'))
-                            $objAccessBlocks->setLastActiveUsers('male');
-                        if ($objTemplate->blockExists('access_last_active_members'))
-                            $objAccessBlocks->setLastActiveUsers();
-                    } else {
-                        $objTemplate->hideBlock('access_last_active_member_list');
-                    }
-                }
-
-                // latest registered users
-                if ($objTemplate->blockExists('access_latest_registered_member_list')) {
-                    if (\FWUser::showLatestRegisteredUsers() && ( $objTemplate->blockExists('access_latest_registered_female_members') || $objTemplate->blockExists('access_latest_registered_male_members') || $objTemplate->blockExists('access_latest_registered_members'))) {
-                        if (!$objAccessBlocks)
-                            $objAccessBlocks = new AccessBlocks();
-                        if ($objTemplate->blockExists('access_latest_registered_female_members'))
-                            $objAccessBlocks->setLatestRegisteredUsers('female');
-                        if ($objTemplate->blockExists('access_latest_registered_male_members'))
-                            $objAccessBlocks->setLatestRegisteredUsers('male');
-                        if ($objTemplate->blockExists('access_latest_registered_members'))
-                            $objAccessBlocks->setLatestRegisteredUsers();
-                    } else {
-                        $objTemplate->hideBlock('access_latest_registered_member_list');
-                    }
-                }
-
-                // birthday users
-                if ($objTemplate->blockExists('access_birthday_member_list')) {
-                    if (\FWUser::showBirthdayUsers() && ( $objTemplate->blockExists('access_birthday_female_members') || $objTemplate->blockExists('access_birthday_male_members') || $objTemplate->blockExists('access_birthday_members'))) {
-                        if (!$objAccessBlocks)
-                            $objAccessBlocks = new AccessBlocks();
-                        if ($objAccessBlocks->isSomeonesBirthdayToday()) {
-                            if ($objTemplate->blockExists('access_birthday_female_members'))
-                                $objAccessBlocks->setBirthdayUsers('female');
-                            if ($objTemplate->blockExists('access_birthday_male_members'))
-                                $objAccessBlocks->setBirthdayUsers('male');
-                            if ($objTemplate->blockExists('access_birthday_members'))
-                                $objAccessBlocks->setBirthdayUsers();
-                            $objTemplate->touchBlock('access_birthday_member_list');
-                        } else {
-                            $objTemplate->hideBlock('access_birthday_member_list');
-                        }
-                    } else {
-                        $objTemplate->hideBlock('access_birthday_member_list');
-                    }
-                }
-                break;
-
-
-            default:
-                break;
-        }
-    }
-
-    /**
      * Do something after resolving is done
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -198,7 +156,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
 
-                global $plainCmd, $isRegularPageRequest;
+                global $plainCmd;
+
                 $objTemplate = $this->cx->getTemplate();
                 $objFWUser = \FWUser::getFWUserObject();
 
@@ -211,7 +170,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     && (!isset($_GET['act']) || $_GET['act'] !== 'resetpw')
                 ) {
                     //not logged in already - do captcha and password checks
-                    $objFWUser->checkAuth();
+                    if ($objFWUser->checkAuth()) {
+                        //Clear cache
+                        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                        $cx->getEvents()->triggerEvent(
+                            'clearEsiCache',
+                            array(
+                                'Widget',
+                                $this->getSessionBasedWidgetNames(),
+                            )
+                        );
+                    }
                 }
 
                 // User only gets the backend if he's logged in.
@@ -224,9 +193,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 if (!$objFWUser->objUser->login(true) && $plainCmd != 'JsonData') {
                     $plainCmd = 'Login';
                     // If the user isn't logged in, the login mask will be showed.
-                    // This mask has its own template handling.
-                    // So we don't need to load any templates in the index.php.
-                    $isRegularPageRequest = false;
+                    // abort further processing
+                    break;
                 } else {
                     $userData = array(
                         'id' => \FWUser::getFWUserObject()->objUser->getId(),
@@ -246,7 +214,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
 
                 $objTemplate->setVariable(array(
-                    'TXT_PROFILE' => $txtProfile,
+                    'TXT_PROFILE' => contrexx_raw2xhtml($txtProfile),
                     'USER_ID' => $objFWUser->objUser->getId(),
                 ));
 
@@ -278,10 +246,110 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * $this->cx->getEvents()->addEventListener($eventName, $listener);
      */
     public function registerEventListeners() {
-        $eventListener = new AccessEventListener($this->cx);
-        $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+        $evm = $this->cx->getEvents();
+        $eventListener = new \Cx\Core_Modules\Access\Model\Event\AccessEventListener($this->cx);
+        $evm->addEventListener('mediasource.load', $eventListener);
+        // locale event listener
+        $localeLocaleEventListener = new \Cx\Core_Modules\Access\Model\Event\LocaleLocaleEventListener($this->cx);
+        $evm->addModelListener('postPersist', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
+        $evm->addModelListener('preRemove', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
     }
 
+    /**
+     * Do something after system initialization
+     *
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $userSettings     = \User_Setting::getSettings();
+        $widgetController = $this->getComponent('Widget');
+        foreach (
+            array(
+                'logged_in',
+                'logged_out',
+            ) as $widgetNamePrefix
+        ) {
+            for ($i = 0; $i <= 10; $i++) {
+                $widgetName = 'access_' . $widgetNamePrefix;
+                if ($i > 0) {
+                    $widgetName .= $i;
+                }
+                $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName,
+                    \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+                );
+                $widget->setEsiVariable(
+                    \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+                );
+                $widgetController->registerWidget(
+                    $widget
+                );
+            }
+        }
+
+        $widgetNames     = array(
+            'access_currently_online_member_list',
+            'access_last_active_member_list',
+            'access_latest_registered_member_list',
+            'access_birthday_member_list',
+            'access_next_birthday_member_list',
+        );
+        foreach ($widgetNames as $widgetName) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                $widgetName,
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
+
+        if ($userSettings['block_random_access_users']['status']) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\RandomEsiWidget(
+                $this,
+                'access_random_users',
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+            );
+            $widget->setUniqueRepetitionCount(
+                $userSettings['block_random_access_users']['value']
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'access_user',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_PLACEHOLDER
+        );
+        $widget->setEsiVariable(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'ACCESS_USER_COUNT'
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
+    }
+    
     /**
      * Do something before main template gets parsed
      *
@@ -293,5 +361,58 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
         // make all language data of Access component globally available
         $template->setVariable(\Env::get('init')->getComponentSpecificLanguageData($this->getName()));
+    }
+
+    /**
+     * Returns a list of widget names based on the given base name
+     * @param string $baseName Widget base name
+     * @return array List of widget names
+     */
+    protected function getRepeatableWidgetNames($baseName) {
+        $widgets = array();
+        for ($i = 0; $i <= 10; $i++) {
+            $widgetName = 'access_' . $baseName;
+            if ($i > 0) {
+                $widgetName .= $i;
+            }
+            $widgets[] = $widgetName;
+        }
+        return $widgets;
+    }
+
+    /**
+     * Get all session based widget names
+     * @return array List of widget names
+     */
+    public function getSessionBasedWidgetNames()
+    {
+        return array_merge(
+            array(
+                'access_currently_online_member_list',
+                'access_last_active_member_list',
+            ),
+            $this->getRepeatableWidgetNames('logged_in'),
+            $this->getRepeatableWidgetNames('logged_out')
+        );
+    }
+
+    /**
+     * Get all user data based widget names
+     * @return array List of widget names
+     */
+    public function getUserDataBasedWidgetNames() {
+        return array_merge(
+            array(
+                'ACCESS_USER_COUNT',
+                'access_currently_online_member_list',
+                'access_last_active_member_list',
+                'access_latest_registered_member_list',
+                'access_birthday_member_list',
+                'access_next_birthday_member_list',
+                'access_random_users',
+                'access_user',
+            ),
+            $this->getRepeatableWidgetNames('logged_in')
+        );
     }
 }

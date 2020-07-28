@@ -63,31 +63,41 @@ class Discount
     const TEXT_NAME_GROUP_CUSTOMER = 'discount_group_customer';
 
     /**
+     * Tells for each group if different products using this discount group can
+     * be summarized to apply the discount.
+     * @var array
+     */
+    protected static $arrDiscountIsCumulative = null;
+
+    /**
      * Array of count type discount group names
      * @var   array
      */
-    private static $arrDiscountCountName = null;
+    protected static $arrDiscountCountName = null;
+
     /**
      * Array of count type discount group units
      * @var   array
      */
-    private static $arrDiscountCountRate = null;
+    protected static $arrDiscountCountRate = null;
+
     /**
      * Array of Customer groups
      * @var   array
      */
-    private static $arrCustomerGroup = null;
+    protected static $arrCustomerGroup = null;
+
     /**
      * Array of Article groups
      * @var   array
      */
-    private static $arrArticleGroup = null;
+    protected static $arrArticleGroup = null;
+
     /**
      * Array of Article/Customer group discount rates
      * @var   array
      */
-    private static $arrDiscountRateCustomer = null;
-
+    protected static $arrDiscountRateCustomer = null;
 
     /**
      * Initializes all static Discount data
@@ -102,13 +112,14 @@ class Discount
                 'name' => self::TEXT_NAME_GROUP_COUNT,
                 'unit' => self::TEXT_UNIT_GROUP_COUNT));
         $query = "
-            SELECT `discount`.`id`, ".$arrSql['field']."
+            SELECT `discount`.`id`, `discount`.`cumulative`, ".$arrSql['field']."
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_discountgroup_count_name` AS `discount`
                    ".$arrSql['join']."
              ORDER BY `discount`.`id` ASC";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return self::errorHandler();
         self::$arrDiscountCountName = array();
+        static::$arrDiscountIsCumulative = array();
         while (!$objResult->EOF) {
             $group_id = $objResult->fields['id'];
             $strName = $objResult->fields['name'];
@@ -125,6 +136,8 @@ class Discount
                 'name' => $strName,
                 'unit' => $strUnit,
             );
+            $isCumulative = (bool) $objResult->fields['cumulative'];
+            static::$arrDiscountIsCumulative[$group_id] = $isCumulative;
             $objResult->MoveNext();
         }
 
@@ -288,6 +301,41 @@ class Discount
         return null;
     }
 
+    /**
+     * Tells whether a discount group is cumulative for all its products
+     * @param   integer   $group_id     The discount group ID
+     * @return boolean True if $group_id counts order limit accross products
+     */
+    public static function isDiscountCumulative($group_id) {
+        if (empty($group_id)) return null;
+        if (is_null(static::$arrDiscountIsCumulative)) self::init();
+        return static::$arrDiscountIsCumulative[$group_id];
+    }
+
+    /**
+     * Returns the number of products to calculate the discount
+     * @param   integer   $group_id     The discount group ID
+     * @param   integer   $count        The number of Products
+     * @return int Number of relevant items
+     */
+    protected static function getItemCountForGroup($group_id, $count=1) {
+        // if group is not cumulative:
+        if (!static::isDiscountCumulative($group_id)) {
+            return $count;
+        }
+        // find number of products in cart matching supplied group id
+        // count them
+        $products = Cart::get_products_array();
+        $count = 0;
+        foreach ($products as $productArr) {
+            $product = Product::getById($productArr['id']);
+            if ($product->group_id() != $group_id) {
+                continue;
+            }
+            $count += $productArr['quantity'];
+        }
+        return $count;
+    }
 
     /**
      * Determine the product discount rate for the discount group with
@@ -304,6 +352,7 @@ class Discount
      */
     static function getDiscountRateCount($group_id, $count=1)
     {
+        $count = static::getItemCountForGroup($group_id, $count);
         // Unknown group ID.  No discount.
         if (empty($group_id)) return 0;
         if (is_null(self::$arrDiscountCountRate)) self::init();
@@ -343,6 +392,7 @@ class Discount
      * Backend use only.
      * @param   integer   $group_id   The ID of the discount group,
      *                                if known, or 0 (zero)
+     * @param   integer   $groupType  Discount type
      * @param   string    $groupName  The group name
      * @param   string    $groupUnit  The group unit
      * @param   array     $arrCount   The array of minimum counts
@@ -354,7 +404,7 @@ class Discount
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
     static function storeDiscountCount(
-        $group_id, $groupName, $groupUnit, $arrCount, $arrRate
+        $group_id, $groupType, $groupName, $groupUnit, $arrCount, $arrRate
     ) {
         global $objDatabase, $_ARRAYLANG;
 
@@ -362,9 +412,11 @@ class Discount
         $group_id = intval($group_id);
         $query = "
             REPLACE INTO `".DBPREFIX."module_shop".MODULE_INDEX."_discountgroup_count_name` (
-                `id`
+                `id`,
+                `cumulative`
             ) VALUES (
-                $group_id
+                " . ($group_id ? $group_id : 'NULL') . ",
+                $groupType
             )";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return self::errorHandler();
@@ -686,7 +738,7 @@ class Discount
             REPLACE INTO `".DBPREFIX."module_shop".MODULE_INDEX."_customer_group` (
                 `id`
             ) VALUES (
-                $group_id
+                " . ($group_id ? $group_id : 'NULL') . "
             )";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) {
@@ -723,7 +775,7 @@ class Discount
             REPLACE INTO `".DBPREFIX."module_shop".MODULE_INDEX."_article_group` (
                 `id`
             ) VALUES (
-                $group_id
+                " . ($group_id ? $group_id : 'NULL') . "
             )";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) {

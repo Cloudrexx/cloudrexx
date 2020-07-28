@@ -1,0 +1,55 @@
+Cx\Modules\Calendar\Model\Entity\Registration:
+  type: entity
+  table: module_calendar_registration
+  indexes:
+    contrexx_module_calendar_event_id_ibfk:
+      columns: [ event_id ]
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    date:
+      type: integer
+    submissionDate:
+      type: timestamp
+      nullable: false
+      column: submission_date
+      options:
+        default: "0000-00-00 00:00:00"
+    type:
+      type: integer
+    userId:
+      type: integer
+      column: user_id
+    langId:
+      type: integer
+      column: lang_id
+    export:
+      type: integer
+    paymentMethod:
+      type: integer
+      column: payment_method
+    paid:
+      type: integer
+  oneToOne:
+    invite:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Invite
+      inversedBy: registration
+      joinColumn:
+        name: invite_id
+        referencedColumnName: id
+        nullable: true
+  oneToMany:
+    registrationFormFieldValues:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue
+      mappedBy: registration
+  manyToOne:
+    event:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Event
+      inversedBy: registrations
+      joinColumn:
+        name: event_id
+        nullable: false
+        referencedColumnName: id

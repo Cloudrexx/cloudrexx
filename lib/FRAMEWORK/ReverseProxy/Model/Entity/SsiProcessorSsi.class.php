@@ -60,8 +60,12 @@ class SsiProcessorSsi extends SsiProcessor {
      * Parses randomized include code
      * @param \HTML_Template_Sigma $template Template to parse
      * @param array $urls List of URLs to get random include tag for
+     * @param int $count (optional) Number of unique random entries to parse
      */
-    protected function parseRandomizedIncludeCode($template, $urls) {
+    protected function parseRandomizedIncludeCode($template, $urls, $count = 1) {
+        if ($count > 1) {
+            throw new \Exception('Generating unique random indexes is not possible using SSI');
+        }
         for ($i = 0; $i < 60; $i++) {
             $index = $i % count($urls);
             $url = $urls[$index];

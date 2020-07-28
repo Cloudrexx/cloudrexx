@@ -71,6 +71,7 @@ class Home {
             $arrAdministratorsOnline = array();
             $i = 0;
             while (!$objUser->EOF) {
+                $arrAdministratorsOnline[$i] = array();
                 $arrAdministratorsOnline[$i]['id'] = $objUser->getId();
                 $arrAdministratorsOnline[$i++]['username'] = $objUser->getUsername();
                 $objUser->next();

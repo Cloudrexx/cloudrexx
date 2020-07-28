@@ -70,7 +70,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $cachedRoot = $this->cx->getTemplate()->getRoot();
         $this->cx->getTemplate()->setRoot($this->getDirectory() . '/View/Template/Backend');
 
-        \Permission::checkAccess(21, 'static');
+        \Permission::checkAccess(ViewManager::VIEW_MANAGER_ACCESS_ID, 'static');
         $objViewManager = new \Cx\Core\ViewManager\Controller\ViewManager();
         $objViewManager->getPage();
 

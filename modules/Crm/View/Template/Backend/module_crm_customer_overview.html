@@ -91,6 +91,7 @@
         $J(".search-checkbox").click(function(){
             $J("#searchcustomer").submit();
         });
+        $J("#filter_membership").chosen();
         $J("#search_customer_type, #filter_membership").change(function(){
             $J("#searchcustomer").submit();
         });
@@ -187,7 +188,7 @@
     <form method='get' action='' name='searchcustomer' id='searchcustomer'>
         <table cellspacing="0" cellpadding="5" border="0" width="100%" class="adminlist" >
             <tr>
-                <th valign="top" colspan="2">
+                <th valign="top" colspan="3">
                     <div align="left">{TXT_CRM_FILTERS}</div>
                 </th>
             </tr>
@@ -205,7 +206,7 @@
                                <input type="checkbox" name="contactSearch[]" value="2" {CRM_CONTACT_CHECKED} class="search-checkbox" />&nbsp;{TXT_CRM_CONTACTS}
                     </div>
                 </td>
-                <td valign="top">
+                <td style="width: 210px;">
                     <!-- BEGIN block_customer_type -->
                     <select style="width:200px" id="search_customer_type" name="customer_type">
                         <option value="0">-{TXT_CRM_FILTER_CUSTOMER_TYPE}-</option>
@@ -213,10 +214,11 @@
                         <option value="{CRM_CUSTOMER_TYPE_ID}" {CRM_CUSTOMER_TYPE_SELECTED}>{CRM_CUSTOMER_TYPE}</option>
                         <!-- END customerTypes -->
                     </select>
+                </td>
+                <td valign="top">
                     <!-- END block_customer_type -->
                     <!-- BEGIN block_memberships -->
-                    <select name="filter_membership" id="filter_membership" style="width:200px">
-                        <option value="0">--{TXT_CRM_FILTER_MEMBERSHIP}--</option>
+                    <select data-placeholder="{TXT_CRM_FILTER_MEMBERSHIP}" name="filter_membership[]" id="filter_membership" style="width:250px" size="1" multiple>
                         <!-- BEGIN memberships -->
                         <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
                         <!-- END memberships -->
@@ -272,7 +274,7 @@
                 <th colspan="9">
                     {TXT_CRM_CUSTOMER_OVERVIEW}
                     <span style="float: right;margin-top: 5px;">
-                        <a title="{TXT_CRM_CUSTOMER_EXPORT}"  href="index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=exportcsv{CRM_SEARCH_LINK}">
+                        <a title="{TXT_CRM_CUSTOMER_EXPORT}" href="index.php?cmd={MODULE_NAME}&amp;act=settings&amp;tpl=interface&amp;subTpl=exportcsv{CRM_SEARCH_LINK}">
                             <img src="../core/Core/View/Media/icons/csv.gif"/>
                         </a>
                     </span>
@@ -281,10 +283,18 @@
             <tr class="row3">
                 <td width="3%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
                 <td width="3%" style="font-weight: bold; white-space: nowrap;">{TXT_CRM_TITLE_ACTIVE}</td>
-                <td width="25%" style="font-weight: bold;text-align: left;"><a title="sort" href="./index.php?cmd={MODULE_NAME}&act=customer{CRM_NAME_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_TITLE_NAME}</a></td>
-                <td width="20%" style="font-weight: bold;text-align: left;"><a title="sort" href="./index.php?cmd={MODULE_NAME}&act=customer{CRM_ACTIVITIES_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_ACTIVITIES}</a></td>
+                <td width="25%" style="font-weight: bold;text-align: left;">
+                    <!-- BEGIN standardNameFilter -->
+                    <a title="sort" href="?cmd={MODULE_NAME}&act=customer{CRM_NAME_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_TITLE_NAME}</a>
+                    <!-- END standardNameFilter -->
+                    <!-- BEGIN contactNameFilter -->
+                    <a title="sort" href="?cmd={MODULE_NAME}&act=customer{CRM_NAME_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_NAME}</a> /
+                    <a title="sort" href="?cmd={MODULE_NAME}&act=customer{CRM_LAST_NAME_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_FAMILY_NAME}</a>
+                    <!-- END contactNameFilter -->
+                </td>
+                <td width="20%" style="font-weight: bold;text-align: left;"><a title="sort" href="?cmd={MODULE_NAME}&act=customer{CRM_ACTIVITIES_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_ACTIVITIES}</a></td>
                 <td width="15%" style="font-weight: bold;text-align: left;">{TXT_CRM_CONTACT}</td>
-                <td width="8%" style="font-weight: bold;"><a title="sort" href="./index.php?cmd={MODULE_NAME}&act=customer{CRM_DATE_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_TITLE_ADDEDDATE}</a></td>
+                <td width="8%" style="font-weight: bold;"><a title="sort" href="?cmd={MODULE_NAME}&act=customer{CRM_DATE_SORT}{CRM_SEARCH_LINK}">{TXT_CRM_TITLE_ADDEDDATE}</a></td>
                 <td width="3%" style="text-align: right;font-weight: bold; white-space: nowrap;">{TXT_CRM_TITLE_FUNCTIONS}</td>
             </tr>
             <!-- BEGIN showEntries -->

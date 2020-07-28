@@ -1,40 +1,36 @@
 <div class="modal-header">
-    <button type="button" class="close" data-ng-click="closeModal()" data-dismiss="modal" aria-hidden="true">×
+    <button type="button" class="close"
+            ng-click="closeModal()"
+            dismiss="modal" aria-hidden="true">×
     </button>
     <h4 class="modal-title">{{:: 'TXT_FILEBROWSER_MEDIABROWSER' | translate }}</h4>
 </div>
-<div class="mediaBrowserMain" id="mediaBrowserMain" data-ng-class="tabs.length == 1 ? 'no-nav': ''">
+<div class="mediaBrowserMain" id="mediaBrowserMain"
+     ng-class="tabs.length === 1 ? 'no-nav' : ''">
     <div>
         <nav class="mediaBrowserNavigation">
             <ul>
-                <li data-ng-repeat="tab in tabs"
-                    data-ng-class="tab.controller == activeController ? 'active-tab' : ''">
-                    <a data-ng-click="setSelectedTab(tab)">
-                        <i class="{{:: tab.icon }}"></i> {{:: tab.label }}
+                <li ng-repeat="tab in tabs"
+                    ng-class="tab.controller === activeController ? 'active-tab' : ''">
+                    <a ng-click="go(tab.controller)">
+                        <i class="{{:: tab.icon}}"></i> {{:: tab.label}}
                     </a>
                 </li>
             </ul>
-            <select class="selectsource" data-ng-options="source as source.name for source in sources"
-                    data-ng-model="selectedSource" data-ng-change="updateSource()"
-                    data-ng-show="activeController == 'MediaBrowserListCtrl'"
-                    data-ng-class="loadingSources ? 'loading' : ''">
+            <select class="selectsource"
+                    ng-options="source as source.name for source in sources"
+                    ng-model="selectedSource" ng-change="updateSource(false, true)"
+                    ng-show="activeController === 'FilebrowserCtrl'"
+                    ng-class="sources ? '' : 'loading'">
                 <option value="files">
                     {{:: 'TXT_FILEBROWSER_FILES' | translate }}
                 </option>
             </select>
         </nav>
-
-        <div data-ng-show="activeController == 'UploaderCtrl'" class="mediaBrowserContent"
-             data-ng-controller="UploaderCtrl">
-            <div data-ng-include="template.url" onload="loadedTemplate()"></div>
-        </div>
-        <div data-ng-show="activeController == 'MediaBrowserListCtrl'" class="mediaBrowserContent"
-             data-ng-controller="MediaBrowserListCtrl">
-            <div data-ng-include="template.url" onload="loadedTemplate()"></div>
-        </div>
-        <div data-ng-show="activeController == 'SitestructureCtrl'" class="mediaBrowserContent"
-             data-ng-controller="SitestructureCtrl">
-            <div data-ng-include="template.url" onload="loadedTemplate()"></div>
+        <div class="mediaBrowserContent"
+             ng-show="tab.controller === activeController"
+             ng-repeat="tab in tabs"
+             ng-include="tab.templateUrl">
         </div>
     </div>
 </div>

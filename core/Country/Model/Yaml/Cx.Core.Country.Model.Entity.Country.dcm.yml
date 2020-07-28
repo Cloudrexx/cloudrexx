@@ -1,0 +1,29 @@
+Cx\Core\Country\Model\Entity\Country:
+  type: entity
+  table: core_country_country
+  repositoryClass: Cx\Core\Country\Model\Repository\CountryRepository
+  id:
+    alpha2:
+      type: string
+      length: 2
+  fields:
+    alpha3:
+      type: string
+      length: 3
+      options:
+        default: ""
+    ord:
+      type: integer
+      unsigned: true
+      options:
+        default: 0 
+  uniqueConstraints:
+    alpha3_UNIQUE:
+      columns: [ alpha3 ]
+  oneToMany:
+    locales:
+      targetEntity: Cx\Core\Locale\Model\Entity\Locale
+      mappedBy: country
+      joinColumn:
+        name: alpha2
+        referencedColumnName: country

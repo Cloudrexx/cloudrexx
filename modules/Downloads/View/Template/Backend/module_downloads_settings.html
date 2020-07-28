@@ -65,20 +65,32 @@
             }
         }
     }
+    $J(document).ready(function() {
+        $J('input[name="downloads_setting_auto_naming"]').change(function() {
+            if ($J('input[name="downloads_setting_auto_naming"]:checked').val() === 'on') {
+                $J('#downloads_pretty_format').show();
+            } else {
+                $J('#downloads_pretty_format').hide();
+            }
+        });
+        $J('input[name="downloads_setting_auto_naming"]').trigger('change');
+    });
 // ]]>
 </script>
 
 <ul id="tabmenu">
-    <li><a id="downloadsTab_settingsSorting" class="active" href="javascript:void(0)" onclick="selectTab('settingsSorting')" title="{TXT_DOWNLOADS_SETTINGS_SORTING}">{TXT_DOWNLOADS_SETTINGS_SORTING}</a></li>
+    <li><a id="downloadsTab_settingsSorting" class="{DOWNLOADS_SORTING_TAB_STATUS}" href="javascript:void(0)" onclick="selectTab('settingsSorting')" title="{TXT_DOWNLOADS_SETTINGS_SORTING}">{TXT_DOWNLOADS_SETTINGS_SORTING}</a></li>
     <li><a id="downloadsTab_settingsListing" href="javascript:void(0)" onclick="selectTab('settingsListing')" title="{TXT_DOWNLOADS_SETTINGS_LISTING}">{TXT_DOWNLOADS_SETTINGS_LISTING}</a></li>
+    <li><a id="downloadsTab_settingsSearch" href="javascript:void(0)" onclick="selectTab('settingsSearch')" title="{TXT_DOWNLOADS_SETTINGS_SEARCH}">{TXT_DOWNLOADS_SETTINGS_SEARCH}</a></li>
     <li><a id="downloadsTab_settingsStatistics" href="javascript:void(0)" onclick="selectTab('settingsStatistics')" title="{TXT_DOWNLOADS_SETTINGS_STATISTICS}">{TXT_DOWNLOADS_SETTINGS_STATISTICS}</a></li>
     <li><a id="downloadsTab_settingsAttributes" href="javascript:void(0)" onclick="selectTab('settingsAttributes')" title="{TXT_DOWNLOADS_SETTINGS_ATTRIBUTES}">{TXT_DOWNLOADS_SETTINGS_ATTRIBUTES}</a></li>
     <li><a id="downloadsTab_settingsInterfaces" href="javascript:void(0)" onclick="selectTab('settingsInterfaces')" title="{TXT_DOWNLOADS_INTERFACES}">{TXT_DOWNLOADS_INTERFACES}</a></li>
+    <li><a id="downloadsTab_settingsEmailTemplates" class="{DOWNLOADS_EMAIL_TEMPLATE_TAB_STATUS}" href="javascript:void(0)" onclick="selectTab('settingsEmailTemplates')" title="{TXT_DOWNLOADS_EMAIL_TEMPLATES}">{TXT_DOWNLOADS_EMAIL_TEMPLATES}</a></li>
 </ul>
 
 <form name="downloads_settings_form" id="downloads_settings_form" action="index.php?cmd=Downloads&amp;act=settings" method="post" onsubmit="downloadsSelectAll(); return true;">
 <!-- start div downloadsTab_settingsSorting -->
-    <div id="settingsSorting" class="downloadsTab">
+    <div id="settingsSorting" class="downloadsTab" style="display:{DOWNLOADS_SORTING_TAB_DIV_STATUS}">
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
             <tbody style="vertical-align:top;">
                 <tr>
@@ -113,6 +125,9 @@
                 </tr>
             </tbody>
         </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
     </div>
 <!-- end div downloadsTab_settingsSorting -->
 <!-- start div downloadsTab_settingsListing -->
@@ -138,6 +153,15 @@
                         {TXT_DOWNLOADS_SUBCAT_COUNT_DESC}
                     </td>
                     <td style="vertical-align:middle;padding-bottom: 10px;"><input type="text" name="downloads_settings_subcat_count" value="{DOWNLOADS_SETTINGS_SUBCAT_COUNT}" /></td>
+                </tr>
+                <tr class="row1">
+                    <td style="padding-bottom: 10px;">
+                        <strong>{TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG}</strong><br />
+                        {TXT_DOWNLOADS_LIST_DOWNLOADS_CURRENT_LANG_DESC}
+                    </td>
+                    <td style="vertical-align:middle;padding-bottom: 10px;">
+                    <input type="checkbox" name="downloads_settings_list_downloads_current_lang" {DOWNLOADS_SETTINGS_LIST_DOWNLOADS_CURRENT_LANG} value="1" />
+                    </td>
                 </tr>
                 <tr class="row3">
                     <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_BLOCKS}</td>
@@ -179,8 +203,46 @@
                 </tr>
             </tbody>
         </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
     </div>
 <!-- end div downloadsTab_settingsListing -->
+<!-- start div downloadsTab_settingsSearch -->
+    <div id="settingsSearch" class="downloadsTab" style="display:none;">
+        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
+            <tbody style="vertical-align:top;">
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS_SEARCH}</th>
+                </tr>
+                <tr class="row3">
+                    <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_INTEGRATE_INTO_SEARCH_COMPONENT}</td>
+                </tr>
+                <tr class="row1">
+                    <td width="50%">
+                    <label for="downloads_settings_integrate_into_search_component">{TXT_DOWNLOADS_INTEGRATE_INTO_SEARCH_COMPONENT_TXT}</label>
+                    </td>
+                    <td style="vertical-align:middle;">
+                    <input type="checkbox" name="downloads_settings_integrate_into_search_component" id="downloads_settings_integrate_into_search_component" {DOWNLOADS_SETTINGS_INTEGRATE_INTO_SEARCH_COMPONENT} value="1" />
+                    </td>
+                </tr>
+                <tr class="row2">
+                    <td width="50%">
+                    <label>{TXT_DOWNLOADS_SEARCH_LINK_METHOD}</label>
+                    </td>
+                    <td style="vertical-align:middle;">
+                    <select name="downloads_settings_global_search_linking" style="width:300px;">
+                    {DOWNLOADS_SETTINGS_SEARCH_LINK_OPTIONS}
+                    </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
+    </div>
+<!-- end div downloadsTab_settingsSearch -->
 <!-- start div downloadsTab_settingsStatistics -->
     <div id="settingsStatistics" class="downloadsTab" style="display:none;">
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
@@ -206,6 +268,9 @@
                 </tr>
             </tbody>
         </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
     </div>
 <!-- end div downloadsTab_settingsStatistics -->
 <!-- start div downloadsTab_settingsAttributes -->
@@ -228,6 +293,9 @@
                 </tr>
             </tbody>
         </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
     </div>
 <!-- end div downloadsTab_settingsAttributes -->
 <!-- start div downloadsTab_settingsInterfaces -->
@@ -278,12 +346,43 @@
                         </table>
                     </td>
                 </tr>
+                <tr class="row3">
+                    <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_SETTINGS_ASSET_SELECTION}</td>
+                </tr>
+                <tr class="row2">
+                    <td width="280">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING}</td>
+                    <td>
+                        <input type="radio" name="downloads_setting_auto_naming" id="auto_naming_off" value="off" {DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE_CHECKED}/>
+                        <label for="auto_naming_off">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_DISABLE}</label>
+                        <br />
+                        <input type="radio" name="downloads_setting_auto_naming" id="auto_naming_on" value="on" {DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE_CHECKED}/>
+                        <label for="auto_naming_on">{TXT_DOWNLOADS_SETTINGS_AUTO_NAMING_ENABLE}</label>
+                        <br />
+                        <div id="downloads_pretty_format">
+                            <input type="text" name="downloads_setting_pretty_format" value="{DOWNLOADS_SETTINGS_PRETTY_FORMAT}" placeholder="#Search#Replace#"/>
+                            <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_DOWNLOADS_SETTINGS_PRETTY_FORMAT_TOOLTIP}</span>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
+        <br />
+        <br />
+        <input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
     </div>
 <!-- end div downloadsTab_settingsInterfaces -->
-<br />
-<br />
-<input type="submit" name="downloads_settings_save" value="{TXT_DOWNLOADS_SAVE}" />
 </form>
+<!-- start div downloadsTab_settingsEmailTemplates -->
+    <div id="settingsEmailTemplates" class="downloadsTab" style="display:{DOWNLOADS_EMAIL_TEMPLATE_DIV_STATUS};">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+       <tbody style="vertical-align:top;">
+           <tr>
+               <th colspan="2">{TXT_DOWNLOADS_EMAIL_TEMPLATES}</th>
+           </tr>
+        </tbody>
+    </table>
+    <br />
+        {DOWNLOADS_EMAIL_TEMPLATE_SETTINGS}
+    </div>
+<!-- end div downloadsTab_settingsEmailTemplates -->
 <!-- end module_downloads_settings.html -->

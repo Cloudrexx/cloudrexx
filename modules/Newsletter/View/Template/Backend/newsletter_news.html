@@ -114,7 +114,7 @@ function NewsSelect(t) {
 <!-- BEGIN news_message -->
   <tr class="row1">
     <td width="5%">
-    <input type="checkbox" id="tr{NEWS_CATEGORY_ID}" onchange="NewsSelect(this);" name="SelectedNews[]" value="{NEWS_ID}" checked="true"/>
+		<input type="checkbox" id="tr{NEWS_CATEGORY_ID}" onchange="NewsSelect(this);" name="selectedNews[{NEWS_CATEGORY_ID}][]" value="{NEWS_ID}" checked="true"/>
   </td>
     <td width="20%" style="text-align:left;">
     <img src="{NEWS_IMAGE_PATH}" width="150" height="100"/>

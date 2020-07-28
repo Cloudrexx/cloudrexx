@@ -108,6 +108,33 @@
       </td>
     </tr>
     <tr class="row1">
+      <td class="nowrap" width="15%">{TXT_SHOP_SETTING_ACTIVATE_PRODUCT_ATTRIBUTE_CHILDREN}&nbsp;
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_SHOP_SETTING_ACTIVATE_PRODUCT_ATTRIBUTE_CHILDREN_TOOLTIP}</span>
+      </td>
+      <td class="nowrap">
+        <input type="checkbox" name="shop_activate_product_attribute_children" value="1"
+               {SHOP_ACTIVATE_PRODUCT_ATTRIBUTE_CHILDREN_CHECKED} />
+      </td>
+    </tr>
+    <tr class="row1">
+      <td class="nowrap" width="15%">{TXT_SHOP_SETTING_FORCE_SELECT_OPTION}&nbsp;
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_SHOP_SETTING_FORCE_SELECT_OPTION_TOOLTIP}</span>
+      </td>
+      <td class="nowrap">
+        <input type="checkbox" name="shop_force_select_option" value="1"
+               {SHOP_FORCE_SELECT_OPTION_CHECKED} />
+      </td>
+    </tr>
+    <tr class="row1">
+      <td class="nowrap" width="15%">{TXT_SHOP_SETTING_VERIFY_ACCOUNT_EMAIL}&nbsp;
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_SHOP_SETTING_VERIFY_ACCOUNT_EMAIL_TOOLTIP}</span>
+      </td>
+      <td class="nowrap">
+        <input type="checkbox" name="shop_verify_account_email" value="1"
+               {SHOP_VERIFY_ACCOUNT_EMAIL_CHECKED} />
+      </td>
+    </tr>
+    <tr class="row1">
       <td class="nowrap">{TXT_SHOP_PRODUCT_SORTING}</td>
       <td class="nowrap">
         <select name="product_sorting" style="width: 270px;">
@@ -245,6 +272,16 @@
         <input type="text" name="numof_products_per_page_frontend"
                style="width: 270px;" class="a_right" maxlength='12'
                value="{SHOP_SETTING_NUMOF_PRODUCTS_PER_PAGE_FRONTEND}" />
+      </td>
+    </tr>
+    <tr class="row1">
+      <td class="nowrap">{TXT_SHOP_SETTING_NUM_CATEGORIES_PER_ROW}
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_SHOP_SETTING_NUM_CATEGORIES_PER_ROW_TOOLTIP}</span>
+      </td>
+      <td class="nowrap">
+        <input type="text" name="num_categories_per_row"
+               style="width: 270px;" class="a_right" maxlength='12'
+               value="{SHOP_SETTING_NUM_CATEGORIES_PER_ROW}" />
       </td>
     </tr>
   </table>

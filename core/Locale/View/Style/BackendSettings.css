@@ -1,0 +1,11 @@
+#content {
+    height: 100%;
+    overflow-y: inherit;
+}
+#content form.cx-ui {
+    overflow: visible;
+    min-height: 90%;
+}
+#content form.cx-ui > fieldset {
+    overflow: visible;
+}

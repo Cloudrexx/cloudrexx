@@ -105,7 +105,7 @@
             recipientName  = $J('input[name="contactFormRecipientName['+i+']['+langId+']"]').val();
 
             newrecipientname = '';
-            if ($J.trim(newrecipientname) == '') {
+            if ($J.trim(recipientName) == '') {
                 if($J.trim($J('input[name="contactFormRecipientName['+i+']['+arrFallBackLang[langId]+']"]').val()) != '') {
                     newrecipientname = $J('input[name="contactFormRecipientName['+i+']['+arrFallBackLang[langId]+']"]').val();
                 } else if($J.trim($J('input[name="contactFormRecipientName['+i+']['+defaultLanguage+']"]').val()) != '') {
@@ -206,6 +206,7 @@
         $J(copy).find('input').val('');
         $J(copy).find('input[type=hidden]').val('new');
         $J(copy).toggleClass('row1 row2');
+        cx.ui.tooltip($J(copy).find('.tooltip-trigger'));
         $J('#formRecipientContainer').append(copy);
     }
 
@@ -318,6 +319,43 @@
     }
 
     /**
+     * mark recipient email option as obsolete when using recipient list field
+     *
+     * @param   active boolean  Set to FALSE to mark the recipient email option
+     *                          as obsolete.
+     */
+    function toggleRecipientFieldState(active = true) {
+        if (active) {
+            // reset background color of input-field
+            jQuery('input[name=contactFormEmail]').css({
+                'background-color': ''
+            });
+            // show info icon
+            jQuery('.recipient-form-email.icon-info').show();
+            jQuery('.recipient-form-email.icon-warning').hide();
+            return;
+        }
+
+        // temporarily disable input-field
+        jQuery('input[name=contactFormEmail]').attr('disabled', true);
+        // fetch background-color of disabled input-field
+        bgcolor = jQuery('input[name=contactFormEmail]').css(
+            'background-color'
+        );
+        // re-enable disabled input-field
+        jQuery('input[name=contactFormEmail]').attr('disabled', false);
+        // set browser's background-color for disabled input-fields to
+        // input-field
+        jQuery('input[name=contactFormEmail]').css({
+            'background-color': bgcolor
+        });
+
+        // show warning icon
+        jQuery('.recipient-form-email.icon-info').hide();
+        jQuery('.recipient-form-email.icon-warning').show();
+    }
+
+    /**
     Remove a form field
     */
     function removeFormField(obj) {
@@ -325,6 +363,7 @@
         if ($J('.formField').size() > 1) {
             if ($J(obj).parent().parent().find('.contactFormFieldType').val() == 'recipient') {
                 $J('.tab_recipients').css('display','none');
+                toggleRecipientFieldState(true);
             }
             var remObj = $J($J(obj).parent()).parent();
             $J(remObj).remove();
@@ -346,6 +385,7 @@
         if (type == "recipient") {
             if ($J('.tab_recipients').is(":visible") == false) {
                 $J('.tab_recipients').css('display','block');
+                toggleRecipientFieldState(false);
             } else {
                 alert('{TXT_CONTACT_RECIPIENT_ALREADY_SET}');
                 $J("#contactFormFieldType_"+elId).val('text');
@@ -363,6 +403,7 @@
 
             if (found == 0) {
                 $J('.tab_recipients').css('display','none');
+                toggleRecipientFieldState(true);
             }
         }
 
@@ -673,10 +714,12 @@
         /**
          * Check for recipent field to hide/show recipient list.
          */
+        toggleRecipientFieldState(true);
         $J('.formField').each(function(e) {
             switch ($J(this).find('.contactFormFieldType').val()) {
                 case 'recipient':
                     $J('.tab_recipients').css('display','block');
+                    toggleRecipientFieldState(false);
                 break;
                 case 'label':
                     id = $J(this).attr('id').split('_')[1];
@@ -737,11 +780,42 @@
         }
     }
 
+    cx.ready(function() {
+        jQuery('input[name=contactFormSendCopy]').bind('change', function() {
+            var status = parseInt(jQuery(this).attr('value'));
+            jQuery('input[name=contactFormSendMultipleReply]').each(function(i, el) {
+                jQuery(el).prop('disabled', !status);
+            });
+            if (!status) {
+                jQuery('input[name=contactFormSendMultipleReply]').each(function(i, el) {
+                    jQuery(el).prop('checked', parseInt(jQuery(el).attr('value')) == status);
+                });
+                jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                    jQuery(el).prop('disabled', status);
+                });
+            }
+        });
+        jQuery('input[name=contactFormSendMultipleReply]').bind('change', function() {
+            var status = parseInt(jQuery(this).attr('value'));
+            jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                jQuery(el).prop('disabled', status);
+            });
+            if (status) {
+                jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                    jQuery(el).prop('checked', parseInt(jQuery(el).attr('value')) != status);
+                });
+            }
+        });
+        jQuery('input[name=contactFormSendCopy]:checked').trigger('change');
+        jQuery('input[name=contactFormSendMultipleReply]:checked').trigger('change');
+    });
+
     // -->
 </script>
 
 <style type="text/css">
     .hide-important { display: none !important; }
+    .formValueView { white-space: nowrap; }
 </style>
 
 <!-- Template of Field elements that is to be added dynamically.  -->
@@ -904,9 +978,10 @@
                                 <!-- BEGIN contact_form_recipient_list -->
                                 <tr id="formRecipient_{CONTACT_FORM_RECIPIENT_ID}" class="formRecipient {ROW_CLASS_NAME}">
                                     <td width="5%"><div class="sort-handle"><input type="hidden" name="contactFormRecipientEditType[{CONTACT_FORM_RECIPIENT_ID}]" value="{CONTACT_FORM_RECIPIENT_TYPE}" id="form_field_recipient_{CONTACT_FORM_RECIPIENT_ID}" /></div></td>
-                                    <td>
+                                    <td style="white-space:nowrap;">
                                         <input style="width:300px;" name="contactFormRecipientEmail[{CONTACT_FORM_RECIPIENT_ID}]"
                                                value="{CONTACT_FROM_RECIPIENT_EMAIL}" />
+                                        <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA}</span>
                                     </td>
                                     <td>
                                         <!-- BEGIN recipient_name -->
@@ -950,12 +1025,13 @@
             <tr class="row1" style="height:20px;">
                 <td style="width: 20%">{TXT_CONTACT_RECEIVER_ADDRESSES}</td>
                 <td>
-                    <input style="width: 300px;" type="text" name="contactFormEmail" value="{CONTACT_FORM_EMAIL}" />&nbsp;
-                    <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA}</span>
+                    <input style="width: 300px;" type="text" name="contactFormEmail" value="{CONTACT_FORM_EMAIL}" />
+                    <span class="tooltip-trigger icon-info recipient-form-email"></span><span class="tooltip-message">{TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA}</span>
+                    <span class="tooltip-trigger icon-warning recipient-form-email"></span><span class="tooltip-message">{TXT_CONTACT_RECIPIENT_LIST_SELECTED_INFO}</span>
                 </td>
             </tr>
             <tr class="row2" style="height:20px;">
-                <td colspan="2">
+                <td colspan="2" style="padding:0;">
                     <!-- BEGIN notificationLanguageForm -->
                     <div style="display: {LANG_FORM_DISPLAY};"  id="notifylangTab_{LANG_ID}" class="notifylangTabs">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -976,14 +1052,18 @@
                 <td><input type="radio" name="contactFormSendCopy" value="1" id="contactFormSendCopy_1" {CONTACT_FORM_SEND_COPY_YES} /><label for="contactFormSendCopy_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormSendCopy" value="0" id="contactFormSendCopy_0" {CONTACT_FORM_SEND_COPY_NO} /><label for="contactFormSendCopy_0">{TXT_CONTACT_NO}</label></td>
             </tr>
             <tr class="row2">
+                <td>{TXT_CONTACT_SEND_MULTIPLE_REPLY}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SEND_MULTIPLE_REPLY_DESCRIPTION}</span></td>
+                <td><input type="radio" name="contactFormSendMultipleReply" value="1" id="contactFormSendMultipleReply_1" {CONTACT_FORM_SEND_MULTIPLE_REPLY_YES} /><label for="contactFormSendMultipleReply_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormSendMultipleReply" value="0" id="contactFormSendMultipleReply_0" {CONTACT_FORM_SEND_MULTIPLE_REPLY_NO} /><label for="contactFormSendMultipleReply_0">{TXT_CONTACT_NO}</label></td>
+            </tr>
+            <tr class="row1">
                 <td>{TXT_CONTACT_USE_EMAIL_OF_SENDER}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_USE_EMAIL_OF_SENDER_DESCRIPTION}</span></td>
                 <td><input type="radio" name="contactFormUseEmailOfSender" value="1" id="contactFormUseEmailOfSender_1" {CONTACT_FORM_USE_EMAIL_OF_SENDER_YES} /><label for="contactFormUseEmailOfSender_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormUseEmailOfSender" value="0" id="contactFormUseEmailOfSender_0" {CONTACT_FORM_USE_EMAIL_OF_SENDER_NO} /><label for="contactFormUseEmailOfSender_0">{TXT_CONTACT_NO}</label></td>
             </tr>
-            <tr class="row1">
+            <tr class="row2">
                 <td>{TXT_CONTACT_SEND_HTML_MAIL}</td>
                 <td><input type="checkbox" name="contactFormHtmlMail" id="contactFormHtmlMail" {CONTACT_FORM_SEND_HTML_MAIL} /></td>
             </tr>
-            <tr class="row2">
+            <tr class="row1">
                 <td>{TXT_CONTACT_SEND_ATTACHMENT}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SEND_ATTACHMENT_DESCRIPTION}</span>
                 <td><input type="checkbox" value="1" name="contactFormSendAttachment" {CONTACT_FORM_SEND_ATTACHMENT}/></td>
             </tr>
@@ -991,7 +1071,7 @@
             <tr class="mailTemplateBlock" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
                 <th colspan="2">{TXT_CONTACT_MAIL_TEMPLATE}</th>
             </tr>
-            <tr class="mailTemplateBlock row1 reset" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
+            <tr class="mailTemplateBlock row2 reset" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
                 <td colspan="2">{CONTACT_MAIL_TEMPLATE}</td>
             </tr>
         </table>

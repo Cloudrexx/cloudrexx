@@ -63,7 +63,9 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
+
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -90,7 +92,7 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[$_LANGID]) ? $arrValue[$_LANGID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 }
 
@@ -120,7 +122,17 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
                 $countFrontendLang = count($this->arrFrontendLanguages);
 
                 if ($objInit->mode == 'backend') {
-                    $strInputfield = '<div id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_Minimized" style="display: block;"><input type="text" data-id="' . $intId . '" class="' . $this->moduleNameLC . 'InputfieldDefault" name="' . $this->moduleNameLC . 'Inputfield[' . $intId . '][0]" id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_0" value="' . $arrValue[0] . '" style="width: 300px" onfocus="this.select();" />&nbsp;<a href="javascript:ExpandMinimize(\'' . $intId . '\');">' . $_ARRAYLANG['TXT_MEDIADIR_MORE'] . '&nbsp;&raquo;</a></div>';
+                    $strInputfield = '<div id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_Minimized" style="display: block;">';
+                    $strInputfield .= '<input type="text" data-id="' . $intId . '" class="' . $this->moduleNameLC . 'InputfieldDefault" name="' . $this->moduleNameLC . 'Inputfield[' . $intId . '][0]" id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_0" value="' . $arrValue[0] . '" style="width: 300px" onfocus="this.select();" />';
+                    $strInputfield .= '&nbsp;&nbsp;<input type="button" 
+                        onClick="getMediaBrowser($J(this));"
+                        data-input-id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_0"
+                        data-views="filebrowser,sitestructure"
+                        data-startmediatype="' . $this->moduleNameLC . '"
+                        value="' . $_ARRAYLANG['TXT_BROWSE'] . '"
+                    />';
+                    $strInputfield .= '&nbsp;<a href="javascript:ExpandMinimize(\'' . $intId . '\');">' . $_ARRAYLANG['TXT_MEDIADIR_MORE'] . '&nbsp;&raquo;</a>';
+                    $strInputfield .= '</div>';
 
                     $strInputfield .= '<div id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_Expanded" style="display: none;">';
                     foreach ($this->arrFrontendLanguages as $key => $arrLang) {
@@ -132,7 +144,15 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
                         }
 
                         $value = isset($arrValue[$intLangId]) ? $arrValue[$intLangId] : '';
-                        $strInputfield .= '<input type="text" data-id="' . $intId . '" name="' . $this->moduleNameLC . 'Inputfield[' . $intId . '][' . $intLangId . ']" id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_' . $intLangId . '" value="' . $value . '" style="width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url(\'' . \Env::get('cx')->getCodeBaseOffsetPath() . \Env::get('cx')->getCoreFolderName() . '/Country/View/Media/Flag/flag_' . $arrLang['lang'] . '.gif\') no-repeat 3px 3px;" onfocus="this.select();" />&nbsp;' . $arrLang['name'] . '&nbsp;' . $minimize . '<br />';
+                        $strInputfield .= '<input type="text" data-id="' . $intId . '" name="' . $this->moduleNameLC . 'Inputfield[' . $intId . '][' . $intLangId . ']" id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_' . $intLangId . '" value="' . $value . '" style="width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url(\'' . \Env::get('cx')->getCodeBaseOffsetPath() . \Env::get('cx')->getCoreFolderName() . '/Country/View/Media/Flag/flag_' . $arrLang['lang'] . '.gif\') no-repeat 3px 3px;" onfocus="this.select();" />';
+                        $strInputfield .= '&nbsp;&nbsp;<input type="button" 
+                            onClick="getMediaBrowser($J(this));"
+                            data-input-id="' . $this->moduleNameLC . 'Inputfield_' . $intId . '_' . $intLangId . '"
+                            data-views="filebrowser,sitestructure"
+                            data-startmediatype="' . $this->moduleNameLC . '"
+                            value="' . $_ARRAYLANG['TXT_BROWSE'] . '"
+                        />';
+                        $strInputfield .= '&nbsp;' . $minimize . '<br />';
                     }
                     $strInputfield .= '</div>';
                 } else {
@@ -191,15 +211,52 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+
+        // replace the links
+        $strValue = preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $strValue);
+        \LinkGenerator::parseTemplate($strValue, true);
+
+        //make link name without protocol
+        $strValueName = preg_replace('#^.*://#', '', $strValue);
+
+        if (strlen($strValueName) >= 55 ) {
+            $strValueName = substr($strValueName, 0, 55)." [...]";
+        }
+
+        //make link href with "http://"
+        $strValueHref = $strValue;
+        if (substr($strValueHref, 0, 1) !== '/' && !preg_match('#^.*://#', $strValueHref)) {
+            $strValueHref = 'http://' . $strValueHref;
+        }
+
+        //make hyperlink with <a> tag
+        $strValueLink = '<a href="'.$strValueHref.'" class="'.$this->moduleNameLC.'InputfieldLink" target="_blank">'.$strValueName.'</a>';
+
+        if(!empty($strValue)) {
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValueLink;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_HREF'] = $strValueHref;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strValueName;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
 
-        $intLangId = $_LANGID;
+        $intLangId = $langId;
         if ($this->arrSettings['settingsTranslationStatus'] == 1) {
-            $intLangId = (in_array($_LANGID, $arrTranslationStatus)) ? $_LANGID : $intEntryDefaultLang;
+            $intLangId = (in_array($langId, $arrTranslationStatus)) ? $langId : $intEntryDefaultLang;
         }
 
         $objInputfieldValue = $objDatabase->Execute("
@@ -233,38 +290,7 @@ class MediaDirectoryInputfieldLink extends \Cx\Modules\MediaDir\Controller\Media
             ");
         }
 
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
-
-        // replace the links
-        $strValue = preg_replace('/\\[\\[([A-Z0-9_-]+)\\]\\]/', '{\\1}', $strValue);
-        \LinkGenerator::parseTemplate($strValue, true);
-
-        //make link name without protocol
-        $strValueName = preg_replace('#^.*://#', '', $strValue);
-
-        if (strlen($strValueName) >= 55 ) {
-            $strValueName = substr($strValueName, 0, 55)." [...]";
-        }
-
-        //make link href with "http://"
-        $strValueHref = $strValue;
-        if (!preg_match('#^.*://#', $strValueHref)) {
-            $strValueHref = "http://".$strValueHref;
-        }
-
-        //make hyperlink with <a> tag
-        $strValueLink = '<a href="'.$strValueHref.'" class="'.$this->moduleNameLC.'InputfieldLink" target="_blank">'.$strValueName.'</a>';
-
-        if(!empty($strValue)) {
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValueLink;
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_HREF'] = $strValueHref;
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strValueName;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
 
 

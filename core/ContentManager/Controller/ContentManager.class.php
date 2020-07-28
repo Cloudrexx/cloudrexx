@@ -61,6 +61,17 @@ class ContentManagerException extends \ModuleException
  */
 class ContentManager extends \Module
 {
+    /**
+     * Name of the cookie to be used by the jstree javascript
+     * library to save the loaded nodes
+     */
+    const JSTREE_COOKIE_LOAD = 'jstree_load_ContentManager_node';
+
+    /**
+     * Name of the cookie to be used by the jstree javascript
+     * library to save the opened nodes
+     */
+    const JSTREE_COOKIE_OPEN = 'jstree_open_ContentManager_node';
 
     //doctrine entity manager
     protected $em = null;
@@ -110,6 +121,10 @@ class ContentManager extends \Module
         \JS::registerJS('lib/javascript/lock.js');
         \JS::registerJS('lib/javascript/jquery/jquery.history.max.js');
 
+        $objCx = \ContrexxJavascript::getInstance();
+        $objCx->setVariable('save_loaded', static::JSTREE_COOKIE_LOAD, 'contentmanager/jstree');
+        $objCx->setVariable('save_opened', static::JSTREE_COOKIE_OPEN, 'contentmanager/jstree');
+
 // this can be used to debug the tree, just add &tree=verify or &tree=fix
         $tree = null;
         if (isset($_GET['tree'])) {
@@ -123,7 +138,6 @@ class ContentManager extends \Module
             // this should print "bool(true)"
             var_dump($this->nodeRepository->recover());
         }
-        $objCx    = \ContrexxJavascript::getInstance();
 
         $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
         $defaultTheme = $themeRepo->getDefaultTheme();
@@ -163,14 +177,11 @@ class ContentManager extends \Module
             $alias_denial     = "block";
         }
 
-        $mediaBrowser = new MediaBrowser();
-        $mediaBrowser->setCallback('target_page_callback');
-        $mediaBrowser->setOptions(array(
-            'type' => 'button',
-            'data-cx-mb-views' => 'sitestructure',
-            'id' => 'page_target_browse'
+        $this->template->setVariable(array(
+            'CORE_CM_METAIMAGE_BUTTON' => static::showMediaBrowserButton('Metaimage')
         ));
 
+        // MediaBrowser used by the WYSIWYG-editor
         $mediaBrowserCkeditor = new MediaBrowser();
         $mediaBrowserCkeditor->setCallback('ckeditor_image_callback');
         $mediaBrowserCkeditor->setOptions(array(
@@ -180,11 +191,7 @@ class ContentManager extends \Module
         ));
 
         $this->template->setVariable(array(
-            'MEDIABROWSER_BUTTON' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE']),
-            'MEDIABROWSER_BUTTON_CKEDITOR' => $mediaBrowserCkeditor->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
-        ));
-
-        $this->template->setVariable(array(
+            'MEDIABROWSER_BUTTON_CKEDITOR' => $mediaBrowserCkeditor->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE']),
             'ALIAS_PERMISSION'  => $alias_permission,
             'ALIAS_DENIAL'      => $alias_denial,
             'CONTREXX_BASE_URL' => ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET . '/',
@@ -196,6 +203,7 @@ class ContentManager extends \Module
 
         $objCx->setVariable('TXT_CORE_CM_VIEW', $_CORELANG['TXT_CORE_CM_VIEW'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_ACTIONS', $_CORELANG['TXT_CORE_CM_ACTIONS'], 'contentmanager/lang');
+        $objCx->setVariable('TXT_CORE_CM_TRANSLATIONS', $_CORELANG['TXT_CORE_CM_TRANSLATIONS'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_VALIDATION_FAIL', $_CORELANG['TXT_CORE_CM_VALIDATION_FAIL'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_HOME_FAIL', $_CORELANG['TXT_CORE_CM_HOME_FAIL'], 'contentmanager/lang');
 
@@ -246,16 +254,25 @@ class ContentManager extends \Module
             }
         }
 
-        // Mediabrowser
+        // MediaBrowser for redirect selection
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array('type' => 'button'));
         $mediaBrowser->setCallback('setWebPageUrlCallback');
         $mediaBrowser->setOptions(array(
-            'data-cx-mb-startview' => 'sitestructure',
+            'startview' => 'sitestructure',
+            'views' => 'uploader,filebrowser,sitestructure',
             'id' => 'page_target_browse'
         ));
         $this->template->setVariable(array(
             'CM_MEDIABROWSER_BUTTON' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
+        ));
+
+        // MediaBrowser for symlink selection
+        $mediaBrowser->setOptions(array(
+            'views' => 'sitestructure',
+        ));
+        $this->template->setVariable(array(
+            'CM_MEDIABROWSER_BUTTON_SYMLINK' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
         ));
 
         $toggleTitles      = !empty($_SESSION['contentManager']['toggleStatuses']['toggleTitles']) ? $_SESSION['contentManager']['toggleStatuses']['toggleTitles'] : 'block';
@@ -275,7 +292,15 @@ class ContentManager extends \Module
 
         // get initial tree data
         $objJsonData = new \Cx\Core\Json\JsonData();
-        $treeData    = $objJsonData->jsondata('node', 'getTree', array('get' => $_GET), false);
+        $treeData = $objJsonData->jsondata(
+            'node',
+            'getTree',
+            array(
+                'get' => $_GET,
+                'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+            ),
+            false
+        );
         $objCx->setVariable('tree-data', $treeData, 'contentmanager/tree');
 
         if (!empty($_GET['act']) && ($_GET['act'] == 'new')) {
@@ -357,24 +382,42 @@ class ContentManager extends \Module
 
         $cxjs = \ContrexxJavascript::getInstance();
         $cxjs->setVariable('confirmDeleteQuestion', $_ARRAYLANG['TXT_CORE_CM_CONFIRM_DELETE'], 'contentmanager/lang');
-        $cxjs->setVariable('cleanAccessData', $objJsonData->jsondata('page', 'getAccessData', array(), false), 'contentmanager');
+        $cxjs->setVariable(
+            'cleanAccessData',
+            $objJsonData->jsondata(
+                'page',
+                'getAccessData',
+                array(
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+                ),
+                false
+            ),
+            'contentmanager'
+        );
         $cxjs->setVariable('contentTemplates', $this->getCustomContentTemplates(), 'contentmanager');
         $cxjs->setVariable('defaultTemplates', $this->getDefaultTemplates(), 'contentmanager/themes');
         $cxjs->setVariable('templateFolders', $this->getTemplateFolders(), 'contentmanager/themes');
-        $cxjs->setVariable('availableBlocks', $objJsonData->jsondata('Block', 'getBlocks', array(), false), 'contentmanager');
+        $cxjs->setVariable(
+            'availableBlocks',
+            $objJsonData->jsondata(
+                'Block',
+                'getBlocks',
+                array(
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+                ),
+                false
+            ),
+            'contentmanager'
+        );
 
         // TODO: move including of add'l JS dependencies to cx obj from /cadmin/index.html
         $getLangOptions=$this->getLangOptions();
-        $statusPageLayout='';
-        $languageDisplay='';
-        if (((!empty($_GET['act']) && $_GET['act'] == 'new')
-                ||!empty($_GET['page'])) && $getLangOptions=="") {
-            $statusPageLayout='margin0';
-            $languageDisplay='display:none';
+        $multiLocaleMode ='';
+        if (!$getLangOptions) {
+            $multiLocaleMode ='cm-single-locale';
         }
 
-        $this->template->setVariable('ADMIN_LIST_MARGIN', $statusPageLayout);
-        $this->template->setVariable('LANGUAGE_DISPLAY', $languageDisplay);
+        $this->template->setVariable('CONTENTMANAGER_LOCALE_CSS_CLASS', $statusPageLayout);
 
         // TODO: move including of add'l JS dependencies to cx obj from /cadmin/index.html
         $this->template->setVariable('SKIN_OPTIONS', $this->getSkinOptions());
@@ -396,11 +439,28 @@ class ContentManager extends \Module
         $cxjs->setVariable(array(
             'editmodetitle'      => $_CORELANG['TXT_FRONTEND_EDITING_SELECTION_TITLE'],
             'editmodecontent'    => $editmodeTemplate->get(),
-            'ckeditorconfigpath' => substr(\Env::get('ClassLoader')->getFilePath(ASCMS_CORE_PATH . '/Wysiwyg/ckeditor.config.js.php'), strlen(ASCMS_DOCUMENT_ROOT) + 1),
+            'ckeditorconfigpath' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Wysiwyg')->getConfigPath(),
             'regExpUriProtocol'  =>  \FWValidator::REGEX_URI_PROTO,
             'contrexxBaseUrl'    => ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET . '/',
             'contrexxPathOffset' => ASCMS_PATH_OFFSET,
+            'showLocaleTagsByDefault'  => \Cx\Core\Setting\Controller\Setting::getValue(
+                'showLocaleTagsByDefault',
+                'Config'
+            ),
         ), 'contentmanager');
+
+        // manually set Wysiwyg variables as the Ckeditor will be
+        // loaded manually through JavaScript (and not properly through the
+        // component interface)
+        $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+        $mediaSourceManager = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getMediaSourceManager();
+        $mediaSource        = current($mediaSourceManager->getMediaTypes());
+        $mediaSourceDir     = $mediaSource->getDirectory();
+        $cxjs->setVariable(array(
+            'ckeditorUploaderId'   => $uploader->getId(),
+            'ckeditorUploaderPath' => $mediaSourceDir[1] . '/'
+        ), 'wysiwyg');
     }
 
     protected function getThemes()
@@ -429,10 +489,12 @@ class ContentManager extends \Module
 
     protected function getLangOptions()
     {
+        global $_CORELANG;
+
         $output = '';
         $language=\FWLanguage::getActiveFrontendLanguages();
         if (count($language)>1) {
-            $output .='<select id="language" class="chzn-select">';
+            $output .= '<select id="language" class="chzn-select" data-disable_search="false" data-no_results_text="' . $_CORELANG['TXT_CORE_LOCALE_DOESNT_EXIST'] . '">';
             foreach ($language as $lang) {
                 $selected = $lang['id'] == FRONTEND_LANG_ID ? ' selected="selected"' : '';
                 $output .= '<option value="' . \FWLanguage::getLanguageCodeById($lang['id']) . '"' . $selected . '>' . $lang['name'] . '</option>';
@@ -494,13 +556,17 @@ class ContentManager extends \Module
 
     protected function getDefaultTemplates()
     {
-        $query = 'SELECT `id`, `lang`, `themesid` FROM `' . DBPREFIX . 'languages`';
-        $rs    = $this->db->Execute($query);
+        $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
 
         $defaultThemes = array();
-        while (!$rs->EOF) {
-            $defaultThemes[$rs->fields['lang']] = $rs->fields['themesid'];
-            $rs->MoveNext();
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            $theme = $themeRepo->getDefaultTheme(
+                \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB,
+                $frontendLanguage['id']);
+            if (!$theme) {
+                continue;
+            }
+            $defaultThemes[$frontendLanguage['lang']] = $theme->getId();
         }
 
         return $defaultThemes;
@@ -518,5 +584,33 @@ class ContentManager extends \Module
         }
 
         return $folderNames;
+    }
+
+    /**
+     * Display the MediaBrowser button
+     *
+     * @global array $_ARRAYLANG
+     *
+     * @param string $name callback function name
+     * @param string $type mediabrowser type
+     *
+     * @return string
+     */
+    protected function showMediaBrowserButton($name, $type = 'filebrowser')
+    {
+        if (empty($name)) {
+            return;
+        }
+
+        global $_ARRAYLANG;
+
+        $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
+        $mediaBrowser->setOptions(array(
+            'type' => 'button',
+            'views' => $type
+        ));
+        $mediaBrowser->setCallback('cx.cm.setSelected' . ucfirst($name));
+
+        return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE']);
     }
 }

@@ -59,9 +59,6 @@ class JsonData {
         '\\Cx\\Core\\Json\\Adapter\\User' => array(
             'JsonUser',
         ),
-        '\\Cx\\Core\\Json\\Adapter\\Calendar' => array(
-            'JsonCalendar',
-        ),
         '\\Cx\\Modules\\Crm\\Controller' => array(
             'JsonCrm',
         ),
@@ -71,7 +68,7 @@ class JsonData {
      * List of adapters to use (they have to implement the JsonAdapter interface)
      * @var Array List of JsonAdapters
      */
-    protected $adapters = array();
+    protected static $adapters = array();
     /**
      * Session id for request which we got from the login request
      * @var string $sessionId
@@ -83,6 +80,10 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      */
     public function __construct() {
+        if (count(static::$adapters)) {
+            return;
+        }
+
         foreach (self::$adapter_classes as $ns=>$adapters) {
             foreach ($adapters as $adapter) {
                 $this->loadAdapter($adapter, $ns);
@@ -124,7 +125,7 @@ class JsonData {
         }
 
         // check if its an adapter!
-        if (!is_a($adapter, '\Cx\Core\Json\JsonAdapter', true)) {
+        if ($adapter instanceof \Cx\Core\Json\JsonAdapter) {
             throw new \Exception('Tried to load class as JsonAdapter, but interface is not implemented: "' . $adapter . '"');
         }
 
@@ -158,7 +159,7 @@ class JsonData {
             return;
             //throw new \Exception('JsonAdapter controller could not be found: "' . $adapter . '"');
         }
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -172,7 +173,7 @@ class JsonData {
             $object = new $adapter();
         }
         \Env::get('init')->loadLanguageData($object->getName());
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -183,34 +184,80 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      * @param String $adapter Adapter name
      * @param String $method Method name
-     * @param Array $arguments Arguments to pass
+     * @param Array $arguments Arguments to pass, first dimension indexes are "response", "get" (optional) and "post" (optional)
      * @param boolean $setContentType (optional) If true (default) the content type is set to application/json
      * @return String JSON data to return to client
      */
     public function jsondata($adapter, $method, $arguments = array(), $setContentType = true) {
-        return $this->json($this->data($adapter, $method, $arguments), $setContentType);
+        $data = $this->data($adapter, $method, $arguments);
+        $arguments['response']->setAbstractContent($data);
+        if ($data['status'] != 'success' && $arguments['response']->getCode() == 200) {
+            $arguments['response']->setCode(500);
+        }
+        return $this->json($arguments['response'], $setContentType);
     }
 
     /**
-     * Parses data into JSON
-     * @param array $data Data to JSONify
+     * Parses a Response into JSON
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Data to JSONify
      * @param boolean $setContentType (optional) If true (NOT default) the content type is set to application/json
      * @return String JSON data to return to client
      */
-    public function json($data, $setContentType = false) {
+    public function json(\Cx\Core\Routing\Model\Entity\Response $response, $setContentType = false) {
+        $response->setParser($this->getParser());
+        $parsedContent = $response->getParsedContent();
         if ($setContentType) {
-            // browsers will pass rendering of application/* MIMEs to other
-            // applications, usually.
-            // Skip the following line for debugging, if so desired
-            header('Content-Type: application/json');
-
             // Disabling CSRF protection. That's no problem as long as we
             // only return associative arrays or objects!
             // https://mycomvation.com/wiki/index.php/Contrexx_Security#CSRF
             // Search for a better way to disable CSRF!
             ini_set('url_rewriter.tags', '');
+            header('Content-Type: ' . $response->getContentType());
         }
-        return json_encode($data);
+        return $parsedContent;
+    }
+
+    /**
+     * Returns the parser used to parse JSON
+     * Parser is either a callback function which accepts an instance of
+     * \Cx\Core\Routing\Model\Entity\Response as first argument or an object with a
+     * parse(\Cx\Core\Routing\Model\Entity\Response $response) method.
+     * @return Object|callable Parser
+     */
+    public function getParser() {
+        return function($response) {
+            $response->setContentType('application/json');
+            return json_encode($response->getAbstractContent());
+        };
+    }
+
+    /**
+     * This method can be used to parse data to JSON format
+     * @param array $data Data to be parsed
+     * @return string JSON encoded data
+     */
+    public function parse(array $data) {
+        $response = new \Cx\Core\Routing\Model\Entity\Response($data);
+        $response->setParser($this->getParser());
+        return $response->getParsedContent();
+    }
+
+    /**
+     * Checks whether an adapter or an adapter's method exists
+     *
+     * @param string $adapterName Adapter name to check for
+     * @param string $methodName (optional) Method name to check for
+     * @return boolean True if adapter or adapter's method exists, false otherwise
+     */
+    public function hasAdapterAndMethod($adapterName, $methodName = '') {
+        $adapterExists = isset(static::$adapters[$adapterName]);
+        if (empty($methodName) || !$adapterExists) {
+            return $adapterExists;
+        }
+        $adapter = static::$adapters[$adapterName];
+        $methods = $adapter->getAccessableMethods();
+        // $methods has two possible formats: value can be a permission
+        return isset($methods[$methodName]) || in_array($methodName, $methods);
     }
 
     /**
@@ -219,16 +266,16 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      * @param String $adapter Adapter name
      * @param String $method Method name
-     * @param Array $arguments Arguments to pass
-     * @return String data to use for further processing
+     * @param Array $arguments Arguments to pass, first dimension indexes are "response", "get" (optional) and "post" (optional)
+     * @return array Data to use for further processing
      */
     public function data($adapter, $method, $arguments = array()) {
         global $_ARRAYLANG;
 
-        if (!isset($this->adapters[$adapter])) {
+        if (!isset(static::$adapters[$adapter])) {
             return $this->getErrorData('No such adapter');
         }
-        $adapter = $this->adapters[$adapter];
+        $adapter = static::$adapters[$adapter];
         $methods = $adapter->getAccessableMethods();
         $realMethod = '';
 
@@ -253,7 +300,7 @@ class JsonData {
             return $this->getErrorData('No such method: ' . $method);
         }
         //permission checks
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, null, null);
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission();
         $defaultPermission = $adapter->getDefaultPermissions();
         if (!empty($methods[$method]) && ($methods[$method] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission)) {
             $objPermission = $methods[$method];
@@ -265,18 +312,27 @@ class JsonData {
             if (!$objPermission->hasAccess($arguments)) {
                 $backend = \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
                 if (!\FWUser::getFWUserObject()->objUser->login($backend)) {
-                    die($this->json($this->getErrorData($_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']), true));
+                    // $_ARRAYLANG data is not load in HEAD request
+                    if (!isset($_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'])) {
+                        $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'] = 'Session expired';
+                    }
+                    return $this->getErrorData(
+                        $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']
+                    );
                 }
                 return $this->getErrorData('JsonData-request to method ' . $realMethod . ' of adapter ' . $adapter->getName() . ' has been rejected by not complying to the permission requirements of the requested method.');
             }
         }
 
-        try {
-            $output = call_user_func(array($adapter, $realMethod), $arguments);
+        if (!isset($arguments['response'])) {
+            $arguments['response'] = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+        }
 
+        try {
+            $data = call_user_func(array($adapter, $realMethod), $arguments);
             return array(
                 'status'  => 'success',
-                'data'    => $output,
+                'data'    => $data,
                 'message' => $adapter->getMessagesAsString()
             );
         } catch (\Exception $e) {
@@ -300,7 +356,7 @@ class JsonData {
      * @param array $data (optional) HTTP post data
      * @param boolean $secure (optional) Wheter to verify peer using SSL or not, default false
      * @param string $certificateFile (optional) Local certificate file for non public SSL certificates
-     * @param array Set an optional HTTP Authentication method and supply its login credentials.
+     * @param array $httpAuth Set an optional HTTP Authentication method and supply its login credentials.
      *              The supplied array must comply with the following structure:
      * <pre class="brush: php">
      *              $httpAuth = array(
@@ -309,18 +365,49 @@ class JsonData {
      *                  'httpAuthPassword' => '<password>',
      *              );
      * </pre>
-     * @return mixed Decoded JSON on success, false otherwise
+     * @param array $files Key is the POST field name, value is the file path
+     * @param boolean $sendJson Whether to encode data as JSON, default false
+     * @param int $timeout Max. time in seconds the request may take. 0 for no timeout
+     * @return stdClass|boolean Decoded JSON on success, false otherwise
      */
-    public function getJson($url, $data = array(), $secure = false, $certificateFile = '', $httpAuth=array(), $files = array()) {
-        $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_POST);
+    public function getJson(
+        $url, $data = array(),
+        $secure = false,
+        $certificateFile = '',
+        $httpAuth=array(),
+        $files = array(),
+        $sendJson = false,
+        $timeout = 0
+    ) {
+        if (count($data)) {
+            $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_POST);
+        } else{
+            $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_GET);
+        }
+        $headers = $request->getHeaders();
+        if (isset($headers['user-agent'])) {
+            $userAgent = $headers['user-agent'] . ' ' . \DBG::getLogHash();
+            $request->setHeader('user-agent', $userAgent);
+        }
+        if ($timeout) {
+            $request->setConfig('timeout', $timeout);
+        }
 
         if (!empty($httpAuth)) {
             switch($httpAuth['httpAuthMethod']) {
                 case 'basic':
-                    $request->setAuth($httpAuth['httpAuthUsername'], $httpAuth['httpAuthPassword'], \HTTP_Request2::AUTH_BASIC);
+                    $request->setAuth(
+                        $httpAuth['httpAuthUsername'],
+                        $httpAuth['httpAuthPassword'],
+                        \HTTP_Request2::AUTH_BASIC
+                    );
                     break;
                 case 'disgest':
-                    $request->setAuth($httpAuth['httpAuthUsername'], $httpAuth['httpAuthPassword'], \HTTP_Request2::AUTH_DIGEST);
+                    $request->setAuth(
+                        $httpAuth['httpAuthUsername'],
+                        $httpAuth['httpAuthPassword'],
+                        \HTTP_Request2::AUTH_DIGEST
+                    );
                     break;
                 case 'none':
                 default:
@@ -328,8 +415,18 @@ class JsonData {
             }
         }
 
-        foreach ($data as $name=>$value) {
-            $request->addPostParameter($name, $value);
+        if ($sendJson) {
+            $request->setHeader(
+                'Content-Type',
+                'application/json'
+            );
+            if (count($data)) {
+                $request->setBody(json_encode($data));
+            }
+        } else {
+            foreach ($data as $name=>$value) {
+                $request->addPostParameter($name, $value);
+            }
         }
 
         if (!empty($files)) {
@@ -343,8 +440,8 @@ class JsonData {
         }
         $request->setConfig(array(
             // disable ssl peer verification
-            'ssl_verify_host' => false,
-            'ssl_verify_peer' => false,
+            'ssl_verify_host' => $secure,
+            'ssl_verify_peer' => $secure,
             // follow HTTP redirect
             'follow_redirects' => true,
             // resend original request to new location
@@ -360,9 +457,12 @@ class JsonData {
             }
         }
         if ($response->getStatus() != 200) {
-            \DBG::msg(__METHOD__.' Request failed! Status: '.$response->getStatus());
+            \DBG::msg(
+                __METHOD__.' Request failed! Status: '.$response->getStatus()
+            );
             \DBG::msg('URL: '.$url);
             \DBG::dump($data);
+            \DBG::dump($response->getBody());
             return false;
         }
 
@@ -378,12 +478,12 @@ class JsonData {
      * Returns the JSON code for a error message
      * @param String $message HTML encoded message
      * @author Michael Ritter <michael.ritter@comvation.com>
-     * @return String JSON code
+     * @return array Data for JSON response
      */
     public function getErrorData($message) {
         return array(
             'status' => 'error',
-            'message'   => $message
+            'message' => $message
         );
     }
 }

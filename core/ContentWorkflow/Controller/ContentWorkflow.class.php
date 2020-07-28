@@ -147,18 +147,24 @@ class ContentWorkflow extends \Module {
     }
 
     /**
-    * Show logfile-entries (new, updated or deleted)
-    *
-    * @global     \Cx\Core\Html\Sigma
-    * @global     array        Core language
-    * @global     array        Configuration
-    */
+     * Show logfile-entries (new, updated or deleted)
+     *
+     * @todo: Merge showHistoryDeleted() into this method
+     *
+     * @global     \Cx\Core\Html\Sigma
+     * @global     array        Core language
+     * @global     array        Configuration
+     */
     protected function showHistory() {
         global $_ARRAYLANG, $_CONFIG;
 
         \Permission::checkAccess(75, 'static');
 
-        $this->tpl->addBlockfile('ADMIN_CONTENT', 'content_history', 'content_history.html');
+        $this->tpl->addBlockfile(
+            'ADMIN_CONTENT',
+            'content_history',
+            'content_history.html'
+        );
 
         switch ($this->cmd) {
             case 'updated':
@@ -176,15 +182,24 @@ class ContentWorkflow extends \Module {
 
         $this->setTextVariables();
 
-        // Gets the quantity of log entries
-        $countLogEntries = $this->logRepo->countLogEntries($this->cmd);
+        // Gets the log entries and quantity of log entries
+        $countLogEntries = 0;
+        $logs  = $this->logRepo->getLogs(
+            $this->cmd,
+            $this->intPos,
+            $_CONFIG['corePagingLimit'],
+            $countLogEntries
+        );
 
         // Paging
-        $strPaging = getPaging($countLogEntries, $this->intPos, '&cmd=ContentWorkflow&act='.$strPagingAct, '', true);
+        $strPaging = getPaging(
+            $countLogEntries,
+            $this->intPos,
+            '&cmd=ContentWorkflow&act='.$strPagingAct,
+            '',
+            true
+        );
         $this->tpl->setVariable('HISTORY_PAGING', $strPaging);
-
-        // Gets the log entries
-        $logs  = $this->logRepo->getLogs($this->cmd, $this->intPos, $_CONFIG['corePagingLimit']);
 
         foreach ($logs as $log) {
             if ($log['action'] == 'remove') {
@@ -193,6 +208,9 @@ class ContentWorkflow extends \Module {
                 $this->logRepo->revert($page, $log['version'] - 1);
             } else {
                 $page = $this->pageRepo->findOneById($log['objectId']);
+            }
+            if (!$page) {
+                continue;
             }
             $data[$page->getId()] = array(
                 'action'  => $log['action'],
@@ -275,20 +293,33 @@ class ContentWorkflow extends \Module {
 
         \Permission::checkAccess(75, 'static');
 
-        $this->tpl->addBlockfile('ADMIN_CONTENT', 'content_history', 'content_history_deleted.html');
+        $this->tpl->addBlockfile(
+            'ADMIN_CONTENT',
+            'content_history',
+            'content_history_deleted.html'
+        );
         $this->strPageTitle = $_ARRAYLANG['TXT_DELETED_PAGES'];
         $this->setTextVariables($_ARRAYLANG['TXT_DELETED_PAGES']);
 
-        // Gets the quantity of log entries
-        $countLogEntries = $this->logRepo->countLogEntries('deleted');
+        // Gets the log entries and quantity of log entries
+        $countLogEntries = 0;
+        $logsByNodeId  = $this->logRepo->getLogs(
+            'deleted',
+            $this->intPos,
+            $_CONFIG['corePagingLimit'],
+            $countLogEntries
+        );
+        $dataByNodeId  = array();
 
         // Paging
-        $strPaging = getPaging($countLogEntries, $this->intPos, '&cmd=ContentWorkflow&act=deleted', '', true);
+        $strPaging = getPaging(
+            $countLogEntries,
+            $this->intPos,
+            '&cmd=ContentWorkflow&act=deleted',
+            '',
+            true
+        );
         $this->tpl->setVariable('HISTORY_PAGING', $strPaging);
-
-        // Gets the log entries
-        $logsByNodeId  = $this->logRepo->getLogs('deleted', $this->intPos, $_CONFIG['corePagingLimit']);
-        $dataByNodeId  = array();
 
         foreach ($logsByNodeId as $nodeId => $logsByLang) {
             $dataByLang = array();
@@ -400,13 +431,15 @@ class ContentWorkflow extends \Module {
 
         $this->restorePage($node, $currentPage, $logs);
 
-        $logsRemove = $this->logRepo->getLogsByAction('remove');
-        foreach ($logsRemove as $logRemove) {
-            $arrData = $this->revertPage($logRemove->getObjectId());
-            $page    = $arrData['page'];
-            $logs    = $arrData['logs'];
-            if ($page->getNodeIdShadowed() == $nodeIdShadowed) {
-                $this->restorePage($node, $page, $logs);
+        if ($nodeIdShadowed !== null) {
+            $logsRemove = $this->logRepo->getLogsByAction('remove');
+            foreach ($logsRemove as $logRemove) {
+                $arrData = $this->revertPage($logRemove->getObjectId());
+                $page    = $arrData['page'];
+                $logs    = $arrData['logs'];
+                if ($page->getNodeIdShadowed() == $nodeIdShadowed) {
+                    $this->restorePage($node, $page, $logs);
+                }
             }
         }
 
@@ -462,8 +495,12 @@ class ContentWorkflow extends \Module {
      * @param  integer  The page with this id will be shown in content manager.
      */
     protected function redirectPage($intPageId) {
-        \Cx\Core\Csrf\Controller\Csrf::header('location: index.php?cmd=ContentManager&page='.$intPageId.'&tab=content');
-        exit;
+        // This is not really a nice way to generate this URL!
+        $baseUrl = \Cx\Core\Routing\Url::fromDocumentRoot();
+        $baseUrl->setMode(\Cx\Core\Core\Controller\Cx::MODE_BACKEND);
+        \Cx\Core\Csrf\Controller\Csrf::redirect(
+            $baseUrl . 'cadmin/ContentManager?page=' . $intPageId . '&tab=content'
+        );
     }
 
 }

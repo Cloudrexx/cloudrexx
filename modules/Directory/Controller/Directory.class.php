@@ -41,7 +41,6 @@ namespace Cx\Modules\Directory\Controller;
  * Includes
  */
 \Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/PEAR/XML/RSS.class.php');
-\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/soap/googlesearch/GoogleSearch.php');
 
 /**
  * RSS Directory
@@ -79,7 +78,6 @@ class Directory extends DirectoryLibrary
     public $arrClient = array();
     public $arrProxy = array();
     public $count = array();
-    public $numLevels = array();
     public $communityModul;
 
     //local settings
@@ -88,7 +86,6 @@ class Directory extends DirectoryLibrary
     public $rowWidth = "50%";
     public $arrRows = array();
     public $arrRowsIndex = array();
-
 
     /**
      * Constructor
@@ -278,7 +275,6 @@ class Directory extends DirectoryLibrary
 
         //select View
         if ($this->settings['indexview']['value'] == 1) {
-            $this->arrRows ='';
             $i = 0;
             $firstCol = true;
             ksort($this->arrRowsIndex);
@@ -308,9 +304,15 @@ $this->arrRows[2] = '';
         }
 
         // set variables
+        $description    = isset($arrAttributes['description']) ? $arrAttributes['description'] : '';
+        $directoryTitle = '';
+        if (isset($arrAttributes['title'])) {
+            $directoryTitle = contrexx_raw2xhtml($arrAttributes['title']);
+        }
+
         $this->_objTpl->setVariable(array(
             'DIRECTORY_TREE' => $this->navtree,
-            'DIRECTORY_DESCRIPTION' => "<br />".$arrAttributes['description'],
+            'DIRECTORY_DESCRIPTION' => "<br />". $description,
             'TYPE_SELECTION' => $this->typeSelection,
             'TXT_DIRECTORY_DIR' => $_ARRAYLANG['TXT_DIR_DIRECTORY'],
 // TODO: Not defined
@@ -318,7 +320,7 @@ $this->arrRows[2] = '';
             'DIRECTORY_ROW_WIDTH' => $this->rowWidth,
             'DIRECTORY_ROW1' => $this->arrRows[1]."<br />",
             'DIRECTORY_ROW2' => $this->arrRows[2]."<br />",
-            'DIRECTORY_TITLE' => htmlentities($arrAttributes['title'], ENT_QUOTES, CONTREXX_CHARSET),
+            'DIRECTORY_TITLE' => $directoryTitle,
             'DIRECTORY_XML_LINK' => $xmlLink,
             'DIRECTORY_INSERT_FEEDS' => $insertFeeds,
         ));
@@ -565,6 +567,7 @@ $this->arrRows[2] = '';
 
         if (isset($lid)) {
             $levelLink = "&lid=".$lid;
+            $lid = intval($lid);
         }
 
         if ($this->settings['sortOrder']['value'] == 1) {
@@ -998,8 +1001,12 @@ $this->arrRows[2] = '';
         }
 
         // set variables
+        $formattedValidateDate = '';
+        if (!empty($validatedate)) {
+            $formattedValidateDate = date('d. M Y', $validatedate);
+        }
         $this->_objTpl->setVariable(array(
-            'DIRECTORY_FEED_VALIDATE_DATE' => date("d. M Y", $validatedate),
+            'DIRECTORY_FEED_VALIDATE_DATE' => $formattedValidateDate,
             'DIRECTORY_FEED_DATE' => date("d. M Y", $date),
             'DIRECTORY_FEED_HITS' => $hits,
         ));
@@ -1032,8 +1039,6 @@ $this->arrRows[2] = '';
                 $arrFeedContent['relatedlinks'] = $objResult->fields['relatedlinks'];
                 $arrFeedContent['status'] = $objResult->fields['status'];
                 $arrFeedContent['addedby'] = $objResult->fields['addedby'];
-                $arrFeedContent['provider'] = $objResult->fields['provider'];
-                $arrFeedContent['ip'] = $objResult->fields['ip'];
                 $arrFeedContent['validatedate'] = $objResult->fields['validatedate'];
                 $arrFeedContent['link'] = $objResult->fields['link'];
                 $arrFeedContent['rss_link'] = $objResult->fields['rss_link'];
@@ -1291,17 +1296,18 @@ $this->arrRows[2] = '';
 
                     //get title
                     if ($fieldName =="title") {
-                        $newTime = $this->settings['mark_new_entrees']['value'];
-                        $now = mktime(date("G"),  date("i"), date("s"), date("m"), date("d"), date("Y"));
-                        $d = date("d",$arrFeedContent['validatedate']);
-                        $m = date("m",$arrFeedContent['validatedate']);
-                        $Y = date("Y",$arrFeedContent['validatedate']);
-                        $d = $d+$newTime;
-                        $newFeed = mktime(0, 0, 0, $m, $d, $Y);
-                        if ($now <= $newFeed) {
-                            $content = $arrFeedContent[$fieldName]."&nbsp;<img src='".$this->imageWebPath."/new.gif' border='0' alt='' />";
-                        } else {
-                            $content = $arrFeedContent[$fieldName];
+                        $content = $arrFeedContent[$fieldName];
+                        if (!empty($arrFeedContent['validatedate'])) {
+                            $newTime = $this->settings['mark_new_entrees']['value'];
+                            $now = mktime(date("G"),  date("i"), date("s"), date("m"), date("d"), date("Y"));
+                            $d = date("d",$arrFeedContent['validatedate']);
+                            $m = date("m",$arrFeedContent['validatedate']);
+                            $Y = date("Y",$arrFeedContent['validatedate']);
+                            $d = $d+$newTime;
+                            $newFeed = mktime(0, 0, 0, $m, $d, $Y);
+                            if ($now <= $newFeed) {
+                                $content = $arrFeedContent[$fieldName]."&nbsp;<img src='".$this->imageWebPath."/new.gif' border='0' alt='' />";
+                            }
                         }
                     }
                     $setVariable["DIRECTORY_FEED_".strtoupper($fieldName)] = nl2br($content);
@@ -1720,12 +1726,6 @@ $this->arrRows[2] = '';
                 'DIRECTORY_CATEGORY_SELECTED' => $categorieSe,
                 'DIRECTORY_LEVELS_DESELECTED' => $levelsDe,
                 'DIRECTORY_LEVELS_SELECTED' => $levelsSe,
-// TODO: Not defined
-//                'DIRECTORY_OS' => $platforms,
-// TODO: Not defined
-//                'DIRECTORY_IP' => $dirIp,
-// TODO: Not defined
-//                'DIRECTORY_HOST' => $dirProvider,
                 'DIRECTORY_ID' => $id,
 // TODO: Not defined
 //                'DIRECTORY_EDIT_FILE' => $filename,
@@ -1939,23 +1939,13 @@ $this->arrRows[2] = '';
                 }
             }
 
-            //Google Search
-            //Googlesearch needs to be tested again. Don't work 100%.
-            $this->settings['google']['googleSeach'] = 0;
-            if ($this->settings['google']['googleSeach'] == "1") {
-                if ($count < 10) {
-                    $results = $this->settings['google']['googleResults']-$count;
-                    $this->googleSearch($searchTermGoogle, $results);
-                }
-            } else {
-                if ($count == 0) {
-                    $this->_objTpl->hideBlock('showResults');
-                    // set variables
-                    $this->_objTpl->setVariable(
-                        'DIRECTORY_NO_FEEDS_FOUND', $_ARRAYLANG['DIRECTORY_NO_FEEDS_FOUND']
-                    );
-                    $this->_objTpl->parse('noResults');
-                }
+            if ($count == 0) {
+                $this->_objTpl->hideBlock('showResults');
+                // set variables
+                $this->_objTpl->setVariable(
+                    'DIRECTORY_NO_FEEDS_FOUND', $_ARRAYLANG['DIRECTORY_NO_FEEDS_FOUND']
+                );
+                $this->_objTpl->parse('noResults');
             }
 /*
         } else {
@@ -2015,62 +2005,6 @@ $this->arrRows[2] = '';
             }
         }
     }
-
-
-    /**
-     * google search
-     * @access   public
-     * @param    string        $term
-     */
-    function googleSearch($term, $results)
-    {
-        global $_ARRAYLANG;
-        /*
-        * Example to access Google cached pages through GoogleSearch for PHP.
-        */
-        $objGoogleSearch = new \GoogleSearch();
-
-        //set Google licensing key
-        $key = $this->settings['google']['googleId'];
-        $objGoogleSearch->setKey($key);
-        //set query string to search.
-        $objGoogleSearch->setQueryString($term);    //set query string to search.
-        //set few other parameters (optional)
-        $objGoogleSearch->setMaxResults($results);    //set max. number of results to be returned.
-        $objGoogleSearch->setSafeSearch(true);    //set Google "SafeSearch" feature.
-        //call search method on GoogleSearch object
-        $search_result = $objGoogleSearch->doSearch();
-        //check for errors
-        if (!$search_result) {
-            $err = $objGoogleSearch->getError();
-            if ($err) {
-                \Cx\Core\Csrf\Controller\Csrf::header("Location: ".CONTREXX_SCRIPT_PATH."?section=Directory&cmd=search");
-                exit;
-            }
-        }
-        //output individual components of each result
-        $re = $search_result->getResultElements();
-        if (!empty($re)) {
-            foreach ($re as $element) {
-                $title = "<a href='".$element->getURL()."' target='_blank'>".$element->getTitle()."</a>";
-                $url = "<a href='".$element->getURL()."' target='_blank'>".substr($element->getURL(), 0, 80)."</a>";
-                $description = $element->getSnippet();
-                // set variables
-                $this->_objTpl->setVariable(array(
-                    'DIRECTORY_FEED_DESCRIPTION' => strip_tags(substr($description, 0, 600)),
-                    'DIRECTORY_FEED_TITLE' => $title,
-                    'DIRECTORY_FEED_URL' => $url,
-                    'DIRECTORY_FEED_DETAIL' => $_ARRAYLANG['TXT_DIRECTORY_DETAIL'],
-                    'DIRECTORY_FEED_DETAIL_LINK' => $element->getURL(),
-                    'DIRECTORY_FEED_VOTE' => $_ARRAYLANG['TXT_DIRECTORY_YOUR_VOTE'],
-                    'DIRECTORY_FEED_VOTE_LINK' => $element->getURL(),
-                    'DIRECTORY_FEED_AVERAGE_VOTE' => $url,
-                ));
-                $this->_objTpl->parse('showResults');
-            }
-        }
-    }
-
 
     /**
      * redirect feed
@@ -2193,10 +2127,10 @@ $this->arrRows[2] = '';
         $this->_getProxyInformations();
         $client = md5($this->arrClient['ip'].$this->arrClient['useragent'].$this->arrClient['language'].$this->arrProxy['ip'].$this->arrProxy['host']);
         $time = time();
-        $voteNEW = intval($_GET['vote']);
-        $id = intval($_GET['id']);
-        $cid = intval($_GET['cid']);
-        $lid = intval($_GET['lid']);
+        $voteNEW = isset($_GET['vote']) ? contrexx_input2int($_GET['vote']) : 0;
+        $id      = isset($_GET['id']) ? contrexx_input2int($_GET['id']) : 0;
+        $cid     = isset($_GET['cid']) ? contrexx_input2int($_GET['cid']) : 0;
+        $lid     = intval($_GET['lid']);
 
         //get clients
         $objResult = $objDatabase->SelectLimit("
@@ -2214,7 +2148,7 @@ $this->arrRows[2] = '';
         }
 
         $feedTitle = '';
-        if (!checkForSpider() && isset($id) && isset($voteNEW) && $client != $clientOLD) {
+        if (!checkForSpider() && $id && $voteNEW && $client != $clientOLD) {
             if ($voteNEW > 10) {
                 $voteNEW = 10;
             } elseif ($voteNEW < 1) {
@@ -2308,7 +2242,8 @@ $this->arrRows[2] = '';
     {
         if (isset($_SERVER['HTTP_VIA']) && $_SERVER['HTTP_VIA']) { // client does use a proxy
             $this->arrProxy['ip'] = $_SERVER['REMOTE_ADDR'];
-            $this->arrProxy['host'] = @gethostbyaddr($this->arrProxy['ip']);
+            $net = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Net');
+            $this->arrProxy['host'] = $net->getHostByAddr($this->arrProxy['ip']);
             $proxyUseragent = trim(addslashes(urldecode(strstr($_SERVER['HTTP_VIA'],' '))));
             $startPos = strpos($proxyUseragent, '(');
             $this->arrProxy['useragent'] = substr($proxyUseragent,$startPos+1);

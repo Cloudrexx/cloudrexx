@@ -211,6 +211,9 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
                 'TXT_ALIAS_OPEN_ALIAS_NEW_WINDOW'   => $_ARRAYLANG['TXT_ALIAS_OPEN_ALIAS_NEW_WINDOW'],
             ));
 
+            // this is a dirty hack, to force the CSS class 'rowWarn'
+            // on non-existent targets
+            $targetURL = '<none>';
             foreach ($arrAliases as $page) {
 
                 $sourceURL = $page->getSlug();
@@ -222,6 +225,7 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
                     ));
 
                     $target = "";
+                    $target_title = '';
                     if ($this->_isLocalAliasTarget($page)) {
                         // alias points to a local webpage
                         $targetPage = $this->_fetchTarget($page);
@@ -337,11 +341,6 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
 
                     if ($newtype == 'local') {
                         $placeholder = \Cx\Core\Routing\NodePlaceholder::fromPlaceholder($newtarget);
-                        // when creating a new alias
-                        //if (($aliasId === 0) && !$placeholder->hasLang()) {
-                            // make sure language is specified in placeholder
-                            $placeholder->setLang(FRONTEND_LANG_ID);
-                        //}
                         // force usage of node ID
                         $newtarget = $placeholder->getPlaceholder(true);
                     }
@@ -390,7 +389,11 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
         }
 
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
-        $mediaBrowser->setOptions(array('type' => 'button', 'data-cx-mb-views' => 'sitestructure'));
+        $mediaBrowser->setOptions(array(
+            'type' => 'button',
+            'views' => 'sitestructure',
+            'startview' => 'sitestructure',
+        ));
         $mediaBrowser->setCallback('aliasSetUrl');
 
         // prepare template

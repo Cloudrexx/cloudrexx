@@ -19,15 +19,15 @@
 <!-- BEGIN news_menu -->
 <form name="formNews" id="filter-form" method="post" action="index.php?section=News&amp;cmd={NEWS_CMD}">
     {NEWS_CAT_DROPDOWNMENU}
-    <!-- BEGIN tagFilterCont -->
+    <!-- BEGIN news_tag_filter_container -->
     <div class="news-frm-full-width tag-filter-cont">
         <div id="tag-filter">
-            <p>{NEWS_FILTER_TAG_NAME}</p>
+            <p>{NEWS_TAG_FILTER_NAME}</p>
             <p id="remove-tag-filter">&nbsp;</p>
         </div>
-        <input type="hidden" name="tag" id='tag-filter-value' value="{NEWS_FILTER_TAG_NAME}" />
+        <input type="hidden" name="tag" id='tag-filter-value' value="{NEWS_TAG_FILTER_NAME}" />
     </div>
-    <!-- END tagFilterCont -->
+    <!-- END news_tag_filter_container -->
 </form>
 <!-- END news_menu -->
 <!-- BEGIN news_list -->
@@ -40,23 +40,18 @@
             <div class="news-text col-md-10">
                 <div class="news-teaser">{NEWS_TEASER}</div>
                 <div class="news-info">
-                    <p>
-                        {NEWS_DATE}
-                        &bull; {NEWS_CATEGORY}
-                        <!-- BEGIN news_comments_count -->
-                        &bull; {NEWS_COUNT_COMMENTS}
-                        <!-- END news_comments_count -->
-                    </p>
-                    <!-- BEGIN tagsBlock -->
-                    <p class="newsTags">
+                    {NEWS_DATE} &bull; {NEWS_CATEGORY}
+                    <!-- BEGIN news_comments_count --> &bull; {NEWS_COUNT_COMMENTS}<!-- END news_comments_count -->
+                    <!-- BEGIN news_tags_container -->
+                    <span class="newsTags">
                         &bull;
                         <span class="tagCont">
-                            <!-- BEGIN newsTagList -->
+                            <!-- BEGIN news_tag_list -->
                             {NEWS_TAG_LINK}
-                            <!-- END newsTagList -->
+                            <!-- END news_tag_list -->
                         </span>
-                    </p>
-                    <!-- END tagsBlock -->
+                    </span>
+                    <!-- END news_tags_container -->
                 </div>
             </div>
         </div>

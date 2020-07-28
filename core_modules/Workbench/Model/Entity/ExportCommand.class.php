@@ -67,7 +67,7 @@ class ExportCommand extends Command {
      * @param array $arguments Array of commandline arguments
      */
     public function execute(array $arguments) {
-        $comp = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[3], $arguments[2]);
+        $comp = new ReflectionComponent($arguments[3], $arguments[2]);
         $customized = false;
         if (isset($arguments[5])) {
             if ($arguments[5] == 'customized') {
@@ -78,7 +78,7 @@ class ExportCommand extends Command {
         $zipPath = $arguments[4];
 
         if (file_exists($zipPath)) {
-            if (!$this->interface->yesNo('File is already exists. Do you want to overwrite it?')) {
+            if (!$this->interface->yesNo('File already exists. Do you want to overwrite it?')) {
                 return;
             }
         }

@@ -72,7 +72,7 @@ class NodeRepository extends NestedTreeRepository {
      * @return array
      * @override
      */
-    public function findBy(array $criteria)
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('n')
@@ -97,13 +97,9 @@ class NodeRepository extends NestedTreeRepository {
     }
 
     /**
-     * Finds a single entity by a set of criteria.
-     *
-     * @param array $criteria
-     * @return object
-     * @override
+     * {@inheritdoc}
      */
-    public function findOneBy(array $criteria)
+    public function findOneBy(array $criteria, array $orderBy = null)
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('n')
@@ -179,6 +175,7 @@ class NodeRepository extends NestedTreeRepository {
                     true, //$includeName = true,
                     true, // true, //$includeMetaData = true,
                     true, // true, //$includeProtection = true,
+                    true, // includeEditingStatus
                     false, // true, //$followRedirects = false,
                     false, // true //$followFallbacks = false
                     $destPage

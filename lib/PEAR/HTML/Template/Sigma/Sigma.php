@@ -372,6 +372,19 @@ class HTML_Template_Sigma extends PEAR
      */
     var $_triggerBlock = '__global__';
 
+    public function __construct($root = '', $cacheRoot = '') {
+        $this->HTML_Template_Sigma($root, $cacheRoot);
+    }
+
+    /**
+     * Cache for parsed variables
+     * This was static. This is a bugfix for correct behavior with multiple instances.
+     * @author Reto Kohli <reto.kohli@comvation.com>
+     * @author Michael Ritter <michael.ritter@cloudrexx.com>
+     * @var array
+     */
+    protected $vars = null;
+
     /**
      * Constructor: builds some complex regular expressions and optionally
      * sets the root directories.
@@ -594,8 +607,6 @@ class HTML_Template_Sigma extends PEAR
      */
     function parse($block = '__global__', $flagRecursion = false, $fakeParse = false)
     {
-        static $vars;
-
         if (!isset($this->_blocks[$block])) {
             return $this->raiseError($this->errorMessage(SIGMA_BLOCK_NOT_FOUND, $block), SIGMA_BLOCK_NOT_FOUND);
         }
@@ -608,13 +619,13 @@ class HTML_Template_Sigma extends PEAR
         $outer = $this->_blocks[$block];
 
         if (!$flagRecursion) {
-            $vars = array();
+            $this->vars = array();
         }
         // block is not empty if its local var is substituted
         $empty = true;
         foreach ($this->_blockVariables[$block] as $allowedvar => $v) {
             if (isset($this->_variables[$allowedvar])) {
-                $vars[$this->openingDelimiter . $allowedvar . $this->closingDelimiter] = $this->_variables[$allowedvar];
+                $this->vars[$this->openingDelimiter . $allowedvar . $this->closingDelimiter] = $this->_variables[$allowedvar];
                 $empty = false;
                 // vital for checking "empty/nonempty" status
                 unset($this->_variables[$allowedvar]);
@@ -649,16 +660,16 @@ class HTML_Template_Sigma extends PEAR
         // add "global" variables to the static array
         foreach ($this->_globalVariables as $allowedvar => $value) {
             if (isset($this->_blockVariables[$block][$allowedvar])) {
-                $vars[$this->openingDelimiter . $allowedvar . $this->closingDelimiter] = $value;
+                $this->vars[$this->openingDelimiter . $allowedvar . $this->closingDelimiter] = $value;
             }
         }
         // if we are inside a hidden block, don't bother
         if (!$fakeParse) {
-            if (0 != count($vars) && (!$flagRecursion || !empty($this->_functions[$block]))) {
-                $varKeys     = array_keys($vars);
+            if ($this->vars && (!$flagRecursion || !empty($this->_functions[$block]))) {
+                $varKeys     = array_keys($this->vars);
                 $varValues   = $this->_options['preserve_data']
-                               ? array_map(array(&$this, '_preserveOpeningDelimiter'), array_values($vars))
-                               : array_values($vars);
+                               ? array_map(array(&$this, '_preserveOpeningDelimiter'), array_values($this->vars))
+                               : array_values($this->vars);
             }
 
             // check whether the block is considered "empty" and append parsed content if not
@@ -670,7 +681,7 @@ class HTML_Template_Sigma extends PEAR
                     foreach ($this->_functions[$block] as $id => $data) {
                         $placeholder = $this->openingDelimiter . '__function_' . $id . '__' . $this->closingDelimiter;
                         // do not waste time calling function more than once
-                        if (!isset($vars[$placeholder])) {
+                        if (!isset($this->vars[$placeholder])) {
                             $args         = array();
                             $preserveArgs = !empty($this->_callback[$data['name']]['preserveArgs']);
                             foreach ($data['args'] as $arg) {
@@ -685,7 +696,7 @@ class HTML_Template_Sigma extends PEAR
                             }
                             $outer = str_replace($placeholder, $res, $outer);
                             // save the result to variable cache, it can be requested somewhere else
-                            $vars[$placeholder] = $res;
+                            $this->vars[$placeholder] = $res;
                         }
                     }
                 }

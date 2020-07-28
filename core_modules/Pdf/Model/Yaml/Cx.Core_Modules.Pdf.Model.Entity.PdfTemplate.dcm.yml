@@ -1,0 +1,27 @@
+Cx\Core_Modules\Pdf\Model\Entity\PdfTemplate:
+  type: entity
+  table: core_module_pdf_template
+  fields:
+    id:
+      id: true
+      type: integer
+      length: 11
+      generator:
+        strategy: AUTO
+    title:
+      type: string
+      length: 255
+      nullable: false
+    fileName:
+      type: string
+      length: 255
+      column: file_name
+    htmlContent:
+      type: text
+      column: html_content
+      nullable: false
+    active:
+      type: boolean
+      nullable: false
+      options:
+        default: true

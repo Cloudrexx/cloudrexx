@@ -45,13 +45,93 @@ namespace Cx\Core\Config\Controller;
  * @subpackage  core_config
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget');
     }
 
-     /**
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController');
+    }
+
+    /**
+     * Do something after all active components are loaded
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     */
+    public function postComponentLoad() {
+        // initial load of all config settings
+        \Cx\Core\Setting\Controller\Setting::init('Config', null, 'Yaml', null, \Cx\Core\Setting\Controller\Setting::REPOPULATE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommandsForCommandMode() {
+        return array('config');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommandDescription($command, $short = false) {
+        switch ($command) {
+            case 'config':
+                if ($short) {
+                    return 'Allows (re-)initialization of base configuration';
+                }
+                return $this->getCommandDescription($command, true) . '
+
+    Usage: ./cx config init [--force]';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
+        switch ($command) {
+            case 'config':
+                $force = current($arguments) == '--force';
+                \Cx\Core\Config\Controller\Config::init(null, $force);
+                echo 'Done' . PHP_EOL;
+                break;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        foreach (
+            array(
+                'GLOBAL_TITLE',
+                'DOMAIN_URL',
+                'GOOGLE_MAPS_API_KEY'
+            ) as $widgetName
+        ) {
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName
+                )
+            );
+        }
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -71,13 +151,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $this->cx->getTemplate()->setRoot($cachedRoot);
     }
 
-    public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        self::registerYamlSettingEventListener();
+    public function registerEventListeners() {
+        static::registerYamlSettingEventListener($this->cx);
     }
 
-    public static function registerYamlSettingEventListener() {
-        $evm = \Env::get('cx')->getEvents();
-        $yamlSettingEventListener = new \Cx\Core\Config\Model\Event\YamlSettingEventListener();
+    public static function registerYamlSettingEventListener($cx) {
+        $evm = $cx->getEvents();
+        $yamlSettingEventListener = new \Cx\Core\Config\Model\Event\YamlSettingEventListener($cx);
         $evm->addModelListener(\Doctrine\ORM\Events::preUpdate, 'Cx\\Core\\Setting\\Model\\Entity\\YamlSetting', $yamlSettingEventListener);
         $evm->addModelListener('postFlush', 'Cx\\Core\\Setting\\Model\\Entity\\YamlSetting', $yamlSettingEventListener);
     }

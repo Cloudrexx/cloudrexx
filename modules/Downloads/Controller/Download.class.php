@@ -54,7 +54,7 @@ class Download {
     private $mime_type;
 
     /**
-     * Source in loaded interface language (LANG_ID)
+     * Source in loaded interface language
      * @var string
      */
     private $source;
@@ -66,7 +66,7 @@ class Download {
     private $sources;
 
     /**
-     * Source-name in loaded interface language (LANG_ID)
+     * Source-name in loaded interface language
      * @var string
      */
     private $source_name;
@@ -78,7 +78,7 @@ class Download {
     private $source_names;
 
     /**
-     * Filetype in loaded interface language (LANG_ID)
+     * Filetype in loaded interface language
      *
      * @var string
      */
@@ -111,7 +111,7 @@ class Download {
     private $categories;
 
     /**
-     * Name of download in loaded interface language (LANG_ID)
+     * Name of download in loaded interface language
      * @var string
      */
     private $name;
@@ -123,7 +123,7 @@ class Download {
     private $names;
 
     /**
-     * Description in loaded interface language (LANG_ID)
+     * Description in loaded interface language
      * @var string
      */
     private $description;
@@ -135,7 +135,7 @@ class Download {
     private $descriptions;
 
     /**
-     * Metakeys in loaded interface language (LANG_ID)
+     * Metakeys in loaded interface language
      * @var string
      */
     private $metakey;
@@ -268,11 +268,20 @@ class Download {
 
     private $userId;
 
+    /**
+     * Local copy of the components config data
+     * @var array
+     */
+    protected $config = array();
 
-    public function __construct()
+    /**
+     * @param   array   $config Config data of DownloadsLibrary
+     */
+    public function __construct($config = array())
     {
         global $objInit;
 
+        $this->config = $config;
         $this->isFrontendMode = $objInit->mode == 'frontend';
 
         $objFWUser = \FWUser::getFWUserObject();
@@ -340,7 +349,7 @@ class Download {
      */
     public function delete($categoryId = null)
     {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
+        global $objDatabase, $_ARRAYLANG;
 
         $objFWUser = \FWUser::getFWUserObject();
 
@@ -358,7 +367,7 @@ class Download {
                 )
             )
         ) {
-            $this->error_msg[] = sprintf($_ARRAYLANG['TXT_DOWNLOADS_NO_PERM_DEL_DOWNLOAD'], htmlentities($this->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET));
+            $this->error_msg[] = sprintf($_ARRAYLANG['TXT_DOWNLOADS_NO_PERM_DEL_DOWNLOAD'], htmlentities($this->getName(), ENT_QUOTES, CONTREXX_CHARSET));
             return false;
         }
 
@@ -372,6 +381,8 @@ class Download {
             LEFT JOIN `'.DBPREFIX.'module_downloads_rel_download_download` AS tblR ON (tblR.`id1` = tblD.`id` OR tblR.`id2` = tblD.`id`)
             WHERE tblD.`id` = '.$this->id) !== false
         ) {
+            //clear Esi Cache
+            DownloadsLibrary::clearEsiCache();
             return true;
         } else {
             $this->error_msg[] = sprintf($_ARRAYLANG['TXT_DOWNLOADS_DOWNLOAD_DELETE_FAILED'], htmlentities($this->name, ENT_QUOTES, CONTREXX_CHARSET));
@@ -409,20 +420,72 @@ class Download {
         }
     }
 
-    public function send($langId = LANG_ID)
+    /**
+     * Send asset to client
+     *
+     * Send the file of this instance to the client.
+     * The script execution gets terminated by the end of this method call.
+     *
+     * @param   integer $langId ID of locale the filename should be sent in
+     * @param   string  $disposition    HTTP-Content-Disposition to use. One of
+     *                                  the following constants can be used:
+     *                                  <ul>
+     *                                      <li>HTTP_DOWNLOAD_ATTACHMENT</li>
+     *                                      <li>HTTP_DOWNLOAD_INLINE</li>
+     *                                  </ul>
+     *                                  If $disposition is unknown, then
+     *                                  HTTP_DOWNLOAD_ATTACHMENT will be
+     *                                  assumed.
+     */
+    public function send($langId = 0, $disposition = HTTP_DOWNLOAD_ATTACHMENT)
     {
+        // verify HTTP Content-Disposition
+        if (
+            !in_array(
+                $disposition,
+                array(
+                    HTTP_DOWNLOAD_ATTACHMENT,
+                    HTTP_DOWNLOAD_INLINE,
+                )
+            )
+        ) {
+            $disposition = HTTP_DOWNLOAD_ATTACHMENT;
+        }
+
+        $file = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getWebsiteDocumentRootPath() .
+            '/' . $this->getSource($langId);
         $objHTTPDownload = new \HTTP_Download();
-        $objHTTPDownload->setFile(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteDocumentRootPath().'/'.$this->getSource($langId));
-        $objHTTPDownload->setContentDisposition(HTTP_DOWNLOAD_ATTACHMENT, str_replace('"', '\"', $this->getSourceName($langId)));
-        $objHTTPDownload->setContentType();
-        $objHTTPDownload->send('application/force-download');
+        $objHTTPDownload->setFile($file);
+        $objHTTPDownload->setContentDisposition(
+            $disposition,
+            str_replace('"', '\"', $this->getSourceName($langId))
+        );
+        $contentType = mime_content_type($file);
+        $objHTTPDownload->setContentType($contentType);
+        $objHTTPDownload->send();
         exit;
     }
 
-    public function getName($langId = LANG_ID)
+    /**
+     * Get name
+     *
+     * @param integer $langId Lang ID
+     * @param boolean $force  If true force to get downloads name
+     *                        from $names based on $langId
+     *                        Otherwise $langId is current lang
+     *                        then taken from $name else taken from $names
+     *
+     * @return string
+     */
+    public function getName($langId = 0, $force = false)
     {
-        // name of interface language (-> LANG_ID) might be cached in $this->name
-        if ($langId == LANG_ID && isset($this->name)) {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // name of interface language might be cached in $this->name
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && !empty($this->name) && !$force) {
             return $this->name;
         }
 
@@ -437,10 +500,14 @@ class Download {
         return $this->filtered_search_count;
     }
 
-    public function getDescription($langId = LANG_ID)
+    public function getDescription($langId = 0)
     {
-        // description of interface language (-> LANG_ID) might be cached in $this->description
-        if ($langId == LANG_ID && isset($this->description)) {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // description of interface language might be cached in $this->description
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && !empty($this->description)) {
             return $this->description;
         }
 
@@ -450,10 +517,33 @@ class Download {
         return isset($this->descriptions[$langId]) ? $this->descriptions[$langId] : '';
     }
 
-    public function getMetakeys($langId = LANG_ID)
+    /**
+     * Returns the description trimmed to maximum length of 100 characters.
+     *
+     * @param   integer $langId ID of the locale the trimmed description
+     *                          shall be returned in
+     * @return  string  The trimmed description of locale $langId
+     */
+    public function getTrimmedDescription($langId = LANG_ID)
     {
-        // metakeys of interface language (-> LANG_ID) might be cached in $this->metakey
-        if ($langId == LANG_ID && isset($this->metakey)) {
+        $description = $this->getDescription($langId);
+        if (strlen($description) > 100) {
+            $shortDescription = substr($description, 0, 97).'...';
+        } else {
+            $shortDescription = $description;
+        }
+
+        return $shortDescription;
+    }
+
+    public function getMetakeys($langId = 0)
+    {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // metakeys of interface language might be cached in $this->metakey
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && !empty($this->metakey)) {
             return $this->metakey;
         }
 
@@ -468,12 +558,16 @@ class Download {
      *
      * @param  integer $langId The language ID
      *
-     * @return string          Filetype in loaded interface language (LANG_ID)
+     * @return string          Filetype of Download
      */
-    public function getFileType($langId = LANG_ID)
+    public function getFileType($langId = 0)
     {
-        // filetype of interface language (-> LANG_ID) might be cached in $this->fileType
-        if ($langId == LANG_ID && isset($this->fileType)) {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // filetype of interface language might be cached in $this->fileType
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && isset($this->fileType)) {
             return $this->fileType;
         }
 
@@ -532,15 +626,47 @@ class Download {
         }
     }
 
-    public function getDownloads($filter = null, $search = null, $arrSort = null, $arrAttributes = null, $limit = null, $offset = null)
-    {
+    /**
+     * Get related downloads
+     *
+     * @param mixed   $filter                         Filter option, it should be array or integer
+     * @param string  $search                         Search term
+     * @param array   $arrSort                        Array of sorting fields and its order
+     * @param array   $arrAttributes                  Array of fields list
+     * @param integer $limit                          Entries per page
+     * @param integer $offset                         Offset value
+     * @param boolean $listDownloadsOfCurrentLanguage If true get Related Downloads of current language
+     *                                                otherwise get Related Downloads of all language
+     *
+     * @return \Cx\Modules\Downloads\Controller\Download
+     */
+    public function getDownloads(
+        $filter = null,
+        $search = null,
+        $arrSort = null,
+        $arrAttributes = null,
+        $limit = null,
+        $offset = null,
+        $listDownloadsOfCurrentLanguage = false
+    ) {
         $objDownload = clone $this;
         $objDownload->arrCachedDownloads = &$this->arrCachedDownloads;
 
-        if ($objDownload->loadDownloads($filter, $search, $arrSort, $arrAttributes, $limit, $offset)) {
+        if (
+            $objDownload->loadDownloads(
+                $filter,
+                $search,
+                $arrSort,
+                $arrAttributes,
+                $limit,
+                $offset,
+                false,
+                $listDownloadsOfCurrentLanguage
+            )
+        ) {
             return $objDownload;
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -555,13 +681,14 @@ class Download {
      * Get meta data of download from database
      * and put them into the analogous class variables.
      *
-     * @param integer $id
-     * @return unknown
+     * @param integer $id                             Download ID
+     * @param boolean $listDownloadsOfCurrentLanguage If true load Download of current language
+     *                                                otherwise load Download of other language
+     *
+     * @return boolean
      */
-    public function load($id)
+    public function load($id, $listDownloadsOfCurrentLanguage = false)
     {
-        global $_LANGID;
-
 //        $arrDebugBackTrace = debug_backtrace();
 //        if (!in_array($arrDebugBackTrace[1]['function'], array('getDownload', 'first','next'))) {
 //            die("Download->load(): Illegal method call in {$arrDebugBackTrace[0]['file']} on line {$arrDebugBackTrace[0]['line']}!");
@@ -569,15 +696,24 @@ class Download {
 
         if ($id) {
             if (!isset($this->arrLoadedDownloads[$id])) {
-                return $this->loadDownloads($id);
+                return $this->loadDownloads(
+                    $id,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    $listDownloadsOfCurrentLanguage
+                );
             } else {
                 $this->id = $id;
                 $this->type = isset($this->arrLoadedDownloads[$id]['type']) ? $this->arrLoadedDownloads[$id]['type'] : $this->defaultType;
                 $this->mime_type = isset($this->arrLoadedDownloads[$id]['mime_type']) ? $this->arrLoadedDownloads[$id]['mime_type'] : $this->defaultMimeType;
                 $this->source = isset($this->arrLoadedDownloads[$id]['source']) ? $this->arrLoadedDownloads[$id]['source'] : '';
-                $this->sources = isset($this->arrLoadedDownloads[$id]['sources']) ? $this->arrLoadedDownloads[$id]['sources'] : '';
+                $this->sources = isset($this->arrLoadedDownloads[$id]['sources']) ? $this->arrLoadedDownloads[$id]['sources'] : null;
                 $this->source_name = isset($this->arrLoadedDownloads[$id]['source_name']) ? $this->arrLoadedDownloads[$id]['source_name'] : '';
-                $this->source_names = isset($this->arrLoadedDownloads[$id]['source_names']) ? $this->arrLoadedDownloads[$id]['source_names'] : '';
+                $this->source_names = isset($this->arrLoadedDownloads[$id]['source_names']) ? $this->arrLoadedDownloads[$id]['source_names'] : null;
                 $this->fileType = isset($this->arrLoadedDownloads[$id]['file_type']) ? $this->arrLoadedDownloads[$id]['file_type'] : null;
                 $this->fileTypes = isset($this->arrLoadedDownloads[$id]['file_types']) ? $this->arrLoadedDownloads[$id]['file_types'] : null;
                 $this->size = isset($this->arrLoadedDownloads[$id]['size']) ? $this->arrLoadedDownloads[$id]['size'] : 0;
@@ -615,8 +751,32 @@ class Download {
         }
     }
 
-    public function loadDownloads($filter = null, $search = null, $arrSort = null, $arrAttributes = null, $limit = null, $offset = null, $subCategories = false)
-    {
+    /**
+     * Load downloads
+     *
+     * @param mixed   $filter                         Filter option, it should be array or integer
+     * @param string  $search                         Search term
+     * @param array   $arrSort                        Array of sorting fields and its order
+     * @param array   $arrAttributes                  Array of fields list
+     * @param integer $limit                          Entries per page
+     * @param integer $offset                         Offset value
+     * @param boolean $subCategories                  If true list also Downloads of subcategories
+     *                                                otherwise not
+     * @param boolean $listDownloadsOfCurrentLanguage If true list Downloads of current language
+     *                                                otherwise list Downloads of all language
+     *
+     * @return boolean
+     */
+    public function loadDownloads(
+        $filter = null,
+        $search = null,
+        $arrSort = null,
+        $arrAttributes = null,
+        $limit = null,
+        $offset = null,
+        $subCategories = false,
+        $listDownloadsOfCurrentLanguage = false
+    ) {
         global $objDatabase;
 
 //        $arrDebugBackTrace = debug_backtrace();
@@ -627,11 +787,16 @@ class Download {
         $this->arrLoadedDownloads = array();
         $arrSelectCoreExpressions = array();
         $this->filtered_search_count = 0;
-        $sqlCondition = '';
+        $sqlCondition = array();
 
         // set filter
         if ((isset($filter) && is_array($filter) && count($filter)) || !empty($search)) {
-            $sqlCondition = $this->getFilteredIdList($filter, $search, $subCategories);
+            $sqlCondition = $this->getFilteredIdList(
+                $filter,
+                $search,
+                $subCategories,
+                $listDownloadsOfCurrentLanguage
+            );
         } elseif (!empty($filter)) {
             $sqlCondition['tables'] = array('core', 'locale');
             $sqlCondition['conditions'] = array('tblD.`id` = '.intval($filter));
@@ -639,7 +804,14 @@ class Download {
         }
 
         // set sort order
-        if (!($arrQuery = $this->setSortedIdList($arrSort, $sqlCondition, $limit, $offset))) {
+        $arrQuery = $this->setSortedIdList(
+            $arrSort,
+            $sqlCondition,
+            $limit,
+            $offset,
+            $listDownloadsOfCurrentLanguage
+        );
+        if (!$arrQuery) {
             $this->clean();
             return false;
         }
@@ -662,22 +834,84 @@ class Download {
             $arrSelectLocaleExpressions = array_keys($this->arrAttributes['locale']);
         }
 
-        if (count($arrSelectLocaleExpressions) || $arrQuery['tables']['locale']) {
-            $arrQuery['conditions'][] = 'tblL.`lang_id` = '.LANG_ID;
+        // locale field values fetched by the following way:
+        // If the locale field values do not exist in the current language
+        // then try to take it from fallback language
+        // If fallback language is empty then take it from the default language,
+        // If default language is empty, then take it any available language
+
+        // add current interface language
+        $frontendLangId = DownloadsLibrary::getOutputLocale()->getId();
+        $availableLangIds = array($frontendLangId);
+        if (\FWLanguage::getFallbackLanguageIdById($frontendLangId)) {
+            $availableLangIds[] = \FWLanguage::getFallbackLanguageIdById($frontendLangId);
         }
 
-        $query = 'SELECT DISTINCT tblD.`'.implode('`, tblD.`', $arrSelectCoreExpressions).'`'
-            .(count($arrSelectLocaleExpressions) ? ', tblL.`'.implode('`, tblL.`', $arrSelectLocaleExpressions).'`' : '')
-            .'FROM `'.DBPREFIX.'module_downloads_download` AS tblD'
-            .(count($arrSelectLocaleExpressions) || $arrQuery['tables']['locale'] ? ' INNER JOIN `'.DBPREFIX.'module_downloads_download_locale` AS tblL ON tblL.`download_id` = tblD.`id`' : '')
-            .($arrQuery['tables']['category'] ? (
-                ' INNER JOIN `'.DBPREFIX.'module_downloads_rel_download_category` AS tblRC ON tblRC.`download_id` = tblD.`id`')
-                .($this->isFrontendMode ? ' INNER JOIN `'.DBPREFIX.'module_downloads_category` AS tblC ON tblC.`id` = tblRC.`category_id`' : '')
-                : '')
-            .($arrQuery['tables']['download'] ? ' INNER JOIN `'.DBPREFIX.'module_downloads_rel_download_download` AS tblR ON (tblR.`id1` = tblD.`id` OR tblR.`id2` = tblD.`id`)' : '')
-            .(count($arrQuery['conditions']) ? ' WHERE ('.implode(') AND (', $arrQuery['conditions']).')' : '')
-            //.' GROUP BY tblD.`id`'
-            .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
+        // add default frontend locale
+        if (!in_array(\FWLanguage::getDefaultLangId(), $availableLangIds)) {
+            $availableLangIds[] = \FWLanguage::getDefaultLangId();
+        }
+
+        // fetch all other frontend locales
+        $otherLangIds = array_diff(
+            array_keys(\FWLanguage::getActiveFrontendLanguages()),
+            $availableLangIds
+        );
+
+        if (count($arrSelectLocaleExpressions)) {
+            array_walk(
+                $arrSelectLocaleExpressions,
+                array($this, 'walkDownloadQueryFunctions'),
+                array_merge($availableLangIds, $otherLangIds)
+            );
+        }
+
+        $fieldsList = 'tblD.`' . implode('`, tblD.`', $arrSelectCoreExpressions) .'`';
+        if (count($arrSelectLocaleExpressions)) {
+            $fieldsList .= ', ' . implode(', ', $arrSelectLocaleExpressions);
+        }
+
+        $joinQueries = '';
+        if (count($arrSelectLocaleExpressions) || $arrQuery['tables']['locale']) {
+            foreach (array_merge($availableLangIds, $otherLangIds) as $alias => $langId) {
+                $joinQueries .=
+                    ' LEFT JOIN `' . DBPREFIX . 'module_downloads_download_locale`
+                        AS tblL' . $alias . '
+                      ON (tblL' . $alias .  '.`download_id` = tblD.`id`
+                        AND tblL' . $alias . '.`lang_id` = '  . $langId . ')';
+            }
+        }
+
+        if ($arrQuery['tables']['category']) {
+            $joinQueries .=
+                ' LEFT JOIN `' . DBPREFIX . 'module_downloads_rel_download_category` AS tblRC
+                    ON tblRC.`download_id` = tblD.`id`';
+            if ($this->isFrontendMode) {
+                $joinQueries .=
+                    ' LEFT JOIN `' . DBPREFIX . 'module_downloads_category` AS tblC
+                        ON tblC.`id` = tblRC.`category_id`';
+            }
+        }
+
+        if ($arrQuery['tables']['download']) {
+            $joinQueries .=
+                ' LEFT JOIN `' . DBPREFIX . 'module_downloads_rel_download_download` AS tblR
+                    ON (tblR.`id1` = tblD.`id` OR tblR.`id2` = tblD.`id`)';
+        }
+
+        $conditions = '';
+        if (count($arrQuery['conditions'])) {
+            $conditions = ' WHERE (' . implode( ') AND (', $arrQuery['conditions']) . ')';
+        }
+
+        $orderBy = '';
+        if (count($arrQuery['sort'])) {
+            $orderBy = ' ORDER BY ' . implode(', ', $arrQuery['sort']);
+        }
+
+        $query = 'SELECT DISTINCT ' . $fieldsList .
+            ' FROM `' . DBPREFIX . 'module_downloads_download` AS tblD' .
+            $joinQueries . $conditions . $orderBy;
 
         if (empty($limit)) {
             $objDownload = $objDatabase->Execute($query);
@@ -701,21 +935,75 @@ class Download {
         }
     }
 
-    private function getFilteredIdList($arrFilter = null, $search = null, $subCategories = false)
-    {
+    /**
+     * Modify the locale fields query for fetching locale values
+     * based on available language
+     *
+     * @param string  $item             Locale field name
+     * @param integer $key              Offset value
+     * @param array   $availableLangIds Array of available languages
+     */
+    protected function walkDownloadQueryFunctions(
+        &$item,
+        &$key,
+        $availableLangIds = array()
+    ) {
+        if (!$availableLangIds || !is_array($availableLangIds)) {
+            return;
+        }
+
+        $query = '( CASE ';
+        foreach ($availableLangIds as $alias => $langId) {
+            $field = 'tblL' . $alias . '.' . $item;
+            $query .= ' WHEN ' . $field . ' IS NOT NULL
+                AND ' . $field . ' != "" THEN ' . $field;
+        }
+        $query .= ' ELSE "" END) AS `' . $item . '`';
+        $item = $query;
+    }
+
+    /**
+     * Get filtered ID list
+     *
+     * @param array   $arrFilter                      Array of filters
+     * @param mixed   $search                         Search term
+     * @param array   $subCategories                  Array of sub categories ID
+     * @param boolean $listDownloadsOfCurrentLanguage If true list Downloads of current language
+     *                                                otherwise list Downloads of all language
+     *
+     * @return array
+     */
+    private function getFilteredIdList(
+        $arrFilter = null,
+        $search = null,
+        $subCategories = false,
+        $listDownloadsOfCurrentLanguage = false
+    ) {
         $arrConditions = array();
         $tblLocales = false;
         $arrTables = array();
 
         // parse filter
         if (isset($arrFilter) && is_array($arrFilter)) {
-            if (count($arrFilterConditions = $this->parseFilterConditions($arrFilter))) {
+            $arrFilterConditions = $this->parseFilterConditions($arrFilter);
+            if (
+                count($arrFilterConditions) &&
+                !empty($arrFilterConditions['conditions']) &&
+                !empty($arrFilterConditions['tables'])
+            ) {
                 $arrConditions[] = implode(' AND ', $arrFilterConditions['conditions']);
                 $tblLocales = isset($arrFilterConditions['tables']['locale']);
             }
         }
 
-        if (in_array('category_id', array_keys($arrFilter)) && (($arrFilter['category_id'] == 0) || !empty($arrFilter['category_id']))) {
+        if (
+            is_array($arrFilter) &&
+            isset($arrFilter['category_id']) && 
+            (
+                ($arrFilter['category_id'] == 0) ||
+                !empty($arrFilter['category_id'])
+            )
+        ) {
             if (is_array($arrFilter['category_id'])) {
                 if ($subCategories) {
                     $arrSubCategories = array();
@@ -729,6 +1017,11 @@ class Download {
                     }
                 } else {
                     foreach ($arrFilter['category_id'] as $condition => $categoryId) {
+                        // in case $condition is a simple array index
+                        // we will apply a simple equal expression 
+                        if (preg_match('/^\d+$/', $condition)) {
+                            $condition = '=';
+                        }
                         $arrCategoryConditions[] = 'tblRC.`category_id` '.$condition.' '.intval($categoryId);
                     }
                 }
@@ -748,7 +1041,10 @@ class Download {
             $arrTables[] = 'category';
         }
 
-        if (in_array('download_id', array_keys($arrFilter)) && !empty($arrFilter['download_id'])) {
+        if (
+            is_array($arrFilter) &&
+            !empty($arrFilter['download_id'])
+        ) {
             $arrConditions[] = '(tblR.`id1` = '.intval($arrFilter['download_id']).' OR tblR.`id2` = '.intval($arrFilter['download_id']).')';
             $arrConditions[] = 'tblD.`id` != '.intval($arrFilter['download_id']);
             $arrTables[] = 'download';
@@ -794,11 +1090,19 @@ class Download {
                 : '');
         }
 
-        // parse search
+        // If the settings option "Only list Downloads in current language" is set,
+        // then parse the search within the current language
+        // Otherwise parse the search within all the languages
         if (!empty($search)) {
-            if (count($arrSearchConditions = $this->parseSearchConditions($search))) {
+            $arrSearchConditions = $this->parseSearchConditions(
+                $search,
+                $listDownloadsOfCurrentLanguage
+            );
+            if (count($arrSearchConditions)) {
                 $arrConditions[] = implode(' OR ', $arrSearchConditions);
-                $tblLocales = true;
+                if ($listDownloadsOfCurrentLanguage) {
+                    $tblLocales = true;
+                }
             }
         }
 
@@ -910,7 +1214,10 @@ class Download {
      */
     private function parseFilterConditions($arrFilter)
     {
-        $arrConditions = array();
+        $arrConditions = array(
+            'conditions' => array(),
+            'tables'     => array(),
+        );
 
         $arrComparisonOperators = array(
             'int'       => array('=','<','>', '<=', '>='),
@@ -931,7 +1238,7 @@ class Download {
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
              */
             foreach ($this->arrAttributes as $type => $arrAttributes) {
-                $table = $type == 'core' ? 'tblD' : 'tblL';
+                $table = $type == 'core' ? 'tblD' : 'tblL0';
 
                 if (isset($arrAttributes[$attribute])) {
                     if (is_array($condition)) {
@@ -976,21 +1283,80 @@ class Download {
         return $arrConditions;
     }
 
-    private function parseSearchConditions($search)
-    {
+    /**
+     * Parse search conditions
+     *
+     * @param mixed   $search                         Search term, it should be string or array
+     * @param boolean $listDownloadsOfCurrentLanguage If true search Downloads of current language
+     *                                                otherwise search Downloads of all language
+     *
+     * @return array
+     */
+    private function parseSearchConditions(
+        $search,
+        $listDownloadsOfCurrentLanguage = true
+    ) {
         $arrConditions = array();
-        $arrAttribute = array('name', 'description');
-        foreach ($arrAttribute as $attribute) {
-            $arrConditions[] = "tblL.`".$attribute."` LIKE '%".(is_array($search) ? implode("%' OR tblL.`".$attribute."` LIKE '%", array_map('addslashes', $search)) : addslashes($search))."%'";
+
+        if ($listDownloadsOfCurrentLanguage) {
+            $availableLangIds = array(DownloadsLibrary::getOutputLocale()->getId());
+        } else {
+            if ($this->isFrontendMode) {
+                $availableLangIds = array_keys(\FWLanguage::getActiveFrontendLanguages());
+            } else {
+                $availableLangIds = array_keys(\FWLanguage::getActiveBackendLanguages());
+            }
+        }
+
+        $searchConditions = array();
+        $fields = array('name', 'description');
+
+        // also lookup metakeys if the usage of meta-keys has been activated
+        if (!empty($this->config['use_attr_metakeys'])) {
+            $fields[] = 'metakeys';
+        }
+
+        foreach ($fields as $fieldName) {
+            if (is_array($search)) {
+                $searchConditions[] = '`' . $fieldName . '` LIKE "%' . implode(
+                    '%" OR `' . $fieldName . '` LIKE "%',
+                    contrexx_input2db($search));
+            } else {
+                $searchConditions[] = '`' . $fieldName . '` LIKE "%' .
+                    contrexx_input2db($search) . '%"';
+            }
+        }
+        foreach ($availableLangIds as $langId) {
+            $arrConditions[] =
+                '(SELECT 1 FROM `' . DBPREFIX . 'module_downloads_download_locale`
+                    WHERE `download_id` = `tblD`.`id`
+                        AND `lang_id` = ' . $langId . '
+                        AND (' . implode(' OR ', $searchConditions) . '))';
         }
 
         return $arrConditions;
     }
 
-
-    private function setSortedIdList($arrSort, $sqlCondition = null, $limit = null, $offset = null)
-    {
-        global $objDatabase, $_LANGID;
+    /**
+     * Set Sorted ID list
+     *
+     * @param array   $arrSort                        Array of sort values
+     * @param array   $sqlCondition                   Array of conditions
+     * @param integer $limit                          Entries count
+     * @param integer $offset                         Offset value
+     * @param boolean $listDownloadsOfCurrentLanguage If true get Downloads count of current language
+     *                                                otherwise get Downloads count of all language
+     *
+     * @return array
+     */
+    private function setSortedIdList(
+        $arrSort,
+        $sqlCondition = null,
+        $limit = null,
+        $offset = null,
+        $listDownloadsOfCurrentLanguage = false
+    ) {
+        global $objDatabase;
 
         $arrCustomSelection = array();
         $joinLocaleTbl = false;
@@ -1008,7 +1374,6 @@ class Download {
             if (isset($sqlCondition['tables'])) {
                 if (in_array('locale', $sqlCondition['tables'])) {
                     $joinLocaleTbl = true;
-                    $arrCustomSelection[] = 'tblL.`lang_id` = '.$_LANGID;
                 }
                 if (in_array('category', $sqlCondition['tables'])) {
                     $joinCategoryTbl = true;
@@ -1025,7 +1390,7 @@ class Download {
                     if (isset($this->arrAttributes['core'][$attribute])) {
                         $arrSortExpressions[] = ($attribute == 'order' && $joinCategoryTbl ? 'tblRC' : 'tblD').'.`'.$attribute.'` '.$direction;
                     } elseif (isset($this->arrAttributes['locale'][$attribute])) {
-                        $arrSortExpressions[] = 'tblL.`'.$attribute.'` '.$direction;
+                        $arrSortExpressions[] = 'tblL0.`' . $attribute . '` ' . $direction;
                         $joinLocaleTbl = true;
                     }
                 } elseif ($attribute == 'special') {
@@ -1034,9 +1399,18 @@ class Download {
             }
         }
 
+        $joinLocaleQuery = '';
+        if ($listDownloadsOfCurrentLanguage || $joinLocaleTbl) {
+            $joinLocaleQuery =
+                ' INNER JOIN `' . DBPREFIX . 'module_downloads_download_locale`
+                AS tblL0 ON tblL0.`download_id` = tblD.`id`';
+        }
+        if ($listDownloadsOfCurrentLanguage) {
+            $arrCustomSelection[] = 'tblL0.`lang_id` = ' . DownloadsLibrary::getOutputLocale()->getId();
+        }
         $query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT tblD.`id`
             FROM `'.DBPREFIX.'module_downloads_download` AS tblD'
-            .($joinLocaleTbl ? ' INNER JOIN `'.DBPREFIX.'module_downloads_download_locale` AS tblL ON tblL.`download_id` = tblD.`id`' : '')
+            . $joinLocaleQuery
             .($joinCategoryTbl ?
                 ' INNER JOIN `'.DBPREFIX.'module_downloads_rel_download_category` AS tblRC ON tblRC.`download_id` = tblD.`id`'
                 .($this->isFrontendMode ? ' INNER JOIN `'.DBPREFIX.'module_downloads_category` AS tblC ON tblC.`id` = tblRC.`category_id`' : '')
@@ -1056,7 +1430,7 @@ class Download {
 
         if ($objDownloadId !== false) {
             while (!$objDownloadId->EOF) {
-                $arrIds[$objDownloadId->fields['id']] = '';
+                $arrIds[$objDownloadId->fields['id']] = array();
                 $objDownloadId->MoveNext();
             }
         }
@@ -1064,7 +1438,7 @@ class Download {
         $this->arrLoadedCategories = $arrIds;
 
         if (!count($arrIds)) {
-            return false;
+            return array();
         }
 
         return array(
@@ -1100,11 +1474,13 @@ class Download {
      *
      * This stores the metadata of the download to the database.
      *
+     * @param Category $objCategory
+     * @param array $selectedLanguages Allowed languages
      * @global ADONewConnection
      * @global array
      * @return boolean
      */
-    public function store($objCategory = null)
+    public function store($objCategory = null, $selectedLanguages = array())
     {
         global $objDatabase, $_ARRAYLANG;
 
@@ -1127,18 +1503,29 @@ class Download {
         }
 
         foreach ($this->sources as $source) {
-            if (empty($source)) {
+            if (empty($source) && in_array($source['id'], $selectedLanguages)) {
                 $this->error_msg[] = $_ARRAYLANG['TXT_DOWNLOADS_SET_SOURCE_MANDATORY'];
                 return false;
             }
         }
 
-        if (($this->type == 'url') && array_search('1', array_map(create_function('$value', 'preg_match("#^[a-z]+://$#i", $value);'), $this->sources))) {
+        if (
+            ($this->type == 'url') &&
+            array_search(
+                '1',
+                array_map(
+                    function ($value) {
+                        return preg_match('#^[a-z]+://$#i', $value);
+                    },
+                    $this->sources
+                )
+            )
+        ) {
             $this->error_msg[] = $_ARRAYLANG['TXT_DOWNLOADS_SET_SOURCE_MANDATORY'];
             return false;
         }
 
-        if (isset($this->names) && !$this->validateName()) {
+        if (isset($this->names) && !$this->validateName($selectedLanguages)) {
             return false;
         }
 
@@ -1233,6 +1620,8 @@ class Download {
         $objFWUser = \FWUser::getFWUserObject();
         $objFWUser->objUser->getDynamicPermissionIds(true);
 
+        //clear Esi Cache
+        DownloadsLibrary::clearEsiCache();
         return true;
     }
 
@@ -1485,7 +1874,7 @@ class Download {
         }
     }
 
-    private function validateName()
+    private function validateName($selectedLanguages)
     {
         global $_ARRAYLANG;
 
@@ -1493,7 +1882,7 @@ class Download {
         $namesSet = true;
         foreach ($arrLanguages as $langId => $arrLanguage) {
             if ($arrLanguage['frontend'] != 1) continue;
-            if (empty($this->names[$langId])) {
+            if (empty($this->names[$langId]) && in_array($langId, $selectedLanguages)) {
                 $namesSet = false;
                 break;
             }
@@ -1522,27 +1911,35 @@ class Download {
         return $this->mime_type;
     }
 
-    public function getSource($langId = LANG_ID)
+    public function getSource($langId = 0)
     {
-        // source of interface language (-> LANG_ID) might be cached in $this->source
-        if ($langId == LANG_ID && isset($this->source)) {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // source of interface language might be cached in $this->source
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && !empty($this->source)) {
             return $this->source;
         }
 
-        if (!isset($this->sources)) {
+        if (empty($this->sources)) {
             $this->loadLocales();
         }
         return isset($this->sources[$langId]) ? $this->sources[$langId] : '';
     }
 
-    public function getSourceName($langId = LANG_ID)
+    public function getSourceName($langId = 0)
     {
-        // source-name of interface language (-> LANG_ID) might be cached in $this->source_name
-        if ($langId == LANG_ID && isset($this->source_name)) {
+        if (!$langId) {
+            $langId = DownloadsLibrary::getOutputLocale()->getId();
+        }
+
+        // source-name of interface language might be cached in $this->source_name
+        if ($langId == DownloadsLibrary::getOutputLocale()->getId() && !empty($this->source_name)) {
             return $this->source_name;
         }
 
-        if (!isset($this->source_names)) {
+        if (empty($this->source_names)) {
             $this->loadLocales();
         }
         return isset($this->source_names[$langId]) ? $this->source_names[$langId] : '';
@@ -1748,7 +2145,7 @@ class Download {
             }
 
             // set source of interface language
-            if ($langId == LANG_ID) {
+            if ($langId == DownloadsLibrary::getOutputLocale()->getId()) {
                 $this->source = $source;
                 $this->source_name = $this->source_names[$langId];
                 $this->fileType    = $this->fileTypes[$langId];
@@ -1848,7 +2245,7 @@ class Download {
     public function setNames($arrNames)
     {
         // set name of interface language
-        $this->name = $arrNames[LANG_ID];
+        $this->name = $arrNames[DownloadsLibrary::getOutputLocale()->getId()];
 
         // set names of all languages
         $this->names = $arrNames;
@@ -1857,7 +2254,7 @@ class Download {
     public function setDescriptions($arrDescriptions)
     {
         // set description of interface language
-        $this->description = $arrDescriptions[LANG_ID];
+        $this->description = $arrDescriptions[DownloadsLibrary::getOutputLocale()->getId()];
 
         // set descriptions of all languages
         $this->descriptions = $arrDescriptions;
@@ -1866,7 +2263,7 @@ class Download {
     public function setMetakeys($arrMetakeys)
     {
         // set metakey of interface language
-        $this->metakey = $arrMetakeys[LANG_ID];
+        $this->metakey = $arrMetakeys[DownloadsLibrary::getOutputLocale()->getId()];
 
         // set metakeys of all languages
         $this->metakeys = $arrMetakeys;

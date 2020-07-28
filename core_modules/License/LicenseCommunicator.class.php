@@ -282,7 +282,7 @@ class LicenseCommunicator {
         $request->setHeader('X-Remote-Addr', $a);
         $request->setHeader('Referer', $r);
         $jd = new \Cx\Core\Json\JsonData();
-        $request->addPostParameter('data', $jd->json($data));
+        $request->addPostParameter('data', $jd->parse($data));
         try {
             $objResponse = $request->send();
             if ($objResponse->getStatus() !== 200) {

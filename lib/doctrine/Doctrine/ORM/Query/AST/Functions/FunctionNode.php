@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -22,9 +22,9 @@ namespace Doctrine\ORM\Query\AST\Functions;
 use Doctrine\ORM\Query\AST\Node;
 
 /**
- * Abtract Function Node.
+ * Abstract Function Node.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * 
  * @link    www.doctrine-project.org
  * @since   2.0
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -34,19 +34,40 @@ use Doctrine\ORM\Query\AST\Node;
  */
 abstract class FunctionNode extends Node
 {
+    /**
+     * @var string
+     */
     public $name;
 
+    /**
+     * @param string $name
+     */
     public function __construct($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @param \Doctrine\ORM\Query\SqlWalker $sqlWalker
+     *
+     * @return string
+     */
     abstract public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker);
 
+    /**
+     * @param \Doctrine\ORM\Query\SqlWalker $sqlWalker
+     *
+     * @return string
+     */
     public function dispatch($sqlWalker)
     {
         return $sqlWalker->walkFunction($this);
     }
 
+    /**
+     * @param \Doctrine\ORM\Query\Parser $parser
+     *
+     * @return void
+     */
     abstract public function parse(\Doctrine\ORM\Query\Parser $parser);
 }

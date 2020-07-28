@@ -5,6 +5,9 @@ Cx\Core\ContentManager\Model\Entity\Page:
   gedmo:
     loggable:
       logEntryClass: Cx\Core\ContentManager\Model\Entity\LogEntry
+  uniqueConstraints:
+    node_id:
+      columns: [ node_id, lang ]
   id:
     id:
       type: integer
@@ -13,122 +16,110 @@ Cx\Core\ContentManager\Model\Entity\Page:
   fields:
     nodeIdShadowed:
       type: integer
+      nullable: true
       gedmo:
         - versioned
-
     lang: #missing foreign entity
       type: integer
       gedmo:
         - versioned
-
     type:
       type: string
       length: 16
       gedmo:
         - versioned
-
     caching:
       type: boolean
       gedmo:
         - versioned
-
     updatedAt:
-      type: datetime    
+      type: timestamp
+      nullable: true
       gedmo:
         - versioned
-        
     updatedBy:
       type: string
       length: 40
       gedmo:
         - versioned
-
     #navigation
     title:
       type: string
       length: 255
       gedmo:
         - versioned
-        
     linkTarget:
       type: string
       length: 16
       nullable: true
       gedmo:
         - versioned
-
     #content
     contentTitle:
       type: string
       length: 255
       gedmo:
         - versioned
-
     #the title used for routing / URLs
     slug:
       type: string
       length: 255
       gedmo:
         - versioned      
-    
     content:
       type: text
       gedmo:
         - versioned
     sourceMode:
       type: boolean
+      options:
+        default: false
       gedmo:
         - versioned
-
     customContent:
       nullable: true
       type: string
       length: 64
       gedmo:
         - versioned
-        
     useCustomContentForAllChannels:
-      type: integer      
+      type: smallint 
+      nullable: true
       gedmo:
         - versioned
-    
     applicationTemplate:
       nullable: true
       type: string
       length: 100
       gedmo:
         - versioned
-        
     useCustomApplicationTemplateForAllChannels:
-      type: integer      
+      type: smallint
+      nullable: true
       gedmo:
         - versioned
-    
     cssName:
       nullable: true
       type: string
       length: 255
       gedmo:
         - versioned
-
     cssNavName:
       nullable: true
       type: string
       length: 255
       gedmo:
         - versioned
-
     skin:
       type: integer
       nullable: true
       gedmo:
         - versioned
-    
     useSkinForAllChannels:
-      type: integer      
+      type: smallint
+      nullable: true
       gedmo:
         - versioned
-
     #meta
     metatitle:
       nullable: true
@@ -136,69 +127,63 @@ Cx\Core\ContentManager\Model\Entity\Page:
       length: 255
       gedmo:
         - versioned
-
     metadesc:
       type: text
       gedmo:
         - versioned
-
     metakeys:
       type: text
       gedmo:
         - versioned
-
     metarobots:
       nullable: true
       type: string
       length: 7
       gedmo:
         - versioned
-
+    metaimage:
+      nullable: true
+      type: string
+      length: 255
+      gedmo:
+        - versioned
     #publishing
     start:
       nullable: true
-      type: datetime
+      type: timestamp
       gedmo:
         - versioned
-
     end:
       nullable: true
-      type: datetime
+      type: timestamp
       gedmo:
         - versioned
-    
     editingStatus:
       type: string
       length: 16
       gedmo:
         - versioned
-
     protection:
       type: integer
       gedmo:
         - versioned
-
     frontendAccessId:
       type: integer
       gedmo:
         - versioned
-
     backendAccessId:
       type: integer
       gedmo:
         - versioned
-
     #visibility
     display:
       type: boolean
       gedmo:
         - versioned
-    
     active:
       type: boolean
       gedmo:
         - versioned
-
     #redirection
     target:
       nullable: true
@@ -206,21 +191,20 @@ Cx\Core\ContentManager\Model\Entity\Page:
       length: 255
       gedmo:
         - versioned
-
     module:
       nullable: true
       type: string
       length: 255
       gedmo:
         - versioned
-    
     cmd:
-      nullable: true
+      nullable: false
       type: string
       length: 50
+      options:
+        default: ""
       gedmo:
         - versioned
-
   manyToOne: # owning side
     node:
       targetEntity: Cx\Core\ContentManager\Model\Entity\Node
@@ -229,7 +213,8 @@ Cx\Core\ContentManager\Model\Entity\Page:
         name: node_id
         referencedColumnName: id
         cascade: [remove]
-
+        onDelete: "SET NULL"
+        onUpdate: "NO ACTION"
   lifecycleCallbacks:
       prePersist: [ validate ]
       onFlush: [ validate ]

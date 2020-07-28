@@ -76,6 +76,13 @@ function mediaBrowserCallback(data) {
     }
   }
 }
+
+$J(document).ready(function() {
+    $J("#newsletter_mail_crm_memberships").chosen();
+    $J("#newsletter_mail_crm_filter_memberships_include").chosen();
+    $J("#newsletter_mail_crm_filter_memberships_exclude").chosen();
+});
+
 // ]]>
 </script>
 <form action="index.php?cmd=Newsletter&amp;act=editMail&amp;sendMail={NEWSLETTER_MAIL_SEND}&amp;id={NEWSLETTER_MAIL_ID}" id="newsletter_mail_form" enctype="multipart/form-data" method="post" onsubmit="return checkTextContent()">
@@ -111,6 +118,8 @@ function mediaBrowserCallback(data) {
     <td>{TXT_NEWSLETTER_PRIORITY}</td>
     <td colspan="3">{NEWSLETTER_MAIL_PRIORITY_MENU}</td>
   </tr>
+
+  <!-- dirty workaround by placing the placeholder {NEWSLETTER_LIST_DISABLED} into a comment to prevent parsing one of the blocks newsletter_mail_associated_list_n or newsletter_mail_associated_group_n once too many  -->
 
   <tr class="row1" style="vertical-align:top;">
     <td width="15%">
@@ -152,6 +161,7 @@ function mediaBrowserCallback(data) {
     </td>
   </tr>
 
+  <!-- BEGIN deliver_user_recipients -->
   <tr class="row2" style="vertical-align:top;">
     <td width="15%">
         {TXT_NEWSLETTER_ASSOCIATED_GROUPS}
@@ -192,8 +202,57 @@ function mediaBrowserCallback(data) {
 <!-- END newsletter_mail_associated_group_2 -->
     </td>
   </tr>
+  <!-- END deliver_user_recipients -->
 
+  <!-- BEGIN deliver_crm_recipients -->
   <tr class="row1" style="vertical-align:top;">
+        <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP}
+            <!-- BEGIN crmMembershipAssociatedToolTipBeforeSend --><span class="icon-warning tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND}</span><!-- END crmMembershipAssociatedToolTipBeforeSend -->
+            <!-- BEGIN crmMembershipAssociatedToolTipAfterSend --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END crmMembershipAssociatedToolTipAfterSend -->
+        </td>
+        <td width="85%" colspan="3">
+            <div>
+                <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_memberships[associate][]" id="newsletter_mail_crm_memberships" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
+                    <!-- BEGIN crmMembership -->
+                    <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
+                    <!-- END crmMembership -->
+                </select>
+            </div>
+        </td>
+    </tr>
+  <!-- END deliver_crm_recipients -->
+
+  <!-- BEGIN use_crm_filter -->
+  <tr class="row1" style="vertical-align:top;">
+    <td width="15%">{TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER}
+        <span class="tooltip-trigger icon-info"></span>
+        <span class="tooltip-message">
+            <!-- BEGIN crmMembershipFilterToolTipBeforeSend -->{TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER_TOOLTIP}<!-- END crmMembershipFilterToolTipBeforeSend -->
+            <!-- BEGIN crmMembershipFilterToolTipAfterSent -->{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}<!-- END crmMembershipFilterToolTipAfterSent -->
+       </span>
+    </td>
+    <td width="85%" colspan="3">
+        <div>
+            {TXT_NEWSLETTER_CRM_MEMBERSHIP_INCLUDE_TXT}<br />
+            <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_filter_memberships[include][]" id="newsletter_mail_crm_filter_memberships_include" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
+                <!-- BEGIN crmMembershipFilterInclude -->
+                <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
+                <!-- END crmMembershipFilterInclude -->
+            </select>
+        </div>
+        <div>
+            {TXT_NEWSLETTER_CRM_MEMBERSHIP_EXCLUDE_TXT}<br />
+            <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_filter_memberships[exclude][]" id="newsletter_mail_crm_filter_memberships_exclude" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
+                <!-- BEGIN crmMembershipFilterExclude -->
+                <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
+                <!-- END crmMembershipFilterExclude -->
+            </select>
+        </div>
+    </td>
+  </tr>
+  <!-- END use_crm_filter -->
+
+  <tr class="row2" style="vertical-align:top;">
     <td valign="top">{TXT_NEWSLETTER_ATTACH}</td>
     <td colspan="3">
       <div id="newsletter_attachment_frame" style="display:{NEWSLETTER_MAIL_ATTACHMENT_BOX}; margin-bottom:20px;">
@@ -266,7 +325,7 @@ function mediaBrowserCallback(data) {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_INDUSTRY_SECTOR}</td>
-    <td>[[industry_sector]]</td>
+    <td>[[industry_sector]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_ADDRESS}</td>
@@ -282,7 +341,7 @@ function mediaBrowserCallback(data) {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_COUNTRY}</td>
-    <td>[[country]]</td>
+    <td>[[country]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_PHONE}</td>
@@ -290,19 +349,19 @@ function mediaBrowserCallback(data) {
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_PHONE_PRIVATE}</td>
-    <td>[[phone_private]]</td>
+    <td>[[phone_private]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_PHONE_MOBILE}</td>
-    <td>[[phone_mobile]]</td>
+    <td>[[phone_mobile]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_FAX}</td>
-    <td>[[fax]]</td>
+    <td>[[fax]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_BIRTHDAY}</td>
-    <td>[[birthday]]</td>
+    <td>[[birthday]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_FOR_CRM}</span></td>
   </tr>
   <tr class="row1">
     <td>{TXT_NEWSLETTER_WEBSITE}</td>
@@ -319,8 +378,16 @@ function mediaBrowserCallback(data) {
     <td>[[profile_setup]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
   </tr>
   <tr class="row1">
+    <td>{TXT_NEWSLETTER_MODIFY_PROFILE} (URL)</td>
+    <td>[[profile_setup_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+  </tr>
+  <tr class="row2">
     <td>{TXT_NEWSLETTER_UNSUBSCRIBE} (Link)</td>
     <td>[[unsubscribe]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_NEWSLETTER_UNSUBSCRIBE} (URL)</td>
+    <td>[[unsubscribe_url]] <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_PLACEHOLDER_NOT_ON_BROWSER_VIEW}</span></td>
   </tr>
   <tr class="row2">
     <td>{TXT_NEWSLETTER_DATE}</td>

@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -29,33 +29,60 @@ namespace Doctrine\ORM;
  */
 class OptimisticLockException extends ORMException
 {
+    /**
+     * @var object|null
+     */
     private $entity;
 
+    /**
+     * @param string $msg
+     * @param object $entity
+     */
     public function __construct($msg, $entity)
     {
+        parent::__construct($msg);
         $this->entity = $entity;
     }
 
     /**
      * Gets the entity that caused the exception.
      *
-     * @return object
+     * @return object|null
      */
     public function getEntity()
     {
         return $this->entity;
     }
 
+    /**
+     * @param object $entity
+     *
+     * @return OptimisticLockException
+     */
     public static function lockFailed($entity)
     {
         return new self("The optimistic lock on an entity failed.", $entity);
     }
 
-    public static function lockFailedVersionMissmatch($entity, $expectedLockVersion, $actualLockVersion)
+    /**
+     * @param object $entity
+     * @param int    $expectedLockVersion
+     * @param int    $actualLockVersion
+     *
+     * @return OptimisticLockException
+     */
+    public static function lockFailedVersionMismatch($entity, $expectedLockVersion, $actualLockVersion)
     {
+        $expectedLockVersion = ($expectedLockVersion instanceof \DateTime) ? $expectedLockVersion->getTimestamp() : $expectedLockVersion;
+        $actualLockVersion = ($actualLockVersion instanceof \DateTime) ? $actualLockVersion->getTimestamp() : $actualLockVersion;
         return new self("The optimistic lock failed, version " . $expectedLockVersion . " was expected, but is actually ".$actualLockVersion, $entity);
     }
 
+    /**
+     * @param  string $entityName
+     *
+     * @return OptimisticLockException
+     */
     public static function notVersioned($entityName)
     {
         return new self("Cannot obtain optimistic lock on unversioned entity " . $entityName, null);

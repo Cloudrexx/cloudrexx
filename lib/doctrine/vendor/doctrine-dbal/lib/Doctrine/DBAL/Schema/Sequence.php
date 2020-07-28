@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -24,31 +22,28 @@ namespace Doctrine\DBAL\Schema;
 use Doctrine\DBAL\Schema\Visitor\Visitor;
 
 /**
- * Sequence Structure
+ * Sequence structure.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @version $Revision$
- * @author  Benjamin Eberlei <kontakt@beberlei.de>
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
 class Sequence extends AbstractAsset
 {
     /**
-     * @var int
+     * @var integer
      */
     protected $_allocationSize = 1;
 
     /**
-     * @var int
+     * @var integer
      */
     protected $_initialValue = 1;
 
     /**
-     *
-     * @param string $name
-     * @param int $allocationSize
-     * @param int $initialValue
+     * @param string  $name
+     * @param integer $allocationSize
+     * @param integer $initialValue
      */
     public function __construct($name, $allocationSize=1, $initialValue=1)
     {
@@ -57,18 +52,81 @@ class Sequence extends AbstractAsset
         $this->_initialValue = (is_numeric($initialValue))?$initialValue:1;
     }
 
+    /**
+     * @return integer
+     */
     public function getAllocationSize()
     {
         return $this->_allocationSize;
     }
 
+    /**
+     * @return integer
+     */
     public function getInitialValue()
     {
         return $this->_initialValue;
     }
 
     /**
-     * @param Visitor $visitor
+     * @param integer $allocationSize
+     *
+     * @return void
+     */
+    public function setAllocationSize($allocationSize)
+    {
+        $this->_allocationSize = (is_numeric($allocationSize))?$allocationSize:1;
+    }
+
+    /**
+     * @param integer $initialValue
+     *
+     * @return void
+     */
+    public function setInitialValue($initialValue)
+    {
+        $this->_initialValue = (is_numeric($initialValue))?$initialValue:1;
+    }
+
+    /**
+     * Checks if this sequence is an autoincrement sequence for a given table.
+     *
+     * This is used inside the comparator to not report sequences as missing,
+     * when the "from" schema implicitly creates the sequences.
+     *
+     * @param \Doctrine\DBAL\Schema\Table $table
+     *
+     * @return boolean
+     */
+    public function isAutoIncrementsFor(Table $table)
+    {
+        if ( ! $table->hasPrimaryKey()) {
+            return false;
+        }
+
+        $pkColumns = $table->getPrimaryKey()->getColumns();
+
+        if (count($pkColumns) != 1) {
+            return false;
+        }
+
+        $column = $table->getColumn($pkColumns[0]);
+
+        if ( ! $column->getAutoincrement()) {
+            return false;
+        }
+
+        $sequenceName      = $this->getShortestName($table->getNamespaceName());
+        $tableName         = $table->getShortestName($table->getNamespaceName());
+        $tableSequenceName = sprintf('%s_%s_seq', $tableName, $pkColumns[0]);
+
+        return $tableSequenceName === $sequenceName;
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Schema\Visitor\Visitor $visitor
+     *
+     * @return void
      */
     public function visit(Visitor $visitor)
     {

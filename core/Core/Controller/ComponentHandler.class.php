@@ -100,12 +100,14 @@ class ComponentHandler {
      * @param \Cx\Core_Modules\License\License $license Current license
      * @param boolean $frontend Wheter we are in frontend mode or not
      * @param \Doctrine\ORM\EntityManager $em Doctrine entity manager
+     * @param array $preLoadedComponents An array containing the preloaded components
      */
-    public function __construct(\Cx\Core_Modules\License\License $license, $frontend, \Doctrine\ORM\EntityManager $em) {
+    public function __construct(\Cx\Core_Modules\License\License $license, $frontend, \Doctrine\ORM\EntityManager $em, $preLoadedComponents) {
         $this->legacyComponentHandler = new LegacyComponentHandler();
         $this->frontend = $frontend;
         //$this->components = $license->getLegalComponentsList();
         $this->systemComponentRepo = $em->getRepository('Cx\\Core\\Core\\Model\\Entity\\SystemComponent');
+        $this->systemComponentRepo->setPreLoadedComponents($preLoadedComponents);
         $this->systemComponentRepo->findAll();
 
         $this->callRegisterEventsHooks();
@@ -132,6 +134,30 @@ class ComponentHandler {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Calls hook scripts on legacy and non-legacy components after they are loaded
+     */
+    public function callPostComponentLoadHooks() {
+        foreach ($this->components as $componentName) {
+            if ($this->checkLegacy('postComponentLoad', $componentName)) {
+                continue;
+            }
+        }
+        $this->systemComponentRepo->callPostComponentLoadHooks();
+    }
+
+    /**
+     * Calls hook scripts on legacy and non-legay components after initialization
+     */
+    public function callPostInitHooks() {
+        foreach ($this->components as $componentName) {
+            if ($this->checkLegacy('postInit', $componentName)) {
+                continue;
+            }
+        }
+        $this->systemComponentRepo->callPostInitHooks();
     }
 
     /**
@@ -188,6 +214,14 @@ class ComponentHandler {
         if ($mode == 'all' || $mode == 'proper') {
             $this->systemComponentRepo->callPostResolveHooks();
         }
+    }
+
+    /**
+     * Calls hook scripts to adjust response object (this is newer than legacy)
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Current response
+     */
+    public function callAdjustResponseHooks($response) {
+        $this->systemComponentRepo->callAdjustResponseHooks($response);
     }
 
     /**
@@ -252,14 +286,15 @@ class ComponentHandler {
 
     /**
      * Calls hook scripts on legacy and non-legacy components after finalizing
+     * @param string $endcode The cx endcode passed by reference
      */
-    public function callPostFinalizeHooks() {
+    public function callPostFinalizeHooks(&$endcode) {
         foreach ($this->components as $componentName) {
             if ($this->checkLegacy('postFinalize', $componentName)) {
                 continue;
             }
         }
-        $this->systemComponentRepo->callPostFinalizeHooks();
+        $this->systemComponentRepo->callPostFinalizeHooks($endcode);
     }
 
     /**

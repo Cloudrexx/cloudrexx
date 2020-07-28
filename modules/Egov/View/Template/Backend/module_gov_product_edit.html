@@ -207,34 +207,25 @@ function updateContentSite()
   }
 }
 
-function newsGetFileBrowser(elInsertBox, sType)
+function mbProductFileCallback(data)
 {
-  newsElInsertBox = elInsertBox;
-  newsElType = sType;
-  openWindow('index.php?cmd=FileBrowser&{CSRF_PARAM}&standalone=true','','width=800,height=600,resizable=yes,status=no,scrollbars=yes');
-}
-
-function openWindow(theURL,winName,features){
-  galleryPopup = window.open(theURL,"gallery",features);
-  galleryPopup.focus();
-}
-
-function SetUrl(url, width, height, alt) {
-  switch (newsElType) {
-  case 'image':
-    document.getElementById(newsElInsertBox).value = url;
-    break
-  case 'link':
-    newsInsertLink(document.getElementById(newsElInsertBox), '<a href="'+url+'">'+newsElLinkText+'<\/a>');
-    break;
+  if (data.type !== 'file' || (typeof data.data[0] === 'undefined')) {
+    return;
   }
+
+  var url = data.data[0].datainfo.filepath;
+  cx.jQuery('#productFile').val(url);
 }
 
-function ShowProductFile(){
-  if(document.forms.frmProductEdit.ElectroProduct.checked==true){
-    document.getElementById('productFileLayer').style.display = 'block';
-  } else {
-    document.getElementById('productFileLayer').style.display = 'none';
+function mbProductTargetUrlCallback(data)
+{
+  if (data.type === 'file' && (typeof data.data[0] !== 'undefined')) {
+    var url = data.data[0].datainfo.filepath;
+    cx.jQuery('#productFormTargetUrl').val(url);
+  }
+  if (data.type === 'page') {
+    var url = data.data[0].node;
+    cx.jQuery('#productFormTargetUrl').val(url);
   }
 }
 
@@ -245,6 +236,16 @@ function showOrHide(strElement) {
     document.getElementById(strElement).style.display = 'none';
   }
 }
+cx.jQuery(function(){
+    cx.jQuery('input[name=productAutoStatus]').change(function(){
+        if (cx.jQuery(this).val() == 2) {
+            cx.jQuery('#productFileLayer').show();
+        } else {
+            cx.jQuery('#productFileLayer').hide();
+        }
+    });
+    cx.jQuery('input[name=productAutoStatus]:checked').trigger('change');
+});
 // -->
 </script>
 <div style="display:none;">
@@ -434,27 +435,55 @@ function showOrHide(strElement) {
           <td><input style="width: 670px;" type="text" name="productQuantityLimit" value="{EGOV_PRODUCT_QUANTITY_LIMIT}" maxlength="2" /></td>
         </tr>
         <tr class="row2">
-          <td>{TXT_EGOV_PRODUCT_ELECTRO}</td>
           <td>
-            <div style="float:left;">
-              <input type="checkbox" name="ElectroProduct" value="1" {ELECTRO_CHECKED} onclick="ShowProductFile();" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </div>
-            <div style="float:left;" id="productFileLayer">{TXT_EGOV_PRODUCT_SELECT_FILE}
-              &nbsp;<input style="width: 450px;" type="text" name="productFile" id="productFile" value="{PRODUCT_FORM_FILE}" />
-              &nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('productFile', 'image')" />
-            </div>
+              {TXT_EGOV_PRODUCT_AUTO}
+              <span class="icon-info tooltip-trigger"></span>
+              <span class="tooltip-message">
+                  <h3>{TXT_EGOV_PRODUCT_ELECTRO}</h3>
+                  <ul>
+                      <li>{TXT_EGOV_ORDER_STATE_HANDLED_DESK}</li>
+                      <li>{TXT_EGOV_ORDER_STATE_HANDLE_EMAIL_NOTIFICATION}</li>
+                  </ul>
+                  <h3>{TXT_EGOV_AUTOMATICALLY}</h3>
+                  <ul>
+                      <li>{TXT_EGOV_ORDER_STATE_HANDLED_DESK}</li>
+                      <li>{TXT_EGOV_ORDER_STATE_EMAIL_NOTIFICATION}</li>
+                  </ul>
+                  <h3>{TXT_EGOV_RESERVATION}</h3>
+                  <ul>
+                      <li>{TXT_EGOV_ORDER_STATE_RESERVE_DESK}</li>
+                      <li>{TXT_EGOV_ORDER_STATE_EMAIL_NOTIFICATION}</li>
+                  </ul>
+                  <h3>{TXT_EGOV_MANUALLY}</h3>
+                  <ul>
+                      <li>{TXT_EGOV_ORDER_STATE_NOT_PAID_DESK}</li>
+                      <li>{TXT_EGOV_ORDER_STATE_NOT_PAID_EMAIL_NOTIFICATION}</li>
+                  </ul>
+              </span>
           </td>
-        </tr>
-        <tr class="row1">
-          <td>{TXT_EGOV_PRODUCT_AUTO}</td>
           <td>
+            <div>
+                <label>
+                    <input type="radio" name="productAutoStatus" value="2" {AUTOSTATUS_CHECKED_ELECTRO} />
+                    {TXT_EGOV_PRODUCT_ELECTRO}
+                </label>
+                <div id="productFileLayer">{TXT_EGOV_PRODUCT_SELECT_FILE}
+                  &nbsp;<input style="width: 450px;" type="text" name="productFile" id="productFile" value="{PRODUCT_FORM_FILE}" />
+                  &nbsp; {EGOV_PRODUCT_MEDIABROWSER_FILE_BUTTON}
+                </div>
+            </div>
             <input type="radio" name="productAutoStatus" value="1"
                 id="productAutoStatus_1" {AUTOSTATUS_CHECKED_YES} />
-            <label for="productAutoStatus_1">{TXT_EGOV_YES} ({TXT_EGOV_ORDER_STATE_AUTOMAIL})</label>
+            <label for="productAutoStatus_1">{TXT_EGOV_AUTOMATICALLY}</label>
+            <br />
+            <input type="radio" name="productAutoStatus" value="3"
+                id="productAutoStatus_3" {AUTOSTATUS_CHECKED_RESERVATION} />
+            <label for="productAutoStatus_3">{TXT_EGOV_RESERVATION}</label>
             <br />
             <input type="radio" name="productAutoStatus" value="0"
                 id="productAutoStatus_0" {AUTOSTATUS_CHECKED_NO} />
-            <label for="productAutoStatus_0">{TXT_EGOV_NO}</label>
+            <label for="productAutoStatus_0">{TXT_EGOV_MANUALLY}</label>
+            <br />
           </td>
         </tr>
         <tr class="row2" style="height:20px;">
@@ -463,7 +492,8 @@ function showOrHide(strElement) {
         </tr>
         <tr class="row1" style="height:20px;">
           <td width="20%">{TXT_EGOV_TARGET_URL}</td>
-          <td width="80%"><input style="width: 580px;" type="text" name="productFormTargetUrl" id="productFormTargetUrl" value="{PRODUCT_FORM_TARGET_URL}" />&nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('productFormTargetUrl', 'image')" /><td>
+          <td width="80%"><input style="width: 580px;" type="text" name="productFormTargetUrl" id="productFormTargetUrl" value="{PRODUCT_FORM_TARGET_URL}" />
+            &nbsp; {EGOV_PRODUCT_MEDIABROWSER_TARGET_URL_BUTTON}
         </tr>
         <tr class="row2" style="height:20px;">
           <td>{TXT_STATE}</td>
@@ -581,11 +611,5 @@ function showOrHide(strElement) {
   <br />
   <input type="submit" name="saveForm" value="{TXT_SAVE}" />
 </form>
-
-<script type="text/javascript">
-  <!--
-    ShowProductFile();
-  // -->
-</script>
 
 <!-- END module_gov_product_edit.html -->

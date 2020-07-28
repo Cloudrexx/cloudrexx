@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,33 +13,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
-*/
+ */
 
 namespace Doctrine\ORM\Tools\Console\Command\SchemaTool;
 
-use Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputOption,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    Symfony\Component\Console\Command\Command,
-    Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper,
-    Doctrine\ORM\Tools\SchemaTool,
-    Doctrine\ORM\Mapping\Driver\AbstractFileDriver;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
+use Doctrine\ORM\Tools\SchemaTool;
 
+/**
+ * Base class for CreateCommand, DropCommand and UpdateCommand.
+ *
+ * @link    www.doctrine-project.org
+ * @since   2.0
+ * @author  Benjamin Eberlei <kontakt@beberlei.de>
+ * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author  Jonathan Wage <jonwage@gmail.com>
+ * @author  Roman Borschel <roman@code-factory.org>
+ */
 abstract class AbstractCommand extends Command
 {
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param SchemaTool $schemaTool
-     * @param array $metadatas
+     * @param SchemaTool      $schemaTool
+     * @param array           $metadatas
+     *
+     * @return null|int Null or 0 if everything went fine, or an error code.
      */
     abstract protected function executeSchemaCommand(InputInterface $input, OutputInterface $output, SchemaTool $schemaTool, array $metadatas);
 
     /**
-     * @see Console\Command\Command
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -54,11 +60,12 @@ abstract class AbstractCommand extends Command
 
         if ( ! empty($metadatas)) {
             // Create SchemaTool
-            $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+            $tool = new SchemaTool($em);
 
-            $this->executeSchemaCommand($input, $output, $tool, $metadatas);
+            return $this->executeSchemaCommand($input, $output, $tool, $metadatas);
         } else {
-            $output->write('No Metadata Classes to process.' . PHP_EOL);
+            $output->writeln('No Metadata Classes to process.');
+            return 0;
         }
     }
 }

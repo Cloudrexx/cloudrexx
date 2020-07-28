@@ -64,7 +64,9 @@ class MediaDirectoryInputfieldLinkGroup extends \Cx\Modules\MediaDir\Controller\
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
+
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -90,7 +92,7 @@ class MediaDirectoryInputfieldLinkGroup extends \Cx\Modules\MediaDir\Controller\
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = contrexx_raw2xhtml($objInputfieldValue->fields['value']);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = isset($arrValue[$_LANGID]) ? $arrValue[$_LANGID] : null;
+                        $arrValue[0] = isset($arrValue[$langId]) ? $arrValue[$langId] : null;
                     }
                 }
 
@@ -189,48 +191,8 @@ class MediaDirectoryInputfieldLinkGroup extends \Cx\Modules\MediaDir\Controller\
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
-
-        $intId = intval($arrInputfield['id']);
-        $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
-        $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
-
-        $intLangId = $_LANGID;
-        if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            $intLangId = in_array($_LANGID, $arrTranslationStatus) ? $_LANGID : $intEntryDefaultLang;
-        }
-
-        $objInputfieldValue = $objDatabase->Execute("
-            SELECT
-                `value`
-            FROM
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-            WHERE
-                field_id=".$intId."
-            AND
-                entry_id=".intval($intEntryId)."
-            AND
-                lang_id=".$intLangId."
-            LIMIT 1
-        ");
-
-        if(empty($objInputfieldValue->fields['value'])) {
-            $objInputfieldValue = $objDatabase->Execute("
-                SELECT
-                    `value`
-                FROM
-                    ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-                WHERE
-                    field_id=".$intId."
-                AND
-                    entry_id=".intval($intEntryId)."
-                AND
-                    lang_id=".intval($intEntryDefaultLang)."
-                LIMIT 1
-            ");
-        }
-
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
 
         if(!empty($strValue)) {
             //get seperator
@@ -277,6 +239,52 @@ class MediaDirectoryInputfieldLinkGroup extends \Cx\Modules\MediaDir\Controller\
         }
 
         return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
+
+        $intId = intval($arrInputfield['id']);
+        $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
+        $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
+
+        $intLangId = $langId;
+        if($this->arrSettings['settingsTranslationStatus'] == 1) {
+            $intLangId = in_array($langId, $arrTranslationStatus) ? $langId : $intEntryDefaultLang;
+        }
+
+        $objInputfieldValue = $objDatabase->Execute("
+            SELECT
+                `value`
+            FROM
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+            WHERE
+                field_id=".$intId."
+            AND
+                entry_id=".intval($intEntryId)."
+            AND
+                lang_id=".$intLangId."
+            LIMIT 1
+        ");
+
+        if(empty($objInputfieldValue->fields['value'])) {
+            $objInputfieldValue = $objDatabase->Execute("
+                SELECT
+                    `value`
+                FROM
+                    ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+                WHERE
+                    field_id=".$intId."
+                AND
+                    entry_id=".intval($intEntryId)."
+                AND
+                    lang_id=".intval($intEntryDefaultLang)."
+                LIMIT 1
+            ");
+        }
+
+        return $objInputfieldValue->fields['value'];
     }
 
 

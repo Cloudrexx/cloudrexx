@@ -6,15 +6,21 @@ namespace Doctrine\Tests;
 
 error_reporting(E_ALL | E_STRICT);
 
-require_once 'PHPUnit/Framework.php';
-require_once 'PHPUnit/TextUI/TestRunner.php';
-require_once __DIR__ . '/../../../lib/Doctrine/Common/ClassLoader.php';
+// register silently failing autoloader
+spl_autoload_register(function($class)
+{
+    if (0 === strpos($class, 'Doctrine\Tests\\')) {
+        $path = __DIR__.'/../../'.strtr($class, '\\', '/').'.php';
+        if (is_file($path) && is_readable($path)) {
+            require_once $path;
 
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine');
-$classLoader->register();
+            return true;
+        }
+    }
+});
 
-set_include_path(
-    __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'lib'
-    . PATH_SEPARATOR .
-    get_include_path()
+require_once __DIR__ . "/../../../vendor/autoload.php";
+
+\Doctrine\Common\Annotations\AnnotationRegistry::registerAutoloadNamespace(
+    'Doctrine\Tests\Common\Annotations\Fixtures', __DIR__ . '/../../'
 );

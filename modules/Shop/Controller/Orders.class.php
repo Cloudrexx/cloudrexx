@@ -1051,6 +1051,7 @@ if (!$limit) {
              WHERE id=$order_id";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult || $objResult->EOF) {
+            \DBG::log('Unknown order ID: ' . $order_id . ' -> declare as cancelled');
             return Order::STATUS_CANCELLED;
         }
         $status = $objResult->fields['status'];
@@ -1063,6 +1064,7 @@ if (!$limit) {
             // or a PayPal IPN that has been received already.
             // No order status is changed automatically in these cases!
             // Leave it as it is.
+            \DBG::log('Order with ID ' . $order_id . ' is not pending (status is ' . $status . ') -> return');
             return $status;
         }
         // Determine and verify the payment handler
@@ -1075,6 +1077,7 @@ if (!$limit) {
         // The payment processor *MUST* match the handler returned.
         if (!preg_match("/^$handler/i", $processorName)) {
 //DBG::log("update_status($order_id, $newOrderStatus): Mismatching Handlers: Order $processorName, Request ".$_GET['handler']);
+            \DBG::log('Invalid paymentprocessor. Registered: ' . $processorName . ' / Supplied: ' . $handle);
             return Order::STATUS_CANCELLED;
         }
         // Only if the optional new order status argument is zero,
@@ -1115,6 +1118,7 @@ if (!$limit) {
                 }
                 //else { deferred, delivery -> confirmed }
             }
+            \DBG::log('Update pending order with ID ' . $order_id . ' to '. $newOrderStatus);
         }
         $query = "
             UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_orders
@@ -1125,8 +1129,10 @@ if (!$limit) {
             // The query failed, but all the data is okay.
             // Don't cancel the order, leave it as it is and let the shop
             // manager handle this.  Return pending status.
+            \DBG::log('Updating order with ID ' . $order_id . ' to '. $newOrderStatus . ' failed!');
             return Order::STATUS_PENDING;
         }
+        \DBG::log('Order with ID ' . $order_id . ' changed to '. $newOrderStatus);
         if (   $newOrderStatus == Order::STATUS_CONFIRMED
             || $newOrderStatus == Order::STATUS_PAID
             || $newOrderStatus == Order::STATUS_SHIPPED
@@ -1224,11 +1230,13 @@ if (!$limit) {
      * @param   integer $order_id     The order ID
      * @param   boolean $create_accounts  If true, creates User accounts
      *                                    and Coupon codes.  Defaults to true
+     * @param   boolean $updateStock  If true, decreases stock according to order.
+     *                                Defaults to true
      * @return  array                 The array with placeholders as keys
      *                                and values from the order on success,
      *                                false otherwise
      */
-    static function getSubstitutionArray($order_id, $create_accounts=true)
+    static function getSubstitutionArray($order_id, $create_accounts=true, $updateStock=true)
     {
         global $_ARRAYLANG;
 /*
@@ -1242,8 +1250,6 @@ if (!$limit) {
             return false;
         }
         $lang_id = $objOrder->lang_id();
-        if (!intval($lang_id))
-            $lang_id = \FWLanguage::getLangIdByIso639_1($lang_id);
         $status = $objOrder->status();
         $customer_id = $objOrder->customer_id();
         $customer = Customer::getById($customer_id);
@@ -1306,7 +1312,7 @@ if (!$limit) {
                 )),
             );
         }
-        $arrItems = $objOrder->getItems();
+        $arrItems = $objOrder->getItems(false);
         if (!$arrItems) {
             \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_WARNING_NO_ITEM']);
         }
@@ -1337,21 +1343,25 @@ if (!$limit) {
             $quantity = $item['quantity'];
 // TODO: Add individual VAT rates for Products
 //            $orderItemVatPercent = $objResultItem->fields['vat_percent'];
-            // Decrease the Product stock count,
-            // applies to "real", shipped goods only
-            $objProduct->decreaseStock($quantity);
+            if ($updateStock) {
+                // Decrease the Product stock count,
+                // applies to "real", shipped goods only
+                $objProduct->decreaseStock($quantity);
+            }
             $product_code = $objProduct->code();
             // Pick the order items attributes
             $str_options = '';
+            $optionList = array();
             // Any attributes?
             if ($item['attributes']) {
                 $str_options = '  '; // '[';
                 $attribute_name_previous = '';
-                foreach ($item['attributes'] as
-                        $attribute_name => $arrAttribute) {
+                foreach ($item['attributes'] as $attribute_name => $arrAttribute) {
+                    $optionValues = array();
 //DBG::log("Attribute /$attribute_name/ => ".var_export($arrAttribute, true));
 // NOTE: The option price is optional and may be left out
                     foreach ($arrAttribute as $arrOption) {
+                        $option = array();
                         $option_name = $arrOption['name'];
                         $option_price = $arrOption['price'];
                         $item_price += $option_price;
@@ -1372,6 +1382,7 @@ if (!$limit) {
                         } else {
                             $str_options .= ', '.$option_name;
                         }
+                        $option['PRODUCT_OPTIONS_VALUE'] = $option_name;
 // TODO: Add proper formatting with sprintf() and language entries
                         if ($option_price != 0) {
                             $str_options .=
@@ -1380,8 +1391,15 @@ if (!$limit) {
                                 ' '.Currency::getActiveCurrencyCode()
 //                                .')'
                                 ;
+                            $option['PRODUCT_OPTIONS_PRICE'] = Currency::formatPrice($option_price);
+                            $option['PRODUCT_OPTIONS_CURRENCY'] = Currency::getActiveCurrencyCode();
                         }
+                        $optionValues[] = $option;
                     }
+                    $optionList[] = array(
+                        'PRODUCT_OPTIONS_NAME' => $attribute_name,
+                        'PRODUCT_OPTIONS_VALUES' => $optionValues,
+                    );
                 }
 //                $str_options .= ']';
             }
@@ -1392,6 +1410,7 @@ if (!$limit) {
                 'PRODUCT_QUANTITY' => $quantity,
                 'PRODUCT_TITLE' => $product_name,
                 'PRODUCT_OPTIONS' => $str_options,
+                'PRODUCT_OPTION_LIST' => $optionList,
                 'PRODUCT_ITEM_PRICE' => sprintf('% 9.2f', $item_price),
                 'PRODUCT_TOTAL_PRICE' => sprintf('% 9.2f', $item_price*$quantity),
             );

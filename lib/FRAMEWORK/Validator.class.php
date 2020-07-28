@@ -146,6 +146,35 @@ class FWValidator
     const REGEX_URI_JS = VALIDATOR_REGEX_URI_JS;
 
     /**
+     * Array of harmful file extensions
+     *
+     * File uploads having those extensions are denied.
+     * 
+     * @var array
+     */
+    protected static $evilFileExtensions = array(
+        # windows executables:
+        'exe', 'bat', 'pif', 'com',
+        # client scripts:
+        'vs', 'vbs',
+        # server scripts:
+        'php', 'php4', 'php5', 'phps', 'cgi', 'pl', 'jsp', 'jspx', 'asp', 'aspx',
+        'jsp', 'jspx', 'jhtml', 'phtml', 'cfm', 'htaccess','py',
+    );
+
+    /**
+     * Array of potential harmful file extensions (client script containers)
+     * 
+     * File uploads having those extensions may be allowed by config
+     *
+     * @var array
+     */
+    protected  static $potentialEvilFileExtensions = array(
+        # client script containers:
+        'xhtml', 'xml', 'svg', 'shtml',
+    );
+
+    /**
      * Validate an E-mail address
      *
      * Note:  This used to have a stripslashes() around the string.
@@ -201,7 +230,7 @@ class FWValidator
     {
         $arrMatches = array();
         preg_match_all(
-            '/\s('.VALIDATOR_REGEX_EMAIL.')\.?\s/', $string, $arrMatches);
+            '/(?:^|\s)('.VALIDATOR_REGEX_EMAIL.')\.?(?:\s|$)/i', $string, $arrMatches);
         return $arrMatches[0]; // include spaces
         // return $arrMatches[1]; // exclude spaces
     }
@@ -238,20 +267,61 @@ class FWValidator
      */
     static function is_file_ending_harmless($file)
     {
-        $evil = array(
-            # windows executables:
-            'exe', 'bat', 'pif', 'com',
-            # client scripts:
-            'vs', 'vbs',
-            # client script containers:
-            'xhtml', 'xml', 'svg', 'shtml',
-            # server scripts:
-            'php', 'php4', 'php5', 'phps', 'cgi', 'pl', 'jsp', 'jspx', 'asp', 'aspx',
-            'jsp', 'jspx', 'jhtml', 'phtml', 'cfm', 'htaccess','py',
-        );
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-        if (in_array($ext, $evil)) return false;
-        return true;
+
+        // check if file is harmfull
+        if (in_array($ext, self::$evilFileExtensions)) {
+            return false;
+        }
+
+        //Check the file extension is present in $potentialEvilFileExtensions
+        //if so, check the config options 
+        //'allowClientsideScriptUpload' and 'allowClientSideScriptUploadOnGroups'.
+        //If the option 'allowClientsideScriptUpload' is 'nobody' then its a harmful file
+        //else if the option is 'groups' and the current user is member of the 
+        // groups mentioned in the option 'allowClientSideScriptUploadOnGroups' then
+        //its a harmless file.
+        //If the option is 'all' then its a harmless file too.
+
+        // if file is not potentially harmfull, then the file is harmless
+        if (!in_array($ext, self::$potentialEvilFileExtensions)) {
+            return true;
+        }
+
+        $allowedCSUpload = \Cx\Core\Setting\Controller\Setting::getValue(
+            'allowClientsideScriptUpload',
+            'Config'
+        );
+        $allowedCSGroups = \Cx\Core\Setting\Controller\Setting::getValue(
+            'allowClientSideScriptUploadOnGroups',
+            'Config'
+        );
+
+        // Check if we are allowed to process the potentially harmful file.
+        // no restriction set at all
+        if ($allowedCSUpload == 'all') {
+            return true;
+        }
+
+        // check if we are a member of a user group that is allowed to upload
+        // potentially harmfull files
+        if (
+            $allowedCSUpload == 'groups' &&
+            (
+                \FWUser::getFWUserObject()->objUser->getAdminStatus() ||
+                count(
+                    array_intersect(
+                        explode(',', $allowedCSGroups),
+                        \FWUser::getFWUserObject()->objUser->getAssociatedGroupIds()
+                    )
+                )
+            )
+        ) {
+            return true;
+        }
+
+        // fallback to file is harmfull
+        return false;
     }
 
 
@@ -295,7 +365,7 @@ class FWValidator
     public static function getCleanFileName($fileName)
     {
         // replace $change with ''
-        $change = array('\\', '/', ':', '*', '?', '"', '<', '>', '|');
+        $change = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '`', '´');
         $fileName = str_replace($change, '_', $fileName);
 
         return $fileName;
@@ -410,6 +480,76 @@ class FWValidator
 
         return true;
     }
+
+    /**
+     * Cut HTML-code in length by a specific amount of visiable characters
+     *
+     * @param   string $html    HTML code to cut
+     * @param   integer $maxLength  Visual length (in characters) to cut the
+     *                              HTML code to
+     * @param   string  $suffix Text to append at the end of the cut HTML code
+     */
+    public static function cutHtmlByDisplayLength(&$html, $maxLength = 250, $suffix = '') {
+        // get plaintext of html code
+        $plaintext = contrexx_html2plaintext($html);
+        $useLength = $maxLength;
+
+        // abort if output is not longer than set length limit
+        if (strlen($plaintext) <= $maxLength) {
+            return;
+        }
+
+        do {
+            // cut html to set length
+            $cutHtml = substr($html, 0, $useLength);
+
+            // strip out any html code
+            $plaintext = contrexx_html2plaintext($cutHtml);
+
+            // obtain length of plaintext of cut html
+            $plaintextLength = strlen($plaintext);
+
+            // determine length of stripped html code
+            $htmlNoise = $maxLength - $plaintextLength;
+
+            // append length of stripped html code to set cut length
+            $useLength += $htmlNoise;
+
+        // repeat above procedere until the length of the raw output
+        // of the cut html reaches the set max length
+        } while ($plaintextLength < $maxLength);
+
+        // now cut the html to the determined length
+        $cutHtml = substr($html, 0, $useLength);
+
+        // cut of the last word-fragment as it might represent
+        // a literal word cut in half
+        $cutHtml = substr($cutHtml, 0, strrpos($cutHtml, ' '));
+
+        // Ensure the html is still valid, by adding any
+        // missing html closing tags.
+        // DOMDocument will do that for us
+        $doc = new \DOMDocument();
+        $doc->loadHTML($cutHtml);
+
+        // fetch only content of html <body> tag
+        $nodeList = $doc->getElementsByTagName('body');
+        $bodyNode = $nodeList->item(0);
+
+        // add optional suffix to the end of the html code
+        $lastNode = $bodyNode->lastChild;
+        if ($suffix && $lastNode) {
+            $lastNode->appendChild($doc->createTextNode($suffix));
+        }
+
+        // fetch content of <body>-tag and strip out <p>-tag
+        // that was automatically added by DOMDocument
+        $body = $doc->saveHTML($bodyNode);
+        $cutHtml = preg_replace('#^<body>(<p>)?\s*|\s*(</p>)?</body>$#', '', $body);
+
+        // assign cut html code to referenced variable
+        $html = $cutHtml;
+    }
 }
 
 /**
@@ -425,16 +565,26 @@ abstract class CxValidate {
     protected $passesValidation;
     protected $messages;
 
+    /**
+     * If empty values are allowed in the validation check
+     *
+     * @var bool
+     */
+    protected $validateEmpty;
+
     // TODO: Possibly throw an Exception if an unknown/typoed constraint was provided
-    public function __construct($constraints) {
-    $this->messages = array();
-    $this->constraints = $constraints;
+    public function __construct($constraints, $validateEmpty = false)
+    {
+        $this->messages = array();
+        $this->constraints = $constraints;
+        $this->validateEmpty = $validateEmpty;
     }
 
     public abstract function isValid($value);
 
-    public function getMessages() {
-    return $this->messages;
+    public function getMessages()
+    {
+        return $this->messages;
     }
 
 }
@@ -448,28 +598,36 @@ abstract class CxValidate {
  * @subpackage  lib_framework
  */
 class CxValidateString extends CxValidate {
-    public function __construct($constraints) {
-    parent::__construct($constraints);
+    public function __construct($constraints, $validateEmpty = false)
+    {
+        parent::__construct($constraints, $validateEmpty);
     }
 
-    public function isValid($value) {
-    $this->passesValidation = true;
-
-    if (isset($this->constraints['maxlength'])) {
-        if (strlen($value) > $this->constraints['maxlength']) {
-        // TODO: Translate messages
-        $this->messages[] = 'is too long.';
-        $this->passesValidation = false;
+    public function isValid($value)
+    {
+        $this->passesValidation = true;
+        if (!$this->validateEmpty && !$value) {
+            return $this->passesValidation;
         }
-    }
 
-    if (isset($this->constraints['alphanumeric']) && $this->constraints['alphanumeric']) {
-        if (!ctype_alnum($value)) {
-        $this->passesValidation = false;
+        if (isset($this->constraints['maxlength'])) {
+            if (strlen($value) > $this->constraints['maxlength']) {
+            // TODO: Translate messages
+            $this->messages[] = 'is too long.';
+            $this->passesValidation = false;
+            }
         }
-    }
 
-    return $this->passesValidation;
+        if (
+            isset($this->constraints['alphanumeric']) &&
+            $this->constraints['alphanumeric']
+        ) {
+            if (!ctype_alnum($value)) {
+            $this->passesValidation = false;
+            }
+        }
+
+        return $this->passesValidation;
     }
 }
 
@@ -482,23 +640,28 @@ class CxValidateString extends CxValidate {
  * @subpackage  lib_framework
  */
 class CxValidateRegexp extends CxValidate {
-    public function __construct($constraints) {
-    parent::__construct($constraints);
+    public function __construct($constraints, $validateEmpty = false)
+    {
+        parent::__construct($constraints, $validateEmpty);
     }
 
-    public function isValid($value) {
-    $this->passesValidation = false;
-
-    if (isset($this->constraints['pattern']) &&
-        preg_match($this->constraints['pattern'], $value)) {
+    public function isValid($value)
+    {
         $this->passesValidation = true;
-    }
-    else {
-        // TODO: Translate messages
-        $this->messages[] = 'doesn\'t match required pattern.';
-    }
+        if (!$this->validateEmpty && !$value) {
+            return $this->passesValidation;
+        }
+        $this->passesValidation = false;
 
-    return $this->passesValidation;
+        if (isset($this->constraints['pattern']) &&
+            preg_match($this->constraints['pattern'], $value)) {
+            $this->passesValidation = true;
+        } else {
+            // TODO: Translate messages
+            $this->messages[] = 'doesn\'t match required pattern.';
+        }
+
+        return $this->passesValidation;
     }
 }
 
@@ -511,21 +674,26 @@ class CxValidateRegexp extends CxValidate {
  * @subpackage  lib_framework
  */
 class CxValidateInteger extends CxValidate {
-    public function __construct($constraints = array()) {
-    parent::__construct($constraints);
+    public function __construct($constraints = array(), $validateEmpty = false)
+    {
+        parent::__construct($constraints, $validateEmpty);
     }
 
-    public function isValid($value) {
-    $this->passesValidation = false;
-
-    if(is_numeric($value) || is_int($value)) {
+    public function isValid($value)
+    {
         $this->passesValidation = true;
-    }
-    else {
-        // TODO: Translate messages
-        $this->messages[] = 'is not a number.';
-    }
+        if (!$this->validateEmpty && !$value) {
+            return $this->passesValidation;
+        }
+        $this->passesValidation = false;
 
-    return $this->passesValidation;
+        if (is_numeric($value) || is_int($value)) {
+            $this->passesValidation = true;
+        } else {
+            // TODO: Translate messages
+            $this->messages[] = 'is not a number.';
+        }
+
+        return $this->passesValidation;
     }
 }

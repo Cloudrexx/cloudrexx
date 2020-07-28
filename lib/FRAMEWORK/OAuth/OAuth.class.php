@@ -111,8 +111,6 @@ abstract class OAuth implements OAuthInterface
      */
     protected function getContrexxUser($oauth_id)
     {
-        global $sessionObj;
-
         //\DBG::activate();
         $arrSettings = \User_Setting::getSettings();
 
@@ -174,7 +172,8 @@ abstract class OAuth implements OAuthInterface
             // check whether there are empty mandatory fields or the setting to show sign up everytime
             if ($registrationRedirectNeeded) {
                 // start session if no session is open
-                if (!isset($sessionObj) || !is_object($sessionObj)) $sessionObj = \cmsSession::getInstance();
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $cx->getComponent('Session')->getSession();
 
                 // write the user id to session so we can pre-fill the sign up form
                 $_SESSION['user_id'] = $objUser->getId();

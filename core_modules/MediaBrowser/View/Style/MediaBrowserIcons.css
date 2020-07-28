@@ -1,111 +1,111 @@
-.fileTypePresentation, .sitestructure, .sitestructureLarge, .sitestrukturHover, .fileTypeSpreadsheet, .fileTypeText, .fileTypeTextdocument, .fileTypeUnknown, .upload, .uploadHover, .uploadLarge, .fileTypeVideo, .dropzone, .fileTypeImage, .folder, .folderHover, .folderLarge, .fileTypePdf{
-  background: url(sprites.png) no-repeat;
+.fileTypePresentation, .sitestructure, .sitestructureLarge, .sitestrukturHover, .fileTypeSpreadsheet, .fileTypeText, .fileTypeTextdocument, .fileTypeUnknown, .upload, .uploadHover, .uploadLarge, .fileTypeVideo, .dropzone, .fileTypeImage, .folder, .folderHover, .folderLarge, .fileTypePdf {
+    background: url(sprites.png) no-repeat;
 }
 
-.fileTypePresentation{
-  background-position: -139px -52px ;
-  width: 16px;
-  height: 16px;
+.fileTypePresentation {
+    background-position: -139px -52px;
+    width: 16px;
+    height: 16px;
 }
 
-.sitestructure{
-  background-position: -210px -17px ;
-  width: 16px;
-  height: 16px;
+.sitestructure {
+    background-position: -210px -17px;
+    width: 16px;
+    height: 16px;
 }
 
-.sitestructureLarge{
-  background-position: -102px 0;
-  width: 36px;
-  height: 34px;
+.sitestructureLarge {
+    background-position: -102px 0;
+    width: 36px;
+    height: 34px;
 }
 
-.sitestrukturHover{
-  background-position: -156px -35px ;
-  width: 16px;
-  height: 16px;
+.sitestrukturHover {
+    background-position: -156px -35px;
+    width: 16px;
+    height: 16px;
 }
 
-.fileTypeSpreadsheet{
-  background-position: -210px 0;
-  width: 16px;
-  height: 16px;
+.fileTypeSpreadsheet {
+    background-position: -210px 0;
+    width: 16px;
+    height: 16px;
 }
 
-.fileTypeText{
-  background-position: -176px -51px ;
-  width: 16px;
-  height: 16px;
+.fileTypeText {
+    background-position: -176px -51px;
+    width: 16px;
+    height: 16px;
 }
 
-.fileTypeTextdocument{
-  background-position: -156px -52px ;
-  width: 16px;
-  height: 16px;
+.fileTypeTextdocument {
+    background-position: -156px -52px;
+    width: 16px;
+    height: 16px;
 }
 
-.fileTypeUnknown{
-  background-position: -193px 0;
-  width: 16px;
-  height: 16px;
+.fileTypeUnknown {
+    background-position: -193px 0;
+    width: 16px;
+    height: 16px;
 }
 
-.upload{
-  background-position: -176px 0;
-  width: 16px;
-  height: 16px;
+.upload {
+    background-position: -176px 0;
+    width: 16px;
+    height: 16px;
 }
 
-.uploadHover{
-  background-position: -176px -34px ;
-  width: 16px;
-  height: 16px;
+.uploadHover {
+    background-position: -176px -34px;
+    width: 16px;
+    height: 16px;
 }
 
-.uploadLarge{
-  background-position: -139px 0;
-  width: 36px;
-  height: 34px;
+.uploadLarge {
+    background-position: -139px 0;
+    width: 36px;
+    height: 34px;
 }
 
-.fileTypeVideo{
-  background-position: -139px -35px ;
-  width: 16px;
-  height: 16px;
+.fileTypeVideo {
+    background-position: -139px -35px;
+    width: 16px;
+    height: 16px;
 }
 
-.dropzone{
-  background-position: 0 0;
-  width: 101px;
-  height: 74px;
+.dropzone {
+    background-position: 0 0;
+    width: 101px;
+    height: 74px;
 }
 
-.fileTypeImage{
-  background-position: -193px -17px ;
-  width: 16px;
-  height: 16px;
+.fileTypeImage {
+    background-position: -193px -17px;
+    width: 16px;
+    height: 16px;
 }
 
-.folder{
-  background-position: -193px -34px ;
-  width: 16px;
-  height: 16px;
+.folder {
+    background-position: -193px -34px;
+    width: 16px;
+    height: 16px;
 }
 
-.folderHover{
-  background-position: -193px -51px ;
-  width: 16px;
-  height: 16px;
+.folderHover {
+    background-position: -193px -51px;
+    width: 16px;
+    height: 16px;
 }
 
-.folderLarge{
-  background-position: -102px -35px ;
-  width: 36px;
-  height: 34px;
+.folderLarge {
+    background-position: -102px -35px;
+    width: 36px;
+    height: 34px;
 }
 
-.fileTypePdf{
-  background-position: -176px -17px ;
-  width: 16px;
-  height: 16px;
+.fileTypePdf {
+    background-position: -176px -17px;
+    width: 16px;
+    height: 16px;
 }

@@ -45,7 +45,14 @@ namespace Cx\Modules\MediaDir\Model\Entity;
  */
 class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\MediaDirectoryLibrary implements Inputfield
 {
-    public $arrPlaceholders = array('TXT_MEDIADIR_INPUTFIELD_NAME','MEDIADIR_INPUTFIELD_VALUE','MEDIADIR_INPUTFIELD_LINK', 'MEDIADIR_INPUTFIELD_LINK_HREF');
+    public $arrPlaceholders = array(
+        'TXT_MEDIADIR_INPUTFIELD_NAME',
+        'MEDIADIR_INPUTFIELD_VALUE',
+        'MEDIADIR_INPUTFIELD_LINK',
+        'MEDIADIR_INPUTFIELD_LINK_HREF',
+        'MEDIADIR_INPUTFIELD_MAP_LAT',
+        'MEDIADIR_INPUTFIELD_MAP_LONG',
+    );
 
     private $imagePath;
     private $imageWebPath;
@@ -62,7 +69,7 @@ class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase,$_CORELANG, $_ARRAYLANG, $_LANGID, $objInit, $_CONFIG;
+        global $objDatabase,$_CORELANG, $_ARRAYLANG, $objInit, $_CONFIG;
 
         switch ($intView) {
             default:
@@ -108,27 +115,56 @@ class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\
                     $strValueZoom = empty($arrValues[2]) ? 0 : $arrValues[2];
                 }
 
-                $strMapId       = $this->moduleNameLC.'Inputfield_'.$intId.'_map';
-                $strLonId       = $this->moduleNameLC.'Inputfield_'.$intId.'_lon';
-                $strLatId       = $this->moduleNameLC.'Inputfield_'.$intId.'_lat';
-                $strZoomId      = $this->moduleNameLC.'Inputfield_'.$intId.'_zoom';
-                $strStreetId    = $this->moduleNameLC.'Inputfield_'.$intId.'_street';
-                $strZipId       = $this->moduleNameLC.'Inputfield_'.$intId.'_zip';
-                $strCityId      = $this->moduleNameLC.'Inputfield_'.$intId.'_city';
-                $strKey         = $_CONFIG['googleMapsAPIKey'];
+                $strMapId       = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_map';
+                $mapIndex       = $intEntryId.'_'.$intId;
+
+                $strLonId       = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_lon';
+                $strLatId       = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_lat';
+                $strZoomId      = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_zoom';
+                $strStreetId    = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_street';
+                $strZipId       = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_zip';
+                $strCityId      = $this->moduleNameLC.'Inputfield_'.$intEntryId.'_'.$intId.'_city';
+
+            $searchFieldIds = array(
+                    'long' => $strLonId,
+                    'lat' => $strLatId,
+                    'zoom' => $strZoomId,
+                    'street' => $strStreetId,
+                    'zip' => $strZipId,
+                    'city' => $strCityId
+                );
+
+                \ContrexxJavascript::getInstance()->setVariable(
+                    'map_search_field_ids',
+                    $searchFieldIds,
+                    'map_' . $mapIndex
+                );
+
+                $objGoogleMap = new \googleMap();
+                $objGoogleMap->setMapModus('search');
+                $objGoogleMap->setMapId($strMapId);
+                $objGoogleMap->setMapIndex($mapIndex);
+                $objGoogleMap->setMapZoom($strValueZoom);
+                $objGoogleMap->setMapCenter($strValueLon, $strValueLat);
+                $objGoogleMap->addMapMarker(
+                    $this->moduleNameLC.'Inputfield_'.$intEntryId .'_'.$intId.'_search',
+                    $strValueLon,
+                    $strValueLat
+                );
 
                 if($objInit->mode == 'backend') {
+                    $objGoogleMap->setMapStyleClass('mediadir-map');
                     $strInputfield  = '<table cellpadding="0" cellspacing="0" border="0" class="'.$this->moduleNameLC.'TableGoogleMap">';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_STREET'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][street]" id="'.$strStreetId.'" value="'.$strValueStreet.'" onfocus="this.select();" /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_CITY'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][place]" id="'.$strZipId.'"  value="'.$strValueZip.'" onfocus="this.select();" /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_ZIP'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][zip]" id="'.$strCityId.'" value="'.$strValueCity.'" onfocus="this.select();" /></td></tr>';
-                    $strInputfield .= '<tr><td style="border: 0px;"><br /></td><td style="border: 0px;"><input type="button" onclick="searchAddress();" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][search]" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_search" value="'.$_CORELANG['TXT_SEARCH'].'" /></td></tr>';
+                    $strInputfield .= '<tr><td style="border: 0px;"><br /></td><td style="border: 0px;"><input type="button" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][search]" id="'.$this->moduleNameLC.'Inputfield_'.$intEntryId .'_'.$intId.'_search" value="'.$_CORELANG['TXT_SEARCH'].'" /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;" coldpan="2"><br /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_LON'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][lon]" id="'.$strLonId.'"  value="'.$strValueLon.'" onfocus="this.select();" /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_LAT'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][lat]" id="'.$strLatId.'" value="'.$strValueLat.'" onfocus="this.select();" /></td></tr>';
                     $strInputfield .= '<tr><td style="border: 0px;">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLE_MAP_ZOOM'].':&nbsp;&nbsp;</td><td style="border: 0px; padding-bottom: 2px;"><input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][zoom]" id="'.$strZoomId.'" value="'.$strValueZoom.'" onfocus="this.select();" /></td></tr>';
                     $strInputfield .= '</table><br />';
-                    $strInputfield .= '<div id="'.$strMapId.'" style="border: solid 1px #0A50A1; width: 418px; height: 300px;"></div>';
+                    $strInputfield .= $objGoogleMap->getMap();
 
                 } else {
                     $strInputfield  = '<div class="'.$this->moduleNameLC.'GoogleMap" style="float: left; height: auto ! important;">';
@@ -146,91 +182,10 @@ class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\
                     $strInputfield .= '</fieldset>';
                     $strInputfield .= '</div>';
                     $strInputfield .= '<div class="'.$this->moduleNameLC.'GoogleMap" style="float: left; height: auto ! important;">';
-                    $strInputfield .= '<div id="'.$strMapId.'" class="map"></div>';
+                    $strInputfield .= $objGoogleMap->getMap();;
                     $strInputfield .= '</div>';
                 }
 
-                $strInputfield .= <<<EOF
-<script src="https://maps.googleapis.com/maps/api/js?key=$strKey&sensor=false&v=3"></script>
-<script>
-//<![CDATA[
-var elZoom, elLon, elLat, elStreet, elZip, elCity;
-var map, marker, geocoder, old_marker = null;
-
-function initialize() {
-    elZoom = document.getElementById("$strZoomId");
-    elLon = document.getElementById("$strLonId");
-    elLat = document.getElementById("$strLatId");
-
-    elStreet = document.getElementById("$strStreetId");
-    elZip = document.getElementById("$strZipId");
-    elCity = document.getElementById("$strCityId");
-
-    map = new google.maps.Map(document.getElementById("$strMapId"));
-
-    map.setCenter(new google.maps.LatLng($strValueLat, $strValueLon));
-    map.setZoom($strValueZoom);
-    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-
-    if($strValueLon != 0 && $strValueLon != 0) {
-        marker = new google.maps.Marker({
-            map: map,
-            draggable:true,
-            animation: google.maps.Animation.DROP
-        });
-        setPosition(new google.maps.LatLng($strValueLat, $strValueLon));
-    }
-
-    google.maps.event.addListener(marker, 'dragend', function(event){
-        if(event.latLng.lat()){
-           elLat.value = event.latLng.lat();
-        }
-        if(event.latLng.lng()){
-           elLon.value = event.latLng.lng();
-        }
-        map.setCenter(new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()));
-    });
-
-    geocoder = new google.maps.Geocoder();
-
-    google.maps.event.addListener(map, "click", function(event) {
-        setPosition(event.latLng);
-    });
-
-    google.maps.event.addListener(map, "idle", function() {
-        elZoom.value = map.getZoom();
-    });
-}
-
-function searchAddress() {
-    var address =  elStreet.value + " " + elZip.value + " " + elCity.value;
-
-    if (geocoder) {
-        geocoder.geocode( { 'address': address}, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-                setPosition(results[0].geometry.location);
-                map.setCenter(results[0].geometry.location);
-            }
-        });
-    }
-}
-
-function setPosition(position) {
-    if (!marker) {
-        marker = new google.maps.Marker({
-            map: map
-        });
-    }
-    marker.setPosition(position);
-    elZoom.value = map.getZoom();
-    elLon.value = position.lng();
-    elLat.value = position.lat();
-}
-
-google.maps.event.addDomListener(window, 'load', initialize);
-//]]>
-</script>
-EOF;
                 return $strInputfield;
 
                 break;
@@ -271,23 +226,11 @@ EOF;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-         global $objDatabase, $_CONFIG, $_ARRAYLANG;
+		global $_ARRAYLANG;
 
-        $intId = intval($arrInputfield['id']);
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET);
 
-        $objInputfieldValue = $objDatabase->Execute("
-            SELECT
-                `value`
-            FROM
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-            WHERE
-                field_id=".$intId."
-            AND
-                entry_id=".$intEntryId."
-            LIMIT 1
-        ");
-
-        $strValue  = htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
         $arrValues = explode(',', $strValue);
 
         $strValueLat = $arrValues[0];
@@ -295,6 +238,8 @@ EOF;
         $strValueZoom = $arrValues[2];
         $strValueLink = '<a href="http://maps.google.com/maps?q='.$strValueLat.','.$strValueLon.'" target="_blank">'.$_ARRAYLANG['TXT_MEDIADIR_GOOGLEMAPS_LINK'].'</a>';
         $strValueLinkHref = 'http://maps.google.com/maps?q='.$strValueLat.','.$strValueLon;
+
+        $intId = intval($arrInputfield['id']);
 
         if(!empty($strValue)) {
             $objGoogleMap = new \googleMap();
@@ -311,6 +256,8 @@ EOF;
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $objGoogleMap->getMap();
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_LINK'] = $strValueLink;
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_LINK_HREF'] = $strValueLinkHref;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_MAP_LAT'] = $strValueLat;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_MAP_LONG'] = $strValueLon;
         } else {
             $arrContent = null;
         }
@@ -318,6 +265,25 @@ EOF;
         return $arrContent;
     }
 
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
+
+        $intId = intval($arrInputfield['id']);
+
+        $objInputfieldValue = $objDatabase->Execute("
+            SELECT
+                `value`
+            FROM
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+            WHERE
+                field_id=".$intId."
+            AND
+                entry_id=".$intEntryId."
+            LIMIT 1
+        ");
+
+        return $objInputfieldValue->fields['value'];
+    }
 
 
     function getJavascriptCheck()

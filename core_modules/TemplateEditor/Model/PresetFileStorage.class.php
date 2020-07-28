@@ -34,7 +34,7 @@
 namespace Cx\Core_Modules\TemplateEditor\Model;
 
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\ParserException;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -67,7 +67,7 @@ class PresetFileStorage implements Storable
      * @param String $name
      *
      * @return array
-     * @throws ParserException
+     * @throws ParseException
      * @throws PresetRepositoryException
      */
     public function retrieve($name)
@@ -93,14 +93,14 @@ class PresetFileStorage implements Storable
             try {
                 $yaml = new Parser();
                 return $yaml->parse($file);
-            } catch (ParserException $e) {
+            } catch (ParseException $e) {
                 preg_match(
                     "/line (?P<line>[0-9]+)/", $e->getMessage(), $matches
                 );
-                throw new ParserException($e->getMessage(), $matches['line']);
+                throw new ParseException($e->getMessage(), $matches['line']);
             }
         } else {
-            throw new ParserException("File not found");
+            throw new ParseException("File not found");
         }
     }
 
@@ -157,11 +157,11 @@ class PresetFileStorage implements Storable
      */
     public function getPresetList($path)
     {
-        return array_filter(
-            array_filter(glob($path . '/options/presets/*'), 'is_file'),
-            function (&$name) {
-                return $name = pathinfo($name, PATHINFO_FILENAME);
-            }
+        return array_map(
+            function ($name) {
+                return pathinfo($name, PATHINFO_FILENAME);
+            },
+            array_filter(glob($path . '/options/presets/*'), 'is_file')
         );
     }
 

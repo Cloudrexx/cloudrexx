@@ -139,7 +139,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function touchProductEntitiesOfExpiredSubscriptions()
     {
         $subscriptionRepo = \Env::get('em')->getRepository('Cx\Modules\Order\Model\Entity\Subscription');
-        $subscriptions    = $subscriptionRepo->getExpiredSubscriptions();
+        $subscriptions    = $subscriptionRepo->getExpiredSubscriptions(array(
+                                \Cx\Modules\Order\Model\Entity\Subscription::STATE_ACTIVE,
+                                \Cx\Modules\Order\Model\Entity\Subscription::STATE_INACTIVE,
+                                \Cx\Modules\Order\Model\Entity\Subscription::STATE_CANCELLED));
 
         if (\FWValidator::isEmpty($subscriptions)) {
             return;
@@ -147,6 +150,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
         foreach ($subscriptions as $subscription) {
             //Trigger the model event model/expired on the Subscription's product entity.
+            \DBG::msg("Trigger model/expired on Subscription with ID ({$subscription->getId()})");
             \Env::get('cx')->getEvents()->triggerEvent('model/expired', array(new \Doctrine\ORM\Event\LifecycleEventArgs($subscription, \Env::get('em'))));
         }
         \Env::get('em')->flush();

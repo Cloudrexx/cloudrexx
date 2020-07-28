@@ -41,10 +41,6 @@
 namespace Cx\Modules\Ecard\Controller;
 
 /**
- * @ignore
- */
-\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php');
-/**
  * E-Card
  *
  * Send electronic postcards to your friends
@@ -218,7 +214,8 @@ class Ecard
         $this->_objTpl->setTemplate($this->pageContent);
         // Initialize POST variables
         $id = intval($_POST['selectedEcard']);
-        $message = nl2br(htmlentities(contrexx_stripslashes($_POST['ecardMessage']), ENT_QUOTES, CONTREXX_CHARSET));
+        $message = contrexx_input2xhtml($_POST['ecardMessage']);
+        $messagePreview = nl2br($message);
         $recipientSalutation = htmlentities(contrexx_stripslashes($_POST['ecardRecipientSalutation']), ENT_QUOTES, CONTREXX_CHARSET);
         $senderName = htmlentities(contrexx_stripslashes($_POST['ecardSenderName']), ENT_QUOTES, CONTREXX_CHARSET);
         $senderEmail = \FWValidator::isEmail($_POST['ecardSenderEmail']) ? $_POST['ecardSenderEmail'] : '';
@@ -240,6 +237,7 @@ class Ecard
                 '" alt="'.$selectedMotive.'" title="'.$selectedMotive.'" />',
             'ECARD_MOTIVE_ID' => $id,
             'ECARD_MESSAGE' => $message,
+            'ECARD_MESSAGE_PREVIEW' => $messagePreview,
             'ECARD_SENDER_NAME' => $senderName,
             'ECARD_SENDER_EMAIL' => $senderEmail,
             'ECARD_RECIPIENT_NAME' => $recipientName,
@@ -271,7 +269,7 @@ class Ecard
 
         // Initialize POST variables
         $id = intval($_POST['selectedEcard']);
-        $message = contrexx_addslashes($_POST['ecardMessage']);
+        $message = contrexx_input2db($_POST['ecardMessage']);
         $recipientSalutation = contrexx_stripslashes($_POST['ecardRecipientSalutation']);
         $senderName = contrexx_stripslashes($_POST['ecardSenderName']);
         $senderEmail = \FWValidator::isEmail($_POST['ecardSenderEmail']) ? $_POST['ecardSenderEmail'] : '';
@@ -348,23 +346,9 @@ class Ecard
 
             $objFile = new \File();
             if ($objFile->copyFile(ASCMS_ECARD_OPTIMIZED_PATH.'/', $fileName, ASCMS_ECARD_SEND_ECARDS_PATH.'/', $code.$fileExtension)) {
-                $objMail = new \phpmailer();
-
-                // Check e-mail settings
-                if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-                    $objSmtpSettings = new \SmtpSettings();
-                    if (($arrSmtp = $objSmtpSettings->getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                        $objMail->IsSMTP();
-                        $objMail->Host = $arrSmtp['hostname'];
-                        $objMail->Port = $arrSmtp['port'];
-                        $objMail->SMTPAuth = true;
-                        $objMail->Username = $arrSmtp['username'];
-                        $objMail->Password = $arrSmtp['password'];
-                    }
-                }
+                $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
                 // Send notification mail to ecard-recipient
-                $objMail->CharSet = CONTREXX_CHARSET;
                 $objMail->SetFrom($senderEmail, $senderName);
                 $objMail->Subject = $subject;
                 $objMail->IsHTML(false);

@@ -2,22 +2,19 @@
 
 namespace Gedmo\Timestampable\Mapping\Driver;
 
-use Gedmo\Mapping\Driver\AnnotationDriverInterface,
-    Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
+use Gedmo\Exception\InvalidMappingException;
 
 /**
  * This is an annotation mapping driver for Timestampable
  * behavioral extension. Used for extraction of extended
- * metadata from Annotations specificaly for Timestampable
+ * metadata from Annotations specifically for Timestampable
  * extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Translatable.Mapping.Driver
- * @subpackage Annotation
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-class Annotation implements AnnotationDriverInterface
+class Annotation extends AbstractAnnotationDriver
 {
     /**
      * Annotation field is timestampable
@@ -29,43 +26,23 @@ class Annotation implements AnnotationDriverInterface
      *
      * @var array
      */
-    private $validTypes = array(
+    protected $validTypes = array(
         'date',
         'time',
         'datetime',
-        'timestamp'
+        'datetimetz',
+        'timestamp',
+        'zenddate',
+        'vardatetime',
+        'integer',
     );
 
     /**
-     * Annotation reader instance
-     *
-     * @var object
-     */
-    private $reader;
-
-    /**
-     * original driver if it is available
-     */
-    protected $_originalDriver = null;
-
-    /**
      * {@inheritDoc}
      */
-    public function setAnnotationReader($reader)
+    public function readExtendedMetadata($meta, array &$config)
     {
-        $this->reader = $reader;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function validateFullMetadata($meta, array $config) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public function readExtendedMetadata($meta, array &$config) {
-        $class = $meta->getReflectionClass();
+        $class = $this->getMetaReflectionClass($meta);
         // property annotations
         foreach ($class->getProperties() as $property) {
             if ($meta->isMappedSuperclass && !$property->isPrivate() ||
@@ -86,42 +63,21 @@ class Annotation implements AnnotationDriverInterface
                     throw new InvalidMappingException("Field - [{$field}] trigger 'on' is not one of [update, create, change] in class - {$meta->name}");
                 }
                 if ($timestampable->on == 'change') {
-                    if (!isset($timestampable->field) || !isset($timestampable->value)) {
-                        throw new InvalidMappingException("Missing parameters on property - {$field}, field and value must be set on [change] trigger in class - {$meta->name}");
+                    if (!isset($timestampable->field)) {
+                        throw new InvalidMappingException("Missing parameters on property - {$field}, field must be set on [change] trigger in class - {$meta->name}");
+                    }
+                    if (is_array($timestampable->field) && isset($timestampable->value)) {
+                        throw new InvalidMappingException("Timestampable extension does not support multiple value changeset detection yet.");
                     }
                     $field = array(
                         'field' => $field,
                         'trackedField' => $timestampable->field,
-                        'value' => $timestampable->value
+                        'value' => $timestampable->value,
                     );
                 }
                 // properties are unique and mapper checks that, no risk here
                 $config[$timestampable->on][] = $field;
             }
         }
-    }
-
-    /**
-     * Checks if $field type is valid
-     *
-     * @param ClassMetadata $meta
-     * @param string $field
-     * @return boolean
-     */
-    protected function isValidField($meta, $field)
-    {
-        $mapping = $meta->getFieldMapping($field);
-        return $mapping && in_array($mapping['type'], $this->validTypes);
-    }
-
-    /**
-     * Passes in the mapping read by original driver
-     *
-     * @param $driver
-     * @return void
-     */
-    public function setOriginalDriver($driver)
-    {
-        $this->_originalDriver = $driver;
     }
 }

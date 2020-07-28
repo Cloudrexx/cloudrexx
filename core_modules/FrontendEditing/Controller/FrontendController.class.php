@@ -81,7 +81,7 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
 
         // activate ckeditor
         \JS::activate('ckeditor');
-        \JS::activate('jquery-cookie');
+        \JS::activate('js-cookie');
 
         // load language data
         $_ARRAYLANG = $objInit->loadLanguageData('FrontendEditing');
@@ -116,8 +116,8 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
         $contrexxJavascript->setVariable('contentTemplates', $this->getCustomContentTemplates(), 'FrontendEditing');
         $contrexxJavascript->setVariable('defaultTemplate', $this->getDefaultTemplate(), 'FrontendEditing');
 
-        $configPath = ASCMS_PATH_OFFSET . substr(\Env::get('ClassLoader')->getFilePath(ASCMS_CORE_PATH . '/Wysiwyg/ckeditor.config.js.php'), strlen(ASCMS_DOCUMENT_ROOT));
-        $contrexxJavascript->setVariable('configPath', $configPath . '?langId=' . FRONTEND_LANG_ID, 'FrontendEditing');
+        $configPath = $this->cx->getComponent('Wysiwyg')->getConfigPath();
+        $contrexxJavascript->setVariable('configPath', $configPath, 'FrontendEditing');
     }
 
     /**
@@ -239,7 +239,10 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
      */
     private function getDefaultTemplate()
     {
-        $query = 'SELECT `id`, `lang`, `themesid` FROM `' . DBPREFIX . 'languages` WHERE `id` = ' . FRONTEND_LANG_ID;
-        return $this->cx->getDb()->getAdoDb()->SelectLimit($query, 1)->fields['themesid'];
+        $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
+        $theme = $themeRepo->getDefaultTheme(
+            \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB,
+            FRONTEND_LANG_ID);
+        return $theme->getId();
     }
 }

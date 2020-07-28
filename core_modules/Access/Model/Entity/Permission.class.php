@@ -100,12 +100,12 @@ class Permission extends \Cx\Model\Base\EntityBase {
     protected $validAccessIds   = array();
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $readDataAccesses;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $writeDataAccesses;
 
@@ -125,6 +125,9 @@ class Permission extends \Cx\Model\Base\EntityBase {
      * @param Boolean $requiresLogin
      */
     public function __construct($allowedProtocols = array('http', 'https'), $allowedMethods = array('get', 'post'), $requiresLogin = true, $validUserGroups = array(), $validAccessIds = array(), $callback = null) {
+        if ($callback && !($callback instanceof Callback)) {
+            $callback = new Callback($callback);
+        }
         if (!$allowedProtocols) {
             $allowedProtocols = array('http', 'https');
         }
@@ -139,7 +142,10 @@ class Permission extends \Cx\Model\Base\EntityBase {
         if (count($this->validUserGroups) || count($this->validAccessIds)) {
             $this->requiresLogin = true;
         }
-        $this->setCallback($callback);
+        $this->setVirtual(true);
+        if ($callback) {
+            $this->setCallback($callback);
+        }
         $this->readDataAccesses  = new \Doctrine\Common\Collections\ArrayCollection();
         $this->writeDataAccesses = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -255,6 +261,29 @@ class Permission extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Add readDataAccesses
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses
+     * @return Permission
+     */
+    public function addReadDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses)
+    {
+        $this->readDataAccesses[] = $readDataAccesses;
+
+        return $this;
+    }
+
+    /**
+     * Remove readDataAccesses
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses
+     */
+    public function removeReadDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $readDataAccesses)
+    {
+        $this->readDataAccesses->removeElement($readDataAccesses);
+    }
+
+    /**
      * Set the read data access
      *
      * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess
@@ -272,6 +301,29 @@ class Permission extends \Cx\Model\Base\EntityBase {
     public function getReadDataAccesses()
     {
         return $this->readDataAccesses;
+    }
+
+    /**
+     * Add writeDataAccesses
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses
+     * @return Permission
+     */
+    public function addWriteDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses)
+    {
+        $this->writeDataAccesses[] = $writeDataAccesses;
+
+        return $this;
+    }
+
+    /**
+     * Remove writeDataAccesses
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses
+     */
+    public function removeWriteDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $writeDataAccesses)
+    {
+        $this->writeDataAccesses->removeElement($writeDataAccesses);
     }
 
     /**
@@ -298,12 +350,11 @@ class Permission extends \Cx\Model\Base\EntityBase {
      * Set the callback
      * Callback may only be used for virtual instances
      *
-     * @param mixed array|string $callback
+     * @param Callback $callback
      */
-    public function setCallback($callback)
+    public function setCallback(Callback $callback)
     {
-        //Use callback only for virtual instances otherwise throw exception
-        if (!$this->isVirtual() && $callback) {
+        if (!$this->isVirtual() && !$callback->isSerializable()) {
             throw new PermissionException('Permission::setCallback() failed: Could not set callback for non-virtual instance.');
         }
         $this->callback = $callback;
@@ -312,10 +363,17 @@ class Permission extends \Cx\Model\Base\EntityBase {
     /**
      * Get the callback
      *
-     * @return mixed array|string
+     * @return Callback Callback for custom permission management
      */
     public function getCallback()
     {
+        if ($this->callback && !($this->callback instanceof Callback)) {
+            try {
+                $this->callback = new Callback($this->callback);
+            } catch (CallbackException $e) {
+                $this->callback = null;
+            }
+        }
         return $this->callback;
     }
 
@@ -328,7 +386,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
     public function setVirtual($virtual)
     {
         //While setting instance as non-virtual, check the instance have callback if so throw exception
-        if ($this->callback && !$virtual) {
+        if ($this->callback && !$this->callback->isSerializable() && !$virtual) {
             throw new PermissionException('Permission::setVirtual() failed: Could not set instance as non-virtual since instance contains callback.');
         }
         parent::setVirtual($virtual);
@@ -337,22 +395,26 @@ class Permission extends \Cx\Model\Base\EntityBase {
     /**
      * Check the permissions(Is allowed protocol, Is allowed method, user's group access, user's login status)
      *
+     * @param array $params Params to pass to callback (if any)
      * @return boolean
      */
     public function hasAccess(array $params = array()) {
         $protocol = $this->cx->getRequest() ? \Env::get('cx')->getRequest()->getUrl()->getProtocol() : '';
         $method = $this->cx->getRequest()->getHttpRequestMethod();
-        if (php_sapi_name() === 'cli') {
+
+        if ($this->cx->isCliCall()) {
             $method = 'cli';
         }
 
         //protocol check
         if ($method != 'cli' && !empty($this->allowedProtocols) && !in_array($protocol, $this->allowedProtocols)) {
+            \DBG::msg(__METHOD__ . ': protocol check failed: ' . $protocol);
             return false;
         }
 
         //access method check
         if (!empty($this->allowedMethods) && !in_array($method, $this->allowedMethods)) {
+            \DBG::msg(__METHOD__ . ': method check failed: ' . $method);
             return false;
         }
 
@@ -362,7 +424,12 @@ class Permission extends \Cx\Model\Base\EntityBase {
         }
 
         //callback function check
-        if (isset($this->callback) && call_user_func($this->callback, $params) !== true) {
+        try {
+            if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
+                return false;
+            }
+        } catch (CallbackException $e) {
+            \DBG::msg('Permission callback failed with message ' . $e->getMessage());
             return false;
         }
 
@@ -383,6 +450,11 @@ class Permission extends \Cx\Model\Base\EntityBase {
         //check user logged in or not
         if (!\FWUser::getFWUserObject()->objUser->login()) {
             return false;
+        }
+
+        // admins have all privileges
+        if (\FWUser::getFWUserObject()->objUser->getAdminStatus()) {
+            return true;
         }
 
         //check user's group access

@@ -247,8 +247,9 @@ class adminMenu
                                     continue 2;
                                 }
                                 break;
-                            case 'Order';
-                                if ( $this->activeCmd == 'Order'
+                            case 'Order':
+                            case 'Pim':
+                                if ( $this->activeCmd == $linkCmd
                                     && (empty($_REQUEST['act']) && !empty($linkCmdSection)
                                         || !empty($_REQUEST['act']) && empty($linkCmdSection))
                                 ) {
@@ -301,7 +302,6 @@ class adminMenu
                                     case 'Downloads':
                                     case 'Calendar':
                                     case 'Podcast':
-                                    case 'Blog':
                                         $requestedArchive = 'ContentManager';
                                         break;
                                     case 'themes':

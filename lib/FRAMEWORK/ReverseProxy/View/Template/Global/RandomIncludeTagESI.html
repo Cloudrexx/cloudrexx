@@ -3,18 +3,32 @@
 [<!-- BEGIN first_content -->'{CONTENT}'<!-- END first_content --><!-- BEGIN content -->,'{CONTENT}'<!-- END content -->]
 </esi:assign>
 
-<!-- choosing random offset --> 
-<esi:assign name="index" value="$rand()%$len($(content_list))" />
+<!-- choosing a unique random offset --> 
+<esi:assign name="usedNumbers" value="[]"/>
+<esi:function name="uniqrand">
+    <esi:choose>
+        <esi:comment text="Give up as soon as we tried all numbers"/>
+        <esi:when test="$len($(usedNumbers)) == $len($(content_list))">
+            <esi:return value=""/>
+        </esi:when>
+        <esi:otherwise>
+            <esi:assign name="randomNumber" value="rand($ARGS{0})"/>
+            <esi:choose>
+                <esi:comment text="Check if number is already in $(usedNumbers)"/>
+                <esi:when test="$exists($(usedNumbers{$(randomNumber)}))">
+                    <esi:return value="$uniqrand($ARGS{0})"/>
+                </esi:when>
+                <esi:otherwise>
+                    <esi:return value="$(randomNumber)"/>
+                </esi:otherwise>
+            </esi:choose>
+        </esi:otherwise>
+    </esi:choose>
+</esi:function>
 
 <esi:vars>
-<!--
-Index: $(index) <br>
-Content: $(content_list{$(index)}) <br>
--->
-</esi:vars>
-
-<esi:vars>
-<esi:include src="$(content_list{$(index)})" onerror="continue"/>
+<!-- BEGIN randomized_list_entry -->
+<esi:include src="$(content_list{$uniqrand(%$len($(content_list)))})" onerror="continue"/>
+<!-- END randomized_list_entry -->
 </esi:vars>
 <!-- ESI_RANDOM_END -->
-

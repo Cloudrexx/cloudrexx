@@ -1792,7 +1792,7 @@ class SurveyManager extends SurveyLibrary {
             $objDatabase->Execute($insertSurvey);
 
             // Last Inserted Id
-            $lastId = mysql_insert_id();
+            $lastId = $objDatabase->Insert_Id();
             \Cx\Core\Csrf\Controller\Csrf::header("Location: ".ASCMS_PATH_OFFSET.ASCMS_BACKEND_PATH."/index.php?cmd=Survey&act=addQuestions&surveyId=$lastId");
         }
     }
@@ -1885,7 +1885,7 @@ class SurveyManager extends SurveyLibrary {
                                 `pos` = '.$sorting_id.',
                                 `column_choice` = "'.contrexx_raw2db($colChoic).'" ';
             $objDatabase->Execute($insertSurvey);
-            $lastId = mysql_insert_id();
+            $lastId = $objDatabase->Insert_Id();
             for ($i=0;$i<count($options);$i++) {
                 if(trim($options[$i]) != "") {
                     $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_surveyAnswers`

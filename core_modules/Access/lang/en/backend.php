@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- *
+ * 
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
-
+ 
 /**
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
@@ -60,6 +60,8 @@ $_ARRAYLANG['TXT_ACCESS_ADD_OTHER_ATTRIBUTE'] = "Add another property after savi
 $_ARRAYLANG['TXT_ACCESS_ADD_OTHER_FRAME'] = "Add another frame after saving";
 $_ARRAYLANG['TXT_ACCESS_ADD_OTHER_MENU_OPTION'] = "Add another menu option after saving";
 $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'] = "E-mail address to send notifications to when a new user has registered.";
+$_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'] = "Trigger e-mail notification %s after a user made a profile change in frontend.";
+$_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION'] = "E-mail addresse(s) to send the notification e-mail to.";
 $_ARRAYLANG['TXT_ACCESS_ADMINISTRATOR'] = "Administrator";
 $_ARRAYLANG['TXT_ACCESS_ADMINISTRATORS'] = "Administrators";
 $_ARRAYLANG['TXT_ACCESS_ALLOW_USERS_DELETE_ACCOUNT'] = "Allow user to delete their own account.";
@@ -73,7 +75,9 @@ $_ARRAYLANG['TXT_ACCESS_AVAILABLE_GROUPS'] = "Available Groups";
 $_ARRAYLANG['TXT_ACCESS_AVAILABLE_USERS'] = "Available users";
 $_ARRAYLANG['TXT_ACCESS_BACK'] = "back";
 $_ARRAYLANG['TXT_ACCESS_BACKEND_DESC'] = "Administration console (backend)";
-$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Birthdays";
+$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Current birthdays";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS'] = "Next birthdays";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS_DAYS'] = "Number of days";
 $_ARRAYLANG['TXT_ACCESS_CANCEL'] = "Cancel";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_PROFILE_PIC'] = "Change profile picture";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_SORT_DIRECTION'] = "Change sort order";
@@ -142,6 +146,9 @@ $_ARRAYLANG['TXT_ACCESS_GROUP_LIST'] = "Group overview";
 $_ARRAYLANG['TXT_ACCESS_GROUPS'] = "Groups";
 $_ARRAYLANG['TXT_ACCESS_GROUP_STORED_SUCCESSFULLY'] = "The group was saved successfully.";
 $_ARRAYLANG['TXT_ACCESS_GROUP_SUCCESSFULLY_DELETED'] = "The group %s was removed.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_MANAGE_GROUP_RIGHTS_NOT_DELETED'] = "The permission \"%s\" wasn't removed for this group, otherwise your user wouldn't be able to manage groups anymore.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DEACTIVATED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "The user group was not deactivated, otherwise your user wouldn't be able to manage groups anymore.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DELETED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "The user group was not deleted, otherwise your user wouldn't be able to manage groups anymore.";
 $_ARRAYLANG['TXT_ACCESS_GROUP_TYP'] = "Group type";
 $_ARRAYLANG['TXT_ACCESS_HISTORY'] = "History";
 $_ARRAYLANG['TXT_ACCESS_HTML_UC'] = "HTML";
@@ -196,7 +203,7 @@ $_ARRAYLANG['TXT_ACCESS_OTHER_PICTURES'] = "Other pictures";
 $_ARRAYLANG['TXT_ACCESS_OVERVIEW'] = "Overview";
 $_ARRAYLANG['TXT_ACCESS_PARENT_ATTRIBUTE'] = "Parent attribute";
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_FIELD_EMPTY'] = "If you leave the password field empty, the current password is kept.";
-$_ARRAYLANG['TXT_ACCESS_PASSWORD_MD5_ENCRYPTED'] = "The password is encrypted using the MD5 algorithm.";
+$_ARRAYLANG['TXT_ACCESS_PASSWORD_MD5_ENCRYPTED'] = "The password is encrypted using the Blowfish algorithm.";
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS'] = "The password must be at least 6 characters long.<br /><br />The complexity requirement can be enabled in the global configuration.";
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_MINIMAL_CHARACTERS_WITH_COMPLEXITY'] = "The password must be at least 6 characters long as well as contain at least one upper and one lower case character and one number.<br /><br />The complexity requirement can be disabled in the global configuration.";
 $_ARRAYLANG['TXT_ACCESS_PERMISSIONS'] = "Rights";
@@ -243,6 +250,8 @@ $_ARRAYLANG['TXT_ACCESS_TEXT_FIELD'] = "Text field";
 $_ARRAYLANG['TXT_ACCESS_THUMBNAIL_HEIGHT'] = "Thumbnail height";
 $_ARRAYLANG['TXT_ACCESS_THUMBNAIL_WIDTH'] = "Thumbnail width";
 $_ARRAYLANG['TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'] = "Time period in hours before the activation time expires. (0 - 24 hours, 0 for unlimited)";
+$_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION_TEXT'] = "Trigger e-mail notification %s after a user successfully activated his profile.";
+$_ARRAYLANG['TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'] = "E-mail addresse(s) to send the notification e-mail to.";
 $_ARRAYLANG['TXT_ACCESS_TRY_TO_REPEAT_OPERATION'] = "Please try to repeat the operation.";
 $_ARRAYLANG['TXT_ACCESS_TYPE'] = "Type";
 $_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'] = "An error occurred while deleting the property %s";
@@ -339,3 +348,13 @@ $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION'] = "Conformity mandatory ( pr
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION_TEXT'] = "The mandatory fields must be checked and set";
 $_ARRAYLANG['TXT_CORE_MODULE_ACCESS_PERMISSION_SET_VIRTUAL_ERROR_MSG'] = "Could not set instance as non-virtual since instance contains callback.";
 $_ARRAYLANG['TXT_CORE_MODULE_ACCESS_PERMISSION_SET_CALLBACK_ERROR_MSG'] = "Could not set callback for non-virtual instance.";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USERS'] = "Manage users";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USER_GROUPS'] = "Manage user groups";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_NO_PERMISSION_DELETE_ADMIN_USER'] = "You have not sufficient permission to delete the account %s";
+$_ARRAYLANG['TXT_ACCESS_TOOLBARCONFIGURATOR'] = 'Editor functions';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TAB_TITLE'] = 'Read access';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT'] = 'Define who shall be granted read access to the data of this attribute of  other users.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM'] = 'Everyone may access this property.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS'] = 'Choose the groups to be allowed to access this property';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT'] = "The read access to a user's profile can further be restricted through the attribute %s. In such case, the configuration in this section is noneffective.";
+$_ARRAYLANG['TXT_ACCESS_RANDOM_USERS'] = 'Random users';

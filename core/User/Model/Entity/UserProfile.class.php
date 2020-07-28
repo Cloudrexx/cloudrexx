@@ -43,6 +43,11 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     private $gender;
 
     /**
+     * @var mixed
+     */
+    protected $designation;
+
+    /**
      * @var string $firstname
      */
     private $firstname;
@@ -133,18 +138,18 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     private $users;
 
     /**
-     * @var Cx\Core\User\Model\Entity\ProfileTitle
+     * @var \Doctrine\Common\Collections\Collection
      */
     private $userTitle;
 
     /**
-     * @var Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Cx\Core\User\Model\Entity\ProfileTitle
      */
-    private $userAttribute;
+    protected $userAttributeValues;
 
     public function __construct()
     {
-        $this->userAttribute = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -185,6 +190,26 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     public function getGender()
     {
         return $this->gender;
+    }
+
+    /**
+     * Set designation
+     *
+     * @param string $designation
+     */
+    public function setDesignation($designation)
+    {
+        $this->designation = $designation;
+    }
+
+    /**
+     * Get designation
+     *
+     * @return string $designation
+     */
+    public function getDesignation()
+    {
+        return $this->designation;
     }
 
     /**
@@ -530,7 +555,7 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     /**
      * Set users
      *
-     * @param Cx\Core\User\Model\Entity\User $users
+     * @param \Cx\Core\User\Model\Entity\User $users
      */
     public function setUsers(\Cx\Core\User\Model\Entity\User $users)
     {
@@ -540,7 +565,7 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     /**
      * Get users
      *
-     * @return Cx\Core\User\Model\Entity\User $users
+     * @return \Cx\Core\User\Model\Entity\User $users
      */
     public function getUsers()
     {
@@ -550,7 +575,7 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     /**
      * Set userTitle
      *
-     * @param Cx\Core\User\Model\Entity\ProfileTitle $userTitle
+     * @param \Cx\Core\User\Model\Entity\ProfileTitle $userTitle
      */
     public function setUserTitle(\Cx\Core\User\Model\Entity\ProfileTitle $userTitle)
     {
@@ -560,7 +585,7 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     /**
      * Get userTitle
      *
-     * @return Cx\Core\User\Model\Entity\ProfileTitle $userTitle
+     * @return \Cx\Core\User\Model\Entity\ProfileTitle $userTitle
      */
     public function getUserTitle()
     {
@@ -568,22 +593,45 @@ class UserProfile extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add userAttribute
+     * Add userAttributeValues
      *
-     * @param Cx\Core\User\Model\Entity\UserAttribute $userAttribute
+     * @param \Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValues
+     * @return UserProfile
      */
-    public function addUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
+    public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValues)
     {
-        $this->userAttribute[] = $userAttribute;
+        $this->userAttributeValues[] = $userAttributeValues;
+
+        return $this;
     }
 
     /**
-     * Get userAttribute
+     * Remove userAttributeValues
      *
-     * @return Doctrine\Common\Collections\Collection $userAttribute
+     * @param \Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValues
      */
-    public function getUserAttribute()
+    public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValues)
     {
-        return $this->userAttribute;
+        $this->userAttributeValues->removeElement($userAttributeValues);
+    }
+
+    /**
+     * Add userAttributeValues
+     *
+     * @param Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue
+     */
+    public function addUserAttributeValues(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
+    {
+        $this->userAttributeValues[] = $userAttributeValue;
+    }
+
+    /**
+     * Get userAttributeValue
+     *
+     * @return Doctrine\Common\Collections\Collection $userAttributeValues
+     */
+    public function getUserAttributeValues()
+    {
+        return $this->userAttributeValues;
     }
 }

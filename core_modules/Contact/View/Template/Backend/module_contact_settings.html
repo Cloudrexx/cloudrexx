@@ -11,16 +11,21 @@
     </tr>
     <tr class="row1">
       <td>{TXT_CONTACT_SPAM_PROTECTION_WORD_LIST}</td>
-      <td><input style="width:370px;" type="text" name="contactSpamProtectionWordList" value="{CONTACT_SPAM_PROTECTION_WORD_LIST}" /><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SPAM_PROTECTION_WW_DESCRIPTION}</span></td>
+      <td><input style="width:370px;" type="text" name="contactSpamProtectionWordList" value="{CONTACT_SPAM_PROTECTION_WORD_LIST}" /> <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SPAM_PROTECTION_WW_DESCRIPTION}</span></td>
     </tr>
     <tr class="row2">
-      <td style="vertical-align:top;">{TXT_CONTACT_META_DATE_BY_EXPORT}</td>
+      <td style="vertical-align:top;">{TXT_CONTACT_META_DATE_BY_EXPORT} <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_PERSONAL_DATA_NOTE}</span></td>
       <td>
         <input type="checkbox" name="contactFieldMetaDate" id="contactFieldMetaDate" value="1" {CONTACT_FIELD_META_DATE} /><label for="contactFieldMetaDate">{TXT_CONTACT_DATE}</label><br />
         <input type="checkbox" name="contactFieldMetaHost" id="contactFieldMetaHost" value="1" {CONTACT_FIELD_META_HOST} /><label for="contactFieldMetaHost">{TXT_CONTACT_HOSTNAME}</label><br />
         <input type="checkbox" name="contactFieldMetaLang" id="contactFieldMetaLang" value="1" {CONTACT_FIELD_META_LANG} /><label for="contactFieldMetaLang">{TXT_CONTACT_BROWSER_LANGUAGE}</label><br />
+        <input type="checkbox" name="contactFieldMetaBrowser" id="contactFieldMetaBrowser" value="1" {CONTACT_FIELD_META_BROWSER} /><label for="contactFieldMetaBrowser">{TXT_CONTACT_BROWSER}</label><br />
         <input type="checkbox" name="contactFieldMetaIP" id="contactFieldMetaIP" value="1" {CONTACT_FIELD_META_IP} /><label for="contactFieldMetaIP">{TXT_CONTACT_IP_ADDRESS}</label>
       </td>
+    </tr>
+    <tr class="row1">
+      <td>{TXT_CONTACT_STORE_SUBMISSIONS}</td>
+      <td><input type="checkbox" name="contactStoreSubmissions" id="contactStoreSubmissions" value="1" {CONTACT_STORE_SUBMISSIONS} /><label for="contactStoreSubmissions">{TXT_CONTACT_STORE_SUBMISSION_DATA_IN_DB}</label> <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_STORE_SUBMISSIONS_NOTE}</span></td>
     </tr>
   </tbody>
 </table>

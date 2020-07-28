@@ -105,6 +105,14 @@
         }
         editor.resize();
     });
+
+    function validateFileEncoding() {
+        if (!cx.variables.get('fileEncodingIsInvalid', 'ViewManager')) {
+            return true;
+        }
+
+        return cx.ui.confirm('{VIEWMANAGER_STORE_INVALID_ENCODING}', 'warning');
+    }
     // -->
 </script>
 <style>
@@ -315,6 +323,10 @@
     table.adminlist tr td.editor-area {
         padding: 0 0 0 15px;
     }
+    table.adminlist tr td.editor-area #alertbox {
+        margin-top: 15px;
+        font-weight: bold;
+    }
 
     .ace_editor {
         border: 1px solid lightgray;
@@ -346,7 +358,9 @@
     <ul>
         <li><a class="active" href="index.php?cmd=ViewManager&amp;act=templates" title="{TXT_THEMES_EDIT}">{TXT_THEMES_EDIT}</a></li>
         <li><a href="index.php?cmd=ViewManager&amp;act=newDir" title="{TXT_THEMES_CREATE}">{TXT_THEMES_CREATE}</a></li>
+        <!-- BEGIN view_manager_import_navigation -->
         <li><a href="index.php?cmd=ViewManager&amp;act=import" title="{TXT_THEME_IMPORT}">{TXT_THEME_IMPORT}</a></li>
+        <!-- END view_manager_import_navigation -->
     </ul>
 </div>
 <div id="instance_table"><div id="tabid"></div>
@@ -430,7 +444,7 @@
         <!-- BEGIN theme_editor -->
         <td width="100%" valign="top" >
 
-            <form name="themesForm2" id="theme_content" method="post" action="index.php?cmd=ViewManager&amp;act=update">
+            <form name="themesForm2" id="theme_content" method="post" action="index.php?cmd=ViewManager&amp;act=update" onsubmit="return validateFileEncoding()">
                 <table summary="" width="100%" border="0" cellspacing="0" cellpadding="3"  class="adminlist">
                     <tr>
                         <th>
@@ -447,6 +461,10 @@
                             <input type="hidden" name="themes" value="{THEMES_SELECTED_THEME}" />
                             <input type="hidden" name="themesPage" value="{THEMES_SELECTED_PAGENAME}" />
                             <textarea id="editorContent" name="content" style="display: none;" >{CONTENT_HTML}</textarea>
+
+                            <!-- BEGIN viewmanager_invalid_encoding -->
+                            <div id="alertbox">{VIEWMANAGER_INVALID_FILE_ENCODING}</div>
+                            <!-- END viewmanager_invalid_encoding -->
 
                             <!-- BEGIN template_content -->
                             <pre id="editor" style="height: 377px; width:100%;">{CONTENT_HTML}</pre>

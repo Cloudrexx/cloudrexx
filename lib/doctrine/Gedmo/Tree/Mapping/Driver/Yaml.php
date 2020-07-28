@@ -2,20 +2,18 @@
 
 namespace Gedmo\Tree\Mapping\Driver;
 
-use Gedmo\Mapping\Driver\File,
-    Gedmo\Mapping\Driver,
-    Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Driver\File;
+use Gedmo\Mapping\Driver;
+use Gedmo\Exception\InvalidMappingException;
+use Gedmo\Tree\Mapping\Validator;
 
 /**
  * This is a yaml mapping driver for Tree
  * behavioral extension. Used for extraction of extended
- * metadata from yaml specificaly for Tree
+ * metadata from yaml specifically for Tree
  * extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Tree.Mapping.Driver
- * @subpackage Yaml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Yaml extends File implements Driver
@@ -27,41 +25,15 @@ class Yaml extends File implements Driver
     protected $_extension = '.dcm.yml';
 
     /**
-     * List of types which are valid for timestamp
-     *
-     * @var array
-     */
-    private $validTypes = array(
-        'integer',
-        'smallint',
-        'bigint'
-    );
-
-    /**
      * List of tree strategies available
      *
      * @var array
      */
     private $strategies = array(
         'nested',
-        'closure'
+        'closure',
+        'materializedPath',
     );
-
-    /**
-     * {@inheritDoc}
-     */
-    public function validateFullMetadata($meta, array $config)
-    {
-        if (isset($config['strategy'])) {
-            if (is_array($meta->identifier) && count($meta->identifier) > 1) {
-                throw new InvalidMappingException("Tree does not support composite identifiers in class - {$meta->name}");
-            }
-            $method = 'validate' . ucfirst($config['strategy']) . 'TreeMetadata';
-            $this->$method($meta, $config);
-        } elseif ($config) {
-            throw new InvalidMappingException("Cannot find Tree type for class: {$meta->name}");
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -69,6 +41,7 @@ class Yaml extends File implements Driver
     public function readExtendedMetadata($meta, array &$config)
     {
         $mapping = $this->_getMapping($meta->name);
+        $validator = new Validator();
 
         if (isset($mapping['gedmo'])) {
             $classMapping = $mapping['gedmo'];
@@ -78,52 +51,150 @@ class Yaml extends File implements Driver
                     throw new InvalidMappingException("Tree type: $strategy is not available.");
                 }
                 $config['strategy'] = $strategy;
+                $config['activate_locking'] = isset($classMapping['tree']['activateLocking']) ?
+                    $classMapping['tree']['activateLocking'] : false;
+                $config['locking_timeout'] = isset($classMapping['tree']['lockingTimeout']) ?
+                    (int) $classMapping['tree']['lockingTimeout'] : 3;
+
+                if ($config['locking_timeout'] < 1) {
+                    throw new InvalidMappingException("Tree Locking Timeout must be at least of 1 second.");
+                }
             }
             if (isset($classMapping['tree']['closure'])) {
-                $class = $classMapping['tree']['closure'];
-                if (!class_exists($class)) {
-                    throw new InvalidMappingException("Tree closure class: {$class} does not exist.");
+                if (!$class = $this->getRelatedClassName($meta, $classMapping['tree']['closure'])) {
+                    throw new InvalidMappingException("Tree closure class: {$classMapping['tree']['closure']} does not exist.");
                 }
                 $config['closure'] = $class;
             }
         }
-        if (isset($mapping['fields'])) {
-            foreach ($mapping['fields'] as $field => $fieldMapping) {
+        
+        if (isset($mapping['id'])) {
+            foreach($mapping['id'] as $field => $fieldMapping) {
                 if (isset($fieldMapping['gedmo'])) {
-                    if (in_array('treeLeft', $fieldMapping['gedmo'])) {
-                        if (!$this->isValidField($meta, $field)) {
-                            throw new InvalidMappingException("Tree left field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
+                    if (in_array('treePathSource', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidFieldForPathSource($meta, $field)) {
+                            throw new InvalidMappingException(
+                                "Tree PathSource field - [{$field}] type is not valid. It can be any of the integer variants, double, float or string in class - {$meta->name}"
+                            );
                         }
-                        $config['left'] = $field;
-                    } elseif (in_array('treeRight', $fieldMapping['gedmo'])) {
-                        if (!$this->isValidField($meta, $field)) {
-                            throw new InvalidMappingException("Tree right field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
-                        }
-                        $config['right'] = $field;
-                    } elseif (in_array('treeLevel', $fieldMapping['gedmo'])) {
-                        if (!$this->isValidField($meta, $field)) {
-                            throw new InvalidMappingException("Tree level field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
-                        }
-                        $config['level'] = $field;
-                    } elseif (in_array('treeRoot', $fieldMapping['gedmo'])) {
-                        if (!$this->isValidField($meta, $field)) {
-                            throw new InvalidMappingException("Tree root field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
-                        }
-                        $config['root'] = $field;
+                        $config['path_source'] = $field;
                     }
                 }
             }
         }
+        
+        if (isset($mapping['fields'])) {
+            foreach ($mapping['fields'] as $field => $fieldMapping) {
+                if (isset($fieldMapping['gedmo'])) {
+                    if (in_array('treeLeft', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidField($meta, $field)) {
+                            throw new InvalidMappingException("Tree left field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
+                        }
+                        $config['left'] = $field;
+                    } elseif (in_array('treeRight', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidField($meta, $field)) {
+                            throw new InvalidMappingException("Tree right field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
+                        }
+                        $config['right'] = $field;
+                    } elseif (in_array('treeLevel', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidField($meta, $field)) {
+                            throw new InvalidMappingException("Tree level field - [{$field}] type is not valid and must be 'integer' in class - {$meta->name}");
+                        }
+                        $config['level'] = $field;
+                    } elseif (in_array('treeRoot', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidFieldForRoot($meta, $field)) {
+                            throw new InvalidMappingException("Tree root field - [{$field}] type is not valid and must be any of the 'integer' types or 'string' in class - {$meta->name}");
+                        }
+                        $config['root'] = $field;
+                    } elseif (in_array('treePath', $fieldMapping['gedmo']) || isset($fieldMapping['gedmo']['treePath'])) {
+                        if (!$validator->isValidFieldForPath($meta, $field)) {
+                            throw new InvalidMappingException("Tree Path field - [{$field}] type is not valid. It must be string or text in class - {$meta->name}");
+                        }
+
+                        $treePathInfo = isset($fieldMapping['gedmo']['treePath']) ? $fieldMapping['gedmo']['treePath'] :
+                            $fieldMapping['gedmo'][array_search('treePath', $fieldMapping['gedmo'])];
+
+                        if (is_array($treePathInfo) && isset($treePathInfo['separator'])) {
+                            $separator = $treePathInfo['separator'];
+                        } else {
+                            $separator = '|';
+                        }
+
+                        if (strlen($separator) > 1) {
+                            throw new InvalidMappingException("Tree Path field - [{$field}] Separator {$separator} is invalid. It must be only one character long.");
+                        }
+
+                        if (is_array($treePathInfo) && isset($treePathInfo['appendId'])) {
+                            $appendId = $treePathInfo['appendId'];
+                        } else {
+                            $appendId = null;
+                        }
+
+                        if (is_array($treePathInfo) && isset($treePathInfo['startsWithSeparator'])) {
+                            $startsWithSeparator = $treePathInfo['startsWithSeparator'];
+                        } else {
+                            $startsWithSeparator = false;
+                        }
+
+                        if (is_array($treePathInfo) && isset($treePathInfo['endsWithSeparator'])) {
+                            $endsWithSeparator = $treePathInfo['endsWithSeparator'];
+                        } else {
+                            $endsWithSeparator = true;
+                        }
+
+                        $config['path'] = $field;
+                        $config['path_separator'] = $separator;
+                        $config['path_append_id'] = $appendId;
+                        $config['path_starts_with_separator'] = $startsWithSeparator;
+                        $config['path_ends_with_separator'] = $endsWithSeparator;
+                    } elseif (in_array('treePathSource', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidFieldForPathSource($meta, $field)) {
+                            throw new InvalidMappingException("Tree PathSource field - [{$field}] type is not valid. It can be any of the integer variants, double, float or string in class - {$meta->name}");
+                        }
+                        $config['path_source'] = $field;
+                    } elseif (in_array('treePathHash', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidFieldForPathSource($meta, $field)) {
+                            throw new InvalidMappingException("Tree PathHash field - [{$field}] type is not valid and must be 'string' in class - {$meta->name}");
+                        }
+                        $config['path_hash'] = $field;
+                    } elseif (in_array('treeLockTime', $fieldMapping['gedmo'])) {
+                        if (!$validator->isValidFieldForLocktime($meta, $field)) {
+                            throw new InvalidMappingException("Tree LockTime field - [{$field}] type is not valid. It must be \"date\" in class - {$meta->name}");
+                        }
+                        $config['lock_time'] = $field;
+                    } elseif (in_array('treeParent', $fieldMapping['gedmo'])) {
+                        $config['parent'] = $field;
+                    }
+                }
+            }
+        }
+
+        if (isset($config['activate_locking']) && $config['activate_locking'] && !isset($config['lock_time'])) {
+            throw new InvalidMappingException("You need to map a date|datetime|timestamp field as the tree lock time field to activate locking support.");
+        }
+
         if (isset($mapping['manyToOne'])) {
             foreach ($mapping['manyToOne'] as $field => $relationMapping) {
                 if (isset($relationMapping['gedmo'])) {
                     if (in_array('treeParent', $relationMapping['gedmo'])) {
-                        if ($relationMapping['targetEntity'] != $meta->name) {
+                        if (!$rel = $this->getRelatedClassName($meta, $relationMapping['targetEntity'])) {
                             throw new InvalidMappingException("Unable to find ancestor/parent child relation through ancestor field - [{$field}] in class - {$meta->name}");
                         }
                         $config['parent'] = $field;
                     }
                 }
+            }
+        }
+
+        if (!$meta->isMappedSuperclass && $config) {
+            if (isset($config['strategy'])) {
+                if (is_array($meta->identifier) && count($meta->identifier) > 1) {
+                    throw new InvalidMappingException("Tree does not support composite identifiers in class - {$meta->name}");
+                }
+                $method = 'validate'.ucfirst($config['strategy']).'TreeMetadata';
+                $validator->$method($meta, $config);
+            } else {
+                throw new InvalidMappingException("Cannot find Tree type for class: {$meta->name}");
             }
         }
     }
@@ -133,66 +204,6 @@ class Yaml extends File implements Driver
      */
     protected function _loadMappingFile($file)
     {
-        return \Symfony\Component\Yaml\Yaml::load($file);
-    }
-
-    /**
-     * Checks if $field type is valid
-     *
-     * @param ClassMetadata $meta
-     * @param string $field
-     * @return boolean
-     */
-    protected function isValidField($meta, $field)
-    {
-        $mapping = $meta->getFieldMapping($field);
-        return $mapping && in_array($mapping['type'], $this->validTypes);
-    }
-
-    /**
-     * Validates metadata for nested type tree
-     *
-     * @param ClassMetadata $meta
-     * @param array $config
-     * @throws InvalidMappingException
-     * @return void
-     */
-    private function validateNestedTreeMetadata($meta, array $config)
-    {
-        $missingFields = array();
-        if (!isset($config['parent'])) {
-            $missingFields[] = 'ancestor';
-        }
-        if (!isset($config['left'])) {
-            $missingFields[] = 'left';
-        }
-        if (!isset($config['right'])) {
-            $missingFields[] = 'right';
-        }
-        if ($missingFields) {
-            throw new InvalidMappingException("Missing properties: " . implode(', ', $missingFields) . " in class - {$meta->name}");
-        }
-    }
-
-    /**
-     * Validates metadata for closure type tree
-     *
-     * @param ClassMetadata $meta
-     * @param array $config
-     * @throws InvalidMappingException
-     * @return void
-     */
-    private function validateClosureTreeMetadata($meta, array $config)
-    {
-        $missingFields = array();
-        if (!isset($config['parent'])) {
-            $missingFields[] = 'ancestor';
-        }
-        if (!isset($config['closure'])) {
-            $missingFields[] = 'closure class';
-        }
-        if ($missingFields) {
-            throw new InvalidMappingException("Missing properties: " . implode(', ', $missingFields) . " in class - {$meta->name}");
-        }
+        return \Symfony\Component\Yaml\Yaml::parse($file);
     }
 }

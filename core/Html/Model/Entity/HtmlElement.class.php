@@ -35,12 +35,34 @@ namespace Cx\Core\Html\Model\Entity;
  *
  */
 class HtmlElement extends \Cx\Model\Base\EntityBase {
+
+    /**
+     * @var array List of element names without content
+     * https://www.w3.org/TR/html5/syntax.html#void-elements
+     */
+    protected static $contentModelVoidTags = array(
+        'area',
+        'base',
+        'br',
+        'col',
+        'embed',
+        'hr',
+        'img',
+        'input',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'wbr',
+    );
+
     private $name;
     private $classes = array();
     private $attributes = array();
     private $children = array();
     private $output = null;
-    private $allowDirectClose = true;
+    private $allowDirectClose = false;
 
     public function __construct($elementName) {
         $this->setName($elementName);
@@ -48,6 +70,10 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
 
     public function allowDirectClose($allow = null) {
         if ($allow === null) {
+            // These tags are not allowed to have content
+            if (in_array($this->name, static::$contentModelVoidTags)) {
+                return true;
+            }
             return $this->allowDirectClose;
         }
         $this->allowDirectClose = $allow;
@@ -213,7 +239,7 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
         $template->setVariable(array(
             'ELEMENT_NAME' => $this->name,
         ));
-        if ($parsedChildren === null && $this->allowDirectClose) {
+        if ($parsedChildren === null && $this->allowDirectClose()) {
             $template->hideBlock('children');
             $template->touchBlock('nochildren');
         } else {
@@ -230,11 +256,13 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
             ));
             $template->parse('attribute');
         }
-        $template->setVariable(array(
-            'ATTRIBUTE_NAME' => 'class',
-            'ATTRIBUTE_VALUE' => contrexx_raw2xhtml($this->getClasses()),
-        ));
-        $template->parse('attribute');
+        if (count($this->classes)) {
+            $template->setVariable(array(
+                'ATTRIBUTE_NAME' => 'class',
+                'ATTRIBUTE_VALUE' => contrexx_raw2xhtml($this->getClasses()),
+            ));
+            $template->parse('attribute');
+        }
         $this->output = $template->get();
         return $this->output;
     }
