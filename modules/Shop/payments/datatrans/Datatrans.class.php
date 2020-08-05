@@ -297,7 +297,7 @@ class Datatrans
          */
         self::$arrFieldMandatory['merchantId'] = trim(strip_tags($merchantId));
         self::$arrFieldMandatory['refno'] = trim(strip_tags($refno));
-        self::$arrFieldMandatory['amount'] = \Cx\Modules\Shop\Controller\Currency::formatCents($amount);
+        self::$arrFieldMandatory['amount'] = \Cx\Modules\Shop\Controller\CurrencyController::formatCents($amount);
         self::$arrFieldMandatory['currency'] = trim(strip_tags($currency));
         if (   empty($merchantId)
             || empty($refno)
@@ -667,6 +667,16 @@ class Datatrans
             '<option value="CAA"'.
             ($datatrans_request_type == 'CAA' ? 'selected="selected"' : '').
             '>'.$_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_CAA'].'</option>';
+    }
+
+    static function getReqtypeOptions()
+    {
+        global $_ARRAYLANG;
+
+        return array(
+            'NOA' => $_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_NOA'],
+            'CAA' => $_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_CAA']
+        );
     }
 
 }

@@ -32,6 +32,68 @@
  * @package     cloudrexx
  * @subpackage  module_shop
  */
+/*** NEW ***/
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_ORDER'] = 'Bestellungen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY'] = 'Rubriken';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT'] = 'Produkte';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_MANUFACTURER'] = 'Hersteller';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER'] = 'Kunden';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_STATISTIC'] = 'Statistik';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_IMPORT'] = 'Import/Export';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING'] = 'Stammdaten';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_DEFAULT'] = 'Übersicht';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_RELDISCOUNTGROUP'] = 'Kundenrabatte';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_CUSTOMERGROUP'] = 'Kundengruppen';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_DEFAULT'] = 'Rubriken';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_PRICELIST'] = 'PDF-Preislisten';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DEFAULT'] = 'Produktekatalog';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_MANAGE'] = 'Produkte hinzufügen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ATTRIBUTE'] = 'Produktemerkmale';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DISCOUNTGROUPCOUNTNAME'] = 'Mengenrabattgruppen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ARTICLEGROUP'] = 'Produktegruppen';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DEFAULT'] = 'Общие Параметры настройки';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_VAT'] = 'Mehrwertsteuer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_CURRENCY'] = 'Währungen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENT'] = 'Виды платежа';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_SHIPPER'] = 'Versandarten';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_RELCOUNTRY'] = 'Lieferländer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Зона';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-Mail Vorlagen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
+
+$_ARRAYLANG['borderOn'] = 'Rahmen';
+$_ARRAYLANG['headerOn'] = 'Kopfzeile anzeigen';
+$_ARRAYLANG['footerOn'] = 'Fusszeile anzeigen';
+$_ARRAYLANG['lang'] = 'Язык';
+$_ARRAYLANG['allCategories'] = 'Enthaltene Rubriken';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
+
+$_ARRAYLANG['code'] = 'Code';
+$_ARRAYLANG['symbol'] = 'Symbol';
+$_ARRAYLANG['rate'] = 'Kurs';
+$_ARRAYLANG['increment'] = 'Rundung';
+$_ARRAYLANG['default'] = 'Standard';
+
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['cumulative'] = 'Pro Produkt';
+$_ARRAYLANG['unit'] = 'Einheit';
+$_ARRAYLANG['discountgroupCountRates'] = 'Mindestmenge';
+
+$_ARRAYLANG['fee']  = 'Gebühr';
+$_ARRAYLANG['freeFrom']  = 'Gebührenfrei ab';
+$_ARRAYLANG['paymentProcessor']  = 'Dienst';
+$_ARRAYLANG['zones']  = 'Зона';
+
+
 $_ARRAYLANG['TXT_ORDERS'] = "Bestellungen";
 $_ARRAYLANG['TXT_STOCK'] = "Bestand";
 $_ARRAYLANG['TXT_ALL_PRODUCT_GROUPS'] = "Все группы продуктов";
@@ -274,7 +336,7 @@ $_ARRAYLANG['TXT_ISO_CODE'] = "ISO-CODE";
 $_ARRAYLANG['TXT_NOT_APPLICABLE_SHORT_FORM'] = "N/A";
 $_ARRAYLANG['TXT_NO_TEMPLATE'] = "Keine Vorlage";
 $_ARRAYLANG['TXT_MANUFACTURER_URL'] = "Link zum Hersteller";
-$_ARRAYLANG['TXT_WITH_HTTP'] = "mit http://";
+$_ARRAYLANG['TXT_WITH_HTTP'] = "(mit http://)";
 $_ARRAYLANG['TXT_OPTIONS'] = "Options";
 $_ARRAYLANG['TXT_FILL_OUT_ALL_REQUIRED_FIELDS'] = "Bitte füllen Sie alle erforderlichen Felder aus.";
 $_ARRAYLANG['TXT_PRODUCT_CHARACTERISTICS'] = "Product characteristics";
@@ -934,3 +996,59 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_PRODUCT_INVALID'] = "ungültiges Produkt";
 $_ARRAYLANG['TXT_SHOP_PAYMILL'] = "Paymill";
 $_ARRAYLANG['TXT_SHOP_PAYMILL_PRIVATE_KEY'] = "Private key";
 $_ARRAYLANG['TXT_SHOP_PAYMILL_PUBLIC_KEY'] = "Public key";
+
+$_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['uri'] = 'Url';
+$_ARRAYLANG['startTime'] = 'Gültig ab';
+$_ARRAYLANG['endTime'] = 'Gültig bis';
+$_ARRAYLANG['minimumAmount'] = "Mindestbetrag (%1\$s)";
+$_ARRAYLANG['discountRate'] = 'Rabatt in %';
+$_ARRAYLANG['discountAmount'] = "Guthaben (%1\$s)";
+$_ARRAYLANG['uses'] = 'Verwendungen';
+$_ARRAYLANG['global'] = 'Gültigkeit';
+$_ARRAYLANG['product'] = 'Produkt';
+$_ARRAYLANG['payment'] = 'Bezahlung';
+$_ARRAYLANG['link'] = 'Link';
+$_ARRAYLANG['TXT_MODULE_SHOP'] = 'Shop';
+$_ARRAYLANG['discountprice'] = 'Sonderangebot';
+$_ARRAYLANG['discountActive'] = 'Активный';
+$_ARRAYLANG['articleGroup'] = 'Teilerabattgruppe';
+$_ARRAYLANG['discountgroupCountName'] = 'Mengenrabattgruppe';
+$_ARRAYLANG['distribution'] = 'Product type';
+$_ARRAYLANG['short'] = 'Kurzbeschreibung';
+$_ARRAYLANG['long'] = 'Beschreibung';
+$_ARRAYLANG['keys'] = 'Suchbegriffe';
+$_ARRAYLANG['manufacturer'] = 'Hersteller';
+$_ARRAYLANG['uri'] = 'Link zum Hersteller';
+$_ARRAYLANG['stock'] = 'Bestand';
+$_ARRAYLANG['stockVisible'] = 'Automatisch deaktivieren, wenn ausverkauft';
+$_ARRAYLANG['minimumOrderQuantity'] = 'Minimum order quantity';
+$_ARRAYLANG['relProductAttributes'] = 'Produktoptionen';
+$_ARRAYLANG['b2b'] = 'B2B';
+$_ARRAYLANG['b2c'] = 'B2C';
+$_ARRAYLANG['dateStart'] = 'Startdatum';
+$_ARRAYLANG['dateEnd'] = 'Enddatum';
+$_ARRAYLANG['userGroups'] = 'Benutzergruppen';
+$_ARRAYLANG['categories'] = 'Kategorie';
+$_ARRAYLANG['normalprice-detail'] = 'Preis Endkunde';
+$_ARRAYLANG['resellerprice-detail'] = 'Preis für Reseller';
+$_ARRAYLANG['vat-detail'] = 'MwSt.-Anteil';
+$_ARRAYLANG['normalprice'] = 'Endkunde';
+$_ARRAYLANG['resellerprice'] = 'Reseller';
+$_ARRAYLANG['vat'] = 'MwSt.';
+$_ARRAYLANG['showAllPendentOrders'] = 'Pendente Bestellungen anzeigen';
+$_ARRAYLANG['TXT_SHOP_TOO_FEW_ARGUMENTS'] = 'Zu wenig Argumente';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEM_WITH_OPTIONS'] = 'Dieses Produkt wurde mit den folgenden Optionen bestellt. Diese Optionen können nicht bearbeitet werden:<br/>';
+$_ARRAYLANG['productId'] = 'Produkt ID';
+$_ARRAYLANG['productName'] = 'Produkt Name';
+$_ARRAYLANG['productCode'] = 'Produkt Code';
+$_ARRAYLANG['vat'] = 'Mehrwertsteuer Satz';
+$_ARRAYLANG['totalWeight'] = ' ';
+$_ARRAYLANG['TXT_SHOP_ORDER_COULD_NOT_BE_FOUND'] = 'Bestellung konnte nicht gefunden werden';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEMS_ARE_ADDED_TO_SUM'] = 'Die Optionen werden zur Produktsumme dazugerechnet.';
+$_ARRAYLANG['sum'] = 'Total';
+$_ARRAYLANG['emptyField'] = ' ';
+$_ARRAYLANG['countryId'] = 'Land';
+$_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Bestellung wurde gelöscht.';
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'Status der Bestellung wurde geändert.';

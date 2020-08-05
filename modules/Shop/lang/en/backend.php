@@ -26,6 +26,69 @@
  */
 
 global $_ARRAYLANG;
+/*** NEW ***/
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_ORDER'] = 'Orders';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY'] = 'Categories';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT'] = 'Products';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_MANUFACTURER'] = 'Manufacturer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER'] = 'Customers';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_STATISTIC'] = 'Statistics';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_IMPORT'] = 'Import/export';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING'] = 'Master data';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_DEFAULT'] = 'Overview';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_RELDISCOUNTGROUP'] = 'Customer discounts';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_CUSTOMERGROUP'] = 'Customer discount groups';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_DEFAULT'] = 'Categories';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_PRICELIST'] = 'PDF price list';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DEFAULT'] = 'Product catalog';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_MANAGE'] = 'Add a new product';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ATTRIBUTE'] = 'Product attributes';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DISCOUNTGROUPCOUNTNAME'] = 'Discount count groups';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ARTICLEGROUP'] = 'Article discount group';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DEFAULT'] = 'General';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_VAT'] = 'VAT';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_CURRENCY'] = 'Currencies';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENT'] = 'Payment methods';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_SHIPPER'] = 'Shipping methods';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_RELCOUNTRY'] = 'Delivery countries';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zones';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-mail Templates';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Coupon codes';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENTPROCESSOR'] = 'Payment provider';
+
+$_ARRAYLANG['borderOn'] = 'Frame';
+$_ARRAYLANG['headerOn'] = 'Show Header';
+$_ARRAYLANG['footerOn'] = 'Show Footer';
+$_ARRAYLANG['lang'] = 'Language';
+$_ARRAYLANG['allCategories'] = 'Contained categories';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'All categories';
+
+$_ARRAYLANG['code'] = 'Code';
+$_ARRAYLANG['symbol'] = 'Symbol';
+$_ARRAYLANG['rate'] = 'Rate';
+$_ARRAYLANG['increment'] = 'Rounding';
+$_ARRAYLANG['default'] = 'Default';
+
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['cumulative'] = 'Per product';
+$_ARRAYLANG['unit'] = 'Unit';
+$_ARRAYLANG['discountgroupCountRates'] = 'Minimum quantity';
+
+$_ARRAYLANG['fee']  = 'Fee';
+$_ARRAYLANG['freeFrom']  = 'Free of charge from';
+$_ARRAYLANG['paymentProcessor']  = 'Payment provider';
+$_ARRAYLANG['zones']  = 'Zone';
+
+
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "The total weight of your order exceeds the available shipment conditions";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Accept changes";
 $_ARRAYLANG['TXT_ACCOUNT_BANK'] = "Bank name";
@@ -960,7 +1023,7 @@ $_ARRAYLANG['TXT_WARNING_SHIPPER_WEIGHT'] = "The total weight of your order exce
 $_ARRAYLANG['TXT_WEIGHT'] = "Weight";
 $_ARRAYLANG['TXT_WEIGHT_INVALID_IGNORED'] = "Invalid weight; your changes have been ignored";
 $_ARRAYLANG['TXT_WHOIS'] = "View details about this IP address";
-$_ARRAYLANG['TXT_WITH_HTTP'] = "Include the 'http://' prefix in the URL";
+$_ARRAYLANG['TXT_WITH_HTTP'] = "(Include the 'http://' prefix in the URL)";
 $_ARRAYLANG['TXT_YELLOWPAY_POSTFINANCE'] = "PostFinance";
 $_ARRAYLANG['TXT_ZIP_CITY'] = "ZIP / City";
 $_ARRAYLANG['TXT_ZONE'] = "Zone";
@@ -1019,3 +1082,64 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_TYPE_TIP'] = 'Whether to apply the the minimum or
 $_ARRAYLANG['TXT_SHOP_TYPE'] = 'Type';
 $_ARRAYLANG['TXT_SHOP_PERCENTAGE'] = 'Percentage';
 $_ARRAYLANG['TXT_SHOP_PAYMENT_FEE_INFO'] = 'Set the fee for each payment method that shall be imposed. This can either be a fixed fee or a percentage based on the order sum.';
+$_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['uri'] = 'URL';
+$_ARRAYLANG['startTime'] = 'Valid from';
+$_ARRAYLANG['endTime'] = 'Valid until';
+$_ARRAYLANG['minimumAmount'] = "Min. amount (%1\$s)";
+$_ARRAYLANG['discountRate'] = 'Discount in %';
+$_ARRAYLANG['discountAmount'] = "Amount (%1\$s)";
+$_ARRAYLANG['uses'] = 'Uses';
+$_ARRAYLANG['global'] = 'Validity';
+$_ARRAYLANG['product'] = 'Product';
+$_ARRAYLANG['payment'] = 'Payment method';
+$_ARRAYLANG['link'] = 'Link';
+$_ARRAYLANG['TXT_MODULE_SHOP'] = 'Shop';
+$_ARRAYLANG['discountprice'] = 'Special offer';
+$_ARRAYLANG['discountActive'] = 'Active';
+$_ARRAYLANG['articleGroup'] = 'Article group';
+$_ARRAYLANG['discountgroupCountName'] = 'Count discount group';
+$_ARRAYLANG['distribution'] = 'Product type';
+$_ARRAYLANG['short'] = 'Short description';
+$_ARRAYLANG['long'] = 'Description';
+$_ARRAYLANG['keys'] = 'Key words';
+$_ARRAYLANG['manufacturer'] = 'Manufacturer';
+$_ARRAYLANG['uri'] = 'Link to the manufacturer';
+$_ARRAYLANG['stock'] = 'Stock';
+$_ARRAYLANG['stockVisible'] = 'Deactivate when stock reaches zero (sold out)';
+$_ARRAYLANG['minimumOrderQuantity'] = 'Minimum order quantity';
+$_ARRAYLANG['relProductAttributes'] = 'Product options';
+$_ARRAYLANG['b2b'] = 'B2B';
+$_ARRAYLANG['b2c'] = 'B2C';
+$_ARRAYLANG['dateStart'] = 'Start date';
+$_ARRAYLANG['dateEnd'] = 'End date';
+$_ARRAYLANG['userGroups'] = 'User groups';
+$_ARRAYLANG['categories'] = 'Category';
+$_ARRAYLANG['normalprice-detail'] = 'Price final customer';
+$_ARRAYLANG['resellerprice-detail'] = 'Price for reseller';
+$_ARRAYLANG['vat-detail'] = 'VAT rate';
+$_ARRAYLANG['normalprice'] = 'Final customer';
+$_ARRAYLANG['resellerprice'] = 'Reseller';
+$_ARRAYLANG['vat'] = 'VAT';
+$_ARRAYLANG['showAllPendentOrders'] = 'View pending orders';
+$_ARRAYLANG['TXT_SHOP_TOO_FEW_ARGUMENTS'] = 'Too fet arguments';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEM_WITH_OPTIONS'] = 'This product was ordered with the following options. These options cannot be edited:<br/>';
+$_ARRAYLANG['productId'] = 'Product ID';
+$_ARRAYLANG['productName'] = 'Product name';
+$_ARRAYLANG['productCode'] = 'Product Code';
+$_ARRAYLANG['vat'] = 'VAT rate';
+$_ARRAYLANG['totalWeight'] = ' ';
+$_ARRAYLANG['TXT_SHOP_ORDER_COULD_NOT_BE_FOUND'] = 'Bestellung konnte nicht gefunden werden';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEMS_ARE_ADDED_TO_SUM'] = 'The options are added to the product total.';
+$_ARRAYLANG['sum'] = 'Total';
+$_ARRAYLANG['emptyField'] = ' ';
+$_ARRAYLANG['countryId'] = 'Country';
+$_ARRAYLANG['orderItem'] = 'Related order';
+$_ARRAYLANG['TXT_SHOP_ORDERITEM_LINK_TO_ORDER'] = 'Order #%d';
+$_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Order has been deleted.';
+$_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Orders have been deleted.';
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'The status of the order has been changed.';
+$_ARRAYLANG['TXT_MODULE_SHOP_ANY'] = 'any';
+$_ARRAYLANG['pdfTemplate'] = 'PDF template';
+$_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='The entries have been updated successfully.';

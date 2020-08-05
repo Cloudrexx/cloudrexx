@@ -134,24 +134,24 @@ class Cart
 
         $arrCart = array(
             'items' => self::$products,
-            'total_price_cart' => Currency::formatPrice(
+            'total_price_cart' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()
                 + self::get_discount_amount()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
-            'total_price_cart_without_vat' => Currency::formatPrice(
+            'total_price_cart_without_vat' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()
                 + self::get_discount_amount()
             ),
-            'total_price' => Currency::formatPrice(
+            'total_price' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
-            'total_price_without_vat' => Currency::formatPrice(
+            'total_price_without_vat' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()
             ),
             'item_count' => $itemCount,
-            'unit' => Currency::getActiveCurrencySymbol()
+            'unit' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol()
         );
         $objJson = new \Services_JSON();
 //DBG::log("send_json(): Sending ".var_export($arrCart, true));
@@ -172,11 +172,16 @@ class Cart
             return;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         $outOfStockProducts = array();
         foreach (Cart::get_products_array() as $product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if ($objProduct && !$objProduct->getStatus()) {
-                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->name());
+                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->getName());
             }
         }
 
@@ -330,6 +335,17 @@ class Cart
                 break;
             }
 //DBG::log("Cart::add_product(): No match!");
+        }
+        // coupons are always a new order item. The reason for this is that
+        // we want to link coupons with the order items that created it.
+        if (!$new) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $productRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+            $product = $productRepo->find($arrNewProduct['id']);
+            if ($product->getDistribution() == 'coupon') {
+                $new = true;
+            }
         }
 //DBG::log("Cart::add_product(): Comparing done, cart ID $cart_id");
         if ($new) {
@@ -493,14 +509,20 @@ class Cart
         // will contain all VAT rates of the products currently in cart
         $usedVatRates = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         // Loop 1: Collect necessary Product data
         $products = $_SESSION['shop']['cart']['items']->toArray();
         foreach ($products as $cart_id => &$product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if (!$objProduct) {
                 unset($products[$cart_id]);
                 continue;
             }
+
 
             // Check minimum order quantity, when set
             // Do not add error message if it's an AJAX request
@@ -510,16 +532,16 @@ class Cart
                     strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest'
                 ) &&
                 $product['quantity'] != 0 &&
-                $product['quantity'] < $objProduct->minimum_order_quantity()
+                $product['quantity'] < $objProduct->getMinimumOrderQuantity()
             ) {
-                \Message::error($objProduct->name().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
+                \Message::error($objProduct->getName().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
             }
 
             // Limit Products in the cart to the stock available if the
             // stock_visibility is enabled.
-            if ($objProduct->stock_visible()
-             && $product['quantity'] > $objProduct->stock()) {
-                $product['quantity'] = $objProduct->stock();
+            if ($objProduct->getStockVisible()
+             && $product['quantity'] > $objProduct->getStock()) {
+                $product['quantity'] = $objProduct->getStock();
             }
 
             // Remove Products with quatities of zero or less
@@ -540,8 +562,8 @@ class Cart
                 $quantity
             );
             $price = $itemprice * $quantity;
-            $handler = $objProduct->distribution();
-            $itemweight = ($handler == 'delivery' ? $objProduct->weight() : 0);
+            $handler = $objProduct->getDistribution();
+            $itemweight = ($handler == 'delivery' ? $objProduct->getWeight() : 0);
 
             // Requires shipment if the distribution type is 'delivery'
             if ($handler == 'delivery') {
@@ -549,7 +571,7 @@ class Cart
             }
             $weight = $itemweight * $quantity;
 
-            $vat_rate = Vat::getRate($objProduct->vat_id());
+            $vat_rate = Vat::getRate($objProduct->getVatId());
             $total_price += $price;
             $total_weight += $weight;
 
@@ -559,32 +581,32 @@ class Cart
             }
 
             self::$products[$cart_id] = array(
-                'id' => $objProduct->id(),
-                'product_id' => $objProduct->code(),
+                'id' => $objProduct->getId(),
+                'product_id' => $objProduct->getCode(),
                 'cart_id' => $cart_id,
                 'title' =>
                     (empty($_GET['remoteJs'])
-                      ? $objProduct->name()
+                      ? $objProduct->getName()
                       : htmlspecialchars(
                           (strtolower(CONTREXX_CHARSET) == 'utf-8'
-                            ? $objProduct->name()
-                            : utf8_encode($objProduct->name())),
+                            ? $objProduct->getName()
+                            : utf8_encode($objProduct->getName())),
                           ENT_QUOTES, CONTREXX_CHARSET)),
                 'options' => $product['options'],
                 'options_count' => count($product['options']),
                 'options_long' => $options_strings[0],
                 'options_cart' => $options_strings[1],
-                'price' => Currency::formatPrice($price),
-                'sale_price' => Currency::formatPrice($price),
+                'price' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price),
+                'sale_price' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price),
                 'quantity' => $quantity,
-                'itemprice' => Currency::formatPrice($itemprice),
+                'itemprice' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($itemprice),
                 'vat_rate' => $vat_rate,
                 'itemweight' => $itemweight, // in grams!
                 'weight' => $weight,
-                'group_id' => $objProduct->group_id(),
-                'article_id' => $objProduct->article_id(),
-                'product_images' => $objProduct->pictures(),
-                'minimum_order_quantity' => $objProduct->minimum_order_quantity(),
+                'group_id' => $objProduct->getGroupId(),
+                'article_id' => $objProduct->getArticleId(),
+                'product_images' => $objProduct->getPicture(),
+                'minimum_order_quantity' => $objProduct->getMinimumOrderQuantity(),
             );
         }
 
@@ -597,6 +619,9 @@ class Cart
         $objCoupon = null;
         $hasCoupon = false;
         $discount_amount = 0;
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
         foreach (self::$products as $cart_id => &$product) {
             $discount_amount = 0;
             $product['discount_amount'] = 0;
@@ -604,27 +629,27 @@ class Cart
             // Coupon case #1: Product specific coupon
             // Coupon:  Either the payment ID or the code are needed
             if ($payment_id || $coupon_code) {
-                $objCoupon = Coupon::available(
+                $objCoupon = $couponRepo->available(
                     $coupon_code, $total_price, $customer_id,
                     $product['id'], $payment_id);
                 if ($objCoupon) {
                     $hasCoupon = true;
-                    $discount_amount = $objCoupon->getDiscountAmount(
+                    $discount_amount = $objCoupon->getDiscountAmountOrRate(
                         $product['price'], $customer_id);
                     // In case the loaded coupon is a coupon of type value (of
                     // a certain amount) and if it has been used on a previous
                     // product, then we have to check if the discount (to be
                     // applied on the current product) will exceed the total
                     // coupon value
-                    if (   $objCoupon->discount_amount() > 0
+                    if (   $objCoupon->getDiscountAmount() > 0
                         && ($total_discount_amount + $discount_amount)
-                            > $objCoupon->discount_amount()) {
+                            > $objCoupon->getDiscountAmount()) {
                         // Already applied discounts plus the discount of this
                         // product exceed the coupons total value. Therefore
                         // we must subtract the applied discounts from the
                         // coupon to get the remaining discount amount.
                         $discount_amount =
-                            $objCoupon->discount_amount()
+                            $objCoupon->getDiscountAmount()
                           - $total_discount_amount;
                     }
                     $total_discount_amount += $discount_amount;
@@ -642,11 +667,11 @@ class Cart
             );
             if (Vat::isEnabled() && !Vat::isIncluded()) {
                 self::$products[$cart_id]['price'] += $vat_amount;
-                self::$products[$cart_id]['price'] = Currency::formatPrice(self::$products[$cart_id]['price']);
+                self::$products[$cart_id]['price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(self::$products[$cart_id]['price']);
             }
             $total_vat_amount += $vat_amount;
             self::$products[$cart_id]['vat_amount'] =
-                Currency::formatPrice($vat_amount);
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($vat_amount);
         }
 
         // Coupon case #2: Non-Product specific coupon
@@ -656,7 +681,7 @@ class Cart
 
             // supply $total_price (without VAT) to Coupon::available()
             // for checking if minimum order amount has reached
-            $objCoupon = Coupon::available(
+            $objCoupon = $couponRepo->available(
                 $coupon_code, $total_price, $customer_id, 0, $payment_id);
 
             // verify that coupon is valid with VAT
@@ -667,7 +692,7 @@ class Cart
                 // TODO: extend the Shop system to support different VAT
                 //       rates on coupons
                 if (Vat::isEnabled() &&
-                    $objCoupon->discount_amount() > 0 &&
+                    $objCoupon->getDiscountAmount() > 0 &&
                     count($usedVatRates) > 1
                 ) {
                     $objCoupon = null;
@@ -677,14 +702,15 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
-                $total_discount_amount = $objCoupon->getDiscountAmount(
-                    $total_price, $customer_id
-                );
+                $discount_amount = $objCoupon->getDiscountAmountOrRate(
+                    $total_price, $customer_id);
+                $total_discount_amount = $discount_amount;
+
                 // in case VAT is being used, we have to subtract the VAT of
                 // the discount from the total VAT amount of the products
                 $couponVatDiscount = 0;
                 if (Vat::isEnabled()) {
-                    if ($objCoupon->discount_amount() > 0) {
+                    if ($objCoupon->getDiscountAmount() > 0) {
                         $vatRate = current($usedVatRates);
                         // in case coupon is a discount of value, then we
                         // have to subtract the VAT amount of that value
@@ -729,10 +755,10 @@ class Cart
 
         // order costs after discount subtraction (incl VAT) but without payment and shippment costs
         $_SESSION['shop']['cart']['total_price'] =
-            Currency::formatPrice($total_price);
+            \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($total_price);
 
         $_SESSION['shop']['cart']['total_vat_amount'] =
-            Currency::formatPrice($total_vat_amount);
+            \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($total_vat_amount);
         $_SESSION['shop']['cart']['total_items'] = $items;
         $_SESSION['shop']['cart']['total_weight'] = $total_weight; // In grams!
 
@@ -913,7 +939,7 @@ die("Cart::view(): ERROR: No template");
                 );
 
                 // product image
-                $arrProductImg = Products::get_image_array_from_base64($arrProduct['product_images']);
+                $arrProductImg = \Cx\Modules\Shop\Controller\ProductController::get_image_array_from_base64($arrProduct['product_images']);
                 $shopImagesWebPath = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteImagesWebPath() . '/Shop/';
                 $thumbnailPath = $shopImagesWebPath.ShopLibrary::noPictureName;
                 foreach($arrProductImg as $productImg) {
@@ -942,10 +968,10 @@ die("Cart::view(): ERROR: No template");
                     'SHOP_PRODUCT_TITLE' => str_replace('"', '&quot;', contrexx_raw2xhtml($arrProduct['title'])),
                     'SHOP_PRODUCT_PRICE' => $arrProduct['price'],  // items * qty
                     'SHOP_PRODUCT_SALE_PRICE' => $arrProduct['sale_price'],  // items * qty (without added VAT, if VAT is configured as excl)
-                    'SHOP_PRODUCT_PRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+                    'SHOP_PRODUCT_PRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                     'SHOP_PRODUCT_QUANTITY' => $arrProduct['quantity'],
                     'SHOP_PRODUCT_ITEMPRICE' => $arrProduct['itemprice'],
-                    'SHOP_PRODUCT_ITEMPRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+                    'SHOP_PRODUCT_ITEMPRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
 // TODO: Move this to (global) language variables
                     'SHOP_REMOVE_PRODUCT' => $_ARRAYLANG['TXT_SHOP_REMOVE_ITEM'],
                 ));
@@ -967,7 +993,7 @@ die("Cart::view(): ERROR: No template");
                             ? Vat::format($arrProduct['vat_rate']) : ''),
                         'SHOP_PRODUCT_TAX_AMOUNT' =>
                             $arrProduct['vat_amount'].'&nbsp;'.
-                            Currency::getActiveCurrencySymbol(),
+                            \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                     ));
                 }
                 if (intval($arrProduct['minimum_order_quantity']) > 0) {
@@ -1000,23 +1026,28 @@ die("Cart::view(): ERROR: No template");
             'TXT_PRODUCT_ID' => $_ARRAYLANG['TXT_ID'],
             'SHOP_PRODUCT_TOTALITEM' => self::get_item_count(),
             // total costs of goods (before subtraction of discount)
-            'SHOP_PRODUCT_TOTAL_GOODS' => Currency::formatPrice(
+            'SHOP_PRODUCT_TOTAL_GOODS' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price() + self::get_discount_amount()),
             // total costs of goods (after subtraction of discount)
-            'SHOP_PRODUCT_TOTALPRICE' => Currency::formatPrice(
+            'SHOP_PRODUCT_TOTALPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()),
             // Add the VAT in the intermediate sum, if active and excluded
-            'SHOP_PRODUCT_TOTALPRICE_PLUS_VAT' => Currency::formatPrice(
+            'SHOP_PRODUCT_TOTALPRICE_PLUS_VAT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   self::get_price()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
-            'SHOP_PRODUCT_TOTALPRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+            'SHOP_PRODUCT_TOTALPRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             'SHOP_TOTAL_WEIGHT' => Weight::getWeightString(self::get_weight()),
-            'SHOP_PRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+            'SHOP_PRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
         ));
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+
         // Show the Coupon code field only if there is at least one defined
-        if (Coupon::count_available()) {
+        if ($couponRepo->count_available()) {
 //DBG::log("Coupons available");
             $objTemplate->setVariable(array(
                 'SHOP_DISCOUNT_COUPON_CODE' =>
@@ -1033,7 +1064,7 @@ die("Cart::view(): ERROR: No template");
 //                    'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' => $coupon_string,
                     'SHOP_DISCOUNT_COUPON_TOTAL' =>
                         $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
-                    'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' => Currency::formatPrice(
+                    'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                         -$total_discount_amount),
                 ));
             }
@@ -1050,14 +1081,14 @@ die("Cart::view(): ERROR: No template");
                 // Add them to the template if desired!
                 'SHOP_TOTAL_TAX_AMOUNT' =>
                     self::get_vat_amount().
-                    '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                    '&nbsp;'.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
 
             ));
             if (Vat::isIncluded()) {
                 $objTemplate->setVariable(array(
                     'SHOP_GRAND_TOTAL_EXCL_TAX' =>
-                        Currency::formatPrice(self::get_price() - self::get_vat_amount()).'&nbsp;'.
-                        Currency::getActiveCurrencySymbol(),
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(self::get_price() - self::get_vat_amount()).'&nbsp;'.
+                        \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
 
                 if ($objTemplate->blockExists('shopVatIncl')) {
@@ -1128,9 +1159,9 @@ die("Cart::view(): ERROR: No template");
                 'MESSAGE_TEXT',
                     sprintf(
                         $_ARRAYLANG['TXT_SHOP_ORDERITEMS_AMOUNT_MIN'],
-                        Currency::formatPrice(
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                             \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_min','Shop')),
-                        Currency::getActiveCurrencySymbol()));
+                        \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol()));
         } elseif (
                \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_max','Shop') > 0
             && \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_max','Shop') < self::get_price()
@@ -1139,148 +1170,13 @@ die("Cart::view(): ERROR: No template");
                 'MESSAGE_TEXT',
                     sprintf(
                         $_ARRAYLANG['TXT_SHOP_ORDERITEMS_AMOUNT_MAX'],
-                        Currency::formatPrice(
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                             \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_max','Shop')),
-                        Currency::getActiveCurrencySymbol()));
+                        \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol()));
         } else {
             $objTemplate->setVariable(
                 'TXT_NEXT', $_ARRAYLANG['TXT_NEXT']);
         }
-    }
-
-
-// TODO: implement/test this
-    /**
-     * Restores the Cart from the Order ID given
-     *
-     * Redirects to the login when nobody is logged in.
-     * Redirects to the history overview when the Order cannot be loaded,
-     * or when it does not belong to the current Customer.
-     * When $editable is true, redirects to the detail view of the first
-     * Item for editing.  Editing will be disabled otherwise.
-     * @global  array   $_ARRAYLANG
-     * @param   integer $order_id   The Order ID
-     * @param   boolean $editable   Items in the Cart are editable iff true
-     */
-    static function from_order($order_id, $editable=false)
-    {
-        global $_ARRAYLANG;
-
-        $objCustomer = Shop::customer();
-        if (!$objCustomer) {
-            \Message::information($_ARRAYLANG['TXT_SHOP_ORDER_LOGIN_TO_REPEAT']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'login').
-                '?redirect='.base64_encode(
-                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart').
-                    '?order_id='.$order_id));
-        }
-        $customer_id = $objCustomer->getId();
-        $order = Order::getById($order_id);
-        if (!$order || $order->customer_id() != $customer_id) {
-            \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_INVALID_ID']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'history'));
-        }
-// Optional!
-        self::destroy();
-        $_SESSION['shop']['shipperId'] = $order->shipment_id();
-        $_SESSION['shop']['paymentId'] = $order->payment_id();
-        $order_attributes = $order->getOptionArray();
-        $count = null;
-        $arrAttributes = Attributes::getArray($count, 0, -1, null, array());
-        // Find an Attribute and option IDs for the reprint type
-        $attribute_id_reprint = $option_id_reprint = NULL;
-        if (!$editable) {
-//DBG::log("Cart::from_order(): Checking for reprint...");
-            foreach ($arrAttributes as $attribute_id => $objAttribute) {
-                if ($objAttribute->getType() == Attribute::TYPE_EZS_REPRINT) {
-//DBG::log("Cart::from_order(): TYPE reprint");
-                    $options = $objAttribute->getOptionArray();
-                    if ($options) {
-                        $option_id_reprint = current(array_keys($options));
-                        $attribute_id_reprint = $attribute_id;
-//DBG::log("Cart::from_order(): Found reprint Attribute $attribute_id_reprint, option $option_id_reprint");
-                        break;
-                    }
-                }
-            }
-        }
-        foreach ($order->getItems() as $item) {
-            $item_id = $item['item_id'];
-            $attributes = $order_attributes[$item_id];
-            $options = array();
-            foreach ($attributes as $attribute_id => $attribute) {
-//                foreach (array_keys($attribute['options']) as $option_id) {
-                foreach ($attribute['options'] as $option_id => $option) {
-//DBG::log("Cart::from_order(): Option: ".var_export($option, true));
-                    switch ($arrAttributes[$attribute_id]->getType()) {
-                        case Attribute::TYPE_TEXT_OPTIONAL:
-                        case Attribute::TYPE_TEXT_MANDATORY:
-                        case Attribute::TYPE_TEXTAREA_OPTIONAL:
-                        case Attribute::TYPE_TEXTAREA_MANDATORY:
-                        case Attribute::TYPE_EMAIL_OPTIONAL:
-                        case Attribute::TYPE_EMAIL_MANDATORY:
-                        case Attribute::TYPE_URL_OPTIONAL:
-                        case Attribute::TYPE_URL_MANDATORY:
-                        case Attribute::TYPE_DATE_OPTIONAL:
-                        case Attribute::TYPE_DATE_MANDATORY:
-                        case Attribute::TYPE_NUMBER_INT_OPTIONAL:
-                        case Attribute::TYPE_NUMBER_INT_MANDATORY:
-                        case Attribute::TYPE_NUMBER_FLOAT_OPTIONAL:
-                        case Attribute::TYPE_NUMBER_FLOAT_MANDATORY:
-                        case Attribute::TYPE_EZS_ACCOUNT_3:
-                        case Attribute::TYPE_EZS_ACCOUNT_4:
-                        case Attribute::TYPE_EZS_IBAN:
-                        case Attribute::TYPE_EZS_IN_FAVOR_OF:
-                        case Attribute::TYPE_EZS_REFERENCE:
-                        case Attribute::TYPE_EZS_CLEARING:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_6:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_2L:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_2H:
-                        case Attribute::TYPE_EZS_PURPOSE_35:
-                        case Attribute::TYPE_EZS_PURPOSE_50:
-                            $options[$attribute_id][] = $option['name'];
-                            break;
-                        case Attribute::TYPE_EZS_REDPLATE:
-                        case Attribute::TYPE_EZS_CONFIRMATION:
-                            if (!$attribute_id_reprint) {
-//DBG::log("Cart::from_order(): No reprint, adding option {$option['name']}");
-                                $options[$attribute_id][] = $option_id;
-                            }
-                            break;
-                        case Attribute::TYPE_EZS_REPRINT:
-                            // Automatically added below when appropriate
-                            break;
-                        default:
-//                        case Attribute::TYPE_EZS_ZEWOLOGO:
-//                        case Attribute::TYPE_EZS_EXPRESS:
-//                        case Attribute::TYPE_EZS_PURPOSE_BOLD:
-                            $options[$attribute_id][] = $option_id;
-                            break;
-                    }
-//DBG::log("Cart::from_order(): Added option: ".var_export($options, true));
-                }
-            }
-            if ($attribute_id_reprint) {
-                $options[$attribute_id_reprint][] = $option_id_reprint;
-//DBG::log("Cart::from_order(): Item has reprint Attribute, added $attribute_id_reprint => ($option_id_reprint)");
-            }
-            self::add_product(array(
-                'id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'options' => $options,
-            ));
-        }
-        if ($attribute_id_reprint) {
-            // Mark the Cart as being unchanged since the restore, so the
-            // additional cost for some Attributes won't be added again.
-            self::restored_order_id($order_id);
-        }
-        \Message::information($_ARRAYLANG['TXT_SHOP_ORDER_RESTORED']);
-// Enable for production
-        \Cx\Core\Csrf\Controller\Csrf::redirect(
-            \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart'));
     }
 
 

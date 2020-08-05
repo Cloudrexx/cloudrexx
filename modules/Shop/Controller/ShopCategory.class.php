@@ -474,7 +474,7 @@ class ShopCategory
 
         $query = "
             UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-              SET `parent_id`=$this->parent_id,
+              SET `parent_id`= ".($this->parent_id ? $this->parent_id : 'NULL').", 
                   `active`=".($this->active ? 1 : 0).",
                   `ord`=$this->ord,
                   `picture`='".addslashes($this->picture)."',
@@ -505,7 +505,7 @@ class ShopCategory
                 `picture`, `flags`
                 ".($this->id ? ', id' : '')."
             ) VALUES (
-                $this->parent_id, ".($this->active ? 1 : 0).", $this->ord,
+                ".($this->parent_id ? $this->parent_id : 'NULL').", ".($this->active ? 1 : 0).", $this->ord,
                 '".addslashes($this->picture)."', '".addslashes($this->flags)."'
                 ".($this->id ? ", $this->id" : '')."
             )";
@@ -533,7 +533,7 @@ class ShopCategory
         global $objDatabase;
 
         // Delete Products and images
-        if (Products::deleteByShopCategory($this->id, $flagDeleteImages) === false) {
+        if (\Cx\Modules\Shop\Controller\ProductController::deleteByShopCategory($this->id, $flagDeleteImages) === false) {
             return false;
         }
         // Delete subcategories
@@ -558,9 +558,29 @@ class ShopCategory
             return false;
         }
 
+        $this->deleteRelation();
         return true;
     }
 
+    /**
+     * Delete entries in intermediate table
+     */
+    function deleteRelation()
+    {
+        global $objDatabase;
+
+        $arrRelation = array(
+            'pricelist',
+            'product'
+        );
+
+        foreach ($arrRelation as $relation) {
+            $objDatabase->Execute(
+                'DELETE FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_'
+                . $relation.' WHERE category_id = '.$this->id()
+            );
+        }
+    }
 
     /**
      * Looks for and deletes the sub-ShopCategory named $name

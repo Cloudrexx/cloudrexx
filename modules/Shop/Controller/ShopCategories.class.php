@@ -321,7 +321,9 @@ class ShopCategories
             $query = "
                SELECT `id`
                  FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-                WHERE `parent_id` IN ($tempList)".
+                 WHERE `parent_id` ". (empty($parent_id) ? 'IS NULL' : 'IN(' . (
+                     $tempList
+                 ) . ')') .
                 ($active ? ' AND `active`=1' : '')."
                 ORDER BY `ord` ASC";
             $objResult = $objDatabase->Execute($query);
@@ -529,7 +531,7 @@ class ShopCategories
         $query = "
             SELECT `picture`, `id`
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-             WHERE `parent_id`=$catId
+              WHERE `parent_id` ". empty($parent_id) ? 'IS NULL' : '='.$catId ."
                AND `picture`!=''
           ORDER BY `ord` ASC";
         $objResult = $objDatabase->Execute($query);
@@ -542,7 +544,11 @@ class ShopCategories
         $arrChildCategoryId =
             self::getChildCategoryIdArray($catId, $active);
         foreach ($arrChildCategoryId as $catId) {
-            $imageName = Products::getPictureByCategoryId($catId);
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Product'
+            );
+            $imageName = $productRepo->getPictureByCategoryId($catId);
             if ($imageName) return $imageName;
         }
 
@@ -758,51 +764,6 @@ class ShopCategories
 
 
     /**
-     * Returns the HTML code for options of two separate menus of available
-     * and assigned ShopCategories.
-     *
-     * The <select> tag pair is not included, nor the option for the root
-     * ShopCategory.
-     * Includes all ShopCategories in one list or the other.
-     * @param   string  $assigned_category_ids   An optional comma separated
-     *                                  list of ShopCategory IDs assigned to a
-     *                                  Product
-     * @return  string                  The HTML code with all <option> tags,
-     *                                  or the empty string on failure.
-     * @static
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     */
-    static function getAssignedShopCategoriesMenuoptions($assigned_category_ids=null)
-    {
-//DBG::log("Getting menuoptions for Category IDs $assigned_category_ids");
-        self::buildTreeArray(true, false, false, 0, 0, 0);
-        $strOptionsAssigned = '';
-        $strOptionsAvailable = '';
-        foreach (self::$arrCategory as $arrCategory) {
-            $level = $arrCategory['level'];
-            $id = $arrCategory['id'];
-            $name = $arrCategory['name'];
-            $option =
-                '<option value="'.$id.'">'.
-                str_repeat('...', $level).
-                contrexx_raw2xhtml($name).
-                "</option>\n";
-            if (preg_match('/(?:^|,)'.$id.'(?:,|$)/', $assigned_category_ids)) {
-//DBG::log("Assigned: $id");
-                $strOptionsAssigned .= $option;
-            } else {
-//DBG::log("Available: $id");
-                $strOptionsAvailable .= $option;
-            }
-        }
-        return array(
-            'assigned' => $strOptionsAssigned,
-            'available' => $strOptionsAvailable,
-        );
-    }
-
-
-    /**
      * Returns an array of IDs of children of this ShopCategory.
      *
      * Note that this includes virtual children of ShopCategories,
@@ -821,11 +782,11 @@ class ShopCategories
     {
         global $objDatabase;
 
-        $parent_id = max(0, intval($parent_id));
+        $parent_id = max(null, intval($parent_id));
         $objResult = $objDatabase->Execute("
            SELECT `id`
              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-            WHERE `parent_id`=?".
+            WHERE `parent_id` ". (is_null($parent_id) ? 'IS NULL' : '=?') .
             ($active ? ' AND `active`=1' : '')."
             ORDER BY `ord` ASC",
             array($parent_id));

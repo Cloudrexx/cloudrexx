@@ -4019,16 +4019,16 @@ INSERT INTO `contrexx_module_repository` (`id`, `moduleid`, `content`, `title`, 
 INSERT INTO `contrexx_module_repository` (`id`, `moduleid`, `content`, `title`, `cmd`, `expertmode`, `parid`, `displaystatus`, `displayorder`, `username`) VALUES ('150', '68', '{APPLICATION_DATA}', 'Filesharing', '', '0', '0', '1', '45', 'system');
 INSERT INTO `contrexx_module_shop_article_group` (`id`) VALUES (1);
 INSERT INTO `contrexx_module_shop_attribute` (`id`, `type`) VALUES (1,0);
-INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (9,0,0,1,'htc_one_x_small.jpg','');
-INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (10,0,0,1,'cloudrexx_logo.png','');
-INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (11,0,0,1,'become_a_member.jpg','');
+INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (9,null,0,1,'htc_one_x_small.jpg','');
+INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (10,null,0,1,'cloudrexx_logo.png','');
+INSERT INTO `contrexx_module_shop_categories` (`id`, `parent_id`, `ord`, `active`, `picture`, `flags`) VALUES (11,null,0,1,'become_a_member.jpg','');
 INSERT INTO `contrexx_module_shop_currencies` (`id`, `code`, `symbol`, `rate`, `ord`, `active`, `default`, `increment`) VALUES (1,'CHF','CHF',1.0000,1,1,1,0.05000);
 INSERT INTO `contrexx_module_shop_currencies` (`id`, `code`, `symbol`, `rate`, `ord`, `active`, `default`, `increment`) VALUES (4,'EUR','€',0.8300,2,1,0,0.01000);
 INSERT INTO `contrexx_module_shop_currencies` (`id`, `code`, `symbol`, `rate`, `ord`, `active`, `default`, `increment`) VALUES (5,'USD','USD',1.0500,0,1,0,0.01000);
 INSERT INTO `contrexx_module_shop_customer_group` (`id`) VALUES (1);
 INSERT INTO `contrexx_module_shop_customer_group` (`id`) VALUES (2);
 INSERT INTO `contrexx_module_shop_customer_group` (`id`) VALUES (3);
-INSERT INTO `contrexx_module_shop_discount_coupon` (`code`, `customer_id`, `payment_id`, `product_id`, `start_time`, `end_time`, `uses`, `global`, `minimum_amount`, `discount_amount`, `discount_rate`) VALUES ('cloudrexx',0,0,0,1336946400,0,1410065408,1,0.00,0.00,10);
+INSERT INTO `contrexx_module_shop_discount_coupon` (`id`, `code`, `customer_id`, `payment_id`, `product_id`, `start_time`, `end_time`, `uses`, `global`, `minimum_amount`, `discount_amount`, `discount_rate`) VALUES (1, 'cloudrexx',null,null,null,1336946400,0,1410065408,1,0.00,0.00,10);
 INSERT INTO `contrexx_module_shop_discountgroup_count_name` (`id`) VALUES (1);
 INSERT INTO `contrexx_module_shop_discountgroup_count_rate` (`group_id`, `count`, `rate`) VALUES (1,5,5.00);
 INSERT INTO `contrexx_module_shop_discountgroup_count_rate` (`group_id`, `count`, `rate`) VALUES (1,25,10.00);
@@ -4061,10 +4061,13 @@ INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `de
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (14,'external','paymill_iban','','https://www.paymill.com',1,'');
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (15,'external','payrexx','Payrexx is a payment gateway solution developed in Switzerland.','https://www.payrexx.com',1,'');
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (16,'external','saferpay_json','Saferpay is a comprehensive Internet payment platform, specially developed for commercial applications. It provides a guarantee of secure payment processes over the Internet for merchants as well as for cardholders. Merchants benefit from the easy integration of the payment method into their e-commerce platform, and from the modularity with which they can take account of current and future requirements. Cardholders benefit from the security of buying from any shop that uses Saferpay.','http://www.saferpay.com/',1,'logo_saferpay.gif');
-INSERT INTO `contrexx_module_shop_pricelists` (`id`, `name`, `lang_id`, `border_on`, `header_on`, `header_left`, `header_right`, `footer_on`, `footer_left`, `footer_right`, `categories`) VALUES (1,'Beispiel Preisliste',1,1,1,'Beispiel Preisliste',NULL,1,'<--DATE-->','<--PAGENUMBER-->','*');
-INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `category_id`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `usergroup_ids`, `minimum_order_quantity`) VALUES (12,'aHRjX29uZV94LmpwZw==?NTIw?Mjkx:?MA==?MA==:?MA==?MA==','9','delivery',549.90,0.00,50,0,500.00,1,1,1,1,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,0,10,0,'',0,0,'',0);
-INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `category_id`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `usergroup_ids`, `minimum_order_quantity`) VALUES (13,'Y2xvdWRyZXh4LnBuZw==?NDA5?NDgw:??:??','10','delivery',588.00,0.00,10000,0,0.00,0,1,1,1,'0000-00-00 00:00:00','0000-00-00 00:00:00',1,0,10,0,'',0,0,'',0);
-INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `category_id`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `usergroup_ids`, `minimum_order_quantity`) VALUES (14,'bWl0Z2xpZWRzY2hhZnQuanBn?NTIy?NTM4:?MA==?MA==:?MA==?MA==','11','none',60.00,0.00,100000,0,0.00,0,1,1,1,'0000-00-00 00:00:00','0000-00-00 00:00:00',4,0,10,0,'',0,0,'',0);
+INSERT INTO `contrexx_module_shop_pricelists` (`id`, `name`, `lang_id`, `border_on`, `header_on`, `header_left`, `header_right`, `footer_on`, `footer_left`, `footer_right`, `all_categories`) VALUES (1,'Beispiel Preisliste',1,1,1,'Beispiel Preisliste',NULL,1,'<--DATE-->','<--PAGENUMBER-->', 1);
+INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `minimum_order_quantity`) VALUES (12,'aHRjX29uZV94LmpwZw==?NTIw?Mjkx:?MA==?MA==:?MA==?MA==','delivery',549.90,0.00,50,0,500.00,1,1,1,1,null,null,3,0,10,0,'',null,null,0);
+INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `minimum_order_quantity`) VALUES (13,'Y2xvdWRyZXh4LnBuZw==?NDA5?NDgw:??:??','delivery',588.00,0.00,10000,0,0.00,0,1,1,1,null,null,1,0,10,0,'',null,null,0);
+INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `minimum_order_quantity`) VALUES (14,'bWl0Z2xpZWRzY2hhZnQuanBn?NTIy?NTM4:?MA==?MA==:?MA==?MA==','none',60.00,0.00,100000,0,0.00,0,1,1,1,null,null,4,0,10,0,'',null,null,0);
+INSERT INTO `contrexx_module_shop_rel_category_product` (`category_id`, `product_id`) VALUES (9,12);
+INSERT INTO `contrexx_module_shop_rel_category_product` (`category_id`, `product_id`) VALUES (10,13);
+INSERT INTO `contrexx_module_shop_rel_category_product` (`category_id`, `product_id`) VALUES (11,14);
 INSERT INTO `contrexx_module_shop_rel_countries` (`zone_id`, `country_id`) VALUES (1,1);
 INSERT INTO `contrexx_module_shop_rel_countries` (`zone_id`, `country_id`) VALUES (1,2);
 INSERT INTO `contrexx_module_shop_rel_countries` (`zone_id`, `country_id`) VALUES (1,3);
@@ -4319,10 +4322,6 @@ INSERT INTO `contrexx_module_shop_rel_payment` (`zone_id`, `payment_id`) VALUES 
 INSERT INTO `contrexx_module_shop_rel_payment` (`zone_id`, `payment_id`) VALUES (2,15);
 INSERT INTO `contrexx_module_shop_rel_product_attribute` (`product_id`, `option_id`, `ord`) VALUES (12,1,0);
 INSERT INTO `contrexx_module_shop_rel_product_attribute` (`product_id`, `option_id`, `ord`) VALUES (12,3,0);
-INSERT INTO `contrexx_module_shop_rel_shipper` (`zone_id`, `shipper_id`) VALUES (1,1);
-INSERT INTO `contrexx_module_shop_rel_shipper` (`zone_id`, `shipper_id`) VALUES (1,2);
-INSERT INTO `contrexx_module_shop_rel_shipper` (`zone_id`, `shipper_id`) VALUES (1,3);
-INSERT INTO `contrexx_module_shop_rel_shipper` (`zone_id`, `shipper_id`) VALUES (1,4);
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (1,1,1000,20.00,100.00);
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (2,2,250,35.00,150.00);
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (3,3,1000,10.00,100.00);
@@ -4330,10 +4329,10 @@ INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weigh
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (5,1,10000,50.00,1000.00);
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (6,2,2000,55.00,300.00);
 INSERT INTO `contrexx_module_shop_shipment_cost` (`id`, `shipper_id`, `max_weight`, `fee`, `free_from`) VALUES (7,3,10000,25.00,1000.00);
-INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`) VALUES (1,1,0);
-INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`) VALUES (2,1,0);
-INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`) VALUES (3,1,0);
-INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`) VALUES (4,1,0);
+INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`, `zone_id`) VALUES (1,1,0,1);
+INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`, `zone_id`) VALUES (2,1,0,1);
+INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`, `zone_id`) VALUES (3,1,0,1);
+INSERT INTO `contrexx_module_shop_shipper` (`id`, `active`, `ord`, `zone_id`) VALUES (4,1,0,1);
 INSERT INTO `contrexx_module_shop_vat` (`id`, `rate`) VALUES (1,0.00);
 INSERT INTO `contrexx_module_shop_vat` (`id`, `rate`) VALUES (2,19.00);
 INSERT INTO `contrexx_module_shop_vat` (`id`, `rate`) VALUES (3,7.00);
@@ -4351,6 +4350,94 @@ INSERT INTO `contrexx_module_shop_vat` (`id`, `rate`) VALUES (14,5.00);
 INSERT INTO `contrexx_module_shop_zones` (`id`, `active`) VALUES (1,1);
 INSERT INTO `contrexx_module_shop_zones` (`id`, `active`) VALUES (2,1);
 INSERT INTO `contrexx_module_shop_zones` (`id`, `active`) VALUES (3,1);
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES
+(1, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Attribute', 'name', '1', 'Zusatzleistungen'),
+(2, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '1', 'Schweizer Franken'),
+(3, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\ArticleGroup', 'name', '1', 'Telefone'),
+(4, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\CustomerGroup', 'name', '1', 'Neukunden'),
+(5, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\DiscountgroupCountName', 'name', '1', 'Mengenrabatt'),
+(6, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\DiscountgroupCountName', 'unit', '1', 'Stück'),
+(7, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '1', 'Cloudrexx AG'),
+(8, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '1', 'https://www.cloudrexx.com'),
+(9, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Option', 'name', '1', 'Leder-Etui'),
+(10, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Shipper', 'name', '1', 'PostPac Priority'),
+(11, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '1', 'Nicht Taxpflichtig'),
+(12, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Zone', 'name', '1', 'All'),
+(13, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '1', 'Schweizer Franken'),
+(14, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '1', 'Cloudrexx AG'),
+(15, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '1', 'https://www.cloudrexx.com'),
+(16, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\CustomerGroup', 'name', '2', 'Stammkunden'),
+(17, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '2', 'Apple, Inc.'),
+(18, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '2', 'http://www.apple.com/'),
+(19, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Option', 'name', '2', 'Pimp my Handy Kit'),
+(20, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '2', 'VISA, Mastercard (Saferpay)'),
+(21, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Shipper', 'name', '2', 'Express Post'),
+(22, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '2', 'Deutschland Normalsatz'),
+(23, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Zone', 'name', '2', 'Schweiz'),
+(24, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '2', 'Apple, Inc.'),
+(25, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '2', 'http://www.apple.com/'),
+(26, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\CustomerGroup', 'name', '3', 'Goldkunden'),
+(27, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '3', 'HTC'),
+(28, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '3', 'http://www.htc.com/'),
+(29, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Option', 'name', '3', 'Headset'),
+(30, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Shipper', 'name', '3', 'Schweizerische Post'),
+(31, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '3', 'Deutschland ermässigt'),
+(32, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Zone', 'name', '3', 'Deutschland'),
+(33, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '3', 'HTC'),
+(34, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '3', 'http://www.htc.com/'),
+(35, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '4', 'Euro'),
+(36, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '4', 'MaxMuster-Foundation'),
+(37, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '4', ''),
+(38, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Shipper', 'name', '4', 'Direct to Me'),
+(39, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '4', 'Deutschland stark ermässigt'),
+(40, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '4', 'Euro'),
+(41, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'name', '4', 'MaxMuster-Foundation'),
+(42, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Manufacturer', 'uri', '4', ''),
+(43, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '5', 'United States Dollars'),
+(44, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '5', 'Deutschland Zwischensatz 1'),
+(45, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Currency', 'name', '5', 'United States Dollars'),
+(46, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '6', 'Deutschland Zwischensatz 2'),
+(47, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '7', 'Österreich Normalsatz'),
+(48, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '8', 'Österreich ermässigt'),
+(49, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'description', '9', 'Mobile Phones von über 10 Marken wie Apple, HTC & Samsung.'),
+(50, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'name', '9', 'Mobile Phones'),
+(51, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '9', 'Nachnahme'),
+(52, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '9', 'Österreich Zwischensatz'),
+(53, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'description', '10', 'Alle Lizenzen für Cloudrexx Download'),
+(54, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'name', '10', 'Cloudrexx'),
+(55, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '10', 'Schweiz'),
+(56, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'description', '11', 'Zum Erwerben von Mitgliedschaften bei verschiedenen Vereienen und Organisationen.'),
+(57, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Category', 'name', '11', 'Mitgliedschaft'),
+(58, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '11', 'Schweiz ermässigt 1'),
+(59, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '12', 'Paypal'),
+(60, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'code', '12', ''),
+(61, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'keys', '12', 'HTC, HTC One X'),
+(62, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'long', '12', '<table border=\"0\">\r\n	<tbody>\r\n		<tr>\r\n			<td style=\"width: 120px;\">\r\n				<strong>Gr&ouml;&szlig;e:</strong></td>\r\n			<td>\r\n				134,36 x 69,9 x 8,9 mm</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Gewicht:</strong></td>\r\n			<td>\r\n				130 g mit Akku</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Display:</strong></td>\r\n			<td>\r\n				HD 720P Touchscreen</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Bildschirm:</strong></td>\r\n			<td>\r\n				4,7&ldquo; (1280 x 720 Aufl&ouml;sung)</td>\r\n		</tr>\r\n	</tbody>\r\n</table>'),
+(63, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'name', '12', 'HTC One X'),
+(64, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'short', '12', 'Als eines der ersten Smartphones besitzt das HTC One X einen Quad-Core-Prozessor &ndash; d.h. die Leistung verteilt sich auf 4 Rechenkerne. Dies macht das HTC One X extrem schnell und leistungsf&auml;hig.'),
+(65, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'uri', '12', 'http://www.htc.com/de/'),
+(66, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '12', 'Schweiz ermässigt 2'),
+(67, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '13', 'LSV'),
+(68, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'code', '13', ''),
+(69, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'keys', '13', 'Cloudrexx'),
+(70, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'long', '13', 'Cloudrexx ist die All-in-One Open-Source L&ouml;sung f&uuml;r leistungsstarke Business-Websites und Online-Shops.<br />\n<br />\nMit Cloudrexx EULA Business erhalten Sie professionellen Produktsupport von Ihrer Cloudrexx Agentur.'),
+(71, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'name', '13', 'Cloudrexx Business'),
+(72, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'short', '13', 'Cloudrexx f&uuml;r die schnelle Verwaltung Ihrer Website.'),
+(73, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'uri', '13', 'https://www.cloudrexx.com'),
+(74, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '13', 'Great Britain'),
+(75, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '14', 'PostFinance (PostCard, Kreditkarte)'),
+(76, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'code', '14', ''),
+(77, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'keys', '14', ''),
+(78, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'long', '14', 'Die Foundation hilft Schulen und Ausbildungsinstitutionen seit 10 Jahren sich technisch weiterzuentwickeln und den Lernenden so verbesserte Ausbildungsm&ouml;glichkeiten zu bieten. Durch eine Mitgliedschaft erhalten Sie Rabatte an verschiedenen Firmenanl&auml;ssen der MaxMuster AG.'),
+(79, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'name', '14', 'Mitglied von der MaxMuster-Foundation'),
+(80, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'short', '14', 'Unterst&uuml;tzen Sie die MaxMuster-Foundation und werden Sie noch heute Mitglied! Sie profitieren von MItgliederrabatten an verschiedenen Anl&auml;ssen.'),
+(81, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Product', 'uri', '14', ''),
+(82, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Vat', 'class', '14', 'Great Britain reduced'),
+(83, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '15', 'Datatrans'),
+(84, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '16', 'Kreditkarte (Paymill)'),
+(85, 'en', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '16', 'paymill'),
+(86, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '17', 'ELV (Paymill)'),
+(87, 'de', 'Cx\\Modules\\Shop\\Model\\Entity\\Payment', 'name', '18', 'IBAN/BIC (Paymill)');
 INSERT INTO `contrexx_module_survey_settings` (`id`, `salutation`, `agegroup`) VALUES (1,'Herr\r--Frau--','Unter 18\r--18 - 22\r--23 - 27\r--28 - 32\r--33 - 37\r--38 - 42\r--43 - 47\r--48 - 52\r--53 - 57\r--58 - 62\r--62 - 65\r--Über 65--');
 INSERT INTO `contrexx_module_survey_surveyAnswers` (`id`, `question_id`, `answer`, `votes`) VALUES (1,0,'Answer','0');
 INSERT INTO `contrexx_module_survey_surveyAnswers` (`id`, `question_id`, `answer`, `votes`) VALUES (2,0,'Medien/Unterhaltung\r','0');

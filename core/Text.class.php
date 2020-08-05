@@ -574,6 +574,15 @@ die("Obsolete method Text::getByKey() called");
         $objText->content($strText);
         // The language may be empty!
         $objText->lang_id($lang_id);
+
+        if ($section == 'Shop' && !preg_match('/^core_mail.*$/i', $key)) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'TmpShopText:Replace',
+                array(array($id, $key, $strText))
+            );
+        }
+
 //DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Storing ".var_export($objText, true));
         if (!$objText->store()) {
 DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Error: failed to store Text");
@@ -602,6 +611,13 @@ DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Error: failed 
          || empty($this->key)) {
 DBG::log("Text::delete($all_languages): ERROR: Empty ID ($this->id), lang_id ($this->lang_id), or key ($this->key)");
             return false;
+        }
+        if ($this->section == 'Shop' && !preg_match("/^core_mail.*$/i", $this->key)) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'TmpShopText:Delete',
+                array(array($this->id, $this->key))
+            );
         }
         $query = "
             DELETE FROM `".DBPREFIX."core_text`
