@@ -316,6 +316,7 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'link' => array(
                 'custom' => true,
                 'showDetail' => false,
+                'sorting' => false,
                 'table' => array(
                     'parse' => array(
                         'adapter' => 'DiscountCoupon',
