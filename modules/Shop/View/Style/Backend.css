@@ -1,3 +1,131 @@
+#vg-0-filterSearch {
+    float: left;
+    width: 20%;
+    height: 90px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+#vg-0-filterSearch tr:nth-child(2) td {
+    padding: 5px 3px 4px;
+}
+
+#vg-0-filterSearch .row1  input[type="button"],
+#vg-0-filterSearch .row1  a,
+#vg-0-extendedSearch tr:nth-child(-n+3) td:nth-child(1) {
+    display: none;
+}
+
+#vg-0-filterSearch .row1 input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#vg-0-extendedSearch {
+    float: right;
+    width: 80%;
+    display:block !important;
+    height: 90px;
+    border-bottom: 1px solid #e5e5e5;
+    position: relative;
+}
+
+#vg-0-extendedSearch .adminlist th {
+    color: #0071bc;
+}
+
+#vg-0-extendedSearch .adminlist td,
+#vg-0-extendedSearch .adminlist tr:nth-child(n+2) {
+    float: left;
+}
+
+#vg-0-extendedSearch .adminlist tr:nth-child(4) {
+    position: absolute;
+    left: -25%;
+    bottom: 1px;
+}
+
+#vg-0-extendedSearch .adminlist tr:nth-child(n+2):nth-child(-n+5) td {
+    border: none;
+}
+
+#vg-0-extendedSearch .adminlist tr:nth-child(5) td {
+    padding: 5px 3px;
+}
+
+#vg-0-extendedSearch .adminlist tr:nth-child(2) td {
+    margin-bottom: 3px;
+}
+
+#vg-0-extendedSearch table.adminlist {
+    border-bottom: #e5e5e5 1px solid;
+}
+
+#vg-0-alphabeticalSearch {
+    float: left;
+    clear: both;
+}
+
+.vg-noresult {
+    clear: both;
+    padding: 20px 5px 0;
+}
+
+#content > table.adminlist tr:nth-child(n+1) td:nth-child(1) {
+    width: 20px;
+}
+
+.custom-input {
+    float: right;
+    margin-right: 20px;
+    font-weight: bold;
+}
+.custom-input input {
+    margin-left: 4px;
+}
+.custom-input span {
+    font-weight: normal;
+}
+
+.tooltip-wrapper {
+    padding: 6px 32px;
+}
+.tooltip-order-item {
+    visibility: hidden;
+    position: absolute;
+    top: -3px;
+    right: -17px;
+}
+.tooltip-order-item.show {
+    visibility: inherit;
+}
+#form-0-orderItems td:last-child > span {
+    position: relative;
+}
+.order-id {
+    width: 4%;
+    text-align: right !important;
+    padding-right: 1% !important;
+}
+.order-sum,
+.order-note,
+.order-date-time,
+.order-status{
+    width: 12%;
+}
+.order-customer {
+    width: 38%;
+}
+
+.pending {
+    background: #ffe7e7 !important;
+}
+
+.readonly {
+    border: none !important;
+    padding-left: 0 !important;
+    background: #fff;
+}
+
 td.manufacturer-id {
     width: 3%;
 }
@@ -33,6 +161,58 @@ span.child label.category {
 #footerRight, #headerRight {
     text-align: right;
 }
+.title-table {
+    margin-left: -201px;
+    width: calc(100% + 205px);
+    margin-bottom: -3px;
+    margin-top: 10px;
+}
+label[for='form-0-titleAddress'],
+label[for='form-0-titlePaymentInfos'],
+label[for='form-0-titleBill'],
+label[for='form-0-titleNote'],
+label[for='form-0-orderItems'],
+label[for='form-0-vatAmount'],
+label[for='form-0-shipmentAmount'],
+label[for='form-0-paymentAmount'],
+label[for='form-0-sum'],
+label[for='form-0-note'],
+label[for='form-0-emptyField'],
+label[for='form-0-lsvs'],
+label[for='form-0-relProductAttributes'] {
+    display:none;
+}
+#form-0-note,
+#form-0-orderItems,
+#form-0-lsvs {
+    margin-left: -200px;
+    width: calc(100% + 200px);
+    border-collapse: collapse;
+    margin-bottom: -4px;
+}
+
+#form-0-orderItems td {
+    padding: 3px;
+    white-space: nowrap;
+}
+
+#form-0-orderItems td:nth-child(2) {
+    min-width: 500px;
+}
+
+#form-0-orderItems td:last-child {
+    padding-right: 20px;
+    text-align: right;
+}
+
+#form-0-orderItems tr {
+    border-bottom: #e5e5e5 1px solid;
+}
+
+.shop-order-info {
+    text-align: right;
+    font-weight: bold;
+}
 div#form-0-type div {
     display: inline;
 }
@@ -43,4 +223,299 @@ div#form-0-type div {
     display: none;
     max-width: 80%;
     margin-left: 5px;
+}
+
+table.adminlist td.discountgroup-name {
+    width: 47% !important;
+}
+
+.payment-processor-info .title {
+    width: 20%;
+    float: left;
+    clear: both;
+}
+
+.payment-processor-info .input {
+    width: 80%;
+    float: left;
+    padding: 2px 0;
+}
+
+.payment-processor-info.hide {
+    display: none;
+}
+.payment-processor-info.show {
+    display: block;
+}
+.payment-processor-info .input select {
+    width: 185px;
+}
+
+.payment-processor-status {
+    width: 5%;
+}
+.payment-processor-name {
+    width: 25%;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-stockVisible'] ~ .controls {
+    padding: 10px 0;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-short'],
+form.cx-ui > fieldset .group > label[for='form-0-long'] {
+    float: none;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-short'] ~ .controls,
+form.cx-ui > fieldset .group > label[for='form-0-long'] ~ .controls {
+    display: block;
+    margin: 7px;
+}
+
+#form-0-keys {
+    width: 300px;
+    height: 80px;
+}
+
+#form-0-flags label {
+    display: none;
+}
+
+.small {
+    width: 70px;
+}
+
+td.small {
+    width: 1%;
+}
+
+.product-name {
+    width: 42%;
+}
+.product-images {
+    max-width: 100%;
+    height: auto;
+    border: none;
+    display: block;
+}
+#form-0-picture {
+    width: 100%;
+}
+.product-images-wrapper {
+    width: 32%;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+.product-images-wrapper a {
+    display: inline-block;
+    margin-bottom: 5px;
+    vertical-align: bottom;
+}
+#form-0-relProductAttributes {
+    width: 100%;
+}
+#content input.product-option-checkbox {
+    float: left;
+    margin: 6px;
+    box-sizing: content-box;
+}
+#content .child input.product-option-checkbox {
+    margin-left: 50px;
+}
+
+#content .child {
+    display: none;
+}
+
+#content .open .child {
+    display: block;
+}
+
+.product-option-label {
+    width: 100%;
+    display: block;
+    padding: 2px;
+}
+#form-0-product-option .controls {
+    margin: 0;
+}
+#form-0-product-option .controls {
+    margin: 0;
+}
+/** Show view **/
+.view-show > tbody > tr:nth-child(2) {
+    display: none;
+}
+/* orderItems */
+#shop-order-items .view-show > tbody > tr > td:nth-child(1),
+/* note */
+#shop-order-note .view-show > tbody > tr > td:nth-child(1) {
+    visibility: hidden;
+}
+.view-show tr td:first-child {
+    min-width: 200px;
+}
+#shop-order-items .view-show > tbody > tr > td:nth-child(2) > table,
+#shop-order-note .view-show > tbody > tr > td:nth-child(2) {
+    margin-left: -209px;
+    width: calc(100% + 213px);
+}
+#shop-order-note .view-show > tbody > tr > td:nth-child(2) {
+    float: left;
+    width: calc(100% + 200px);
+}
+#shop-order-items .view-show > tbody > tr > td:nth-child(2) {
+    padding: 0 3px;
+}
+#shop-order-items .view-show > tbody > tr > td:nth-child(2) > table th {
+    background: transparent;
+    color: #000;
+    padding: 0 3px;
+}
+#shop-order-items .view-show > tbody > tr > td:nth-child(2) > table tr:first-child {
+    border-bottom: #e5e5e5 1px solid;
+}
+.view-show .vat-detail span:nth-child(2) {
+    float: right;
+    padding-left: 15%;
+}
+.view-show .strong-text {
+    font-weight: bold;
+}
+.view-show .align-right,
+.view-show td > table th:nth-child(n+6) {
+    text-align: right;
+}
+.view-show .quantity-detail,
+.view-show .product-id-detail,
+.view-show .weight-detail {
+    width: 7% !important;
+    min-width: auto !important;
+}
+.view-show .product-code-detail {
+    width: 15%;
+}
+.view-show .price-detail,
+.view-show .vat-detail,
+.view-show .sum-detail {
+    width: 10%;
+}
+.view-show .product-name-detail {
+    width: 30%;
+}
+
+#shop-order {
+    float: left;
+    width: 100%;
+}
+
+#shop-order > div > table > tbody > tr > td:first-child {
+    width: 200px;
+}
+
+#shop-order #shop-order-billing,
+#shop-order #shop-order-shipping {
+    width: 50%;
+    display: inline-block;
+    float: left;
+}
+
+/** to align billing and shipping address side by side **/
+ form.cx-ui.order > fieldset .group:nth-child(2n+8):nth-child(-n+29) {
+    float: left !important;
+    width: 49.2% !important;
+    height: 25px !important;
+}
+
+.order .group:nth-child(2n+9):nth-child(-n+29) {
+    float: left !important;
+    width: 50% !important;
+    height: 25px;
+}
+
+.order .group:nth-child(30) {
+    clear: both;
+}
+
+.order #form-0-titleAddress th:first-child {
+    width: 50%;
+}
+.order #form-0-titleAddress th:last-child {
+    padding-left: 0px;
+}
+
+table.adminlist td.discountgroup-name {
+    width: 47% !important;
+}
+
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
+}
+
+.payment-processor-info .title {
+    width: 20%;
+    float: left;
+    clear: both;
+}
+
+.payment-processor-info .input {
+    width: 80%;
+    float: left;
+    padding: 2px 0;
+}
+
+.payment-processor-info.hide {
+    display: none;
+}
+.payment-processor-info.show {
+    display: block;
+}
+.payment-processor-info .input select {
+    width: 185px;
+}
+
+.payment-processor-status {
+    width: 5%;
+}
+.payment-processor-name {
+    width: 25%;
+}
+
+#group-0-userGroups,
+#group-0-weight,
+#group-0-flags,
+#group-0-stockVisible,
+#group-0-discountActive {
+    display: none;
+}
+
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
+}
+
+#vg-0-customSearch {
+    margin-bottom: 20px;
+}
+
+#form-0-stock {
+    display: flex;
+}
+#discountHeader {
+    margin-left: -23px;
+}
+#group-0-uri .controls #form-0-uri,
+#group-0-uri .controls .tooltip-trigger {
+    display: inline-block;
+}
+
+table.adminlist.sortable[data-entity="Product"] tr.row3 td:first-child,
+table.adminlist.sortable[data-entity="Product"] tr.row2 td:first-child,
+table.adminlist.sortable[data-entity="Product"] tr.row1 td:first-child {
+    padding-left: 40px;
+}
+/** MediaBrowser Fix **/
+#content input {
+    height: auto;
 }

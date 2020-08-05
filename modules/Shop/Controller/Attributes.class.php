@@ -920,7 +920,7 @@ class Attributes
                     $option_name = $arrOptions[$option_id]['value'];
                 } else {
                     $option_name = ShopLibrary::stripUniqidFromFilename($option_id);
-                    $path = Order::UPLOAD_FOLDER.$option_id;
+                    $path = \Cx\Modules\Shop\Model\Entity\Order::UPLOAD_FOLDER.$option_id;
                     if (   $option_name != $option_id
                         && file_exists($path)) {
                         $option_name = \Html::getLink('/' . $path, $option_name, 'uploadimage');

@@ -57,9 +57,6 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
         global $_ARRAYLANG;
 
         $this->setJavaScriptVariables();
-        \JS::registerJS(
-            $this->cx->getModuleFolderName() . '/Shop/View/Script/DiscountCoupon.js'
-        );
 
         $options['order']['overview'] = array(
             'code',
@@ -244,6 +241,14 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
                     $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TITLE'] .
                     '</strong> <br/>' .
                     $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TEXT']
+            ),
+            'orderItem' => array(
+                'showOverview' => false,
+                'type' => 'div',
+                'valueCallback' => array(
+                    'adapter' => 'DiscountCoupon',
+                    'method' => 'parseOrderItemField',
+                ),
             ),
             'uses' => array(
                 'formfield' => array(

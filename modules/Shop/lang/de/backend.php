@@ -58,10 +58,95 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_RELCOUNTRY'] = 'Lieferländer';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zonen';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-Mail Vorlagen';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
-
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENTPROCESSOR'] = 'Zahlungsanbieter';
 
 $_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['dateTime'] = 'Datum';
+$_ARRAYLANG['note'] = 'Bemerkungen';
+$_ARRAYLANG['status'] = 'Status';
+$_ARRAYLANG['customer'] = 'Kunde';
+$_ARRAYLANG['zip'] = 'PLZ';
+$_ARRAYLANG['city'] = 'Ort';
+$_ARRAYLANG['lastname'] = 'Nachname';
+$_ARRAYLANG['firstname'] = 'Vorname';
+$_ARRAYLANG['country'] = 'Land';
+$_ARRAYLANG['phone'] = 'Telefon';
+$_ARRAYLANG['company'] = 'Firma';
+$_ARRAYLANG['address'] = 'Adresse';
+$_ARRAYLANG['billingCompany'] = 'Firma';
+$_ARRAYLANG['billingFax'] = 'Fax';
+$_ARRAYLANG['billingPhone'] = 'Telefon';
+$_ARRAYLANG['billingLastname'] = 'Nachname';
+$_ARRAYLANG['billingFirstname'] = 'Vorname';
+$_ARRAYLANG['billingAddress'] = 'Adresse';
+$_ARRAYLANG['billingGender'] = 'Anrede';
+$_ARRAYLANG['billingZip'] = 'PLZ';
+$_ARRAYLANG['billingCity'] = 'Ort';
+$_ARRAYLANG['billingEmail'] = 'E-Mail';
+$_ARRAYLANG['billingCountryId'] = 'Land';
+$_ARRAYLANG['modifiedOn'] = 'Letzte Bearbeitung';
+$_ARRAYLANG['modifiedBy'] = 'Bearbeitet durch';
+$_ARRAYLANG['payment'] = 'Zahlungsart';
+$_ARRAYLANG['shipper'] = 'Versandart';
+$_ARRAYLANG['shipmentAmount'] = 'Versandkosten';
+$_ARRAYLANG['vatAmount'] = 'inkl. MwSt.';
+$_ARRAYLANG['paymentAmount'] = 'Zahlungskosten';
+$_ARRAYLANG['gender'] = 'Anrede';
+$_ARRAYLANG['lang'] = 'Browser Sprache';
+
+$_ARRAYLANG['quantity'] = 'Anzahl';
+$_ARRAYLANG['product_name'] = 'Produkt';
+$_ARRAYLANG['weight'] = 'Gewicht';
+$_ARRAYLANG['price'] = 'Stückpreis';
+$_ARRAYLANG['vat_rate'] = 'Mehrwertsteuer Satz';
+
+$_ARRAYLANG['holder'] = 'Kontoinhaber';
+$_ARRAYLANG['bank'] = 'Kreditinstitut';
+$_ARRAYLANG['blz'] = 'Bankleitzahl (BLZ)';
+
 $_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['cumulative'] = 'Pro Produkt';
+$_ARRAYLANG['unit'] = 'Einheit';
+$_ARRAYLANG['discountgroupCountRates'] = 'Mindestmenge';
+
+$_ARRAYLANG['DETAIL_ID'] = 'Auftragsnummer';
+$_ARRAYLANG['DETAIL_DATETIME'] = 'Bestelldatum';
+$_ARRAYLANG['DETAIL_STATUS'] = 'Bestellstatus';
+$_ARRAYLANG['DETAIL_ZIP_CITY'] = 'PLZ / Ort';
+
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS'] = 'Status';
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_0'] = "pendent";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_1'] = "bestätigt";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_2'] = "gelöscht";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_3'] = "annuliert";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_4'] = "abgeschlossen";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_5'] = "bezahlt";
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_6'] = "versandt";
+
+$_ARRAYLANG['TXT_SHOP_GENDER_FEMALE'] = "Frau";
+$_ARRAYLANG['TXT_SHOP_GENDER_MALE'] = "Herr";
+$_ARRAYLANG['TXT_SHOP_GENDER_UNDEFINED'] = "Unbekannt";
+
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_PLEASE_CHOOSE'] = "-- Status --";
+$_ARRAYLANG['TXT_SHOP_ORDER_CUSTOMER_GROUP_PLEASE_CHOOSE'] = "-- Kundengruppe --";
+$_ARRAYLANG['TXT_CUSTOMER'] = "Kunde";
+$_ARRAYLANG['TXT_RESELLER'] = "Reseller";
+
+$_ARRAYLANG['TXT_SHOP_DETAIL_NETPRICE'] = 'Nettopreis';
+
+$_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'] = "Diese Aktion kann nicht rückgängig gemacht werden!";
+$_ARRAYLANG['TXT_CONFIRM_DELETE_ORDER'] = "Möchten Sie diese Bestellung(en) wirklich löschen?";
+$_ARRAYLANG['TXT_SHOP_CONFIRM_RESET_STOCK'] = 'Soll der Lagerbestand zurückgesetzt werden?';
+
+$_ARRAYLANG['TXT_PRODUCT_ALREADY_PRESENT'] = "Dieses Produkt ist bereits auf der Bestellungsliste vorhanden!";
+$_ARRAYLANG['TXT_WARNING_SHIPPER_WEIGHT'] = "Warnung: Das Gesamtgewicht der Bestellung ist zu gross für diese Versandart!";
+$_ARRAYLANG['TXT_TOTAL_WEIGHT'] = "Gesamtgewicht";
+$_ARRAYLANG['TXT_SEND_MAIL'] = "E-Mail \"Auftrag abgeschlossen\" an Kunde senden?";
+
+$_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'] = "Gutschein Code";
+
+$_ARRAYLANG['TXT_ORDER_WASNT_YET_EDITED'] = "Diese Bestellung wurde noch nicht bearbeitet.";
+
 $_ARRAYLANG['active'] = 'Aktiv';
 $_ARRAYLANG['parentCategory'] = 'Übergeordnete Rubrik';
 $_ARRAYLANG['picture'] = 'Kategoriebild';
@@ -73,7 +158,6 @@ $_ARRAYLANG['headerOn'] = 'Kopfzeile anzeigen';
 $_ARRAYLANG['footerOn'] = 'Fusszeile anzeigen';
 $_ARRAYLANG['lang'] = 'Sprache';
 $_ARRAYLANG['allCategories'] = 'Enthaltene Rubriken';
-$_ARRAYLANG['categories'] = ' ';
 $_ARRAYLANG['headerLeft'] = '';
 $_ARRAYLANG['footerLeft'] = '';
 $_ARRAYLANG['headerRight'] = '';
@@ -85,6 +169,11 @@ $_ARRAYLANG['symbol'] = 'Symbol';
 $_ARRAYLANG['rate'] = 'Kurs';
 $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
+
+$_ARRAYLANG['fee']  = 'Gebühr';
+$_ARRAYLANG['freeFrom']  = 'Gebührenfrei ab';
+$_ARRAYLANG['paymentProcessor']  = 'Dienst';
+$_ARRAYLANG['zones']  = 'Zone';
 
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "Das Gesamtgewicht der Bestellung übersteigt die verfügbaren Versandmöglichkeiten.";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Änderungen übernehmen";
@@ -1017,7 +1106,7 @@ $_ARRAYLANG['TXT_WARNING_SHIPPER_WEIGHT'] = "Warnung: Das Gesamtgewicht der Best
 $_ARRAYLANG['TXT_WEIGHT'] = "Gewicht";
 $_ARRAYLANG['TXT_WEIGHT_INVALID_IGNORED'] = "Ungültiges Gewicht; Änderung ignoriert!";
 $_ARRAYLANG['TXT_WHOIS'] = "Informationen zu dieser IP-Adresse abfragen";
-$_ARRAYLANG['TXT_WITH_HTTP'] = "mit http://";
+$_ARRAYLANG['TXT_WITH_HTTP'] = "(mit http://)";
 $_ARRAYLANG['TXT_YELLOWPAY_POSTFINANCE'] = "PostFinance";
 $_ARRAYLANG['TXT_ZIP_CITY'] = "PLZ / Ort";
 $_ARRAYLANG['TXT_ZONE'] = "Zone";
@@ -1112,4 +1201,51 @@ $_ARRAYLANG['product'] = 'Produkt';
 $_ARRAYLANG['payment'] = 'Bezahlung';
 $_ARRAYLANG['link'] = 'Link';
 $_ARRAYLANG['TXT_MODULE_SHOP'] = 'Shop';
+$_ARRAYLANG['discountprice'] = 'Sonderangebot';
+$_ARRAYLANG['discountActive'] = 'Aktiv';
+$_ARRAYLANG['articleGroup'] = 'Produktegruppe';
+$_ARRAYLANG['discountgroupCountName'] = 'Mengenrabattgruppe';
+$_ARRAYLANG['distribution'] = 'Produkttyp';
+$_ARRAYLANG['short'] = 'Kurzbeschreibung';
+$_ARRAYLANG['long'] = 'Beschreibung';
+$_ARRAYLANG['keys'] = 'Suchbegriffe';
+$_ARRAYLANG['manufacturer'] = 'Hersteller';
+$_ARRAYLANG['uri'] = 'Link zum Hersteller';
+$_ARRAYLANG['stock'] = 'Bestand';
+$_ARRAYLANG['stockVisible'] = 'Automatisch deaktivieren, wenn ausverkauft';
+$_ARRAYLANG['minimumOrderQuantity'] = 'Mindestbestellmenge';
+$_ARRAYLANG['relProductAttributes'] = 'Produktoptionen';
+$_ARRAYLANG['b2b'] = 'B2B';
+$_ARRAYLANG['b2c'] = 'B2C';
+$_ARRAYLANG['dateStart'] = 'Startdatum';
+$_ARRAYLANG['dateEnd'] = 'Enddatum';
+$_ARRAYLANG['userGroups'] = 'Benutzergruppen';
+$_ARRAYLANG['categories'] = 'Rubrik';
+$_ARRAYLANG['normalprice-detail'] = 'Preis Endkunde';
+$_ARRAYLANG['resellerprice-detail'] = 'Preis für Reseller';
+$_ARRAYLANG['vat-detail'] = 'Mehrwertsteuer Satz';
+$_ARRAYLANG['normalprice'] = 'Endkunde';
+$_ARRAYLANG['resellerprice'] = 'Reseller';
+$_ARRAYLANG['vat'] = 'MwSt';
 $_ARRAYLANG['TXT_MODULE_SHOP_ANY'] = 'beliebig';
+$_ARRAYLANG['showAllPendentOrders'] = 'Pendente Bestellungen anzeigen';
+$_ARRAYLANG['TXT_SHOP_TOO_FEW_ARGUMENTS'] = 'Zu wenig Argumente';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEM_WITH_OPTIONS'] = 'Dieses Produkt wurde mit den folgenden Optionen bestellt. Diese Optionen können nicht bearbeitet werden:<br/>';
+$_ARRAYLANG['productId'] = 'Produkt ID';
+$_ARRAYLANG['productName'] = 'Produkt Name';
+$_ARRAYLANG['productCode'] = 'Produkt Code';
+$_ARRAYLANG['vat'] = 'Mehrwertsteuer Satz';
+$_ARRAYLANG['totalWeight'] = ' ';
+$_ARRAYLANG['TXT_SHOP_ORDER_COULD_NOT_BE_FOUND'] = 'Bestellung konnte nicht gefunden werden';
+$_ARRAYLANG['TXT_SHOP_ORDER_ITEMS_ARE_ADDED_TO_SUM'] = 'Die Optionen werden zur Produktsumme dazugerechnet.';
+$_ARRAYLANG['sum'] = 'Total';
+
+$_ARRAYLANG['emptyField'] = ' ';
+$_ARRAYLANG['countryId'] = 'Land';
+$_ARRAYLANG['orderItem'] = 'Zugehörige Bestellung';
+$_ARRAYLANG['TXT_SHOP_ORDERITEM_LINK_TO_ORDER'] = 'Bestellung #%d';
+$_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Bestellung wurde gelöscht.';
+$_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Bestellungen wurden gelöscht.';
+$_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'Status der Bestellung wurde geändert.';
+$_ARRAYLANG['pdfTemplate'] = 'PDF Vorlage';
+$_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='Die Einträge wurden erfolgreich aktualisiert.';

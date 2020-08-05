@@ -533,7 +533,7 @@ class ShopCategory
         global $objDatabase;
 
         // Delete Products and images
-        if (Products::deleteByShopCategory($this->id, $flagDeleteImages) === false) {
+        if (\Cx\Modules\Shop\Controller\ProductController::deleteByShopCategory($this->id, $flagDeleteImages) === false) {
             return false;
         }
         // Delete subcategories

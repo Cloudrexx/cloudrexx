@@ -170,4 +170,14 @@ class Manufacturer extends \Cx\Model\Base\EntityBase implements \Gedmo\Translata
     {
         return $this->products;
     }
+
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
 }

@@ -253,4 +253,16 @@ class PaymentProcessor extends \Cx\Model\Base\EntityBase {
     {
         return $this->payments;
     }
+
+    /**
+     * Set name to String
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        global $_ARRAYLANG;
+
+        return $_ARRAYLANG['TXT_SHOP_PSP_' . strtoupper($this->name)];
+    }
 }

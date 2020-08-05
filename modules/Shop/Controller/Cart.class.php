@@ -172,11 +172,16 @@ class Cart
             return;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         $outOfStockProducts = array();
         foreach (Cart::get_products_array() as $product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if ($objProduct && !$objProduct->getStatus()) {
-                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->name());
+                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->getName());
             }
         }
 
@@ -330,6 +335,17 @@ class Cart
                 break;
             }
 //DBG::log("Cart::add_product(): No match!");
+        }
+        // coupons are always a new order item. The reason for this is that
+        // we want to link coupons with the order items that created it.
+        if (!$new) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $productRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+            $product = $productRepo->find($arrNewProduct['id']);
+            if ($product->getDistribution() == 'coupon') {
+                $new = true;
+            }
         }
 //DBG::log("Cart::add_product(): Comparing done, cart ID $cart_id");
         if ($new) {
@@ -493,14 +509,20 @@ class Cart
         // will contain all VAT rates of the products currently in cart
         $usedVatRates = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         // Loop 1: Collect necessary Product data
         $products = $_SESSION['shop']['cart']['items']->toArray();
         foreach ($products as $cart_id => &$product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if (!$objProduct) {
                 unset($products[$cart_id]);
                 continue;
             }
+
 
             // Check minimum order quantity, when set
             // Do not add error message if it's an AJAX request
@@ -510,16 +532,16 @@ class Cart
                     strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest'
                 ) &&
                 $product['quantity'] != 0 &&
-                $product['quantity'] < $objProduct->minimum_order_quantity()
+                $product['quantity'] < $objProduct->getMinimumOrderQuantity()
             ) {
-                \Message::error($objProduct->name().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
+                \Message::error($objProduct->getName().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
             }
 
             // Limit Products in the cart to the stock available if the
             // stock_visibility is enabled.
-            if ($objProduct->stock_visible()
-             && $product['quantity'] > $objProduct->stock()) {
-                $product['quantity'] = $objProduct->stock();
+            if ($objProduct->getStockVisible()
+             && $product['quantity'] > $objProduct->getStock()) {
+                $product['quantity'] = $objProduct->getStock();
             }
 
             // Remove Products with quatities of zero or less
@@ -540,8 +562,8 @@ class Cart
                 $quantity
             );
             $price = $itemprice * $quantity;
-            $handler = $objProduct->distribution();
-            $itemweight = ($handler == 'delivery' ? $objProduct->weight() : 0);
+            $handler = $objProduct->getDistribution();
+            $itemweight = ($handler == 'delivery' ? $objProduct->getWeight() : 0);
 
             // Requires shipment if the distribution type is 'delivery'
             if ($handler == 'delivery') {
@@ -549,7 +571,7 @@ class Cart
             }
             $weight = $itemweight * $quantity;
 
-            $vat_rate = Vat::getRate($objProduct->vat_id());
+            $vat_rate = Vat::getRate($objProduct->getVatId());
             $total_price += $price;
             $total_weight += $weight;
 
@@ -559,16 +581,16 @@ class Cart
             }
 
             self::$products[$cart_id] = array(
-                'id' => $objProduct->id(),
-                'product_id' => $objProduct->code(),
+                'id' => $objProduct->getId(),
+                'product_id' => $objProduct->getCode(),
                 'cart_id' => $cart_id,
                 'title' =>
                     (empty($_GET['remoteJs'])
-                      ? $objProduct->name()
+                      ? $objProduct->getName()
                       : htmlspecialchars(
                           (strtolower(CONTREXX_CHARSET) == 'utf-8'
-                            ? $objProduct->name()
-                            : utf8_encode($objProduct->name())),
+                            ? $objProduct->getName()
+                            : utf8_encode($objProduct->getName())),
                           ENT_QUOTES, CONTREXX_CHARSET)),
                 'options' => $product['options'],
                 'options_count' => count($product['options']),
@@ -581,10 +603,10 @@ class Cart
                 'vat_rate' => $vat_rate,
                 'itemweight' => $itemweight, // in grams!
                 'weight' => $weight,
-                'group_id' => $objProduct->group_id(),
-                'article_id' => $objProduct->article_id(),
-                'product_images' => $objProduct->pictures(),
-                'minimum_order_quantity' => $objProduct->minimum_order_quantity(),
+                'group_id' => $objProduct->getGroupId(),
+                'article_id' => $objProduct->getArticleId(),
+                'product_images' => $objProduct->getPicture(),
+                'minimum_order_quantity' => $objProduct->getMinimumOrderQuantity(),
             );
         }
 
@@ -597,7 +619,6 @@ class Cart
         $objCoupon = null;
         $hasCoupon = false;
         $discount_amount = 0;
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
         );
@@ -910,7 +931,7 @@ die("Cart::view(): ERROR: No template");
                 );
 
                 // product image
-                $arrProductImg = Products::get_image_array_from_base64($arrProduct['product_images']);
+                $arrProductImg = \Cx\Modules\Shop\Controller\ProductController::get_image_array_from_base64($arrProduct['product_images']);
                 $shopImagesWebPath = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteImagesWebPath() . '/Shop/';
                 $thumbnailPath = $shopImagesWebPath.ShopLibrary::noPictureName;
                 foreach($arrProductImg as $productImg) {
@@ -1148,141 +1169,6 @@ die("Cart::view(): ERROR: No template");
             $objTemplate->setVariable(
                 'TXT_NEXT', $_ARRAYLANG['TXT_NEXT']);
         }
-    }
-
-
-// TODO: implement/test this
-    /**
-     * Restores the Cart from the Order ID given
-     *
-     * Redirects to the login when nobody is logged in.
-     * Redirects to the history overview when the Order cannot be loaded,
-     * or when it does not belong to the current Customer.
-     * When $editable is true, redirects to the detail view of the first
-     * Item for editing.  Editing will be disabled otherwise.
-     * @global  array   $_ARRAYLANG
-     * @param   integer $order_id   The Order ID
-     * @param   boolean $editable   Items in the Cart are editable iff true
-     */
-    static function from_order($order_id, $editable=false)
-    {
-        global $_ARRAYLANG;
-
-        $objCustomer = Shop::customer();
-        if (!$objCustomer) {
-            \Message::information($_ARRAYLANG['TXT_SHOP_ORDER_LOGIN_TO_REPEAT']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'login').
-                '?redirect='.base64_encode(
-                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart').
-                    '?order_id='.$order_id));
-        }
-        $customer_id = $objCustomer->getId();
-        $order = Order::getById($order_id);
-        if (!$order || $order->customer_id() != $customer_id) {
-            \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_INVALID_ID']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'history'));
-        }
-// Optional!
-        self::destroy();
-        $_SESSION['shop']['shipperId'] = $order->shipment_id();
-        $_SESSION['shop']['paymentId'] = $order->payment_id();
-        $order_attributes = $order->getOptionArray();
-        $count = null;
-        $arrAttributes = Attributes::getArray($count, 0, -1, null, array());
-        // Find an Attribute and option IDs for the reprint type
-        $attribute_id_reprint = $option_id_reprint = NULL;
-        if (!$editable) {
-//DBG::log("Cart::from_order(): Checking for reprint...");
-            foreach ($arrAttributes as $attribute_id => $objAttribute) {
-                if ($objAttribute->getType() == Attribute::TYPE_EZS_REPRINT) {
-//DBG::log("Cart::from_order(): TYPE reprint");
-                    $options = $objAttribute->getOptionArray();
-                    if ($options) {
-                        $option_id_reprint = current(array_keys($options));
-                        $attribute_id_reprint = $attribute_id;
-//DBG::log("Cart::from_order(): Found reprint Attribute $attribute_id_reprint, option $option_id_reprint");
-                        break;
-                    }
-                }
-            }
-        }
-        foreach ($order->getItems() as $item) {
-            $item_id = $item['item_id'];
-            $attributes = $order_attributes[$item_id];
-            $options = array();
-            foreach ($attributes as $attribute_id => $attribute) {
-//                foreach (array_keys($attribute['options']) as $option_id) {
-                foreach ($attribute['options'] as $option_id => $option) {
-//DBG::log("Cart::from_order(): Option: ".var_export($option, true));
-                    switch ($arrAttributes[$attribute_id]->getType()) {
-                        case Attribute::TYPE_TEXT_OPTIONAL:
-                        case Attribute::TYPE_TEXT_MANDATORY:
-                        case Attribute::TYPE_TEXTAREA_OPTIONAL:
-                        case Attribute::TYPE_TEXTAREA_MANDATORY:
-                        case Attribute::TYPE_EMAIL_OPTIONAL:
-                        case Attribute::TYPE_EMAIL_MANDATORY:
-                        case Attribute::TYPE_URL_OPTIONAL:
-                        case Attribute::TYPE_URL_MANDATORY:
-                        case Attribute::TYPE_DATE_OPTIONAL:
-                        case Attribute::TYPE_DATE_MANDATORY:
-                        case Attribute::TYPE_NUMBER_INT_OPTIONAL:
-                        case Attribute::TYPE_NUMBER_INT_MANDATORY:
-                        case Attribute::TYPE_NUMBER_FLOAT_OPTIONAL:
-                        case Attribute::TYPE_NUMBER_FLOAT_MANDATORY:
-                        case Attribute::TYPE_EZS_ACCOUNT_3:
-                        case Attribute::TYPE_EZS_ACCOUNT_4:
-                        case Attribute::TYPE_EZS_IBAN:
-                        case Attribute::TYPE_EZS_IN_FAVOR_OF:
-                        case Attribute::TYPE_EZS_REFERENCE:
-                        case Attribute::TYPE_EZS_CLEARING:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_6:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_2L:
-                        case Attribute::TYPE_EZS_DEPOSIT_FOR_2H:
-                        case Attribute::TYPE_EZS_PURPOSE_35:
-                        case Attribute::TYPE_EZS_PURPOSE_50:
-                            $options[$attribute_id][] = $option['name'];
-                            break;
-                        case Attribute::TYPE_EZS_REDPLATE:
-                        case Attribute::TYPE_EZS_CONFIRMATION:
-                            if (!$attribute_id_reprint) {
-//DBG::log("Cart::from_order(): No reprint, adding option {$option['name']}");
-                                $options[$attribute_id][] = $option_id;
-                            }
-                            break;
-                        case Attribute::TYPE_EZS_REPRINT:
-                            // Automatically added below when appropriate
-                            break;
-                        default:
-//                        case Attribute::TYPE_EZS_ZEWOLOGO:
-//                        case Attribute::TYPE_EZS_EXPRESS:
-//                        case Attribute::TYPE_EZS_PURPOSE_BOLD:
-                            $options[$attribute_id][] = $option_id;
-                            break;
-                    }
-//DBG::log("Cart::from_order(): Added option: ".var_export($options, true));
-                }
-            }
-            if ($attribute_id_reprint) {
-                $options[$attribute_id_reprint][] = $option_id_reprint;
-//DBG::log("Cart::from_order(): Item has reprint Attribute, added $attribute_id_reprint => ($option_id_reprint)");
-            }
-            self::add_product(array(
-                'id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'options' => $options,
-            ));
-        }
-        if ($attribute_id_reprint) {
-            // Mark the Cart as being unchanged since the restore, so the
-            // additional cost for some Attributes won't be added again.
-            self::restored_order_id($order_id);
-        }
-        \Message::information($_ARRAYLANG['TXT_SHOP_ORDER_RESTORED']);
-// Enable for production
-        \Cx\Core\Csrf\Controller\Csrf::redirect(
-            \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart'));
     }
 
 

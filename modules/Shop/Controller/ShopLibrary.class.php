@@ -302,8 +302,12 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
      */
     static function sendConfirmationMail($order_id, $create_accounts=true)
     {
-        $arrSubstitution =
-            Orders::getSubstitutionArray($order_id, $create_accounts);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
+
+        $arrSubstitution = $orderRepo->getSubstitutionArray($order_id, $create_accounts);
         $customer_id = $arrSubstitution['CUSTOMER_ID'];
         $objCustomer = Customer::getById($customer_id);
         if (!$objCustomer) {
@@ -330,7 +334,7 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
             'to' =>
                 $arrSubstitution['CUSTOMER_EMAIL'].','.
                 \Cx\Core\Setting\Controller\Setting::getValue('email_confirmation','Shop'),
-            'substitution' => &$arrSubstitution,
+            'substitution' => $arrSubstitution,
         );
 //DBG::log("sendConfirmationMail($order_id, $create_accounts): Template: ".var_export($arrMailTemplate, true));
 //DBG::log("sendConfirmationMail($order_id, $create_accounts): Substitution: ".var_export($arrSubstitution, true));
@@ -345,6 +349,45 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
 //        //$file->makeWritable(); // Fails on win32
 //        $file->write($template);
 ///
+        // Cache order item substitutions as we parse PDFs for individual order items
+        $orderItemSubstitutions = array();
+        foreach ($arrSubstitution['ORDER_ITEM'] as $orderItemSubstitution) {
+            $orderItemSubstitutions[$orderItemSubstitution['PRODUCT_ID']] =
+                $orderItemSubstitution;
+        }
+        $arrSubstitution['ORDER_ITEM'] = array();
+        // loop over products
+        $i = 1;
+        $objOrder = $orderRepo->find($order_id);
+        foreach ($objOrder->getOrderItems() as $orderItem) {
+            // generate pdfs of products
+            if (!$orderItem->getProduct()->getPdfTemplate()) {
+                continue;
+            }
+            $arrSubstitution['ORDER_ITEM'] = array(
+                $orderItemSubstitutions[$orderItem->getProduct()->getId()]
+            );
+            // Buffer and reset the filename in order to allow us to set the
+            // filename manually. If we don't do this the current time is used
+            // which leads to the same file being overwritten if we generate
+            // multiple PDFs quickly.
+            $pdfName = $orderItem->getProduct()->getPdfTemplate()->getFileName();
+            $orderItem->getProduct()->getPdfTemplate()->setFileName('');
+            $productPdf = $cx->getComponent('Pdf')->generatePDF(
+                $orderItem->getProduct()->getPdfTemplate()->getId(),
+                $arrSubstitution,
+                $i . '_' . $pdfName
+            );
+            // restore name so it is still there in the next iteration and
+            // does not get persisted.
+            $orderItem->getProduct()->getPdfTemplate()->setFileName($pdfName);
+            // add pdfs to $arrMailTemplate['attachments']
+            if (!isset($arrMailTemplate['attachments'])) {
+                $arrMailTemplate['attachments'] = array();
+            }
+            $arrMailTemplate['attachments'][$productPdf['filePath']] = $pdfName . $i;
+            $i++;
+        }
         if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) return false;
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }

@@ -48,6 +48,9 @@ namespace Cx\Modules\Shop\Controller;
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController
 {
+    // Order Id to edit
+    protected $orderId = 0;
+
     /**
      * This is called by the ComponentController and does all the repeating work
      *
@@ -71,20 +74,9 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $tpl = $splitAct[1];
 
         switch($act)  {
-            case 'Order':
-            case 'editorder':
-            case 'orderdetails':
-            case 'delorder':
-            case 'orders':
             case 'Category':
             case 'categories':
             case 'category_edit':
-            case 'Product':
-            case 'products':
-            case 'activate_products':
-            case 'deactivate_products':
-            case 'delProduct':
-            case 'deleteProduct':
             case 'Customer':
             case 'delcustomer':
             case 'customer_activate':
@@ -99,51 +91,30 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Setting':
             case 'settings':
             case 'Vat':
-            case 'Payment':
             case 'Shipper':
             case 'Relcountry':
             case 'Zone':
             case 'Mail':
             case 'mailtemplate_overview':
             case 'mailtemplate_edit':
-            case '':
                 $mappedNavItems = array(
-                    'Order' => 'orders',
                     'Category' => 'categories',
-                    'Product' => 'products',
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
-                    'DiscountgroupCountName' => 'discounts',
-                    'ArticleGroup' => 'groups',
                     'Customer' => 'customers',
-                    'CustomerGroup' => 'groups',
-                    'RelDiscountGroup' => 'discounts',
                     'Statistic' => 'statistics',
                     'Import' => 'import',
                     'Setting' => 'settings',
                     'Vat' => 'vat',
-                    'Payment' => 'payment',
                     'Shipper' => 'shipment',
                     'RelCountry' => 'countries',
                     'Zone' => 'zones',
                     'Mail' => 'mail',
-                    '' => 'orders'
                 );
                 $mappedCmdItems = array(
-                    'editorder' => 'Order',
-                    'orderdetails' => 'Order',
-                    'delorder' => 'Order',
-                    'orders' => 'Order',
                     'categories' => 'Category',
                     'category_edit' => 'Category',
-                    'products' => 'Product',
-                    'activate_products' => 'Product',
-                    'deactivate_products' => 'Product',
-                    'delProduct' => 'Product',
-                    'deleteProduct' => 'Product',
                     'manage' => 'Manage',
-                    'groups' => 'ArticleGroup',
-                    'discounts' => 'DiscountgroupCountName',
                     'delcustomer' => 'Customer',
                     'customer_activate' => 'Customer',
                     'customer_deactivate' => 'Customer',
@@ -258,11 +229,12 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Vat',
                     'Currency',
                     'Payment',
+                    'PaymentProcessor',
                     'Shipper',
                     'RelCountry',
                     'Zone',
                     'Mail',
-                    'DiscountCoupon'
+                    'DiscountCoupon',
                 ),
                 'translatable' => true
             ),
@@ -292,16 +264,26 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '')
     {
         global $_ARRAYLANG;
+
         $options = parent::getViewGeneratorOptions(
             $entityClassName,
             $dataSetIdentifier
         );
 
         switch ($entityClassName) {
+            case 'Cx\Modules\Shop\Model\Entity\Order':
+                $options = $this->getSystemComponentController()->getController(
+                    'Order'
+                )->getViewGeneratorOptions($options);
+
+                break;
             case 'Cx\Modules\Shop\Model\Entity\Manufacturer':
                 $options = $this->getSystemComponentController()->getController(
                     'Manufacturer'
                 )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier != $entityClassName) {
+                    break;
+                }
                 $options = $this->normalDelete(
                     $_ARRAYLANG['TXT_SHOP_CONFIRM_DELETE_MANUFACTURER'],
                     $options
@@ -311,6 +293,9 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 $options = $this->getSystemComponentController()->getController(
                     'Category'
                 )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier != $entityClassName) {
+                    break;
+                }
                 // Delete event
                 $options = $this->normalDelete(
                     $_ARRAYLANG['TXT_CONFIRM_DELETE_SHOP_CATEGORIES'],
@@ -327,7 +312,71 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Currency'
                 )->getViewGeneratorOptions($options);
                 break;
+            case 'Cx\Modules\Shop\Model\Entity\ArticleGroup':
+                $options['functions']['editable'] = true;
+                $options['functions']['paging'] = false;
+                $options['functions']['sorting'] = false;
+                $options['fields'] = array(
+                    'name' => array(
+                        'editable' => true,
+                    ),
+                    'relDiscountGroups' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                    'products' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                );
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\CustomerGroup':
+                $options['functions']['editable'] = true;
+                $options['functions']['paging'] = false;
+                $options['functions']['sorting'] = false;
+                $options['fields'] = array(
+                    'id' => array(
+                        'showOverview' => false,
+                    ),
+                    'name' => array(
+                        'editable' => true,
+                    ),
+                    'relDiscountGroups' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                );
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName':
+                $options = $this->getSystemComponentController()->getController(
+                    'DiscountgroupCountName'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\Payment':
+                $options = $this->getSystemComponentController()->getController(
+                    'Payment'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\PaymentProcessor':
+                $options = $this->getSystemComponentController()->getController(
+                    'PaymentProcessor'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\Product':
+                $options = $this->getSystemComponentController()->getController(
+                    'Product'
+                )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier == $entityClassName) {
+                    $options = $this->setMultiActionsForProduct($options);
+                }
+                break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
+                if ($entityClassName == $dataSetIdentifier) {
+                    \JS::registerJS(
+                        $this->cx->getModuleFolderName()
+                        . '/Shop/View/Script/DiscountCoupon.js'
+                    );
+                }
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountCoupon'
                 )->getViewGeneratorOptions($options);
@@ -371,5 +420,144 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         );
 
         return $options;
+    }
+
+    /**
+     * Add multi actions to ViewGenerator options for products
+     *
+     * @param array $options ViewGenerator options
+     *
+     * @return array updated array with ViewGenerator options
+     */
+    protected function setMultiActionsForProduct($options)
+    {
+        global $_ARRAYLANG;
+
+        $options = $this->normalDelete(
+            $_ARRAYLANG['TXT_CONFIRM_DELETE_PRODUCT'],
+            $options
+        );
+
+        $options['multiActions']['activate'] = array(
+            'title' => $_ARRAYLANG['TXT_SHOP_ACTIVATE'],
+            'jsEvent' => 'activate:shopActivate'
+        );
+
+        $options['multiActions']['deactivate'] = array(
+            'title' => $_ARRAYLANG['TXT_SHOP_DEACTIVATE'],
+            'jsEvent' => 'deactivate:shopDeactivate'
+        );
+
+        return $options;
+    }
+
+    /**
+     * Returns the HTML dropdown menu options with all of the
+     * article group names, plus a null option prepended
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupArticle($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $articleGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
+
+        $arrArticleGroupName = array();
+        foreach ($articleGroups as $articleGroup) {
+            $arrArticleGroupName[
+            $articleGroup->getId()
+            ] = $articleGroup->getName();
+        }
+        return \Html::getOptions(
+            array(0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'], )
+            + $arrArticleGroupName, $selectedId);
+    }
+
+    /**
+     * Returns the HTML dropdown menu options with all of the
+     * customer group names
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupCustomer($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $customerGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->findAll();
+
+        $arrGroupname = array();
+        foreach ($customerGroups as $customerGroup) {
+            $arrGroupname[$customerGroup->getId()] = $customerGroup->getName();
+        }
+
+        return \Html::getOptions(
+            array(
+                0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE']
+            ) + $arrGroupname, $selectedId);
+    }
+
+    /**
+     * Load custom view for order detail view
+     *
+     * @param \Cx\Core\Html\Sigma $template Backend template for this page
+     * @param array $cmd Supplied CMD
+     * @param bool $isSingle if page is single
+     */
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
+    {
+        // Last entry will be empty if we're on a nav-entry without children
+        // or on the first child of a nav-entry.
+        // The following code works fine as long as we don't want an entity
+        // view on the first child of a nav-entry or introduce a third
+        // nav-level. If we want either, we need to refactor getCommands() and
+        // parseNavigation().
+        $entityName = '';
+        if (!empty($cmd) && !empty($cmd[count($cmd) - 1])) {
+            $entityName = $cmd[count($cmd) - 1];
+        } else if (!empty($cmd)) {
+            $entityName = $cmd[0];
+        }
+
+        // Parse entity view generation pages
+        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\'
+            . $entityName;
+        if (
+            $entityName == 'Order' &&
+            $this->cx->getRequest()->hasParam('showid')
+        ) {
+            $options = parent::getViewGeneratorOptions($entityClassName);
+
+            return $this->getSystemComponentController()->getController(
+                'Order'
+            )->parseOrderDetailPage($template, $entityClassName, $options);
+        } else if (
+            $entityName == 'RelDiscountGroup'
+        ) {
+            $options = parent::getViewGeneratorOptions($entityClassName);
+
+            return $this->getSystemComponentController()->getController(
+                'DiscountGroup'
+            )->parsePage($template, $options);
+        }
+
+        return parent::parsePage($template, $cmd,$isSingle);
+
     }
 }

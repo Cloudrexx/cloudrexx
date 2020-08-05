@@ -1058,6 +1058,28 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function __toString()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+
+        return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getJsArray($groupCustomerId = 0, $isReseller = false)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getJsArray', array($groupCustomerId, $isReseller));
+
+        return parent::getJsArray($groupCustomerId, $isReseller);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -1119,17 +1141,6 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
-
-        return parent::__toString();
     }
 
 }

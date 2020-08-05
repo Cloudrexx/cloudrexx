@@ -97,6 +97,7 @@ class JsonDiscountCouponController
             'getTypeCheckboxes',
             'getCouponLink',
             'showDiscountAmount',
+            'parseOrderItemField',
         );
     }
 
@@ -769,5 +770,31 @@ class JsonDiscountCouponController
             return $params['data'];
         }
         return $coupon->getUsedAmount() . ' / ' . $params['data'];
+    }
+
+    /**
+     * Value callback for OrderItem field
+     *
+     * @param array $params contains the parameters of the callback function
+     * @return string Link to order or translated "none"
+     */
+    public function parseOrderItemField($params) {
+        global $_ARRAYLANG;
+
+        if (empty($params['fieldvalue'])) {
+            return $_ARRAYLANG['TXT_CORE_NONE'];
+        }
+        $fieldvalue = $params['fieldvalue'];
+        if (!$fieldvalue->getOrder()) {
+            return $_ARRAYLANG['TXT_CORE_NONE'];
+        }
+        return '<a href="' . \Cx\Core\Html\Controller\ViewGenerator::getVgEditUrl(
+            0,
+            $fieldvalue->getOrder()->getId(),
+            \Cx\Core\Routing\Url::fromBackend('Shop', 'Order')
+        ) . '">' . sprintf(
+            $_ARRAYLANG['TXT_SHOP_ORDERITEM_LINK_TO_ORDER'],
+            $fieldvalue->getOrder()->getId()
+        ) . '</a>';
     }
 }

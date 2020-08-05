@@ -365,6 +365,28 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function __toString()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+
+        return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getJsArray()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getJsArray', array());
+
+        return parent::getJsArray();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -426,17 +448,6 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
-
-        return parent::__toString();
     }
 
 }
