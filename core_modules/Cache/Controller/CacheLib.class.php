@@ -204,14 +204,17 @@ class CacheLib
                 },
             ),
             'HTTP_COOKIE' => array(
-                // This only supports PHPSESSID instead of full cookie support
-                // as specified by W3C
-                'PHPSESSID' => function() {
-                    $sessId = 0;
-                    if (!empty($_COOKIE[session_name()])) {
-                        $sessId = $_COOKIE[session_name()];
+                // This only supports the session cookie instead of full cookie
+                // support as specified by W3C
+                \Cx\Core\Session\Model\Entity\Session::getSessionName() => function() {
+                    try {
+                        // note: in case no active session exists, it will
+                        // throw an exception
+                        return \Cx\Core\Session\Model\Entity\Session::getValidIdFromRequest();
+                    } catch (\Exception $e) {
+                        // use pseudo-sessionid '0' in no active session exists
+                        return 0;
                     }
-                    return $sessId;
                 },
             ),
             // HTTP_ACCEPT_LANGUAGE

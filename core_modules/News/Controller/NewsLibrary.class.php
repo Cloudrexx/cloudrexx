@@ -3483,9 +3483,9 @@ EOF;
         );
 
         // Get Headlines placeholders
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 0; $i <= 20; $i++) {
             $id = '';
-            if ($i > 1) {
+            if ($i > 0) {
                 $id = $i;
             }
             $placeholders[] = 'HEADLINES' . $id . '_FILE';

@@ -141,9 +141,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         $widgetController = $this->getComponent('Widget');
         // Get Headlines
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 0; $i <= 20; $i++) {
             $id = '';
-            if ($i > 1) {
+            if ($i > 0) {
                 $id = $i;
             }
             $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(

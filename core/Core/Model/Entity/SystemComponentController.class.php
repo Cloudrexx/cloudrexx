@@ -325,7 +325,8 @@ class SystemComponentController extends Controller {
      */
     public function hasAccessToExecuteCommand($command, $arguments) {
         $commands = $this->getCommandsForCommandMode();
-        $method = (php_sapi_name() === 'cli') ? array('cli') : null;
+        $isCliCall = $this->cx->isCliCall();
+        $method = $isCliCall ? array('cli') : null;
 
         $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
             array(),

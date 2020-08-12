@@ -104,7 +104,7 @@ class ViewGenerator {
         $this->viewId = static::$increment++;
         try {
             \JS::registerCSS(
-                $this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css'
+                substr($this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css', 1)
             );
             $entityWithNS = preg_replace(
                 '/^\\\/',
@@ -868,7 +868,10 @@ class ViewGenerator {
         //If 'sorting' is applied and sorting field is not equal to
         //'sortBy' => 'field' then disable the row sorting.
         $orderParam = $this->getVgParam($_GET['order']);
-        if (!isset($orderParam[$sortField])) {
+        if (empty($orderParam)) {
+            $orderParam = $this->options['functions']['order'];
+        }
+        if (count($orderParam) != 1 || current(array_keys($orderParam)) != $sortField) {
             return;
         }
 

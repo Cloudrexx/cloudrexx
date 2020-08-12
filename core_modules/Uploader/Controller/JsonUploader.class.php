@@ -100,7 +100,11 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
     {
         global $_ARRAYLANG;
         $id = null;
-        if (isset($params['get']['id']) && preg_match('/^[a-z0-9]+$/i', $params['get']['id'])
+        if (
+            isset($params['get']['id']) &&
+            \Cx\Core_Modules\Uploader\Model\Entity\Uploader::isValidId(
+                $params['get']['id']
+            )
         ) {
             $id = ($params['get']['id']);
             $uploadedFileCount = isset($params['get']['uploadedFileCount']) ? intval($params['get']['uploadedFileCount']) : 0;
@@ -143,6 +147,11 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
             )
         );
 
+        // abort in case the upload failed
+        if (isset($uploader['error'])) {
+            throw new UploaderException(UploaderController::getErrorCode());
+        }
+
         $fileLocation = array(
             $uploader['path'],
             str_replace($this->cx->getWebsitePath(), '', $uploader['path'])
@@ -150,7 +159,14 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
 
 
         $response = new UploadResponse();
-        if (isset($_SESSION['uploader']['handlers'][$id]['callback']) && $uploader !== true) {
+
+        // execute callback once upload is finished
+        if (
+            isset($_SESSION['uploader']['handlers'][$id]['callback']) &&
+            // if $uploader is TRUE, then we are still in the process of
+            // uploading chunks
+            $uploader !== true
+        ) {
 
             /**
              * @var $callback RecursiveArrayAccess
@@ -173,22 +189,24 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
                 $data = $data->toArray();
             }
 
-            $filePath = dirname( $uploader['path']);
+            $filePath = dirname($uploader['path']);
             if (!is_array($callback)) {
                 $class = new \ReflectionClass($callback);
                 if ($class->implementsInterface(
                     '\Cx\Core_Modules\Uploader\Model\UploadCallbackInterface'
-                )
-                ) {
+                )) {
                     /**
                      * @var \Cx\Core_Modules\Uploader\Model\UploadCallbackInterface $callbackInstance
                      */
                     $callbackInstance = $class->newInstance($this->cx);
                     $fileLocation = $callbackInstance->uploadFinished(
-                        $filePath, str_replace(
-                            $this->cx->getWebsiteTempPath(), $this->cx->getWebsiteTempWebPath(),
+                        $filePath,
+                        str_replace(
+                            $this->cx->getWebsiteTempPath(),
+                            $this->cx->getWebsiteTempWebPath(),
                             $filePath
-                        ), $data,
+                        ),
+                        $data,
                         $id,
                         $uploader,
                         $response
@@ -196,10 +214,17 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
                 }
             } else {
                 $fileLocation = call_user_func(
-                    array($callback[1], $callback[2]), $filePath,
+                    array($callback[1], $callback[2]),
+                    $filePath,
                     str_replace(
-                        $this->cx->getWebsiteTempPath(), $this->cx->getWebsiteTempWebPath(), $filePath
-                    ), $data, $id, $uploader, $response
+                        $this->cx->getWebsiteTempPath(),
+                        $this->cx->getWebsiteTempWebPath(),
+                        $filePath
+                    ),
+                    $data,
+                    $id,
+                    $uploader,
+                    $response
                 );
             }
 
@@ -232,12 +257,12 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
         }
 
         if ($response->getWorstStatus()) {
-                $result = $response->getResponse();
-                return array(
-                    'OK' => 0,
-                    'file' => $fileLocation[1],
-                    'response' => $result['messages']
-                );
+            $result = $response->getResponse();
+            return array(
+                'OK' => 0,
+                'file' => $fileLocation[1],
+                'response' => $result['messages']
+            );
         }
         if (isset($uploader['error'])) {
             throw new UploaderException(UploaderController::getErrorCode());

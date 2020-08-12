@@ -40,15 +40,6 @@ function shopProductsIsChecked(fieldName)
   }
   return false;
 }
-!(function($jq) {
-    $jq(function(){
-        $jq('.schedule_status').each(function(){
-            if ($jq(this).hasClass('scheduled')) {
-                $jq(this).attr('href', $jq(this).attr('href') +'#content4');
-            }
-        });
-    });
-})(cx.jQuery);
 // ]]>
 </script>
 <form name="product_search" method="get" action="index.php">
@@ -120,7 +111,7 @@ function shopProductsIsChecked(fieldName)
         <input type="hidden" name="product_id[{SHOP_PRODUCT_ID}]" value="{SHOP_PRODUCT_ID}" /></td>
       <td class="a_center">
           <a class="schedule_status {SHOP_PRODUCT_STATUS_CLASS}"
-             href="index.php?cmd=Shop{MODULE_INDEX}&amp;act=products&amp;tpl=manage&amp;id={SHOP_PRODUCT_ID}">
+             href="index.php?cmd=Shop{MODULE_INDEX}&amp;act=products&amp;tpl=manage&amp;id={SHOP_PRODUCT_ID}#content4">
             &nbsp;
           </a>
       </td>

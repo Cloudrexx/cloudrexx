@@ -128,6 +128,9 @@ class BackendTable extends HTML_Table {
             $sortOrder  = !empty($sortBy) && isset($sortBy['sortOrder'])
                           ? $sortBy['sortOrder']
                           : '';
+            $sortOrder  = is_int($sortOrder)
+                          ? ($sortOrder == SORT_DESC ? 'DESC' : 'ASC')
+                          : $sortOrder;
             $pagingPos  = !empty($sortBy) && isset($sortBy['pagingPosition'])
                           ? $sortBy['pagingPosition']
                           : '';

@@ -157,4 +157,21 @@ class Distribution
         return $menuoptions;
     }
 
+    /**
+     * Get a short description of each distribution type.
+     *
+     * @global  array   $_ARRAYLANG
+     * @return string
+     */
+    static function getDistributionDescription() {
+        global $_ARRAYLANG;
+
+        $desc= array();
+        foreach (self::$arrDistributionTypes as $type) {
+            $desc[] = '<strong>' . $_ARRAYLANG['TXT_DISTRIBUTION_'.strtoupper($type)] . '</strong>' .
+                '<br />' . $_ARRAYLANG['TXT_DISTRIBUTION_'.strtoupper($type).'_DESC'];
+        }
+
+        return join('<br /><br />', $desc);
+    }
 }

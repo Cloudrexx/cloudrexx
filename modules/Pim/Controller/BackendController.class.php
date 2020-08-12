@@ -51,13 +51,16 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      */
     protected $template;
 
+    public function showOverviewPage() {
+        return true;
+    }
 
     /**
      * Returns a list of available commands (?act=XY)
      * @return array List of acts
      */
     public function getCommands() {
-        return array('Price');
+        return array('Price', 'VatRate');
     }
 
     /**
@@ -85,23 +88,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         if ($act != '') {
             parent::parsePage($template, $cmd, $isSingle);
         } else {
-            $this->connectToController('Default');
+            $this->parseEntityClassPage($template, 'Cx\Modules\Pim\Model\Entity\Product', 'Product');
         }
 
         \Message::show();
-    }
-
-    /**
-     * Trigger a controller according the act param from the url
-     *
-     * @param   string $act
-     */
-    public function connectToController($act)
-    {
-        $act = ucfirst($act);
-        $controller = $this->getSystemComponentController()->getController($act);
-        $controller->parsePage($this->template, array());
-
     }
 
     /**
@@ -125,6 +115,34 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             $header = $_ARRAYLANG[$langVarName];
         }
         switch ($entityClassName) {
+            case 'Cx\Modules\Pim\Model\Entity\VatRate':
+                return array(
+                    'header' => $_ARRAYLANG['TXT_MODULE_PIM_ACT_VATRATE'],
+                    'fields' => array(
+                        'products'    => array(
+                            'showOverview' => false,
+                        ),
+                        'rate'  => array(
+                            'table' => array(
+                                'parse' => function($value) {
+                                    if (empty($value)) {
+                                        return;
+                                    }
+                                    return $value . '%';
+                                }
+                            )
+                        )
+                    ),
+                    'functions' => array(
+                        'add'       => true,
+                        'edit'      => true,
+                        'delete'    => true,
+                        'sorting'   => true,
+                        'paging'    => true,
+                        'filtering' => false,
+                    ),
+                );
+                break;
             case 'Cx\Modules\Pim\Model\Entity\Product':
                 return array(
                     'header'    => $_ARRAYLANG['TXT_MODULE_PIM_ACT_DEFAULT'],
@@ -135,7 +153,38 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         'sorting'   => true,
                         'paging'    => true,
                         'filtering' => false,
-                    )
+                    ),
+                    'fields'    => array(
+                        'vatRate'  => array(
+                            'table' => array(
+                                'parse' => function($value) {
+                                    if (empty($value)) {
+                                        return;
+                                    }
+                                    $vatRate = $this->cx->getDb()->getEntityManager()->getRepository('Cx\Modules\Pim\Model\Entity\VatRate')->findOneBy(array('id' => $value ));
+                                    return $vatRate->getRate(). '%';
+                                },
+                            ),
+                            'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
+                                global $_ARRAYLANG;
+
+                                $vatRates        = $this->cx->getDb()->getEntityManager()->getRepository('Cx\Modules\Pim\Model\Entity\VatRate')->findAll();
+                                $arrOptions['0'] = $_ARRAYLANG['TXT_MODULE_PIM_PLEASE_SELECT'];
+                                foreach ( $vatRates as $vatRate) {
+                                    $arrOptions[$vatRate->getId()] = $vatRate->getVatClass().' '. $vatRate->getRate() .'%';
+                                }
+                                $selectOption = new \Cx\Core\Html\Model\Entity\DataElement(
+                                    $fieldname,
+                                    \Html::getOptions(
+                                        $arrOptions,
+                                        $fieldvalue
+                                    ),
+                                    \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
+                                );
+                                return $selectOption;
+                            },
+                        ),
+                    ),
                 );
                 break;
             case 'Cx\Modules\Pim\Model\Entity\Price':

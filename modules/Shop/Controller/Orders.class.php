@@ -1328,6 +1328,9 @@ if (!$limit) {
         }
         $orderItemCount = 0;
         $total_item_price = 0;
+
+        $arrProductGroups = Discount::getArticleGroupArray();
+
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach ($arrItems as $item) {
@@ -1403,6 +1406,12 @@ if (!$limit) {
                 }
 //                $str_options .= ']';
             }
+
+            $productGroupName = '';
+            if (isset($arrProductGroups[$objProduct->article_id()])) {
+                $productGroupName = $arrProductGroups[$objProduct->article_id()]['name'];
+            }
+
             // Product details
             $arrProduct = array(
                 'PRODUCT_ID' => $product_id,
@@ -1410,6 +1419,7 @@ if (!$limit) {
                 'PRODUCT_QUANTITY' => $quantity,
                 'PRODUCT_TITLE' => $product_name,
                 'PRODUCT_OPTIONS' => $str_options,
+                'PRODUCT_GROUP_NAME' => $productGroupName,
                 'PRODUCT_OPTION_LIST' => $optionList,
                 'PRODUCT_ITEM_PRICE' => sprintf('% 9.2f', $item_price),
                 'PRODUCT_TOTAL_PRICE' => sprintf('% 9.2f', $item_price*$quantity),

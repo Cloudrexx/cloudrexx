@@ -59,9 +59,8 @@ class PagingController extends ListingHandler {
      */
     public function handle($config, $params) {
         $config['offset'] = 0;
-        $paramName = !empty($config['entity']) ? $config['entity'] . 'Pos' : 'pos';
-        if (isset($params[$paramName])) {
-            $config['offset'] = $params[$paramName];
+        if (isset($params['pos'])) {
+            $config['offset'] = (int) $params['pos'];
         }
         $config['count'] = $this->countPerPage;
         return $config;
