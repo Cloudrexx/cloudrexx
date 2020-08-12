@@ -78,7 +78,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     /**
      * @{inheritdoc}
      */
-    public function postContentLoad() {
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_ARRAYLANG;
         $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('Html', false);
 

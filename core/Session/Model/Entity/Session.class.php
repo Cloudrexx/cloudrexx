@@ -149,6 +149,28 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     private static $sessionLockTime = 10;
 
     /**
+     * Name of the session cookie
+     *
+     * @var string
+     */
+    const SESSION_NAME = 'clxsid';
+
+    /**
+     * Length of the session ID
+     *
+     * @var integer
+     */
+    const SESSION_SID_LENGTH = 32;
+
+    /**
+     * Regular expression to match a session ID.
+     * The valid characters are defined by session.sid_bits_per_character.
+     *
+     * @var string
+     */
+    const SESSION_SID_CHAR_CLASS = '[0-9a-v]';
+
+    /**
      * Maximum allowed length of a session variable key.
      * This maximum length is defined by the associated database field core_session_variable.key.
      * @var integer
@@ -206,7 +228,7 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
             }
 
             if ($destroyCookie) {
-                setcookie("PHPSESSID", '', time() - 3600, '/');
+                setcookie(static::SESSION_NAME, '', time() - 3600, '/');
             }
             // do not write the session data
             $this->discardChanges = true;
@@ -257,6 +279,20 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         }
 
         register_shutdown_function(array(& $this, 'releaseLocks'));
+
+        if (!$this->isSecureSessionConfig()) {
+            throw new \Exception('Unable to initialize session on non-secure environment.');
+        }
+
+        // ensure only self-generated session IDs are valid
+        try {
+            static::getIdOfActiveSession();
+        } catch (\Exception $e) {
+            // Supplied session ID is not known by the session handler,
+            // therefore, we will drop it.
+            // session_start() will then set a new one
+            unset($_COOKIE[static::SESSION_NAME]);
+        }
 
         $this->initDatabase();
         $this->initRememberMe();
@@ -497,7 +533,7 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     protected function initRememberMe()
     {
         /** @var $objResult ADORecordSet */
-        $sessionId = !empty($_COOKIE[session_name()]) ? $_COOKIE[session_name()] : null;
+        $sessionId = !empty($_COOKIE[static::SESSION_NAME]) ? $_COOKIE[static::SESSION_NAME] : null;
         if (isset($_POST['remember_me'])) {
             $this->rememberMe = true;
             if (static::sessionExists($sessionId)) {//remember me status for new sessions will be stored in cmsSessionRead() (when creating the appropriate db entry)
@@ -531,9 +567,9 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
 
         if (
             empty($sessionId) &&
-            !empty($_COOKIE[session_name()])
+            !empty($_COOKIE[static::SESSION_NAME])
         ) {
-            $sessionId = $_COOKIE[session_name()];
+            $sessionId = $_COOKIE[static::SESSION_NAME];
         }
 
         if (empty($sessionId)) {
@@ -578,12 +614,11 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     public function cmsSessionExpand()
     {
         // Reset the expiration time upon page load
-        $ses = session_name();
-        if (isset($_COOKIE[$ses])) {
+        if (isset($_COOKIE[static::SESSION_NAME])) {
             $expirationTime = ($this->lifetime > 0 ? $this->lifetime + time() : 0);
             setcookie(
-                $ses,
-                $_COOKIE[$ses],
+                static::SESSION_NAME,
+                $_COOKIE[static::SESSION_NAME],
                 $expirationTime,
                 '/',
                 ini_get('session.cookie_domain'),
@@ -628,20 +663,35 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         $this->sessionid = $aKey;
         $this->sessionPath = \Env::get('cx')->getWebsiteTempWebPath() . '/' . $this->sessionPathPrefix . $this->sessionid;
         /** @var $objResult ADORecordSet */
-        $objResult = \Env::get('db')->Execute('SELECT `user_id`, `status` FROM `' . DBPREFIX . 'sessions` WHERE `sessionid` = "' . $aKey . '"');
-        if ($objResult !== false) {
-            if ($objResult->RecordCount() == 1) {
-                $this->userId = $objResult->fields['user_id'];
-                $this->status = $objResult->fields['status'];
-            } else {
-                \Env::get('db')->Execute('
-                    INSERT INTO `' . DBPREFIX . 'sessions` (`sessionid`, `remember_me`, `startdate`, `lastupdated`, `status`, `user_id`)
-                    VALUES ("' . $aKey . '", ' . ($this->rememberMe ? 1 : 0) . ', "' . time() . '", "' . time() . '", "' . $this->status . '", ' . intval($this->userId) . ')
-                ');
+        $objResult = \Env::get('db')->Execute('SELECT `user_id`, `status`, `client_hash` FROM `' . DBPREFIX . 'sessions` WHERE `sessionid` = "' . $aKey . '"');
+        if ($objResult === false) {
+            throw new \Exception('Unable to read session data');
+        }
 
+        $clientHash = $this->getClientHash();
+
+        // check for an existing session
+        if ($objResult->RecordCount() == 1) {
+            $this->userId = $objResult->fields['user_id'];
+            $this->status = $objResult->fields['status'];
+
+            // verify fingerprint of the client
+            if ($objResult->fields['client_hash'] == $clientHash) {
                 return '';
             }
+
+            // request was made from a different browser
+            // this might indicate a possible session hijack attack
+            // therefore the reuqested session is being denied
+            session_destroy();
+            setcookie(static::SESSION_NAME, '', time() - 3600, '/');
+            throw new \Exception('Access to session denied');
         }
+
+        \Env::get('db')->Execute('
+            INSERT INTO `' . DBPREFIX . 'sessions` (`sessionid`, `remember_me`, `startdate`, `lastupdated`, `status`, `user_id`, `client_hash`)
+            VALUES ("' . $aKey . '", ' . ($this->rememberMe ? 1 : 0) . ', "' . time() . '", "' . time() . '", "' . $this->status . '", ' . intval($this->userId) . ', "' . $clientHash .  '")
+        ');
 
         return '';
     }
@@ -814,7 +864,7 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         $esiFiles = glob($cx->getWebsiteTempPath() . '/cache/*_u*');
         foreach ($esiFiles as $esiFile) {
             $match = array();
-            if (!preg_match('#/[0-9a-f]{32}(?:_[pl][a-z0-9]+){0,2}?_u([a-z0-9]+)(?:_|$)#', $esiFile, $match)) {
+            if (!preg_match('#/[0-9a-f]{32}(?:_[pl][a-z0-9]+){0,2}?_u(' . static::SESSION_SID_CHAR_CLASS . '+)(?:_|$)#', $esiFile, $match)) {
                 continue;
             }
             if (in_array($match[1], $sessions)) {
@@ -1089,5 +1139,129 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
         }
 
         return true;
+    }
+
+    /**
+     * Verifies that a secure session can be initialized.
+     * If needed it tries to adjust the session config to ensure
+     * a secure session can be initialized.
+     *
+     * @return  boolean TRUE if the session config is valid, otherwise FALSE.
+     */
+    protected static function isSecureSessionConfig() {
+        // ensure we use a non-default session cookie name
+        if (session_name() != static::SESSION_NAME) {
+            session_name(static::SESSION_NAME);
+        }
+        if (session_name() != static::SESSION_NAME) {
+            return false;
+        }
+
+        // enforce fixed session length
+        ini_set('session.sid_length', static::SESSION_SID_LENGTH);
+        if (ini_get('session.sid_length') != static::SESSION_SID_LENGTH) {
+            return false;
+        }
+
+        // enforce fixed bits per character
+        ini_set('session.sid_bits_per_character', 5);
+        if (ini_get('session.sid_bits_per_character') != 5) {
+            return false;
+        }
+
+        // exposing the session cookie in URLs must be prohibited
+        ini_set('session.use_trans_sid', false);
+        if (ini_get('session.use_trans_sid')) {
+            return false;
+        }
+
+        // setup qualifies for secure session
+        return true;
+    }
+
+    /**
+     * Get the client hash to be used to map the session ID to.
+     * The hash is build as follows:
+     * hash = md5(User-Agent + Accept-Language)
+     *
+     * @return  string  Hash of the client.
+     */
+    protected function getClientHash() {
+        $userAgent = 'anonymous';
+        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        }
+
+        $locale = 'none';
+        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+            $locale = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        }
+
+        return md5($userAgent . $locale);
+    }
+
+    /**
+     * Get the name of the session cookie
+     *
+     * @return  string  The name of the session cookie.
+     */
+    public static function getSessionName() {
+        return static::SESSION_NAME;
+    }
+
+    /**
+     * Get ID of active session
+     *
+     * @throws  Exception   In case no active session exists
+     * @return string   ID of active session
+     */
+    public static function getIdOfActiveSession() {
+        if (empty($_COOKIE[static::SESSION_NAME])) {
+            throw new \Exception('No session ID supplied in request');
+        }
+
+        $sessionId = $_COOKIE[static::SESSION_NAME];
+        if (!static::sessionExists($sessionId)) {
+            throw new \Exception('No active session');
+        }
+
+        return $sessionId;
+    }
+
+    /**
+     * Get valid session ID from current request
+     *
+     * @throws  Exception   In case the current request does not contain a
+     *                      valid session ID.
+     * @return string   Valid session ID of current requeset.
+     */
+    public static function getValidIdFromRequest() {
+        // check if a session ID has been supplied to the current request
+        if (empty($_COOKIE[static::SESSION_NAME])) {
+            throw new \Exception('No session ID supplied in request');
+        }
+
+        $id = $_COOKIE[static::SESSION_NAME];
+
+        // verify that the session ID has a valid scheme
+        if (!static::isValidSessionId($id)) {
+            throw new \Exception('No valid session id');
+        }
+
+        return $id;
+    }
+
+    /**
+     * Verify the scheme of a session id
+     * @param   string  $id The session ID to verify.
+     * @return  boolean TRUE if the session ID $id has a valid format.
+     *                  Otherwise FALSE.
+     */
+    protected static function isValidSessionId($id) {
+        return preg_match(
+            '/^' . static::SESSION_SID_CHAR_CLASS .
+                '{' . static::SESSION_SID_LENGTH . '}$/',
+            $id
+        );
     }
 }

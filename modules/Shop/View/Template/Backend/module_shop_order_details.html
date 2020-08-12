@@ -151,15 +151,15 @@ function edit(order_id)
   <tr>
     <th colspan="9">{TXT_BILL}</th>
   </tr>
-  <tr class="row1">
-    <td class="f_bold" width="05%">{TXT_NUMBER}</td>
-    <td class="f_bold" width="05%">{TXT_PRODUCT_ID}</td>
-    <td class="f_bold" width="10%">{TXT_SHOP_PRODUCT_CUSTOM_ID}</td>
-    <td class="f_bold" width="40%">{TXT_PRODUCT_NAME}</td>
-    <td class="number f_bold" width="05%">{TXT_WEIGHT}</td>
-    <td class="number f_bold" width="10%">{TXT_PRODUCT_PRICE}</td>
-    <td class="number f_bold" colspan="2" width="10%">{TXT_TAX_RATE}</td>
-    <td class="number f_bold" width="10%">{TXT_SUM}</td>
+  <tr class="row3">
+    <td width="05%">{TXT_NUMBER}</td>
+    <td width="05%">{TXT_PRODUCT_ID}</td>
+    <td width="10%">{TXT_SHOP_PRODUCT_CUSTOM_ID}</td>
+    <td width="40%">{TXT_PRODUCT_NAME}</td>
+    <td class="number" width="05%">{TXT_WEIGHT}</td>
+    <td class="number" width="10%">{TXT_PRODUCT_PRICE}</td>
+    <td class="number" colspan="2" width="10%">{TXT_TAX_RATE}</td>
+    <td class="number" width="10%">{TXT_SUM}</td>
   </tr>
 <!-- BEGIN order_item -->
   <tr class="{SHOP_ROWCLASS}">
@@ -176,12 +176,10 @@ function edit(order_id)
 <!-- END order_item -->
 
 <!-- BEGIN coupon_row -->
-  <tr class="{SHOP_ROWCLASS}">
-    <td colspan="2">&nbsp;</td>
-    <td>{SHOP_COUPON_CODE}&nbsp;</td>
-    <td>{SHOP_COUPON_NAME}&nbsp;</td>
-    <td colspan="4">&nbsp;</td>
-    <td class="number">{SHOP_COUPON_AMOUNT}&nbsp;{SHOP_CURRENCY}</td>
+  <tr>
+    <td colspan="8" class="number"><strong>{TXT_SHOP_DISCOUNT}</strong> ({SHOP_COUPON_NAME}: {SHOP_COUPON_CODE})</td>
+    <td class="number">{SHOP_COUPON_AMOUNT}&nbsp;{SHOP_CURRENCY}
+    </td>
   </tr>
 <!-- END coupon_row -->
 
@@ -200,7 +198,7 @@ function edit(order_id)
   </tr>
 <!-- END shopTaxPrice -->
 <!-- BEGIN shopShipmentPrice -->
-  <tr><td colspan="9">&nbsp;</td></tr>
+  <tr class="row3"><td colspan="9">&nbsp;</td></tr>
   <tr>
     <td colspan="3">&nbsp;</td>
     <td class="number f_bold">{TXT_TOTAL_WEIGHT}&nbsp;</td>

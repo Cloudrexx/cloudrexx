@@ -26,34 +26,22 @@
  */
 
 /**
- * Output controller for JSON format
+ * Class VatRateRepository
  *
- * @copyright   Cloudrexx AG
- * @author Michael Ritter <michael.ritter@cloudrexx.com>
- * @package cloudrexx
- * @subpackage core_modules_dataaccess
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Project Team SS4U <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  module_pim
  */
 
-namespace Cx\Core_Modules\DataAccess\Controller;
+namespace Cx\Modules\Pim\Model\Repository;
 
 /**
- * Output controller for JSON format
- *
- * @copyright   Cloudrexx AG
- * @author Michael Ritter <michael.ritter@cloudrexx.com>
- * @package cloudrexx
- * @subpackage core_modules_dataaccess
+ * Class VatRateRepository
+ * 
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Project Team SS4U <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  module_pim
  */
-class JsonOutputController extends OutputController {
-
-    /**
-     * Returns the JSON encoded data
-     * @param array $data Data to encode
-     * @return string Encoded data
-     * @todo: Handle encoding (json_encode() fails for non-UTF8 contents)
-     */
-    public function parse($data) {
-        header('Content-Type: application/json');
-        return json_encode($data, JSON_FORCE_OBJECT);
-    }
-}
+class VatRateRepository extends \Doctrine\ORM\EntityRepository {}

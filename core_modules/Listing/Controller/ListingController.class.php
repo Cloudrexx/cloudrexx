@@ -470,13 +470,19 @@ class ListingController {
                 //       cannot sort by it here. Find a solution for sorting
                 //       by relation fields.
                 if (isset($metaData->associationMappings[$field])) {
+                    \DBG::msg('Cannot sort by association "' . $field . '"');
                     continue;
                 }
                 $qb->orderBy('x.' . $field, $order);
             }
             $qb->setFirstResult($this->offset ? $this->offset : null);
             $qb->setMaxResults($this->count ? $this->count : null);
-            $entities = $qb->getQuery()->getResult();
+            $query = $qb->getQuery();
+            $query->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            );
+            $entities = $query->getResult();
 
             $metaData = $em->getClassMetaData($this->entityClass);
             $identifierFieldNames = $metaData->getIdentifierFieldNames();
@@ -486,7 +492,12 @@ class ListingController {
             );
             $qb->setFirstResult(null);
             $qb->setMaxResults(null);
-            $this->dataSize = $qb->getQuery()->getSingleScalarResult();
+            $query = $qb->getQuery();
+            $query->setHint(
+                \Doctrine\ORM\Query::HINT_CUSTOM_OUTPUT_WALKER,
+                'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+            );
+            $this->dataSize = $query->getSingleScalarResult();
         }
 
         // return calculated data

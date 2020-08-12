@@ -677,29 +677,36 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
-                $discount_amount = $objCoupon->getDiscountAmount(
-                    $total_price, $customer_id);
-                $total_discount_amount = $discount_amount;
-
+                $total_discount_amount = $objCoupon->getDiscountAmount(
+                    $total_price, $customer_id
+                );
                 // in case VAT is being used, we have to subtract the VAT of
                 // the discount from the total VAT amount of the products
+                $couponVatDiscount = 0;
                 if (Vat::isEnabled()) {
                     if ($objCoupon->discount_amount() > 0) {
                         $vatRate = current($usedVatRates);
                         // in case coupon is a discount of value, then we
                         // have to subtract the VAT amount of that value
                         if (Vat::isIncluded()) {
-                            $total_vat_amount -= $objCoupon->discount_amount() / (1 + $vatRate / 100) * $vatRate / 100;
+                            $couponVatDiscount =
+                                $total_discount_amount
+                                / (1 + $vatRate / 100) * $vatRate / 100;
                         } else {
-                            $total_vat_amount -= $objCoupon->discount_amount() * $vatRate / 100;
+                            $couponVatDiscount =
+                                $total_discount_amount
+                                * $vatRate / 100;
                         }
                     } else {
                         // in case coupon is a discount in percent, then we
                         // have to subtract the same percentage from the total
                         // VAT amount
-                        $total_vat_amount -= $total_vat_amount * $objCoupon->discount_rate() / 100;
+                        $couponVatDiscount =
+                            $total_vat_amount
+                            * $objCoupon->discount_rate()  / 100;
                     }
                 }
+                $total_vat_amount -= $couponVatDiscount;
             }
         }
 
@@ -795,7 +802,7 @@ class Cart
     {
         if (empty($_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id]))
             return null;
-        return $_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id];
+        return $_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id]->toArray();
     }
 
 
@@ -1044,6 +1051,8 @@ die("Cart::view(): ERROR: No template");
                 'SHOP_TOTAL_TAX_AMOUNT' =>
                     self::get_vat_amount().
                     '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                'SHOP_TOTAL_TAX_AMOUNT_NO_SYMBOL' =>
+                    self::get_vat_amount(),
 
             ));
             if (Vat::isIncluded()) {

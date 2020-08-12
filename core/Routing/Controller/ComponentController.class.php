@@ -48,7 +48,37 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
-        return array('Backend');
+        return array('Backend', 'EsiWidget');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson() {
+        return array(
+            'EsiWidgetController',
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        foreach (
+            array(
+                'PAGE_ID',
+                'PAGE_NODE_ID',
+            ) as $widgetName
+        ) {
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName
+                )
+            );
+        }
     }
 
     public function preResolve(\Cx\Core\Routing\Url $url) {

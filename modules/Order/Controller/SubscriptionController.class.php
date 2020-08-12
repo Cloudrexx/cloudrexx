@@ -109,6 +109,17 @@ class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
             $subscriptions = $this->subscriptionRepo->getSubscriptionsByCriteria(null, array('s.id' => 'DESC'));
         }
 
+        // Workaround for field subscriptionDate of Subscription model.
+        // This can be dropped once the read-only flag of a field properly
+        // works.
+        if (
+            !empty($_GET['add']) &&
+            empty($_POST['subscriptionDate'])
+        ) {
+            $_POST['subscriptionDate'] = date('d.m.Y H:i:s');
+        }
+        // END: Workaround
+
         $subscriptions = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($subscriptions);
         // setDataType is used to make the ViewGenerator load the proper options if $subscriptions is empty
         $subscriptions->setDataType('Cx\Modules\Order\Model\Entity\Subscription');

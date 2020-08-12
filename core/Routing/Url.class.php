@@ -574,6 +574,22 @@ class Url {
         return $this->splitParamsFromPath();
     }
 
+    /**
+     * Get the anchor of the URL
+     * @return  string  The part after the # in the URL
+     */
+    public function getAnchor() {
+        return $this->fragment;
+    }
+
+    /**
+     * Set an anchor to the URL
+     * @param   string  $anchor  The part after the # in the URL
+     */
+    public function setAnchor($anchor) {
+        $this->fragment = $anchor;
+    }
+
     public function getSuggestedTargetPath() {
         return $this->suggestedTargetPath;
     }
@@ -595,7 +611,8 @@ class Url {
     }
 
     public static function fromRequest() {
-        if (php_sapi_name() === 'cli') {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if ($cx->isCliCall()) {
             return new Url('file://' . getcwd());
         }
         $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';

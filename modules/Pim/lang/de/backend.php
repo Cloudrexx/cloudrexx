@@ -26,34 +26,14 @@
  */
 
 /**
- * Output controller for JSON format
- *
- * @copyright   Cloudrexx AG
- * @author Michael Ritter <michael.ritter@cloudrexx.com>
- * @package cloudrexx
- * @subpackage core_modules_dataaccess
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @access      public
+ * @package     cloudrexx
+ * @subpackage  modules_pim
  */
+global $_ARRAYLANG;
 
-namespace Cx\Core_Modules\DataAccess\Controller;
-
-/**
- * Output controller for JSON format
- *
- * @copyright   Cloudrexx AG
- * @author Michael Ritter <michael.ritter@cloudrexx.com>
- * @package cloudrexx
- * @subpackage core_modules_dataaccess
- */
-class JsonOutputController extends OutputController {
-
-    /**
-     * Returns the JSON encoded data
-     * @param array $data Data to encode
-     * @return string Encoded data
-     * @todo: Handle encoding (json_encode() fails for non-UTF8 contents)
-     */
-    public function parse($data) {
-        header('Content-Type: application/json');
-        return json_encode($data, JSON_FORCE_OBJECT);
-    }
-}
+// Here come the ACTs:
+$_ARRAYLANG['TXT_MODULE_PIM_ACT_VATRATE'] = 'Mehrwertsteuer Sätze';
+$_ARRAYLANG['TXT_MODULE_PIM_VATRATE']     = 'Mehrwertsteuer Sätze';

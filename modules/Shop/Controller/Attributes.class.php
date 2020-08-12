@@ -882,20 +882,39 @@ class Attributes
             foreach ($arrOptionIds as $option_id) {
 //DBG::log("Attributes::getAsStrings(): Option ID $option_id");
                 $option_name = '';
-                // Valid indices are: 'value', 'price', 'order'
-                $option_price = $arrOptions[$option_id]['price'];
-                if (
-                    in_array(
-                        $objAttribute->getType(),
-                        array(
-                            Attribute::TYPE_UPLOAD_MANDATORY,
-                            Attribute::TYPE_UPLOAD_OPTIONAL
-                        )
-                    )
-                ) {
-                    $option = current($arrOptions);
-                    $option_price = $option['price'];
+
+                // get price of attribute
+                switch ($objAttribute->getType()) {
+                    // form field attributes always have only one option
+                    case Attribute::TYPE_TEXT_OPTIONAL:
+                    case Attribute::TYPE_TEXT_MANDATORY:
+                    case Attribute::TYPE_UPLOAD_OPTIONAL:
+                    case Attribute::TYPE_UPLOAD_MANDATORY:
+                    case Attribute::TYPE_TEXTAREA_OPTIONAL:
+                    case Attribute::TYPE_TEXTAREA_MANDATORY:
+                    case Attribute::TYPE_EMAIL_OPTIONAL:
+                    case Attribute::TYPE_EMAIL_MANDATORY:
+                    case Attribute::TYPE_URL_OPTIONAL:
+                    case Attribute::TYPE_URL_MANDATORY:
+                    case Attribute::TYPE_DATE_OPTIONAL:
+                    case Attribute::TYPE_DATE_MANDATORY:
+                    case Attribute::TYPE_NUMBER_INT_OPTIONAL:
+                    case Attribute::TYPE_NUMBER_INT_MANDATORY:
+                    case Attribute::TYPE_NUMBER_FLOAT_OPTIONAL:
+                    case Attribute::TYPE_NUMBER_FLOAT_MANDATORY:
+                        $option = current($arrOptions);
+                        $option_price = $option['price'];
+                        break;
+
+                    // non-form fields attributes can have multiple options
+                    // to select from
+                    default:
+                        $option_price = $arrOptions[$option_id]['price'];
+                        break;
                 }
+
+                // Get name of selected or set option
+                //
                 // Note that this *MUST NOT* test for is_integer()
                 // (which $option_id isn't -- it's either an arbitrary
                 // string, or one that represents a positive integer),

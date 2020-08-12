@@ -276,11 +276,8 @@ class StatsLibrary
         $arrUriGets = explode("&", $completeUriString);
 
         foreach ($arrUriGets AS $elem) {
-            //check if Session-ID is traced by url (cookies are disabled)
-            if (!preg_match("/PHPSESSID/",$elem)) {
-                if ($elem != "") {
-                    $uriString .="&".$elem;
-                }
+            if ($elem != "") {
+                $uriString .="&".$elem;
             }
         }
 

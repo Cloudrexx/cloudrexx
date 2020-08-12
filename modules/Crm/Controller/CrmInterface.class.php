@@ -394,7 +394,22 @@ class CrmInterface extends CrmLibrary
             $where[] = " MATCH (".implode(',', $fullTextContact).") AGAINST ('".contrexx_input2db($_GET['term'])."' IN BOOLEAN MODE)";
         }
 
-        $process = isset ($_GET['process']) ? trim($_GET['process']) : '';
+        // identify type of export:
+        // <none>: all
+        // 1: only companies
+        // 2: only persons
+        // active: only active entries
+        $process = '';
+
+        // filter from section settings/interface/export
+        if (isset($_GET['process'])) {
+            $process = trim($_GET['process']);
+        } else
+        // filter from overview listing
+        // if it has been set to only list companies
+        if (count($searchContactTypeFilter) == 1) {
+            $process = current($searchContactTypeFilter);
+        }
         switch ($process) {
         case '1':
                 $where[] = " c.contact_type = 1";
@@ -423,6 +438,7 @@ class CrmInterface extends CrmLibrary
                            c.updated_date,
                            c.customer_website,
                            c.contact_role,
+                           c.contact_customer,
                            c.notes,
                            c.gender,
                            c.salutation,
@@ -460,6 +476,7 @@ class CrmInterface extends CrmLibrary
         switch ($process){
         case '1':
             $headerCsv = array(
+                '#',
                 $_ARRAYLANG['TXT_CRM_CONTACT_TYPE'],
                 $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_NAME'],
                 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERID'],
@@ -475,6 +492,7 @@ class CrmInterface extends CrmLibrary
             break;
         case '2':
             $headerCsv = array(
+                '#',
                 $_ARRAYLANG['TXT_CRM_CONTACT_TYPE'],
                 $_ARRAYLANG['TXT_CRM_CONTACT_NAME'],
                 $_ARRAYLANG['TXT_CRM_FAMILY_NAME'],
@@ -483,6 +501,7 @@ class CrmInterface extends CrmLibrary
                 $_ARRAYLANG['TXT_CRM_SALUTATION'],
                 $_ARRAYLANG['TXT_CRM_ROLE'],
                 $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_NAME'],
+                $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_ID'],
                 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERID'],
                 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERTYPE'],
                 $_ARRAYLANG['TXT_CRM_CUSTOMER_MEMBERSHIP'],
@@ -496,6 +515,7 @@ class CrmInterface extends CrmLibrary
             break;
         default:
             $headerCsv = array(
+                '#',
                 $_ARRAYLANG['TXT_CRM_CONTACT_TYPE'],
                 $_ARRAYLANG['TXT_CRM_CONTACT_NAME'],
                 $_ARRAYLANG['TXT_CRM_FAMILY_NAME'],
@@ -504,6 +524,7 @@ class CrmInterface extends CrmLibrary
                 $_ARRAYLANG['TXT_CRM_SALUTATION'],
                 $_ARRAYLANG['TXT_CRM_ROLE'],
                 $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_NAME'],
+                $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_ID'],
                 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERID'],
                 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERTYPE'],
                 $_ARRAYLANG['TXT_CRM_INDUSTRY_TYPE'],
@@ -586,6 +607,7 @@ class CrmInterface extends CrmLibrary
                 $langName = \FWLanguage::getLanguageParameter($langId, 'name');
                 switch ($process) {
                 case '1':
+                        print $objResult->fields['id'] . $this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? 'Company' : 'Person').$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 ? $this->_escapeCsvValue($objResult->fields['contactCustomer']) : $this->_escapeCsvValue($objResult->fields['customer_name'])).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 && !empty($personCmyNme) ? '' : $this->_escapeCsvValue($objResult->fields['customer_id'])).$this->_csvSeparator;
@@ -599,6 +621,7 @@ class CrmInterface extends CrmLibrary
                         print $this->_escapeCsvValue($objResult->fields['updated_date']).$this->_csvSeparator;
                     break;
                 case '2':
+                        print $objResult->fields['id'] . $this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? 'Company' : 'Person').$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? '' : $this->_escapeCsvValue($objResult->fields['customer_name'])).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? '' : $this->_escapeCsvValue($objResult->fields['contact_familyname'])).$this->_csvSeparator;
@@ -607,6 +630,7 @@ class CrmInterface extends CrmLibrary
                         print $salutationAttributeName . $this->_csvSeparator;
                         print $this->_escapeCsvValue($objResult->fields['contact_role']).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 ? $this->_escapeCsvValue($objResult->fields['contactCustomer']) : $this->_escapeCsvValue($objResult->fields['customer_name'])).$this->_csvSeparator;
+                        print ($objResult->fields['contact_type'] == 1 ? '' : $objResult->fields['contact_customer'] . $this->_csvSeparator);
                         print ($objResult->fields['contact_type'] == 2 && !empty($personCmyNme) ? '' : $this->_escapeCsvValue($objResult->fields['customer_id'])).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 && !empty($personCmyNme) ? '' : $this->_escapeCsvValue($objResult->fields['cType'])).$this->_csvSeparator;
                         print $this->_escapeCsvValue($membership).$this->_csvSeparator;
@@ -618,6 +642,7 @@ class CrmInterface extends CrmLibrary
                         print $this->_escapeCsvValue($objResult->fields['updated_date']).$this->_csvSeparator;
                     break;
                 default:
+                        print $objResult->fields['id'] . $this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? 'Company' : 'Person').$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? '' : $this->_escapeCsvValue($objResult->fields['customer_name'])).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 1 ? '' : $this->_escapeCsvValue($objResult->fields['contact_familyname'])).$this->_csvSeparator;
@@ -626,6 +651,7 @@ class CrmInterface extends CrmLibrary
                         print $salutationAttributeName . $this->_csvSeparator;
                         print $this->_escapeCsvValue($objResult->fields['contact_role']).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 ? $this->_escapeCsvValue($objResult->fields['contactCustomer']) : $this->_escapeCsvValue($objResult->fields['customer_name'])).$this->_csvSeparator;
+                        print ($objResult->fields['contact_type'] == 1 ? '' : $objResult->fields['contact_customer']) . $this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 && !empty($personCmyNme) ? '' : $this->_escapeCsvValue($objResult->fields['customer_id'])).$this->_csvSeparator;
                         print ($objResult->fields['contact_type'] == 2 && !empty($personCmyNme) ? '' : $this->_escapeCsvValue($objResult->fields['cType'])).$this->_csvSeparator;
                         print $this->_escapeCsvValue($objResult->fields['industryType']).$this->_csvSeparator;

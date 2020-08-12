@@ -127,8 +127,8 @@ class LinkSanitizer {
         // fix empty urls like empty form-action tags
         if (empty($matches[\LinkSanitizer::FILE_PATH])) {
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $this->cx->getRequest()->getUrl() .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $this->cx->getRequest()->getUrl() .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         }
         $testPath = explode('?', $matches[\LinkSanitizer::FILE_PATH], 2);
         if ($testPath[0] == 'index.php' || $testPath[0] == '' || $testPath[0] == './') {
@@ -138,12 +138,20 @@ class LinkSanitizer {
             }
             $ret .= '/';
             if (isset($testPath[1])) {
-                $args = preg_split('/&(amp;)?/', $testPath[1]);
-                $params = array();
-                foreach ($args as $arg) {
-                    $split = explode('=', $arg, 2);
-                    $params[$split[0]] = $split[1];
+                // split it up into the query string and the anchor
+                $qsParts = explode('#', $testPath[1], 2);
+                $anchor = '';
+                if (isset($qsParts[1])) {
+                    $anchor = $qsParts[1];
                 }
+
+                // fix wrong encoding
+                $qs = str_replace('&amp;', '&', $qsParts[0]);
+
+                // parse query string into an array
+                $params = array();
+                parse_str($qs, $params);
+
                 // frontend case
                 if (isset($params['section'])) {
                     $cmd = '';
@@ -154,12 +162,13 @@ class LinkSanitizer {
                     $ret = \Cx\Core\Routing\Url::fromModuleAndCmd($params['section'], $cmd);
                     unset($params['section']);
                     $ret->setParams($params);
+                    $ret->setAnchor($anchor);
                     return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-                    $ret .
-                    $matches[\LinkSanitizer::CLOSE_QUOTE];
-
+                        $ret .
+                        $matches[\LinkSanitizer::CLOSE_QUOTE];
+                } else
                 // backend case
-                } else if (isset($params['cmd'])) {
+                if (isset($params['cmd'])) {
                     $ret .= $params['cmd'];
                     unset($params['cmd']);
                     if (isset($params['act'])) {
@@ -167,19 +176,20 @@ class LinkSanitizer {
                         unset($params['act']);
                     }
                 }
+
+                // re-add query string
                 if (count($params)) {
-                    array_walk(
-                        $params,
-                        function(&$value, $key) {
-                            $value = $key . '=' . $value;
-                        }
-                    );
-                    $ret .= '?' . implode('&', $params);
+                    $ret .= '?' . http_build_query($params, null, '&', PHP_QUERY_RFC3986);
+                }
+
+                // re-add anchor
+                if ($anchor != '') {
+                    $ret .= '#' . $anchor;
                 }
             }
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $ret .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $ret .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else if (
             $localFile = $this->cx->getClassLoader()->getWebFilePath(
                 $this->cx->getCodeBaseDocumentRootPath() . '/' .
@@ -188,14 +198,14 @@ class LinkSanitizer {
         ) {
             // this is an existing file, do not add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $localFile . (isset($testPath[1]) ? '?' . $testPath[1] : '') .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $localFile . (isset($testPath[1]) ? '?' . $testPath[1] : '') .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else {
             // this is a link to a page, add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $this->offset .
-            $matches[\LinkSanitizer::FILE_PATH] .
-            $matches[\LinkSanitizer::CLOSE_QUOTE];
+                $this->offset .
+                $matches[\LinkSanitizer::FILE_PATH] .
+                $matches[\LinkSanitizer::CLOSE_QUOTE];
         }
     }
 

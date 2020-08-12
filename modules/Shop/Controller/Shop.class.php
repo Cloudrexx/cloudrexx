@@ -1052,11 +1052,7 @@ die("Failed to update the Cart!");
                 $catName = contrexx_raw2xhtml($objCategory->name());
                 $imageName = $objCategory->picture();
                 $shortDescription = $objCategory->shortDescription();
-                $shortDescription = nl2br(contrexx_raw2xhtml($shortDescription));
-                $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
                 $description = $objCategory->description();
-                $description = nl2br(contrexx_raw2xhtml($description));
-                $description = preg_replace('/[\n\r]/', '', $description);
                 self::$objTemplate->setVariable(array(
                     'SHOP_CATEGORY_CURRENT_ID'          => $id,
                     'SHOP_CATEGORY_CURRENT_NAME'        => $catName,
@@ -1064,7 +1060,7 @@ die("Failed to update the Cart!");
                     'SHOP_CATEGORY_CURRENT_DESCRIPTION' => $description,
                 ));
                 static::$pageTitle = $objCategory->name();
-                static::$pageMetaDesc = $objCategory->shortDescription();
+                static::$pageMetaDesc = contrexx_html2plaintext($objCategory->shortDescription());
                 if ($imageName) {
                     self::$objTemplate->setVariable(array(
                         'SHOP_CATEGORY_CURRENT_IMAGE'       => $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
@@ -1117,11 +1113,7 @@ die("Failed to update the Cart!");
             $imageName = $objCategory->picture();
             $thumbnailPath = self::$defaultImage;
             $shortDescription = $objCategory->shortDescription();
-            $shortDescription = nl2br(htmlentities($shortDescription, ENT_QUOTES, CONTREXX_CHARSET));
-            $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
             $description = $objCategory->description();
-            $description = nl2br(htmlentities($description, ENT_QUOTES, CONTREXX_CHARSET));
-            $description = preg_replace('/[\n\r]/', '', $description);
             if (empty($arrDefaultImageSize)) {
 //\DBG::log("Shop::showCategories(): ".\Cx\Core\Core\Controller\Cx::instanciate()->getWebsitePath() . self::$defaultImage);
                 $arrDefaultImageSize = getimagesize($cx->getWebsitePath() . self::$defaultImage);
@@ -1577,6 +1569,7 @@ die("Failed to update the Cart!");
                     'THUMBNAIL_LINK' => $pictureLink,
                     'POPUP_LINK' => $pictureLink,
                     'IMAGE_PATH' => $imageFilePath,
+                    'IMAGE_NAME' => basename($imageFilePath),
                     'POPUP_LINK_NAME' => $_ARRAYLANG['TXT_SHOP_IMAGE'].' '.$index,
                     'THUMBNAIL_FORMATS' => $arrThumbnails,
                 );
@@ -1596,6 +1589,7 @@ die("Failed to update the Cart!");
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_THUMBNAIL_'.$i => $arrProductImage['THUMBNAIL'],
                     'SHOP_PRODUCT_THUMBNAIL_SIZE_'.$i => $arrProductImage['THUMBNAIL_SIZE'],
+                    'SHOP_PRODUCT_IMAGE_NAME_'.$i => $arrProductImage['IMAGE_NAME'],
                 ));
                 if (!empty($arrProductImage['THUMBNAIL_LINK'])) {
                     self::$objTemplate->setVariable(array(
@@ -1653,6 +1647,11 @@ die("Failed to update the Cart!");
             self::showDiscountInfo(
                 $groupCustomerId, $groupArticleId, $groupCountId, 1
             );
+
+            self::$objTemplate->setVariable(array(
+                'SHOP_PRODUCT_GROUP_ID' => $groupArticleId,
+            ));
+
 /* OLD
             $price = Currency::getCurrencyPrice(
                 $objProduct->getCustomerPrice(self::$objCustomer)
@@ -1931,6 +1930,18 @@ die("Failed to update the Cart!");
                 }
                 if (self::$objTemplate->blockExists('shop_product_not_in_stock')) {
                     self::$objTemplate->touchBlock('shop_product_not_in_stock');
+                }
+            }
+
+            // list assigned categories
+            if (self::$objTemplate->blockExists('shop_product_categories')) {
+                $categoryIds = $objProduct->category_id();
+                foreach (preg_split('/\s*,\s*/', $categoryIds) as $catId) {
+                    self::$objTemplate->setVariable(
+                        'SHOP_PRODUCT_CATEGORY_ID',
+                        $catId
+                    );
+                    self::$objTemplate->parse('shop_product_categories');
                 }
             }
 
@@ -2480,6 +2491,8 @@ die("Failed to update the Cart!");
                         // left old spelling for comatibility (obsolete)
                         'SHOP_PRODCUT_OPTION' => $selectValues,
                         'SHOP_PRODUCT_OPTION' => $selectValues,
+                        'SHOP_PRODUCT_OPTIONS_ID' => $objAttribute->getId(),
+                        'SHOP_PRODUCT_OPTIONS_TYPE_ID' => $objAttribute->getType(),
                         'SHOP_PRODUCT_OPTIONS_NAME' => $objAttribute->getName(),
                         'SHOP_PRODUCT_OPTIONS_TITLE' =>
                             '<a href="javascript:{}" onclick="toggleOptions('.
@@ -3929,6 +3942,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
                 'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' =>
                     Currency::formatPrice(-$total_discount_amount),
+                'SHOP_COUPON_UNIT' => Currency::getActiveCurrencySymbol(),
             ));
         }
         // Show the Coupon code field only if there is at least one defined
@@ -3954,6 +3968,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_TAX_PRICE' =>
                     $_SESSION['shop']['vat_price'].
                     '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                'SHOP_TAX_PRICE_NO_SYMBOL' =>
+                    $_SESSION['shop']['vat_price'],
                 'SHOP_TAX_PRODUCTS_TXT' => $_SESSION['shop']['vat_products_txt'],
                 'SHOP_TAX_GRAND_TXT' => $_SESSION['shop']['vat_grand_txt'],
                 'TXT_TAX_RATE' => $_ARRAYLANG['TXT_SHOP_VAT_RATE'],

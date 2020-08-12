@@ -43,6 +43,7 @@ $_ARRAYLANG['TXT_CRM_CUSTOMER_DETAILS_DELETED_SUCCESSFULLY']             = "Cust
 $_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_DELETE_ENTRIES']                       = 'Are you sure you want to delete the entry';
 $_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_DELETE_SELECTED_ENTRIES']              = 'Are you sure you want to delete selected entry';
 $_ARRAYLANG['TXT_CRM_TITLE_COMPANY_NAME']                                = 'Company';
+$_ARRAYLANG['TXT_CRM_TITLE_COMPANY_ID']                                  = 'Company (ID)';
 $_ARRAYLANG['TXT_CRM_TITLE_NAME']                                        = 'Name';
 $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERTYPE']                                = 'Customer type';
 $_ARRAYLANG['TXT_CRM_TITLE_POSTAL_CODE']                                 = 'Postal code';
