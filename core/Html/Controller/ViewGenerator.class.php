@@ -2030,6 +2030,11 @@ class ViewGenerator {
         }
 
         $pos = $this->getVgParam($_GET['pos']);
+        $this->getListingController(
+            $entityWithNS,
+            $entityWithNS
+        );
+        $this->listingController->getData(array());
         $dataSize = $this->listingController->getDataSize() - 1;
         if ($pos >= $dataSize) {
             // self-healing: recalculate last page
