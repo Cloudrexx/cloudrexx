@@ -4009,9 +4009,11 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
             static::viewShipmentDiscount();
         }
-        if (   Cart::get_price()
-            || $_SESSION['shop']['shipment_price']
-            || $_SESSION['shop']['vat_price']
+        // note: we have to check for greater than 0 as PHP does evaluate a
+        // float of 0.00 as true
+        if (
+            Cart::get_price() > 0 ||
+            $_SESSION['shop']['shipment_price'] > 0
         ) {
             self::$objTemplate->setVariable(array(
                 'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
@@ -4019,12 +4021,10 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_PAYMENT_MENU' => self::get_payment_menu(),
             ));
 
-            // If cart has a value or needs a shipment (which might cost) we
-            // need to parse payment options
-            // TODO: Check if the first line is not already checked above
-            if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
-                &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods(
+            // parse payment methods, if any matches
+            if (
+                self::$objTemplate->blockExists('shop_payment_payment_methods') &&
+                $paymentMethods = Payment::getPaymentMethods(
                     // countryId is used for payment address
                     $_SESSION['shop']['countryId']
                 )
@@ -4046,6 +4046,10 @@ die("Shop::processRedirect(): This method is obsolete!");
                     self::$objTemplate->parse('shop_payment_payment_methods');
                 }
             }
+
+            self::$objTemplate->touchBlock('shop_payment');
+        } else {
+            self::$objTemplate->hideBlock('shop_payment');
         }
 
         if (empty($_SESSION['shop']['coupon_code'])) {
