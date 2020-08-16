@@ -3485,9 +3485,23 @@ die("Shop::processRedirect(): This method is obsolete!");
         // parsed in order to consider payment dependent Coupons
         if (isset($_POST['paymentId']))
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
-        // Determine any valid value for it
-        if (   $cart_amount
-            && empty($_SESSION['shop']['paymentId'])) {
+
+        // Initial initialization of the payment method based on the customers
+        // country.
+        // However, payment is only initialized if the order costs anything at
+        // all.
+        //
+        // note: we have to check for greater than 0 as PHP does evaluate a
+        // float of 0.00 as true
+        if (
+            (
+                $cart_amount > 0 || (
+                    isset($_SESSION['shop']['shipment_price']) &&
+                    $_SESSION['shop']['shipment_price'] > 0
+                )
+            ) &&
+            empty($_SESSION['shop']['paymentId'])
+        ) {
             $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
                 // countryId is used for payment address
                 $_SESSION['shop']['countryId'],
@@ -3495,8 +3509,20 @@ die("Shop::processRedirect(): This method is obsolete!");
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
-        if (empty($_SESSION['shop']['paymentId']))
+        // unset payment method in case the order (incl. shipping) is free of
+        // charge
+        elseif (
+            $cart_amount == 0 &&
+            $_SESSION['shop']['shipment_price'] == 0
+        ) {
             $_SESSION['shop']['paymentId'] = null;
+        }
+
+        // force unsetting of payment method in case it has been set to 0
+        if (empty($_SESSION['shop']['paymentId'])) {
+            $_SESSION['shop']['paymentId'] = null;
+        }
+
         // hide currency navbar
         self::$show_currency_navbar = false;
         if (isset($_POST['customer_note'])) {
