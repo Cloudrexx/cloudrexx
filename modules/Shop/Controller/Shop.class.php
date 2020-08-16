@@ -3632,6 +3632,16 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (Cart::getCoupon() != $coupon) {
             return static::_initPaymentDetails();
         }
+
+        // recalculate payment costs in case a coupon has been applied on the
+        // shipment costs and does make the payment method now obsolete
+        if (
+            Cart::get_price() == 0 &&
+            $_SESSION['shop']['shipment_price'] == 0 &&
+            !empty($_SESSION['shop']['paymentId'])
+        ) {
+            return static::_initPaymentDetails();
+        }
     }
 
 
