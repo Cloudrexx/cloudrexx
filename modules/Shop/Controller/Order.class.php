@@ -1020,7 +1020,7 @@ class Order
                 $this->customer_id, $this->currency_id, $this->sum,
                 ".($this->date_time ? "'$this->date_time'" : "'".date('Y-m-d H:i:s')."'").",
                 $this->status,
-                $this->payment_id, $this->payment_amount,
+                " . intval($this->payment_id) . ", $this->payment_amount,
                 $this->vat_amount,
                 '".addslashes($this->ip)."',
                 $this->lang_id,

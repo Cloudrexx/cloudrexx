@@ -263,12 +263,6 @@ class PaymentProcessing
         $return = '';
         // @since 3.0.5: Names are now lowercase, i.e. "internal" instead of "Internal"
         switch (self::getPaymentProcessorName()) {
-            case 'internal':
-                \Cx\Core\Csrf\Controller\Csrf::redirect(
-                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                        array('result' => 1, 'handler' => 'internal')
-                    )
-                );
             case 'internal_lsv':
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
@@ -341,6 +335,15 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 break;
             case 'dummy':
                 $return = \Dummy::getForm();
+                break;
+
+            case 'internal':
+            default:
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
+                        array('result' => 1, 'handler' => 'internal')
+                    )
+                );
                 break;
         }
         // shows the payment picture
