@@ -4269,16 +4269,11 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objTemplate->setVariable(array(
             'SHOP_UNIT' => Currency::getActiveCurrencySymbol(),
             'SHOP_TOTALITEM' => Cart::get_item_count(),
-            // costs for payment handler (CC, invoice, etc.)
-            'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
-                $_SESSION['shop']['payment_price']),
             // costs of all goods (before subtraction of discount) without payment and shippment costs
             'SHOP_PRODUCT_TOTAL_GOODS' => Currency::formatPrice(
                   Cart::get_price() + Cart::get_discount_amount()),
             // order costs after discount subtraction (incl VAT) but without payment and shippment costs
             'SHOP_TOTALPRICE' => Currency::formatPrice(Cart::get_price()),
-            'SHOP_PAYMENT' =>
-                Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
             // final order costs
             'SHOP_GRAND_TOTAL' => Currency::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
@@ -4298,6 +4293,21 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
         ));
+
+        // parse set payment method
+        if ($_SESSION['shop']['paymentId']) {
+            self::$objTemplate->setVariable(array(
+                // costs for payment handler (CC, invoice, etc.)
+                'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
+                    $_SESSION['shop']['payment_price']),
+                'SHOP_PAYMENT' =>
+                    Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
+            ));
+
+            self::$objTemplate->touchBlock('shop_payment');
+        } else {
+            self::$objTemplate->hideBlock('shop_payment');
+        }
 
         // only parse birthday if it had been set
         if (!empty($_SESSION['shop']['birthday'])) {
