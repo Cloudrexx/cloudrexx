@@ -3474,8 +3474,13 @@ die("Shop::processRedirect(): This method is obsolete!");
 
     static function _initPaymentDetails()
     {
-        // Uses the active currency
+        // coupon to be redeemed
+        $coupon = null;
+
+        // total cost of the products in the cart after redemption of a coupon
+        // note: Uses the active currency
         $cart_amount = Cart::get_price();
+
         // The Payment ID must be known and up to date when the cart is
         // parsed in order to consider payment dependent Coupons
         if (isset($_POST['paymentId']))
@@ -3494,14 +3499,21 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['paymentId'] = null;
         // hide currency navbar
         self::$show_currency_navbar = false;
-        if (isset($_POST['customer_note']))
+        if (isset($_POST['customer_note'])) {
             $_SESSION['shop']['note'] =
                 trim(strip_tags(contrexx_input2raw($_POST['customer_note'])));
-        if (isset($_POST['agb']))
+        }
+        if (isset($_POST['agb'])) {
             $_SESSION['shop']['agb'] = \Html::ATTRIBUTE_CHECKED;
-        if (isset($_POST['cancellation_terms']))
+        }
+        if (isset($_POST['cancellation_terms'])) {
             $_SESSION['shop']['cancellation_terms'] = \Html::ATTRIBUTE_CHECKED;
+        }
+
+        // reset applied discount on shipment costs
+        // before recalculating them below
         unset($_SESSION['shop']['shipment_discount_amount']);
+
         // if shipperId is not set, there is no use in trying to determine a shipment_price
         if (isset($_SESSION['shop']['shipperId'])) {
             $shipmentPrice = self::_calculateShipmentPrice(
@@ -3572,12 +3584,17 @@ die("Shop::processRedirect(): This method is obsolete!");
         } else {
             $_SESSION['shop']['shipment_price'] = '0.00';
         }
+
+        // calculate payment costs based on set payment method
         $_SESSION['shop']['payment_price'] =
             self::_calculatePaymentPrice(
                 $_SESSION['shop']['paymentId'],
                 $cart_amount,
                 $shipmentPrice
             );
+
+        // Revalidate any entered coupons to match up with the set payment
+        // method. This is done by Cart::update().
         Cart::update(self::$objCustomer);
         self::update_session();
     }
