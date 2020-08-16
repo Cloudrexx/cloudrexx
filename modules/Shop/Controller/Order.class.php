@@ -1690,25 +1690,46 @@ class Order
             return \Message::error(sprintf(
                 $_ARRAYLANG['TXT_SHOP_ORDER_NOT_FOUND'], $order_id));
         }
-        // lsv data
-        $query = "
-            SELECT `holder`, `bank`, `blz`
-              FROM ".DBPREFIX."module_shop".MODULE_INDEX."_lsv
-             WHERE order_id=$order_id";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) {
-            return self::errorHandler();
-        }
-        if ($objResult->RecordCount() == 1) {
+
+        if ($objOrder->payment_id()) {
+            $ppName = '';
+            $psp_id = Payment::getPaymentProcessorId($objOrder->payment_id());
+            if ($psp_id) {
+                $ppName = PaymentProcessing::getPaymentProcessorName($psp_id);
+            }
             $objTemplate->setVariable(array(
-                'SHOP_ACCOUNT_HOLDER' => contrexx_raw2xhtml(
-                    $objResult->fields['holder']),
-                'SHOP_ACCOUNT_BANK' => contrexx_raw2xhtml(
-                    $objResult->fields['bank']),
-                'SHOP_ACCOUNT_BLZ' => contrexx_raw2xhtml(
-                    $objResult->fields['blz']),
+                'SHOP_PAYMENTTYPE' => Payment::getProperty($objOrder->payment_id(), 'name'),
+                'SHOP_PAYMENT_HANDLER' => $ppName,
+                'SHOP_PAYMENT_PRICE' => $objOrder->payment_amount(),
             ));
+
+            // lsv data
+            $query = "
+                SELECT `holder`, `bank`, `blz`
+                  FROM ".DBPREFIX."module_shop".MODULE_INDEX."_lsv
+                 WHERE order_id=$order_id";
+            $objResult = $objDatabase->Execute($query);
+            if (!$objResult) {
+                return self::errorHandler();
+            }
+            if ($objResult->RecordCount() == 1) {
+                $objTemplate->setVariable(array(
+                    'SHOP_ACCOUNT_HOLDER' => contrexx_raw2xhtml(
+                        $objResult->fields['holder']),
+                    'SHOP_ACCOUNT_BANK' => contrexx_raw2xhtml(
+                        $objResult->fields['bank']),
+                    'SHOP_ACCOUNT_BLZ' => contrexx_raw2xhtml(
+                        $objResult->fields['blz']),
+                ));
+            }
+
+            $objTemplate->touchBlock('shop_payment');
+            $objTemplate->touchBlock('shopPaymentPrice');
+        } else {
+            $objTemplate->hideBlock('shop_payment');
+            $objTemplate->hideBlock('shopPaymentPrice');
         }
+
         $customer_id = $objOrder->customer_id();
         if (!$customer_id) {
 //DBG::log("Shop::shopShowOrderdetails(): Invalid Customer ID $customer_id");
@@ -1784,7 +1805,6 @@ class Order
                 ? \Cx\Core\Country\Controller\Country::getMenu('shipCountry', $objOrder->country_id(), false)
                 : \Cx\Core\Country\Controller\Country::getNameById($objOrder->country_id())),
             'SHOP_SHIP_PHONE' => $objOrder->phone(),
-            'SHOP_PAYMENTTYPE' => Payment::getProperty($objOrder->payment_id(), 'name'),
             'SHOP_CUSTOMER_NOTE' => $objOrder->note(),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_SHIPPING_TYPE' => ($objOrder->shipment_id()
@@ -1815,15 +1835,8 @@ class Order
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart'),
             ));
         }
-        $ppName = '';
-        $psp_id = Payment::getPaymentProcessorId($objOrder->payment_id());
-        if ($psp_id) {
-            $ppName = PaymentProcessing::getPaymentProcessorName($psp_id);
-        }
         $objTemplate->setVariable(array(
             'SHOP_SHIPPING_PRICE' => $objOrder->shipment_amount(),
-            'SHOP_PAYMENT_PRICE' => $objOrder->payment_amount(),
-            'SHOP_PAYMENT_HANDLER' => $ppName,
             'SHOP_LAST_MODIFIED_DATE' => $objOrder->modified_on(),
         ));
         if ($edit) {
