@@ -3626,6 +3626,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         // method. This is done by Cart::update().
         Cart::update(self::$objCustomer);
         self::update_session();
+
+        // recalculate payment costs in case the customer entered a new coupon
+        // or removed one again
+        if (Cart::getCoupon() != $coupon) {
+            return static::_initPaymentDetails();
+        }
     }
 
 
