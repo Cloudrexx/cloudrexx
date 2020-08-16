@@ -3482,9 +3482,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         $cart_amount = Cart::get_price();
 
         // The Payment ID must be known and up to date when the cart is
-        // parsed in order to consider payment dependent Coupons
-        if (isset($_POST['paymentId']))
+        // parsed in order to consider payment dependent Coupons.
+        // Therefore, we do have to call Cart::update() again at the end of
+        // this method.
+        if (isset($_POST['paymentId'])) {
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
+        }
 
         // Initial initialization of the payment method based on the customers
         // country.
