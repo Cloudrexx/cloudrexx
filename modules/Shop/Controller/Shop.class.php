@@ -3558,15 +3558,23 @@ die("Shop::processRedirect(): This method is obsolete!");
                 // deduct global coupon (if one is set)
                 $coupon = Cart::getCoupon();
 
-                // verify VAT of shipment
-                // ensure each VAT rate only occurs once
-                $usedVatRates = array_unique(
-                    array_merge(
-                        $_SESSION['shop']['cart']['item_vat_rates']->toArray(),
-                        // VAT for shipment
-                        array(Vat::getOtherRate())
-                    )
+                // Collect used VAT rates for the order being processed.
+                // This will be used to ensure that only one VAT rate is being
+                // used. Otherwise we will not be able to apply the coupon on
+                // the shipment costs.
+                $usedVatRates = array(
+                    // VAT for shipment
+                    Vat::getOtherRate()
                 );
+                // VAT of ordered items
+                if (isset($_SESSION['shop']['cart']['item_vat_rates'])) {
+                    $usedVatRates = array_unique(
+                        array_merge(
+                            $_SESSION['shop']['cart']['item_vat_rates']->toArray(),
+                            $usedVatRates
+                        )
+                    );
+                }
 
                 // check if we have to apply a discount on the shipment costs
                 $shipmentDiscount = 0;
