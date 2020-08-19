@@ -1,0 +1,9 @@
+td.manufacturer-id {
+    width: 3%;
+}
+td.manufacturer-name {
+    width: 20%;
+}
+td.manufacturer-uri {
+    width: 75%;
+}

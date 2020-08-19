@@ -32,6 +32,40 @@
  * @package     cloudrexx
  * @subpackage  module_shop
  */
+/*** NEW ***/
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_ORDER'] = 'Pedidos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY'] = 'Categor&iacute;as de productos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT'] = 'Productos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_MANUFACTURER'] = 'Fabricantes';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER'] = 'Clientes / Vendedores';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_STATISTIC'] = 'Estad&iacute;sticas';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_IMPORT'] = 'Importar/Exportar';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING'] = 'Propiedades';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_DEFAULT'] = 'Descripci&oacute;n general';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_RELDISCOUNTGROUP'] = 'Rebajas de clientes';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_CUSTOMERGROUP'] = 'Grupo de rebajas de clientes';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_DEFAULT'] = 'Categor&iacute;as de productos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_PRICELIST'] = 'Crear PDF con lista de precios';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DEFAULT'] = 'Cat&aacute;logo de productos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_MANAGE'] = 'A&ntilde;adir productos';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ATTRIBUTE'] = 'Caracter&iacute;sticas del producto';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DISCOUNTGROUPCOUNTNAME'] = 'Grupos de descuentos de cantidad';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ARTICLEGROUP'] = 'Grupo de rebajas parciales';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DEFAULT'] = 'Propiedades Generales';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_VAT'] = 'Mehrwertsteuer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_CURRENCY'] = 'Monedas';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENT'] = 'Tipos de pago';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_SHIPPER'] = 'M&eacute;todos de env&iacute;o';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_RELCOUNTRY'] = 'Pa&iacute;ses de entrega';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zonas';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'Plantillas de E-mail';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
+
+
 $_ARRAYLANG['TXT_ORDERS'] = "Pedidos";
 $_ARRAYLANG['TXT_STOCK'] = "En stock";
 $_ARRAYLANG['TXT_ALL_PRODUCT_GROUPS'] = "Todas las categor&iacute;as";
@@ -704,3 +738,7 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_PRODUCT_INVALID'] = "ungültiges Produkt";
 $_ARRAYLANG['TXT_SHOP_PAYMILL'] = "Paymill";
 $_ARRAYLANG['TXT_SHOP_PAYMILL_PRIVATE_KEY'] = "Private key";
 $_ARRAYLANG['TXT_SHOP_PAYMILL_PUBLIC_KEY'] = "Public key";
+
+$_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['name'] = 'Nombre';
+$_ARRAYLANG['uri'] = 'Url';

@@ -27,14 +27,38 @@
 
 global $_ARRAYLANG;
 /*** NEW ***/
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_ORDERS'] = 'Bestellungen';
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORIES'] = 'Rubriken';
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCTS'] = 'Produkte';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_ORDER'] = 'Bestellungen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY'] = 'Rubriken';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT'] = 'Produkte';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_MANUFACTURER'] = 'Hersteller';
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMERS'] = 'Kunden';
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_STATISTICS'] = 'Statistik';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER'] = 'Kunden';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_STATISTIC'] = 'Statistik';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_IMPORT'] = 'Schnittstellen';
-$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTINGS'] = 'Stammdaten';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING'] = 'Stammdaten';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_DEFAULT'] = 'Übersicht';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_RELDISCOUNTGROUP'] = 'Kundenrabatte';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CUSTOMER_CUSTOMERGROUP'] = 'Kundengruppen';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_DEFAULT'] = 'Rubriken';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_CATEGORY_PRICELIST'] = 'PDF-Preislisten';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DEFAULT'] = 'Produktekatalog';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_MANAGE'] = 'Produkte hinzufügen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ATTRIBUTE'] = 'Produktemerkmale';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_DISCOUNTGROUPCOUNTNAME'] = 'Mengenrabattgruppen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_PRODUCT_ARTICLEGROUP'] = 'Produktegruppen';
+
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DEFAULT'] = 'Allgemein';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_VAT'] = 'Mehrwertsteuer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_CURRENCY'] = 'Währungen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENT'] = 'Zahlungsarten';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_SHIPPER'] = 'Versandarten';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_RELCOUNTRY'] = 'Lieferländer';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zonen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-Mail Vorlagen';
+$_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
+
 
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "Das Gesamtgewicht der Bestellung übersteigt die verfügbaren Versandmöglichkeiten.";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Änderungen übernehmen";
@@ -1055,3 +1079,6 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_TYPE_TIP'] = 'Gilt die Mindestmenge pro Produkt o
 $_ARRAYLANG['TXT_SHOP_TYPE'] = 'Art';
 $_ARRAYLANG['TXT_SHOP_PERCENTAGE'] = 'Prozent';
 $_ARRAYLANG['TXT_SHOP_PAYMENT_FEE_INFO'] = 'Definieren Sie hier die Höhe der Kommission, die bei Verwendung der jeweiligen Zahlungsart bei der Bestellung erhoben werden soll. Hinterlegen Sie entweder einen Fixbetrag oder einen Prozentsatz, der auf die Bestellsumme aufgerechnet werden soll.';
+$_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['uri'] = 'URL';

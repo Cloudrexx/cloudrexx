@@ -604,7 +604,7 @@ class Product
         if (isset($date_start)) {
             $time_start = strtotime($date_start);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if ($time_start) {
+            if ($date_start && $date_start != '0000-00-00 00:00:00') {
                 $this->date_start =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_start);
             } else {
@@ -626,7 +626,7 @@ class Product
         if (isset($date_end)) {
             $time_end = strtotime($date_end);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if ($time_end) {
+            if ($time_end && $date_end != '0000-00-00 00:00:00') {
                 $this->date_end =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_end);
             } else {
@@ -1570,7 +1570,11 @@ class Product
         // Fix the Text, Discount, and Manufacturer tables first
         \Text::errorHandler();
 //        Discount::errorHandler(); // Called by Customer::errorHandler();
-        Manufacturer::errorHandler();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $manufacturer = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Manufacturer'
+        );
+        $manufacturer->errorHandler();
 
         $table_name = DBPREFIX.'module_shop_products';
         $table_structure = array(

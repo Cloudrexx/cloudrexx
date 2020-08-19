@@ -193,8 +193,10 @@ class ShopManager extends ShopLibrary
 
     /**
      * Set up the shop admin page
+     *
+     * @param \Cx\Core\Html\Sigma $navigation
      */
-    function getPage()
+    function getPage($navigation)
     {
         global $objTemplate, $_ARRAYLANG;
 
@@ -266,9 +268,6 @@ class ShopManager extends ShopLibrary
             case 'import':
                 $this->_import();
                 break;
-            case 'manufacturer':
-                $this->view_manufacturers();
-                break;
             default:
                 $this->view_order_overview();
                 break;
@@ -280,119 +279,9 @@ class ShopManager extends ShopLibrary
             'ADMIN_CONTENT' => self::$objTemplate->get(),
         ));
         $this->act = (isset ($_REQUEST['act']) ? $_REQUEST['act'] : '');
-        $this->setNavigation();
+
+        $objTemplate->setVariable('CONTENT_NAVIGATION', $navigation);
     }
-
-
-    /**
-     * Manages manufacturers
-     */
-    function view_manufacturers()
-    {
-        global $_ARRAYLANG;
-
-        self::update_manufacturers();
-
-        self::$pageTitle = $_ARRAYLANG['TXT_SHOP_MANUFACTURER'];
-        self::$objTemplate->loadTemplateFile('module_shop_manufacturer.html');
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-
-        $uri = \Html::getRelativeUri();
-        \Html::stripUriParam($uri, 'delete');
-        $arrSorting = array(
-          'id' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_ID'],
-          'name' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_NAME'],
-          'url' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_URL'],
-        );
-        $objSorting = new \Sorting($uri, $arrSorting, true, 'order_manufacturer');
-        self::$objTemplate->setVariable(array(
-            'SHOP_HEADER_ID' => $objSorting->getHeaderForField('id'),
-            'SHOP_HEADER_NAME' => $objSorting->getHeaderForField('name'),
-            'SHOP_HEADER_URL' => $objSorting->getHeaderForField('url'),
-        ));
-
-        $count = 0;
-// TODO: Implement the filter in the Manufacturer class
-        $filter = null;
-        $limit = \Cx\Core\Setting\Controller\Setting::getValue('numof_manufacturers_per_page_backend','Shop');
-        $arrManufacturers = Manufacturer::getArray($count,
-            $objSorting->getOrder(), \Paging::getPosition(), $limit, $filter);
-        $i = 0;
-        foreach ($arrManufacturers as $manufacturer_id => $arrManufacturer) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_MANUFACTURER_ID' => $manufacturer_id,
-                'SHOP_MANUFACTURER_NAME' => $arrManufacturer['name'],
-                'SHOP_MANUFACTURER_URL' => $arrManufacturer['url'],
-                'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse("manufacturerRow");
-        }
-        $manufacturer_id = (!empty($_REQUEST['id']) ? intval($_REQUEST['id']) : 0);
-        $name = $url = '';
-        if (isset($arrManufacturers[$manufacturer_id])) {
-            $name = $arrManufacturers[$manufacturer_id]['name'];
-            $url = $arrManufacturers[$manufacturer_id]['url'];
-        }
-        if (!empty($_POST['name'])) $name = contrexx_input2raw($_POST['name']);
-        if (!empty($_POST['url'])) $url = contrexx_input2raw($_REQUEST['url']);
-
-        $currentUrl = clone \Env::get('Resolver')->getUrl();
-        self::$objTemplate->setVariable(array(
-            'SHOP_MANUFACTURER_PAGING' => \Paging::get($currentUrl, $_ARRAYLANG['TXT_SHOP_MANUFACTURER'], $count, $limit),
-            'SHOP_EDIT_MANUFACTURER' => ($manufacturer_id
-                ? $_ARRAYLANG['TXT_SHOP_MANUFACTURER_EDIT']
-                : $_ARRAYLANG['TXT_SHOP_MANUFACTURER_ADD']),
-            'SHOP_MANUFACTURER_NAME' => $name,
-            'SHOP_MANUFACTURER_URL' => $url,
-            'SHOP_MANUFACTURER_ID' => $manufacturer_id,
-        ));
-    }
-
-
-    /**
-     * Updates the Manufacturers in the database
-     *
-     * Stores or deletes records depending on the contents of the
-     * current request
-     * @return  boolean           True on success, null on noop, false otherwise
-     */
-    static function update_manufacturers()
-    {
-        global $_ARRAYLANG;
-
-        // Delete any single manufacturer, if requested to
-        if (!empty($_GET['delete'])) {
-            $manufacturer_id = intval($_GET['delete']);
-            return Manufacturer::delete($manufacturer_id);
-        }
-        // Multiaction: Only deleting implemented
-        if (   !empty($_POST['multi_action'])
-            && !empty($_POST['selected_manufacturer_id'])
-            && is_array($_POST['selected_manufacturer_id'])) {
-            switch ($_POST['multi_action']) {
-              case 'delete':
-                // Delete multiple selected manufacturers
-                return Manufacturer::delete($_POST['selected_manufacturer_id']);
-            }
-        }
-        if (!isset($_POST['bstore'])) return null;
-        if (empty($_POST['name'])) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_MANUFACTURER_ERROR_EMPTY_NAME']);
-        }
-        $manufacturer_id = (empty($_POST['id']) ? null : intval($_POST['id']));
-        $name = (empty($_POST['name']) ? '' : contrexx_input2raw($_POST['name']));
-        $url = (empty($_REQUEST['url']) ? '' : contrexx_input2raw($_REQUEST['url']));
-//DBG::log("ShopManager::update_manufacturers(): Storing Manufacturer: $name, $url, $manufacturer_id");
-        $result = Manufacturer::store($name, $url, $manufacturer_id);
-        if ($result) {
-            // Do not set up the same Manufacturer for editing again after
-            // storing it successfully
-            $_REQUEST['id'] = $_POST['name'] = $_POST['url'] = null;
-            Manufacturer::flush();
-        }
-        return $result;
-    }
-
 
     /**
      * Import and Export data from/to csv
@@ -2279,7 +2168,7 @@ if ($test === NULL) {
             'SHOP_STOCK_VISIBILITY' => ($objProduct->stock_visible()
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                Manufacturer::getMenuoptions($objProduct->manufacturer_id(), true),
+                \Cx\Modules\Shop\Controller\ManufacturerController::getMenuoptions($objProduct->manufacturer_id(), true),
             'SHOP_PICTURE1_IMG_SRC' =>
                 (   !empty($arrImages[1]['img'])
                  && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
