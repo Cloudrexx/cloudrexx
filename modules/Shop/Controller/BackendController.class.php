@@ -111,7 +111,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Attribute' => 'attributes',
                     'DiscountgroupCountName' => 'discounts',
                     'Customer' => 'customers',
-                    'CustomerGroup' => 'groups',
                     'RelDiscountGroup' => 'discounts',
                     'Statistic' => 'statistics',
                     'Import' => 'import',
@@ -347,6 +346,23 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     ),
                 );
                 break;
+            case 'Cx\Modules\Shop\Model\Entity\CustomerGroup':
+                $options['functions']['editable'] = true;
+                $options['functions']['paging'] = false;
+                $options['functions']['sorting'] = false;
+                $options['fields'] = array(
+                    'id' => array(
+                        'showOverview' => false,
+                    ),
+                    'name' => array(
+                        'editable' => true,
+                    ),
+                    'relDiscountGroups' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                );
+                break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountCoupon'
@@ -422,6 +438,37 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         return \Html::getOptions(
             array(0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'], )
             + $arrArticleGroupName, $selectedId);
+    }
+
+    /**
+     * Returns the HTML dropdown menu options with all of the
+     * customer group names
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupCustomer($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $customerGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->findAll();
+
+        $arrGroupname = array();
+        foreach ($customerGroups as $customerGroup) {
+            $arrGroupname[$customerGroup->getId()] = $customerGroup->getName();
+        }
+
+        return \Html::getOptions(
+            array(
+                0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE']
+            ) + $arrGroupname, $selectedId);
     }
 
     /**
