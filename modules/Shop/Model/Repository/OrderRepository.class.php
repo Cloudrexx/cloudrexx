@@ -795,10 +795,29 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 //\DBG::log("Orders::getSubstitutionArray(): Coupon $coupon_code, amount $coupon_amount");
             $coupon_amount = $this->getOrderDiscountCoupon($order_id)->getAmount();
 //\DBG::log("Orders::getSubstitutionArray(): Got Order Coupon $coupon_code");
-            $arrSubstitution['DISCOUNT_COUPON'][] = array(
+            $couponInfo = array(
                 'DISCOUNT_COUPON_CODE' => sprintf('%-40s', $coupon_code),
+                // This is the amount that is substracted from this order:
                 'DISCOUNT_COUPON_AMOUNT' => sprintf('% 9.2f', -$coupon_amount),
             );
+
+            // The remaining value of the coupon (if not by rate):
+            if ($objCoupon->getDiscountAmount() > 0) {
+                $couponInfo['DISCOUNT_COUPON_REMAINING_AMOUNT'] = sprintf(
+                    '% 9.2f',
+                    // as the order is already persisted at this point we can
+                    // simply calculate (total amount - used amount)
+                    $objCoupon->getDiscountAmount() -
+                    $objCoupon->getUsedAmount(
+                        $customer_id
+                    )
+                );
+                $couponInfo['DISCOUNT_COUPON_INITIAL_AMOUNT'] = sprintf(
+                    '% 9.2f',
+                    $objCoupon->getDiscountAmount()
+                );
+            }
+            $arrSubstitution['DISCOUNT_COUPON'][] = $couponInfo;
         }
 
         if (\Cx\Modules\Shop\Controller\Vat::isEnabled()) {
