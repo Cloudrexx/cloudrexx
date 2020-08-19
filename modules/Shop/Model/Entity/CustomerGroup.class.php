@@ -74,8 +74,6 @@ class CustomerGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Set translatable locale
      *
      * @param $locale
@@ -88,10 +86,9 @@ class CustomerGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     }
 
     /**
->>>>>>> CLX-2421-migrate-core-text-attributes
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -141,7 +138,7 @@ class CustomerGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * Get relDiscountGroups
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getRelDiscountGroups()
     {
