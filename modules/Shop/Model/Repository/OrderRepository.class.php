@@ -648,6 +648,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
+        $orderItemIdx = 0;
         foreach ($arrItems as $item) {
             $product_id = $item->getProductId();
             $objProduct = $item->getProduct();
@@ -741,6 +742,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                 'PRODUCT_TOTAL_PRICE' => sprintf(
                     '% 9.2f', $item_price*$quantity
                 ),
+                'ORDER_ITEM_IDX' => $orderItemIdx,
             );
 //DBG::log("Orders::getSubstitutionArray($order_id, $create_accounts): Adding article: ".var_export($arrProduct, true));
             $orderItemCount += $quantity;
@@ -787,6 +789,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             if (empty($arrSubstitution['ORDER_ITEM']))
                 $arrSubstitution['ORDER_ITEM'] = array();
             $arrSubstitution['ORDER_ITEM'][] = $arrProduct;
+            $orderItemIdx++;
         }
         $arrSubstitution['ORDER_ITEM_SUM'] =
             sprintf('% 9.2f', $total_item_price);
