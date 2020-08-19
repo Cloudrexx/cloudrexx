@@ -334,7 +334,7 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
             'to' =>
                 $arrSubstitution['CUSTOMER_EMAIL'].','.
                 \Cx\Core\Setting\Controller\Setting::getValue('email_confirmation','Shop'),
-            'substitution' => $arrSubstitution,
+            'substitution' => &$arrSubstitution,
         );
 //DBG::log("sendConfirmationMail($order_id, $create_accounts): Template: ".var_export($arrMailTemplate, true));
 //DBG::log("sendConfirmationMail($order_id, $create_accounts): Substitution: ".var_export($arrSubstitution, true));
@@ -355,7 +355,7 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
             $orderItemSubstitutions[$orderItemSubstitution['PRODUCT_ID']] =
                 $orderItemSubstitution;
         }
-        $arrSubstitution['ORDER_ITEM'] = array();
+
         // loop over products
         $i = 1;
         $objOrder = $orderRepo->find($order_id);
@@ -367,28 +367,20 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
             $arrSubstitution['ORDER_ITEM'] = array(
                 $orderItemSubstitutions[$orderItem->getProduct()->getId()]
             );
-            // Buffer and reset the filename in order to allow us to set the
-            // filename manually. If we don't do this the current time is used
-            // which leads to the same file being overwritten if we generate
-            // multiple PDFs quickly.
-            $pdfName = $orderItem->getProduct()->getPdfTemplate()->getFileName();
-            $orderItem->getProduct()->getPdfTemplate()->setFileName('');
             $productPdf = $cx->getComponent('Pdf')->generatePDF(
                 $orderItem->getProduct()->getPdfTemplate()->getId(),
                 $arrSubstitution,
-                $i . '_' . $pdfName
+                $arrMailTemplate['key']
             );
-            // restore name so it is still there in the next iteration and
-            // does not get persisted.
-            $orderItem->getProduct()->getPdfTemplate()->setFileName($pdfName);
             // add pdfs to $arrMailTemplate['attachments']
             if (!isset($arrMailTemplate['attachments'])) {
                 $arrMailTemplate['attachments'] = array();
             }
-            $arrMailTemplate['attachments'][$productPdf['filePath']] = $pdfName . $i;
+            $arrMailTemplate['attachments'][$productPdf['filePath']] = $productPdf['fileName'];
             $i++;
         }
         if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) return false;
+        $arrSubstitution['ORDER_ITEM'] = array_values($orderItemSubstitutions);
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }
 
