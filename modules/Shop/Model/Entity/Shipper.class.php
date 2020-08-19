@@ -83,9 +83,9 @@ class Shipper extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     protected $shipmentCosts;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Cx\Modules\Shop\Model\Entity\Zones
      */
-    protected $zones;
+    protected $zone;
 
     /**
      * Constructor
@@ -240,32 +240,22 @@ class Shipper extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     }
 
     /**
-     * Add zone
+     * Set zone
      *
      * @param \Cx\Modules\Shop\Model\Entity\Zone $zone
      */
-    public function addZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function setZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
     {
-        $this->zones[] = $zone;
+        $this->zone = $zone;
     }
 
     /**
-     * Remove zone
+     * Get zone
      *
-     * @param \Cx\Modules\Shop\Model\Entity\Zone $zone
+     * @return \Cx\Modules\Shop\Model\Entity\Zones
      */
-    public function removeZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function getZone()
     {
-        $this->zones->removeElement($zone);
-    }
-
-    /**
-     * Get zones
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getZones()
-    {
-        return $this->zones;
+        return $this->zone;
     }
 }

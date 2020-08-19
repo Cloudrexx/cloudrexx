@@ -257,14 +257,12 @@ class Shipment
 //DBG::log("Shipment::getCountriesRelatedShippingIdArray($countryId): Shippers: ".var_export(self::$arrShippers, true));
 //DBG::activate(DBG_ADODB);
         $query = "
-            SELECT DISTINCT `relation`.`shipper_id`
+            SELECT DISTINCT `shipper`.`id`
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_countries` AS `country`
               JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_zones` AS `zone`
                 ON `country`.`zone_id`=`zone`.`id`
-              JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper` AS `relation`
-                ON `zone`.`id`=`relation`.`zone_id`
               JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_shipper` AS `shipper`
-                ON `relation`.`shipper_id`=`shipper`.`id`
+                ON `zone`.`id`=`shipper`.`zone_id`
              WHERE `zone`.`active`=1
                AND `shipper`.`active`=1".
               ($countryId ? " AND `country`.`country_id`=$countryId" : '');
@@ -273,7 +271,7 @@ class Shipment
 //DBG::deactivate(DBG_ADODB);
         $arrShipperId = array();
         while ($objResult && !$objResult->EOF) {
-            $shipper = $objResult->fields['shipper_id'];
+            $shipper = $objResult->fields['id'];
             if (isset(self::$arrShippers[$shipper])) {
                 $arrShipperId[] = $shipper;
 //DBG::log("Shipment::getCountriesRelatedShippingIdArray($countryId): Shipper ID $shipper OK");
@@ -392,10 +390,6 @@ class Shipment
              WHERE shipper_id=".$shipper_id);
         if (!$objResult) return false;
         $objResult = $objDatabase->Execute("
-            DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper
-             WHERE shipper_id=".$shipper_id);
-        if (!$objResult) return false;
-        $objResult = $objDatabase->Execute("
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_shipper
              WHERE id=".$shipper_id);
         if (!$objResult) return false;
@@ -432,15 +426,16 @@ class Shipment
      * @static
      * @access  private
      */
-    private function _add_shipper($name, $active=false)
+    private function _add_shipper($name, $active=false, $zoneId)
     {
         global $objDatabase;
 
         $objResult = $objDatabase->Execute("
             INSERT INTO `".DBPREFIX."module_shop".MODULE_INDEX."_shipper` (
-                `active`
+                `active`,
+                `zone_id`
             ) VALUES (
-                ".($active ? 1 : 0)."
+                ".($active ? 1 : 0).", ".$zoneId."
             )");
         if (!$objResult) return false;
         $id = $objDatabase->Insert_ID();
@@ -519,8 +514,6 @@ class Shipment
             !empty($_POST['active_new']),
             intval($_POST['zone_id_new']));
         if (!$shipper_id) return false;
-        return Zones::update_shipper_relation(
-            intval($_POST['zone_id_new']), $shipper_id);
     }
 
 
@@ -623,7 +616,7 @@ class Shipment
      * @static
      * @access  private
      */
-    private static function _update_shipment($shipment_id, $shipper_id, $fee, $free_from, $max_weight)
+    private static function _update_shipment($shipment_id, $shipper_id, $fee, $free_from, $max_weight,$zoneId)
     {
         global $objDatabase;
 
@@ -632,7 +625,8 @@ class Shipment
                SET `shipper_id`=$shipper_id,
                    `fee`=$fee,
                    `free_from`=$free_from,
-                   `max_weight`=$max_weight
+                   `max_weight`=$max_weight,
+                   `zone_id`=$zoneId
              WHERE `id`=$shipment_id");
         return (boolean)$objResult;
     }
@@ -799,10 +793,8 @@ class Shipment
                 SELECT DISTINCT `country`.`id`,".
                        $arrSqlName['field']."
                   FROM `".DBPREFIX."module_shop".MODULE_INDEX."_shipper` AS `shipper`
-                 INNER JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper` AS `rel_shipper`
-                    ON `shipper`.`id`=`rel_shipper`.`shipper_id`
                  INNER JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_zones` AS `zone`
-                    ON `rel_shipper`.`zone_id`=`zone`.`id`
+                    ON `shipper`.`zone_id`=`zone`.`id`
                  INNER JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_rel_countries` AS `rel_country`
                     ON `zone`.`id`=`rel_country`.`zone_id`
                  INNER JOIN `".DBPREFIX."core_country` AS `country`
@@ -900,6 +892,7 @@ class Shipment
             'id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'auto_increment' => true, 'primary' => true),
             'ord' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'default' => '0'),
             'active' => array('type' => 'TINYINT(1)', 'unsigned' => true, 'notnull' => true, 'default' => '1', 'renamefrom' => 'status'),
+            'zone_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => 'NULL')
         );
         $table_index = array();
         $default_lang_id = \FWLanguage::getDefaultLangId();

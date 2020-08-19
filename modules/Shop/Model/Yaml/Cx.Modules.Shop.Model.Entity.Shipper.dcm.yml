@@ -44,7 +44,10 @@ Cx\Modules\Shop\Model\Entity\Shipper:
       joinColumn:
         name: id
         referencedColumnName: shipper_id
-  manyToMany:
-    zones:
+  manyToOne:
+    zone:
       targetEntity: Cx\Modules\Shop\Model\Entity\Zone
-      mappedBy: shippers
+      inversedBy: shippers
+      joinColumn:
+        name: zone_id
+        referencedColumnName: id

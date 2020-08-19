@@ -91,11 +91,7 @@ ALTER TABLE contrexx_module_shop_rel_payment
   CHANGE zone_id zone_id INT UNSIGNED NOT NULL,
   CHANGE payment_id payment_id INT UNSIGNED NOT NULL;
 
-ALTER TABLE contrexx_module_shop_rel_shipper DROP PRIMARY KEY;
-ALTER TABLE contrexx_module_shop_rel_shipper
-  CHANGE shipper_id shipper_id INT UNSIGNED NOT NULL,
-  CHANGE zone_id zone_id INT UNSIGNED NOT NULL;
-
+ALTER TABLE contrexx_module_shop_shipper ADD zone_id INT UNSIGNED DEFAULT NULL;
 
 /** Drop Primary Keys **/
 ALTER TABLE contrexx_module_shop_discount_coupon DROP PRIMARY KEY;
@@ -250,13 +246,7 @@ ALTER TABLE contrexx_module_shop_rel_payment
 ALTER TABLE contrexx_module_shop_rel_payment
   ADD CONSTRAINT FK_43EB87984C3A3BB FOREIGN KEY (payment_id) REFERENCES contrexx_module_shop_payment (id);
 
-ALTER TABLE contrexx_module_shop_rel_shipper
-  ADD CONSTRAINT FK_87E5C9689F2C3FAB FOREIGN KEY (zone_id) REFERENCES contrexx_module_shop_zones (id);
-ALTER TABLE contrexx_module_shop_rel_shipper
-  ADD CONSTRAINT FK_87E5C96838459F23 FOREIGN KEY (shipper_id) REFERENCES contrexx_module_shop_shipper (id);
-
-ALTER TABLE contrexx_module_shop_shipment_cost
-  ADD CONSTRAINT FK_2329A4538459F23 FOREIGN KEY (shipper_id) REFERENCES contrexx_module_shop_shipper (id);
+ALTER TABLE contrexx_module_shop_shipment_cost ADD CONSTRAINT FK_2329A4538459F23 FOREIGN KEY (shipper_id) REFERENCES contrexx_module_shop_shipper (id);
 
 ALTER TABLE contrexx_module_shop_rel_product_user_group
   ADD CONSTRAINT FK_32A4494A4584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id);
@@ -269,6 +259,8 @@ ALTER TABLE contrexx_module_shop_rel_countries
 ALTER TABLE contrexx_module_shop_categories
   ADD CONSTRAINT FK_A9242624727ACA70 FOREIGN KEY (parent_id) REFERENCES contrexx_module_shop_categories (id);
 
+
+ALTER TABLE contrexx_module_shop_shipper ADD CONSTRAINT FK_52CD810E9F2C3FAB FOREIGN KEY (zone_id) REFERENCES contrexx_module_shop_zones (id);
 
 /** Index **/
 CREATE INDEX IDX_DA286BB1B213FA4 ON contrexx_module_shop_orders (lang_id);
@@ -308,10 +300,9 @@ CREATE INDEX IDX_93D6FD61ABBC2D2C ON contrexx_module_shop_rel_discount_group (ar
 CREATE INDEX IDX_43EB87989F2C3FAB ON contrexx_module_shop_rel_payment (zone_id);
 CREATE INDEX IDX_43EB87984C3A3BB ON contrexx_module_shop_rel_payment (payment_id);
 
-CREATE INDEX IDX_87E5C9689F2C3FAB ON contrexx_module_shop_rel_shipper (zone_id);
-CREATE INDEX IDX_87E5C96838459F23 ON contrexx_module_shop_rel_shipper (shipper_id);
-
 CREATE INDEX IDX_2329A4538459F23 ON contrexx_module_shop_shipment_cost (shipper_id);
+
+CREATE INDEX IDX_52CD810E9F2C3FAB ON contrexx_module_shop_shipper (zone_id);
 
 CREATE INDEX IDX_C859EA8B9F2C3FAB ON contrexx_module_shop_rel_countries (zone_id);
 
@@ -325,7 +316,6 @@ CREATE UNIQUE INDEX fk_module_shop_rel_customer_coupon_unique_idx
 
 
 /** Add Primary Keys **/
-ALTER TABLE contrexx_module_shop_rel_shipper ADD PRIMARY KEY (zone_id, shipper_id);
 ALTER TABLE contrexx_module_shop_rel_countries ADD PRIMARY KEY (zone_id, country_id);
 ALTER TABLE contrexx_module_shop_rel_category_pricelist ADD PRIMARY KEY (category_id, pricelist_id);
 
@@ -400,5 +390,11 @@ SELECT `l`.`iso_1` AS locale, CONCAT('Cx\\Modules\\Shop\\Model\\Entity\\', (
   LEFT JOIN `contrexx_core_locale_locale` AS `l` ON `t`.`lang_id` = `l`.`id`
 	WHERE `section` LIKE 'Shop' AND `key` NOT LIKE '%core_mail_template%%';
 
+/** Move zone ids to shipper table */
+UPDATE contrexx_module_shop_shipper AS s
+	JOIN contrexx_module_shop_rel_shipper AS rs ON rs.shipper_id = s.id
+    SET s.zone_id = rs.zone_id;
+
 ALTER TABLE contrexx_module_shop_products DROP category_id, DROP usergroup_ids;
 ALTER TABLE contrexx_module_shop_pricelists DROP categories;
+DROP TABLE contrexx_module_shop_rel_shipper;

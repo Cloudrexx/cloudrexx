@@ -73,10 +73,10 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zones', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zone', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zones', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zone', 'validators', 'virtual');
     }
 
     /**
@@ -343,34 +343,23 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     /**
      * {@inheritDoc}
      */
-    public function addZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function setZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addZone', array($zone));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setZone', array($zone));
 
-        return parent::addZone($zone);
+        return parent::setZone($zone);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function getZone()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeZone', array($zone));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getZone', array());
 
-        return parent::removeZone($zone);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getZones()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getZones', array());
-
-        return parent::getZones();
+        return parent::getZone();
     }
 
     /**

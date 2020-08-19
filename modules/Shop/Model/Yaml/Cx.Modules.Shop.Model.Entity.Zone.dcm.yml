@@ -33,6 +33,12 @@ Cx\Modules\Shop\Model\Entity\Zone:
       joinColumn:
         name: id
         referencedColumnName: zone_id
+    shippers:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Shipper
+      mappedBy: zone
+      joinColumn:
+        name: id
+        referencedColumnName: zone_id
   manyToMany:
     payments:
       targetEntity: Cx\Modules\Shop\Model\Entity\Payment
@@ -44,15 +50,4 @@ Cx\Modules\Shop\Model\Entity\Zone:
             referencedColumnName: id
         inverseJoinColumns:
           payment_id:
-            referencedColumnName: id
-    shippers:
-      targetEntity: Cx\Modules\Shop\Model\Entity\Shipper
-      inversedBy: zones
-      joinTable:
-        name: module_shop_rel_shipper
-        joinColumns:
-          zone_id:
-            referencedColumnName: id
-        inverseJoinColumns:
-          shipper_id:
             referencedColumnName: id
