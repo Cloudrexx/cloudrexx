@@ -241,11 +241,12 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Vat',
                     'Currency',
                     'Payment',
+                    'PaymentProcessor',
                     'Shipper',
                     'RelCountry',
                     'Zone',
                     'Mail',
-                    'DiscountCoupon'
+                    'DiscountCoupon',
                 ),
                 'translatable' => true
             ),
@@ -366,6 +367,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Cx\Modules\Shop\Model\Entity\Payment':
                 $options = $this->getSystemComponentController()->getController(
                     'Payment'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\PaymentProcessor':
+                $options = $this->getSystemComponentController()->getController(
+                    'PaymentProcessor'
                 )->getViewGeneratorOptions($options);
                 break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':

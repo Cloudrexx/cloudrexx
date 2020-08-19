@@ -71,10 +71,6 @@
     padding: 20px 5px 0;
 }
 
-#content > table.adminlist tr:nth-child(n+1) td:nth-child(1) {
-    width: 20px;
-}
-
 .custom-input {
     float: right;
     margin-right: 20px;
@@ -333,4 +329,33 @@ table.adminlist td.discountgroup-name {
 
 #discount-group-table tr td:nth-child(1) {
     font-weight: bold;
+}
+
+.payment-processor-info .title {
+    width: 20%;
+    float: left;
+    clear: both;
+}
+
+.payment-processor-info .input {
+    width: 80%;
+    float: left;
+    padding: 2px 0;
+}
+
+.payment-processor-info.hide {
+    display: none;
+}
+.payment-processor-info.show {
+    display: block;
+}
+.payment-processor-info .input select {
+    width: 185px;
+}
+
+.payment-processor-status {
+    width: 5%;
+}
+.payment-processor-name {
+    width: 25%;
 }

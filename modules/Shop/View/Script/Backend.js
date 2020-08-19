@@ -344,3 +344,11 @@ function updateExchangeRates(selectedElement)
     document.getElementsByName("rate-"+indexSelected)[0].value = "1.000000";
     return true;
 }
+
+function swapBlock(div)
+{
+    const oldClass = (document.getElementById(div).classList.contains('hide') ? 'hide' : 'show');
+    const newClass = (document.getElementById(div).classList.contains('hide') ? 'show' : 'hide');
+    document.getElementById(div).classList.remove(oldClass);
+    document.getElementById(div).classList.add(newClass);
+}

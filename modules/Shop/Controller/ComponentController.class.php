@@ -56,7 +56,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'Backend', 'Manufacturer', 'Category', 'Pdf', 'Pricelist',
             'JsonPriceList', 'Currency', 'JsonCurrency', 'DiscountCoupon',
             'JsonDiscountCoupon', 'Order', 'JsonOrder', 'DiscountgroupCountName',
-            'DiscountGroup', 'JsonDiscountGroup', 'Payment', 'JsonPayment'
+            'DiscountGroup', 'JsonDiscountGroup',
+            'Payment', 'JsonPayment', 'PaymentProcessor',
         );
     }
 
@@ -127,7 +128,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
-    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) 
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page)
     {
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
@@ -162,16 +163,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Called for additional, component specific resolving
-     * 
+     *
      * If /en/Path/to/Page is the path to a page for this component
      * a request like /en/Path/to/Page/with/some/parameters will
      * give an array like array('with', 'some', 'parameters') for $parts
-     * 
+     *
      * This may be used to redirect to another page
      * @param array $parts List of additional path parts
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
      */
-    public function resolve($parts, $page) 
+    public function resolve($parts, $page)
     {
         $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $this->cx->getRequest()->getUrl()->getParamArray());
         header('Link: <' . $canonicalUrl->toString() . '>; rel="canonical"');
@@ -267,7 +268,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 if ($short) {
                     return 'Generates Pdf for a pricelist';
                 }
-                return 'Generates Pdf for a pricelist with all related 
+                return 'Generates Pdf for a pricelist with all related
                     categories and their products.';
             default:
                 return '';
@@ -313,7 +314,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * list statements like
      * $this->cx->getEvents()->addEventListener($eventName, $listener);
      */
-    public function registerEventListeners() 
+    public function registerEventListeners()
     {
         $eventListener = new \Cx\Modules\Shop\Model\Event\ShopEventListener($this->cx);
         $eventListenerTemp = new \Cx\Modules\Shop\Model\Event\RolloutTextSyncListener($this->cx);

@@ -1104,9 +1104,6 @@ class ShopManager extends ShopLibrary
         self::$objTemplate->loadTemplateFile('module_shop_settings.html');
         if (empty($_GET['tpl'])) $_GET['tpl'] = '';
         switch ($_GET['tpl']) {
-            case 'payment':
-                Payment::view_settings(self::$objTemplate);
-                break;
             case 'shipment':
                 self::view_settings_shipment();
                 break;

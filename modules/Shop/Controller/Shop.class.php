@@ -3789,7 +3789,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (!empty($_SESSION['shop']['paymentId']))
             $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getPaymentProcessorId($_SESSION['shop']['paymentId']);
         if (!empty($processor_id))
-            $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+            $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
         return $processor_name;
     }
 
@@ -4710,9 +4710,9 @@ die("Shop::processRedirect(): This method is obsolete!");
         \Message::restore();
 
         $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
-        $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+        $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
          // other payment methods
-        PaymentProcessing::initProcessor($processor_id);
+        \Cx\Modules\Shop\Controller\PaymentProcessorController::initProcessor($processor_id);
 // TODO: These arguments are no longer valid.  Set them up later?
 //            Currency::getActiveCurrencyCode(),
 //            FWLanguage::getLanguageParameter(FRONTEND_LANG_ID, 'lang'));
@@ -4746,7 +4746,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         $_SESSION['shop']['order_id_checkin'] = $order_id;
-        $strProcessorType = PaymentProcessing::getCurrentPaymentProcessorType();
+        $strProcessorType = \Cx\Modules\Shop\Controller\PaymentProcessorController::getCurrentPaymentProcessorType();
 
         // Test whether the selected payment method can be
         // considered an instant or deferred one.
@@ -4775,7 +4775,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // from this page in checkOut():
         // 'internal', 'internal_lsv'
         self::$objTemplate->setVariable(
-            'SHOP_PAYMENT_PROCESSING', PaymentProcessing::checkOut()
+            'SHOP_PAYMENT_PROCESSING', \Cx\Modules\Shop\Controller\PaymentProcessorController::checkOut()
         );
         // Clear the order ID.
         // The order may be resubmitted and the payment retried.
@@ -4803,7 +4803,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Use the Order ID stored in the session, if possible.
         // Otherwise, get it from the payment processor.
         $order_id = (empty($_SESSION['shop']['order_id_checkin'])
-            ? PaymentProcessing::getOrderId()
+            ? \Cx\Modules\Shop\Controller\PaymentProcessorController::getOrderId()
             : $_SESSION['shop']['order_id_checkin']);
 //\DBG::deactivate();
 //\DBG::activate(DBG_LOG_FILE);
@@ -4812,7 +4812,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // update_status() will choose the new value automatically.
         $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 
-        $checkinresult = PaymentProcessing::checkIn();
+        $checkinresult = \Cx\Modules\Shop\Controller\PaymentProcessorController::checkIn();
 //\DBG::log("success(): CheckIn Result ".var_export($checkinresult, true));
 
         if ($checkinresult === false) {

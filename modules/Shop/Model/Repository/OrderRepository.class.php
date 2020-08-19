@@ -235,7 +235,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         $processor_id = \Cx\Modules\Shop\Controller\PaymentController::
             getPaymentProcessorId($payment_id);
 //if (!$processor_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor ID for Payment ID $payment_id");
-        $processorName = \Cx\Modules\Shop\Controller\PaymentProcessing::
+        $processorName = \Cx\Modules\Shop\Controller\PaymentProcessorController::
             getPaymentProcessorName($processor_id);
 //if (!$processorName) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor Name for Processor ID $processor_id");
         // The payment processor *MUST* match the handler returned.
@@ -259,7 +259,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             // If neither condition is met, the status is set to 'confirmed'.
             $newOrderStatus = self::STATUS_CONFIRMED;
             $processorType =
-                \Cx\Modules\Shop\Controller\PaymentProcessing::
+                \Cx\Modules\Shop\Controller\PaymentProcessorController::
                     getCurrentPaymentProcessorType($processor_id);
             $shipmentId = $order->getShipmentId();
             if ($processorType == 'external') {
