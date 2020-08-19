@@ -371,4 +371,9 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     {
         return $this->zones;
     }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
 }

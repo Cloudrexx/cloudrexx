@@ -54,7 +54,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         return array(
             'Backend', 'Manufacturer', 'Category', 'Pdf', 'Pricelist',
-            'JsonPriceList', 'Currency', 'JsonCurrency'
+            'JsonPriceList', 'Currency', 'JsonCurrency', 'DiscountCoupon',
+            'JsonDiscountCoupon'
         );
     }
 
@@ -69,7 +70,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of ComponentController classes
      */
     public function getControllersAccessableByJson() {
-        return array('JsonPriceListController', 'JsonCurrencyController');
+        return array(
+            'JsonPriceListController', 'JsonCurrencyController',
+            'JsonDiscountCouponController'
+        );
     }
 
     /**
@@ -315,17 +319,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $this->cx->getEvents()->addEventListener('TmpShopText:Replace', $eventListenerTemp);
         $this->cx->getEvents()->addEventListener('TmpShopText:Delete', $eventListenerTemp);
 
-        $this->cx->getEvents()->addModelListener(
-            \Doctrine\ORM\Events::prePersist,
-            'Cx\\Modules\\Shop\\Model\\Entity\\Currency',
-            new \Cx\Modules\Shop\Model\Event\CurrencyEventListener($this->cx)
+        $modelEvents = array(
+            \Doctrine\ORM\Events::prePersist => array(
+                'Currency',
+                'DiscountCoupon'
+            ),
+            \Doctrine\ORM\Events::preUpdate => array(
+                'Currency',
+                'DiscountCoupon'
+            ),
         );
 
-        $this->cx->getEvents()->addModelListener(
-            \Doctrine\ORM\Events::preUpdate,
-            'Cx\\Modules\\Shop\\Model\\Entity\\Currency',
-            new \Cx\Modules\Shop\Model\Event\CurrencyEventListener($this->cx)
-        );
+        foreach ($modelEvents as $eventName => $entities) {
+            foreach ($entities as $entity) {
+                $modelEventListener = '\\Cx\\Modules\\Shop\\Model\\Event\\' .
+                    $entity . 'EventListener';
+
+                $this->cx->getEvents()->addModelListener(
+                    $eventName,
+                    'Cx\\Modules\\Shop\\Model\\Entity\\' . $entity,
+                    new $modelEventListener($this->cx)
+                );
+            }
+        }
     }
 
     /**

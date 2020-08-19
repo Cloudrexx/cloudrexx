@@ -33,3 +33,14 @@ span.child label.category {
 #footerRight, #headerRight {
     text-align: right;
 }
+div#form-0-type div {
+    display: inline;
+}
+.shop-coupon-link {
+    width: 10%;
+}
+.coupon-url-link {
+    display: none;
+    max-width: 80%;
+    margin-left: 5px;
+}

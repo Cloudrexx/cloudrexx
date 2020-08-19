@@ -1038,4 +1038,9 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     {
         return $this->userGroups;
     }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
 }

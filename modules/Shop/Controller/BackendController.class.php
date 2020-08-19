@@ -104,7 +104,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Relcountry':
             case 'Zone':
             case 'Mail':
-            case 'DiscountCoupon':
             case 'mailtemplate_overview':
             case 'mailtemplate_edit':
             case '':
@@ -128,7 +127,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'RelCountry' => 'countries',
                     'Zone' => 'zones',
                     'Mail' => 'mail',
-                    'DiscountCoupon' => 'coupon',
                     '' => 'orders'
                 );
                 $mappedCmdItems = array(
@@ -305,7 +303,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Manufacturer'
                 )->getViewGeneratorOptions($options);
                 $options = $this->normalDelete(
-                    $_ARRAYLANG['TXT_CONFIRM_DELETE_MANUFACTURER'],
+                    $_ARRAYLANG['TXT_SHOP_CONFIRM_DELETE_MANUFACTURER'],
                     $options
                 );
                 break;
@@ -315,7 +313,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 )->getViewGeneratorOptions($options);
                 // Delete event
                 $options = $this->normalDelete(
-                    $_ARRAYLANG['TXT_CONFIRM_DELETE_CATEGORY'],
+                    $_ARRAYLANG['TXT_CONFIRM_DELETE_SHOP_CATEGORIES'],
                     $options
                 );
                 break;
@@ -327,6 +325,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Cx\Modules\Shop\Model\Entity\Currency':
                 $options = $this->getSystemComponentController()->getController(
                     'Currency'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
+                $options = $this->getSystemComponentController()->getController(
+                    'DiscountCoupon'
                 )->getViewGeneratorOptions($options);
                 break;
         }

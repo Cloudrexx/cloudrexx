@@ -600,6 +600,10 @@ class Cart
         $objCoupon = null;
         $hasCoupon = false;
         $discount_amount = 0;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
         foreach (self::$products as $cart_id => &$product) {
             $discount_amount = 0;
             $product['discount_amount'] = 0;
@@ -607,12 +611,12 @@ class Cart
             // Coupon case #1: Product specific coupon
             // Coupon:  Either the payment ID or the code are needed
             if ($payment_id || $coupon_code) {
-                $objCoupon = Coupon::available(
+                $objCoupon = $couponRepo->available(
                     $coupon_code, $total_price, $customer_id,
                     $product['id'], $payment_id);
                 if ($objCoupon) {
                     $hasCoupon = true;
-                    $discount_amount = $objCoupon->getDiscountAmount(
+                    $discount_amount = $objCoupon->getDiscountAmountOrRate(
                         $product['price'], $customer_id
                     );
                     // The amount already spent by that Customer
@@ -624,7 +628,7 @@ class Cart
                     // coupon value
                     if (
                         // coupon is of type value
-                        $objCoupon->discount_amount() > 0 &&
+                        $objCoupon->getDiscountAmount() > 0 &&
                         // and sum of
                         (
                             // applied discount on previous product(s) of cart
@@ -638,7 +642,7 @@ class Cart
                         // available (in case the coupon has been used before
                         // in other orders)
                         (
-                            $objCoupon->discount_amount()
+                            $objCoupon->getDiscountAmount()
                           - $couponUsedAmount
                         )
                     ) {
@@ -648,7 +652,7 @@ class Cart
                         // coupon to get the remaining discount amount.
                         $discount_amount =
                             // initial discount amount of coupon
-                            $objCoupon->discount_amount()
+                            $objCoupon->getDiscountAmount()
                             // already redeemed discount amount (from previous
                             // orders)
                           - $couponUsedAmount
@@ -685,7 +689,7 @@ class Cart
 
             // supply $total_price (without VAT) to Coupon::available()
             // for checking if minimum order amount has reached
-            $objCoupon = Coupon::available(
+            $objCoupon = $couponRepo->available(
                 $coupon_code, $total_price, $customer_id, 0, $payment_id);
 
             // verify that coupon is valid with VAT
@@ -696,7 +700,7 @@ class Cart
                 // TODO: extend the Shop system to support different VAT
                 //       rates on coupons
                 if (Vat::isEnabled() &&
-                    $objCoupon->discount_amount() > 0 &&
+                    $objCoupon->getDiscountAmount() > 0 &&
                     count($usedVatRates) > 1
                 ) {
                     $objCoupon = null;
@@ -706,14 +710,14 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
-                $total_discount_amount = $objCoupon->getDiscountAmount(
+                $total_discount_amount = $objCoupon->getDiscountAmountOrRate(
                     $total_price, $customer_id
                 );
                 // in case VAT is being used, we have to subtract the VAT of
                 // the discount from the total VAT amount of the products
                 $couponVatDiscount = 0;
                 if (Vat::isEnabled()) {
-                    if ($objCoupon->discount_amount() > 0) {
+                    if ($objCoupon->getDiscountAmount() > 0) {
                         $vatRate = current($usedVatRates);
                         // in case coupon is a discount of value, then we
                         // have to subtract the VAT amount of that value
@@ -1045,8 +1049,12 @@ die("Cart::view(): ERROR: No template");
             'SHOP_PRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
         ));
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
         // Show the Coupon code field only if there is at least one defined
-        if (Coupon::count_available()) {
+        if ($couponRepo->count_available()) {
 //DBG::log("Coupons available");
             $objTemplate->setVariable(array(
                 'SHOP_DISCOUNT_COUPON_CODE' =>
@@ -1357,14 +1365,26 @@ die("Cart::view(): ERROR: No template");
 
     /**
      * Get currently redeemed coupon
-     *
      * @return  \Cx\Modules\Shop\Controller\Coupon  The redeemed coupon or NULL
+     * @todo    Should use DiscountCouponRepository instead of this method
      */
     public static function getCoupon() {
         if (empty($_SESSION['shop']['cart']['coupon_code'])) {
             return null;
         }
-
-        return Coupon::get($_SESSION['shop']['cart']['coupon_code']);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+        // TODO: Make sure that when this method is called, the availability
+        // of that Coupon has already been verified with
+        //    $objCoupon = $couponRepo->available(
+        //        $coupon_code, /*[... current parameters ...]*/);
+        // Otherwise, the customer may receive a discount from an Coupon
+        // that doesn't apply.
+        $objCoupon = $couponRepo->findOneBy([
+            'code' => $_SESSION['shop']['cart']['coupon_code']
+        ]);
+        return $objCoupon;
     }
 }
