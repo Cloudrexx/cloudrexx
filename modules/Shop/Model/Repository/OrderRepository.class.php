@@ -413,7 +413,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     $newCoupon->setCode($code);
                     $newCoupon->setDiscountAmount($item_price);
                     $newCoupon->setGlobal(true);
-                    $newCoupon->setUses(1e10);
+                    $newCoupon->setUses(1);
                     $newCoupon->setOrderItem($item);
 
                     $this->_em->persist($newCoupon);
@@ -503,7 +503,8 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
      *
      * You only have to set the 'substitution' index value of your MailTemplate
      * array to the array returned.
-     * Customer data is included here, see {@see Customer::getSubstitutionArray()}.
+     * Customer data is not included here.
+     * See {@see Customer::getSubstitutionArray()}.
      * Note that this method is now mostly independent of the current session.
      * The language of the mail template is determined by the browser
      * language range stored with the order.
@@ -775,11 +776,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         if (empty($arrProduct['COUPON_DATA']))
                             $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
-
-                        $validTo = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_END_TIME_UNLIMITED'];
-                        if ($item->getDiscountCoupon()->getEndTime()) {
-                            $validTo = date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getEndTime());
-                        }
                         $arrProduct['COUPON_DATA'][] = array(
                             'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
                         );
