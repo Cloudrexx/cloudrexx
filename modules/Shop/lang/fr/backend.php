@@ -65,6 +65,18 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zones';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'Modèles d\'E-mail';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
 
+$_ARRAYLANG['borderOn'] = 'Cadres';
+$_ARRAYLANG['headerOn'] = 'Entête';
+$_ARRAYLANG['footerOn'] = 'Bas de page';
+$_ARRAYLANG['lang'] = 'Langue';
+$_ARRAYLANG['allCategories'] = 'Enthaltene Rubriken';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Commandes";
 $_ARRAYLANG['TXT_STOCK'] = "Stock";

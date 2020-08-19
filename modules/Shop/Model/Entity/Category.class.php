@@ -395,7 +395,7 @@ class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
      */
     public function getChildren()
     {
-        return $this->products;
+        return $this->children;
     }
 
     /**

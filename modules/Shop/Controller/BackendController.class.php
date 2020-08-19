@@ -112,7 +112,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 $mappedNavItems = array(
                     'Order' => 'orders',
                     'Category' => 'categories',
-                    'Pricelist' => 'pricelists',
                     'Product' => 'products',
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
@@ -321,6 +320,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     $_ARRAYLANG['TXT_CONFIRM_DELETE_CATEGORY'],
                     $options
                 );
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\Pricelist':
+                $options = $this->getSystemComponentController()->getController(
+                    'Pricelist'
+                )->getViewGeneratorOptions($options);
                 break;
         }
         return $options;

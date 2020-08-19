@@ -405,10 +405,6 @@ die("Failed to get Customer for ID $customer_id");
                     ),
                 ));
                 die("Done!");
-
-            case 'pricelist':
-                self::send_pricelist();
-                break;
             case 'terms':
                 // Static content only (fttb)
                 break;
@@ -5336,36 +5332,6 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (!$objResult || $objResult->EOF) return false;
         return $objResult->fields['payment_id'];
     }
-
-
-    /**
-     * Creates and sends a Pricelist as a PDF document
-     *
-     * Does not return on success, just sends the list and dies happily instead.
-     * Note that the $lang_id is ignored if it's defined for the Pricelist.
-     * @param   integer   $lang_id      The optional language ID
-     * @return  boolean                 False on failure
-     */
-    static function send_pricelist($lang_id=null)
-    {
-        global $_ARRAYLANG;
-
-        if (!$lang_id) $lang_id = FRONTEND_LANG_ID;
-        $list_id = (isset($_GET['list_id'])
-            ? intval($_GET['list_id']) : null);
-        if (!$list_id) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_PRICELIST_ERROR_MISSING_LIST_ID']);
-        }
-        // Optional
-        $currency_id = (isset($_GET['currency_id'])
-            ? intval($_GET['currency_id']) : null);
-        $objList = new PriceList($list_id, $currency_id, $lang_id);
-        if (!$objList->send_as_pdf()) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_PRICELIST_ERROR_SENDING']);
-        }
-        exit();
-    }
-
 
     static function customer()
     {

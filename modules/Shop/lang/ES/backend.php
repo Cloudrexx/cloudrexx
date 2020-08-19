@@ -65,6 +65,18 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zonas';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'Plantillas de E-mail';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
 
+$_ARRAYLANG['borderOn'] = 'Borde';
+$_ARRAYLANG['headerOn'] = 'Cabecera';
+$_ARRAYLANG['footerOn'] = 'Pie';
+$_ARRAYLANG['lang'] = 'Idioma';
+$_ARRAYLANG['allCategories'] = 'Enthaltene Rubriken';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Pedidos";
 $_ARRAYLANG['TXT_STOCK'] = "En stock";

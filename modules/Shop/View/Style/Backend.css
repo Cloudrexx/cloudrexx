@@ -14,3 +14,16 @@ td.category-id {
 td.category-name {
     width: 88%;
 }
+
+label.category {
+    display: block;
+}
+span.child:before {
+    content: '|----';
+}
+span.child label.category {
+    display: inline-block;
+}
+#footerRight, #headerRight {
+    text-align: right;
+}

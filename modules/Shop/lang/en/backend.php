@@ -59,6 +59,18 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zones';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-mail Templates';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Coupon codes';
 
+$_ARRAYLANG['borderOn'] = 'Frame';
+$_ARRAYLANG['headerOn'] = 'Show Header';
+$_ARRAYLANG['footerOn'] = 'Show Footer';
+$_ARRAYLANG['lang'] = 'Language';
+$_ARRAYLANG['allCategories'] = 'Contained categories';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'All categories';
+
 
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "The total weight of your order exceeds the available shipment conditions";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Accept changes";

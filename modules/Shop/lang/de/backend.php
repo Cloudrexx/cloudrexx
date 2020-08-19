@@ -68,6 +68,18 @@ $_ARRAYLANG['picture'] = 'Kategoriebild';
 $_ARRAYLANG['shortDescription'] = 'Kurzbeschreibung';
 $_ARRAYLANG['description'] = 'Beschreibung';
 
+$_ARRAYLANG['borderOn'] = 'Rahmen';
+$_ARRAYLANG['headerOn'] = 'Kopfzeile anzeigen';
+$_ARRAYLANG['footerOn'] = 'Fusszeile anzeigen';
+$_ARRAYLANG['lang'] = 'Sprache';
+$_ARRAYLANG['allCategories'] = 'Enthaltene Rubriken';
+$_ARRAYLANG['categories'] = ' ';
+$_ARRAYLANG['headerLeft'] = '';
+$_ARRAYLANG['footerLeft'] = '';
+$_ARRAYLANG['headerRight'] = '';
+$_ARRAYLANG['footerRight'] = '';
+$_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
+
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "Das Gesamtgewicht der Bestellung übersteigt die verfügbaren Versandmöglichkeiten.";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Änderungen übernehmen";
 $_ARRAYLANG['TXT_ACCOUNT_BANK'] = "Kreditinstitut";

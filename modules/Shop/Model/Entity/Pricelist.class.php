@@ -46,7 +46,8 @@ namespace Cx\Modules\Shop\Model\Entity;
  * @subpackage  module_shop
  * @version     5.0.0
  */
-class Pricelist extends \Cx\Model\Base\EntityBase {
+class Pricelist extends \Cx\Model\Base\EntityBase
+{
     /**
      * @var integer
      */
@@ -111,6 +112,36 @@ class Pricelist extends \Cx\Model\Base\EntityBase {
      * @var boolean
      */
     protected $allCategories = 0;
+
+    /**
+     * @var string font - not an entity attr
+     */
+    protected $font = 'Helvetica';
+
+    /**
+     * @var int font size header - not an entity attr
+     */
+    protected $fontSizeHeader = 8;
+
+    /**
+     * @var int font size footer - not an entity attr
+     */
+    protected $fontSizeFooter = 7;
+
+    /**
+     * @var int font size list - not an entity attr
+     */
+    protected $fontSizeList = 7;
+
+    /**
+     * @var string row color 1 - not an entity attr
+     */
+    protected $rowColor1 = 'dddddd';
+
+    /**
+     * @var string row color 2 - not an entity attr
+     */
+    protected $rowColor2 = 'ffffff';
 
     /**
      * Constructor
@@ -317,6 +348,7 @@ class Pricelist extends \Cx\Model\Base\EntityBase {
      */
     public function addCategory(\Cx\Modules\Shop\Model\Entity\Category $category)
     {
+        $category->addPricelist($this);
         $this->categories[] = $category;
     }
 
@@ -327,6 +359,7 @@ class Pricelist extends \Cx\Model\Base\EntityBase {
      */
     public function removeCategory(\Cx\Modules\Shop\Model\Entity\Category $category)
     {
+        $category->removePricelist($this);
         $this->categories->removeElement($category);
     }
 
@@ -379,4 +412,125 @@ class Pricelist extends \Cx\Model\Base\EntityBase {
     {
         return $this->allCategories;
     }
+
+    /**
+     * Set font
+     *
+     * @param string $font
+     */
+    public function setFont($font)
+    {
+        $this->font = $font;
+    }
+
+    /**
+     * Get font
+     *
+     * @return string
+     */
+    public function getFont()
+    {
+        return $this->font;
+    }
+
+    /**
+     * Set font size header
+     *
+     * @param int $fontSizeHeader
+     */
+    public function setFontSizeHeader($fontSizeHeader)
+    {
+        $this->fontSizeHeader = $fontSizeHeader;
+    }
+
+    /**
+     * Get font size header
+     *
+     * @return int
+     */
+    public function getFontSizeHeader()
+    {
+        return $this->fontSizeHeader;
+    }
+
+    /**
+     * Set font size footer
+     *
+     * @param int $fontSizeFooter
+     */
+    public function setFontSizeFooter($fontSizeFooter)
+    {
+        $this->fontSizeFooter = $fontSizeFooter;
+    }
+
+    /**
+     * Get font size footer
+     *
+     * @return int
+     */
+    public function getFontSizeFooter()
+    {
+        return $this->fontSizeFooter;
+    }
+
+    /**
+     * Set font size list
+     *
+     * @param int $fontSizeList
+     */
+    public function setFontSizeList($fontSizeList)
+    {
+        $this->fontSizeList = $fontSizeList;
+    }
+
+    /**
+     * Get font size list
+     *
+     * @return int
+     */
+    public function getFontSizeList()
+    {
+        return $this->fontSizeList;
+    }
+
+    /**
+     * Set row color 1
+     *
+     * @param string $rowColor1
+     */
+    public function setRowColor1($rowColor1)
+    {
+        $this->rowColor1 = $rowColor1;
+    }
+
+    /**
+     * Get row color 1
+     *
+     * @return string
+     */
+    public function getRowColor1()
+    {
+        return $this->rowColor1;
+    }
+
+    /**
+     * Set row color 2
+     *
+     * @param string $rowColor2
+     */
+    public function setRowColor2($rowColor2)
+    {
+        $this->rowColor2 = $rowColor2;
+    }
+
+    /**
+     * Get row color 2
+     *
+     * @return string
+     */
+    public function getRowColor2()
+    {
+        return $this->rowColor2;
+    }
+
 }
