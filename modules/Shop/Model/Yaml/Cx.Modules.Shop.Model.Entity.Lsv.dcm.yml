@@ -1,0 +1,24 @@
+Cx\Modules\Shop\Model\Entity\Lsv:
+  type: entity
+  table: module_shop_lsv
+  repositoryClass: Cx\Modules\Shop\Model\Repository\LsvRepository
+  id:
+    orderId:
+      type: integer
+      options:
+        unsigned: true
+      column: order_id
+  fields:
+    holder:
+      type: text
+    bank:
+      type: text
+    blz:
+      type: text
+  manyToOne:
+    order:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Order
+      inversedBy: lsvs
+      joinColumn:
+        name: order_id
+        referencedColumnName: id

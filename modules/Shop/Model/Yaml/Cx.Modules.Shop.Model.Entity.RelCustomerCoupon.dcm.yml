@@ -1,0 +1,50 @@
+Cx\Modules\Shop\Model\Entity\RelCustomerCoupon:
+  type: entity
+  table: module_shop_rel_customer_coupon
+  repositoryClass: Cx\Modules\Shop\Model\Repository\RelCustomerCouponRepository
+  indexes:
+    fk_contrexx_module_shop_rel_customer_coupon_contrexx_module_idx:
+      columns: [ order_id ]
+  id:
+    code:
+      type: string
+      length: 20
+      options:
+        default: ''
+    customerId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: customer_id
+    orderId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: order_id
+  fields:
+    count:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+    amount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+  manyToOne:
+    order:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Order
+      inversedBy: relCustomerCoupons
+      joinColumn:
+        name: order_id
+        referencedColumnName: id
+    customer:
+      targetEntity: Cx\Core\User\Model\Entity\User
+      joinColumn:
+        name: customer_id
+        referencedColumnName: id

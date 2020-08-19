@@ -1,0 +1,97 @@
+Cx\Modules\Shop\Model\Entity\DiscountCoupon:
+  type: entity
+  table: module_shop_discount_coupon
+  repositoryClass: Cx\Modules\Shop\Model\Repository\DiscountCouponRepository
+  indexes:
+    fk_contrexx_module_shop_discount_coupon_contrexx_module_sho_idx:
+      columns: [ product_id ]
+    fk_module_shop_discount_coupon_module_shop_payment1_idx:
+      columns: [ payment_id ]
+  id:
+    code:
+      type: string
+      length: 20
+      options:
+        default: ''
+  fields:
+    customerId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: customer_id
+    paymentId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: payment_id
+    productId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: product_id
+    startTime:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: start_time
+    endTime:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: end_time
+    uses:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+    global:
+      type: boolean
+      options:
+        unsigned: true
+        default: 0
+    minimumAmount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: minimum_amount
+    discountAmount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: discount_amount
+    discountRate:
+      type: decimal
+      precision: 3
+      options:
+        unsigned: true
+        default: '0'
+      column: discount_rate
+  manyToOne:
+    payment:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Payment
+      inversedBy: discountCoupons
+      joinColumn:
+        name: payment_id
+        referencedColumnName: id
+    product:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Product
+      inversedBy: discountCoupons
+      joinColumn:
+        name: product_id
+        referencedColumnName: id
+    customer:
+      targetEntity: Cx\Core\User\Model\Entity\User
+      joinColumn:
+        name: customer_id
+        referencedColumnName: id

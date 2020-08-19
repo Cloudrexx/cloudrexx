@@ -1,0 +1,58 @@
+Cx\Modules\Shop\Model\Entity\Zone:
+  type: entity
+  table: module_shop_zones
+  gedmo:
+    translation:
+      locale: locale
+      entity: Cx\Core\Locale\Model\Entity\Translation
+  repositoryClass: Cx\Modules\Shop\Model\Repository\ZoneRepository
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    active:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    name:
+      type: string
+      length: 255
+      gedmo:
+        - translatable
+      options:
+        default: ''
+  oneToMany:
+    relCountries:
+      targetEntity: Cx\Modules\Shop\Model\Entity\RelCountry
+      mappedBy: zone
+      joinColumn:
+        name: id
+        referencedColumnName: zone_id
+  manyToMany:
+    payments:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Payment
+      inversedBy: zones
+      joinTable:
+        name: module_shop_rel_payment
+        joinColumns:
+          zone_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          payment_id:
+            referencedColumnName: id
+    shippers:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Shipper
+      inversedBy: zones
+      joinTable:
+        name: module_shop_rel_shipper
+        joinColumns:
+          zone_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          shipper_id:
+            referencedColumnName: id

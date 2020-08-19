@@ -211,8 +211,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function registerEventListeners() {
         $eventListener = new \Cx\Modules\Shop\Model\Event\ShopEventListener($this->cx);
+        $eventListenerTemp = new \Cx\Modules\Shop\Model\Event\RolloutTextSyncListener($this->cx);
         $this->cx->getEvents()->addEventListener('SearchFindContent',$eventListener);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+        $this->cx->getEvents()->addEventListener('TmpShopText:Replace', $eventListenerTemp);
+        $this->cx->getEvents()->addEventListener('TmpShopText:Delete', $eventListenerTemp);
+    }
+
+    /**
+     * Register your events here
+     *
+     * Do not do anything else here than list statements like
+     * $this->cx->getEvents()->addEvent($eventName);
+     */
+    public function registerEvents() {
+        $this->cx->getEvents()->addEvent('TmpShopText:Replace');
+        $this->cx->getEvents()->addEvent('TmpShopText:Delete');
     }
 
     public function preFinalize(\Cx\Core\Html\Sigma $template)

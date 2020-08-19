@@ -1,0 +1,49 @@
+Cx\Modules\Shop\Model\Entity\ShipmentCost:
+  type: entity
+  table: module_shop_shipment_cost
+  repositoryClass: Cx\Modules\Shop\Model\Repository\ShipmentCostRepository
+  indexes:
+    fk_contrexx_module_shop_shipment_cost_contrexx_module_shop__idx:
+      columns: [ shipper_id ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    shipperId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: shipper_id
+    maxWeight:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: max_weight
+    freeFrom:
+      type: decimal
+      precision: 9
+      scale: 2
+      nullable: true
+      options:
+        unsigned: true
+      column: free_from
+    fee:
+      type: decimal
+      precision: 9
+      scale: 2
+      nullable: true
+      options:
+        unsigned: true
+  manyToOne:
+    shipper:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Shipper
+      inversedBy: shipmentCosts
+      joinColumn:
+        name: shipper_id
+        referencedColumnName: id

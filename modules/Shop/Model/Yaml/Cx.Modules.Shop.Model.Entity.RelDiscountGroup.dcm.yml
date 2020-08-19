@@ -1,0 +1,42 @@
+Cx\Modules\Shop\Model\Entity\RelDiscountGroup:
+  type: entity
+  table: module_shop_rel_discount_group
+  repositoryClass: Cx\Modules\Shop\Model\Repository\RelDiscountGroupRepository
+  indexes:
+    fk_contrexx_module_shop_rel_discount_group_contrexx_module__idx:
+      columns: [ customer_group_id ]
+    fk_contrexx_module_shop_rel_discount_group_contrexx_module__idx1:
+      columns: [ article_group_id ]
+  id:
+    customerGroupId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: customer_group_id
+    articleGroupId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: article_group_id
+  fields:
+    rate:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        default: 0.00
+  manyToOne:
+    customerGroup:
+      targetEntity: Cx\Modules\Shop\Model\Entity\CustomerGroup
+      inversedBy: relDiscountGroups
+      joinColumn:
+        name: customer_group_id
+        referencedColumnName: id
+    articleGroup:
+      targetEntity: Cx\Modules\Shop\Model\Entity\ArticleGroup
+      inversedBy: relDiscountGroups
+      joinColumn:
+        name: article_group_id
+        referencedColumnName: id

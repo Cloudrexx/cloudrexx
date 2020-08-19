@@ -1,0 +1,95 @@
+Cx\Modules\Shop\Model\Entity\Category:
+  type: entity
+  table: module_shop_categories
+  gedmo:
+    translation:
+      locale: locale
+      entity: Cx\Core\Locale\Model\Entity\Translation
+  indexes:
+    flags:
+      columns: [ flags ]
+  repositoryClass: Cx\Modules\Shop\Model\Repository\CategoryRepository
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    parentId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: parent_id
+    ord:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+    active:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    picture:
+      type: string
+      length: 255
+      options:
+        default: ''
+    flags:
+      type: string
+      length: 255
+      options:
+        default: ''
+    name:
+      type: string
+      length: 255
+      gedmo:
+        - translatable
+      options:
+        default: ''
+    description:
+      type: text
+      gedmo:
+        - translatable
+    shortDescription:
+      type: text
+      gedmo:
+        - translatable
+      column: short_description
+  manyToMany:
+    pricelists:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Pricelist
+      inversedBy: categories
+      joinTable:
+        name: module_shop_rel_category_pricelist
+        joinColumns:
+          category_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          pricelist_id:
+            referencedColumnName: id
+    products:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Product
+      inversedBy: categories
+      joinTable:
+        name: module_shop_rel_category_product
+        joinColumns:
+          category_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          product_id:
+            referencedColumnName: id
+  oneToMany:
+    children:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Category
+      mappedBy: parentCategory
+  manyToOne:
+    parentCategory:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Category
+      inversedBy: children
+      joinColumn:
+        name: parent_id
+        referencedColumnName: id

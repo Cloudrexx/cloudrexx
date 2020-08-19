@@ -1,0 +1,34 @@
+Cx\Modules\Shop\Model\Entity\DiscountgroupCountRate:
+  type: entity
+  table: module_shop_discountgroup_count_rate
+  repositoryClass: Cx\Modules\Shop\Model\Repository\DiscountgroupCountRateRepository
+  indexes:
+    fk_contrexx_module_shop_discountgroup_count_rate_contrexx_m_idx:
+      columns: [ count ]
+  id:
+    groupId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: group_id
+    count:
+      type: integer
+      options:
+        unsigned: true
+        default: 1
+  fields:
+    rate:
+      type: decimal
+      precision: 5
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+  manyToOne:
+    discountgroupCountName:
+      targetEntity: Cx\Modules\Shop\Model\Entity\DiscountgroupCountName
+      inversedBy: discountgroupCountRates
+      joinColumn:
+        name: count
+        referencedColumnName: id

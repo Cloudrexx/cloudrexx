@@ -1,0 +1,75 @@
+Cx\Modules\Shop\Model\Entity\Pricelist:
+  type: entity
+  table: module_shop_pricelists
+  repositoryClass: Cx\Modules\Shop\Model\Repository\PricelistRepository
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    name:
+      type: string
+      length: 25
+      options:
+        default: ''
+    langId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: lang_id
+    borderOn:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+      column: border_on
+    headerOn:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+      column: header_on
+    headerLeft:
+      type: text
+      nullable: true
+      column: header_left
+    headerRight:
+      type: text
+      nullable: true
+      column: header_right
+    footerOn:
+      type: boolean
+      options:
+        unsigned: true
+        default: 0
+      column: footer_on
+    footerLeft:
+      type: text
+      nullable: true
+      column: footer_left
+    footerRight:
+      type: text
+      nullable: true
+      column: footer_right
+    allCategories:
+      type: boolean
+      options:
+        default: 0
+      column: all_categories
+  manyToMany:
+    categories:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Category
+      mappedBy: pricelists
+      joinTable:
+        name: module_shop_rel_category_pricelist
+  manyToOne:
+    lang:
+      targetEntity: Cx\Core\Locale\Model\Entity\Locale
+      mappedBy: pricelists
+      joinColumn:
+        name: lang_id
+        referencedColumnName: id

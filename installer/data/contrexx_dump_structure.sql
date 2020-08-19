@@ -2979,11 +2979,13 @@ CREATE TABLE `contrexx_module_repository` (
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_article_group` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_attribute` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_categories` (
@@ -2993,6 +2995,9 @@ CREATE TABLE `contrexx_module_shop_categories` (
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `picture` varchar(255) NOT NULL DEFAULT '',
   `flags` varchar(255) NOT NULL DEFAULT '',
+  `name` varchar(255) DEFAULT '' NOT NULL,
+  `description` text NOT NULL,
+  `short_description` text NOT NULL,
   PRIMARY KEY (`id`),
   FULLTEXT KEY `flags` (`flags`)
 ) ENGINE=InnoDB ;
@@ -3005,10 +3010,12 @@ CREATE TABLE `contrexx_module_shop_currencies` (
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `default` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `increment` decimal(6,5) unsigned NOT NULL DEFAULT '0.01000',
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_customer_group` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_discount_coupon` (
@@ -3028,6 +3035,8 @@ CREATE TABLE `contrexx_module_shop_discount_coupon` (
 CREATE TABLE `contrexx_module_shop_discountgroup_count_name` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cumulative` int(1) unsigned NOT NULL DEFAULT '0',
+  `unit` varchar(255) DEFAULT '' NOT NULL,
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_discountgroup_count_rate` (
@@ -3053,12 +3062,15 @@ CREATE TABLE `contrexx_module_shop_lsv` (
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_shop_manufacturer` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uri` varchar(255) DEFAULT '' NOT NULL,
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_option` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `attribute_id` int(10) unsigned NOT NULL,
   `price` decimal(9,2) NOT NULL DEFAULT '0.00',
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_order_attributes` (
@@ -3130,6 +3142,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `name` VARCHAR(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_payment_processors` (
@@ -3179,6 +3192,12 @@ CREATE TABLE `contrexx_module_shop_products` (
   `group_id` int(10) unsigned DEFAULT NULL,
   `article_id` int(10) unsigned DEFAULT NULL,
   `minimum_order_quantity` int(10) NOT NULL DEFAULT '0',
+  `uri` varchar(255) DEFAULT '' NOT NULL,
+  `short` text NOT NULL,
+  `long`  text NOT NULL,
+  `name` VARCHAR(255) DEFAULT '' NOT NULL,
+  `keys`  text NOT NULL,
+  `code` VARCHAR(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`),
   KEY `article_id` (`article_id`),
@@ -3246,16 +3265,19 @@ CREATE TABLE `contrexx_module_shop_shipper` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `ord` int(10) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_vat` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rate` decimal(5,2) unsigned NOT NULL DEFAULT '0.00',
+  `class` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_zones` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_survey_addtionalfields` (
