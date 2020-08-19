@@ -270,7 +270,7 @@ class PdfController extends \Cx\Core\Core\Model\Entity\Controller
         $count = 1000; // Be sensible!
         // Pattern is "%" because all-empty parameters will result in an
         // empty array!
-        $arrProduct = Products::getByShopParams(
+        $arrProduct = \Cx\Modules\Shop\Controller\ProductController::getByShopParams(
             $count, 0, null, $category_ids, null, '%', null, null,
             '`category_product`.`category_id` ASC, `name` ASC', null, false,
             $pricelist->getLangId()
@@ -281,21 +281,21 @@ class PdfController extends \Cx\Core\Core\Model\Entity\Controller
         );
         $arrOutput = array();
         foreach ($arrProduct as $product_id => $objProduct) {
-            $categoryIds = explode(',', $objProduct->category_id());
+            $categoryIds = explode(',', $objProduct->getCategoryId());
             $arrCategoryNames = array();
             foreach ($categoryIds as $categoryId) {
                 $arrCategoryNames[] = $arrCategoryName[$categoryId];
             }
 
             $arrOutput[$product_id] = array(
-                'product_name' => self::decode($objProduct->name()),
+                'product_name' => self::decode($objProduct->getName()),
                 'category_name' => self::decode(implode(', ', $arrCategoryNames)),
-                'product_code' => self::decode($objProduct->code()),
-                'product_id' => self::decode($objProduct->id()),
+                'product_code' => self::decode($objProduct->getCode()),
+                'product_id' => self::decode($objProduct->getId()),
                 'price' =>
-                    ($objProduct->discount_active()
-                        ? "S " . \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice())
-                        : \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price())) .
+                    ($objProduct->getDiscountActive()
+                        ? "S " . \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->getDiscountopice())
+                        : \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->getNormalprice())) .
                     ' ' . $currency_symbol,
             );
         }

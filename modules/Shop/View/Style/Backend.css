@@ -71,6 +71,10 @@
     padding: 20px 5px 0;
 }
 
+#content > table.adminlist tr:nth-child(n+1) td:nth-child(1) {
+    width: 20px;
+}
+
 .custom-input {
     float: right;
     margin-right: 20px;
@@ -175,7 +179,8 @@ label[for='form-0-paymentAmount'],
 label[for='form-0-sum'],
 label[for='form-0-note'],
 label[for='form-0-emptyField'],
-label[for='form-0-lsvs'] {
+label[for='form-0-lsvs'],
+label[for='form-0-relProductAttributes'] {
     display:none;
 }
 #form-0-note,
@@ -221,6 +226,129 @@ div#form-0-type div {
     margin-left: 5px;
 }
 
+table.adminlist td.discountgroup-name {
+    width: 47% !important;
+}
+
+.payment-processor-info .title {
+    width: 20%;
+    float: left;
+    clear: both;
+}
+
+.payment-processor-info .input {
+    width: 80%;
+    float: left;
+    padding: 2px 0;
+}
+
+.payment-processor-info.hide {
+    display: none;
+}
+.payment-processor-info.show {
+    display: block;
+}
+.payment-processor-info .input select {
+    width: 185px;
+}
+
+.payment-processor-status {
+    width: 5%;
+}
+.payment-processor-name {
+    width: 25%;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-stockVisible'] ~ .controls {
+    padding: 10px 0;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-short'],
+form.cx-ui > fieldset .group > label[for='form-0-long'] {
+    float: none;
+}
+
+form.cx-ui > fieldset .group > label[for='form-0-short'] ~ .controls,
+form.cx-ui > fieldset .group > label[for='form-0-long'] ~ .controls {
+    display: block;
+    margin: 7px;
+}
+
+#form-0-keys {
+    width: 300px;
+    height: 80px;
+}
+
+#form-0-flags label {
+    display: none;
+}
+
+.small {
+    width: 70px;
+}
+
+td.small {
+    width: 1%;
+}
+
+.product-name {
+    width: 42%;
+}
+.product-images {
+    max-width: 100%;
+    height: auto;
+    border: none;
+    display: block;
+}
+#form-0-picture {
+    width: 100%;
+}
+.product-images-wrapper {
+    width: 32%;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+.product-images-wrapper a {
+    display: inline-block;
+    margin-bottom: 5px;
+    vertical-align: bottom;
+}
+#form-0-relProductAttributes {
+    width: 100%;
+}
+#content input.product-order-input {
+    float: left;
+    width: 25px;
+}
+#content input.product-option-checkbox {
+    float: left;
+    margin: 6px;
+    box-sizing: content-box;
+}
+#content .child input.product-option-checkbox {
+    margin-left: 50px;
+}
+
+#content .child {
+    display: none;
+}
+
+#content .open .child {
+    display: block;
+}
+
+.product-option-label {
+    width: 100%;
+    display: block;
+    padding: 2px;
+}
+#form-0-product-option .controls {
+    margin: 0;
+}
+#form-0-product-option .controls {
+    margin: 0;
+}
 /** Show view **/
 .view-show > tbody > tr:nth-child(2) {
     display: none;
@@ -358,4 +486,35 @@ table.adminlist td.discountgroup-name {
 }
 .payment-processor-name {
     width: 25%;
+}
+
+#group-0-userGroups,
+#group-0-weight,
+#group-0-flags,
+#group-0-stockVisible,
+#group-0-discountActive {
+    display: none;
+}
+
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
+}
+
+#vg-0-customSearch {
+    margin-bottom: 20px;
+}
+
+#form-0-stock {
+    display: flex;
+}
+#discountHeader {
+    margin-left: -23px;
+}
+#group-0-uri .controls #form-0-uri,
+#group-0-uri .controls .tooltip-trigger {
+    display: inline-block;
+}
+/** MediaBrowser Fix **/
+#content input {
+    height: auto;
 }

@@ -36,7 +36,7 @@ cx.ready(function() {
 
 
 function loadGenerateCodeButton() {
-    const codeInput = cx.jQuery('#form-0-code');
+    const codeInput = cx.jQuery('form.discountcoupon #form-0-code');
 
     if (codeInput.length == 0 || codeInput.val().length > 0) {
         return;

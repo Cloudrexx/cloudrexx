@@ -57,9 +57,6 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
         global $_ARRAYLANG;
 
         $this->setJavaScriptVariables();
-        \JS::registerJS(
-            $this->cx->getModuleFolderName() . '/Shop/View/Script/DiscountCoupon.js'
-        );
 
         $options['order']['overview'] = array(
             'code',
@@ -90,6 +87,8 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'product',
             'payment',
         );
+
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'];
 
         $defaultCurrency = $this->cx->getDb()->getEntityManager()->getRepository(
             '\Cx\Modules\Shop\Model\Entity\Currency'

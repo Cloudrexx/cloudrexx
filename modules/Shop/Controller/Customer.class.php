@@ -288,10 +288,10 @@ class Customer extends \User
      */
     function is_reseller($is_reseller=null)
     {
-        $this->isReseller();
+        return $this->isReseller($is_reseller);
     }
 
-    public function isReseller() {
+    public function isReseller($isReseller = null) {
         // get defined groups in shop
         \Cx\Core\Setting\Controller\Setting::init('Shop');
         $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller');
@@ -307,7 +307,7 @@ class Customer extends \User
         }
 
         // return the value
-        if (!isset($is_reseller)) {
+        if (!isset($isReseller)) {
             return (in_array($group_reseller, $this->getAssociatedGroupIds()));
         }
 
@@ -321,7 +321,7 @@ class Customer extends \User
         }
 
         // add selected shop group
-        if ($is_reseller) {
+        if ($isReseller) {
             $groups[] = $group_reseller;
         } else {
             $groups[] = $group_customer;

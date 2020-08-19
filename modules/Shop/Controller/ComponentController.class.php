@@ -58,6 +58,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'JsonDiscountCoupon', 'Order', 'JsonOrder', 'DiscountgroupCountName',
             'DiscountGroup', 'JsonDiscountGroup',
             'Payment', 'JsonPayment', 'PaymentProcessor',
+            'Product', 'JsonProduct',
         );
     }
 
@@ -76,7 +77,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array(
             'JsonPriceListController', 'JsonCurrencyController',
             'JsonDiscountCouponController', 'JsonOrderController',
-            'JsonDiscountGroupController', 'JsonPaymentController'
+            'JsonDiscountGroupController',
+            'JsonPaymentController',
+            'JsonProductController',
         );
     }
 

@@ -100,6 +100,8 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             )
         );
 
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENT'];
+
         $options['fields'] = array(
             'id' => array(
                 'showOverview' => false,

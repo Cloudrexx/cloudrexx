@@ -79,6 +79,8 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
             'field' => 'status'
         );
 
+        $options['header'] = $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_PAYMENTPROCESSOR'];
+
         $options['fields'] = array(
             'id' => array(
                 'showOverview' => false,
@@ -707,7 +709,7 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
                 } else {
                     \DBG::log("PaymentProcessing::checkIn(): WARNING: paymill: Payment verification failed; errors: ".var_export($response, true));
                     return false;
-    }
+                }
 
             case 'saferpay':
                 $arrShopOrder = array(
@@ -716,14 +718,14 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
                 if (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_finalize_payment','Shop')) {
                     $arrShopOrder['ID'] = $id;
                     $id = \Saferpay::payComplete($arrShopOrder);
-    }
+                }
 //DBG::log("Transaction: ".var_export($transaction, true));
                 return (boolean)$id;
             case 'paypal':
                 if (empty ($_POST['custom'])) {
 //DBG::log("PaymentProcessing::checkIn(): No custom parameter, returning NULL");
                     return NULL;
-    }
+                }
                 $order_id = \PayPal::getOrderId();
 //                    if (!$order_id) {
 //                        $order_id = (isset($_SESSION['shop']['order_id'])
@@ -807,7 +809,7 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
                 return \Dummy::commit($result);
             default:
                 break;
-    }
+        }
         // Anything else is wrong.
         return false;
     }
@@ -881,11 +883,11 @@ class PaymentProcessorController extends \Cx\Core\Core\Model\Entity\Controller
 //DBG::log("Postfinance Mobile getForm() returned:");
 //DBG::log($return);
                 } else {
-\DBG::log("PaymentProcessing::checkOut(): ERROR: Postfinance Mobile getForm() failed");
-\DBG::log("Postfinance Mobile error messages:");
-foreach (\PostfinanceMobile::getErrors() as $error) {
-\DBG::log($error);
-}
+                    \DBG::log("PaymentProcessing::checkOut(): ERROR: Postfinance Mobile getForm() failed");
+                    \DBG::log("Postfinance Mobile error messages:");
+                    foreach (\PostfinanceMobile::getErrors() as $error) {
+                        \DBG::log($error);
+                    }
                 }
                 break;
             // Added 20081117 -- Reto Kohli
@@ -1034,16 +1036,16 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
             'ORDERID'       => $_SESSION['shop']['order_id'],
             'ACCOUNTID'     => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'),
             'SUCCESSLINK'   => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                                   array('result' => 1, 'handler' => 'saferpay'))->toString(),
+                array('result' => 1, 'handler' => 'saferpay'))->toString(),
             'FAILLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                                   array('result' => 0, 'handler' => 'saferpay'))->toString(),
+                array('result' => 0, 'handler' => 'saferpay'))->toString(),
             'BACKLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                                   array('result' => 2, 'handler' => 'saferpay'))->toString(),
+                array('result' => 2, 'handler' => 'saferpay'))->toString(),
             'DESCRIPTION'   => '"'.$_ARRAYLANG['TXT_ORDER_NR'].
-                                ' '.$_SESSION['shop']['order_id'].'"',
+                ' '.$_SESSION['shop']['order_id'].'"',
             'LANGID'        => \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID),
             'NOTIFYURL'     => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                                   array('result' => '-1', 'handler' => 'saferpay'))->toString(),
+                array('result' => '-1', 'handler' => 'saferpay'))->toString(),
             'ALLOWCOLLECT'  => 'no',
             'DELIVERY'      => 'no',
         );
@@ -1206,51 +1208,6 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
         return $return;
     }
 
-    static function getOrderId()
-    {
-        if (empty($_REQUEST['handler'])) {
-//DBG::log("PaymentProcessing::getOrderId(): No handler, fail");
-            return false;
-        }
-        switch ($_REQUEST['handler']) {
-            case 'saferpay':
-                return \Saferpay::getOrderId();
-            case 'saferpay_json':
-                return \SaferpayJson::getOrderId();
-            case 'paypal':
-                return \PayPal::getOrderId();
-            case 'yellowpay':
-                return \Yellowpay::getOrderId();
-            case 'payrexx':
-                return \PayrexxProcessor::getOrderId();
-            // Added 20100222 -- Reto Kohli
-            case 'mobilesolutions':
-//DBG::log("getOrderId(): mobilesolutions");
-                $order_id = \PostfinanceMobile::getOrderId();
-//DBG::log("getOrderId(): mobilesolutions, Order ID $order_id");
-                return $order_id;
-            // Added 20081117 -- Reto Kohli
-            case 'datatrans':
-                return \Datatrans::getOrderId();
-            // For the remaining types, there's no need to check in, so we
-            // return true and jump over the validation of the order ID
-            // directly to success!
-            // Note: A backup of the order ID is kept in the session
-            // for payment methods that do not return it. This is used
-            // to cancel orders in all cases where false is returned.
-            case 'Internal':
-            case 'Internal_CreditCard':
-            case 'Internal_Debit':
-            case 'Internal_LSV':
-            case 'dummy':
-                return (isset($_SESSION['shop']['order_id_checkin'])
-                    ? $_SESSION['shop']['order_id_checkin']
-                    : false);
-        }
-        // Anything else is wrong.
-        return false;
-    }
-
     /**
      * Returns the complete HTML code for the Datatrans payment form
      *
@@ -1400,6 +1357,49 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
              WHERE `id` IN (5, 6, 7, 8)");
 
         // Always
+        return false;
+    }
+
+    static function getOrderId()
+    {
+        if (empty($_REQUEST['handler'])) {
+//DBG::log("PaymentProcessing::getOrderId(): No handler, fail");
+            return false;
+        }
+        switch ($_REQUEST['handler']) {
+            case 'saferpay':
+                return \Saferpay::getOrderId();
+            case 'paypal':
+                return \PayPal::getOrderId();
+            case 'yellowpay':
+                return \Yellowpay::getOrderId();
+            case 'payrexx':
+                return \PayrexxProcessor::getOrderId();
+            // Added 20100222 -- Reto Kohli
+            case 'mobilesolutions':
+//DBG::log("getOrderId(): mobilesolutions");
+                $order_id = \PostfinanceMobile::getOrderId();
+//DBG::log("getOrderId(): mobilesolutions, Order ID $order_id");
+                return $order_id;
+            // Added 20081117 -- Reto Kohli
+            case 'datatrans':
+                return \Datatrans::getOrderId();
+            // For the remaining types, there's no need to check in, so we
+            // return true and jump over the validation of the order ID
+            // directly to success!
+            // Note: A backup of the order ID is kept in the session
+            // for payment methods that do not return it. This is used
+            // to cancel orders in all cases where false is returned.
+            case 'Internal':
+            case 'Internal_CreditCard':
+            case 'Internal_Debit':
+            case 'Internal_LSV':
+            case 'dummy':
+                return (isset($_SESSION['shop']['order_id_checkin'])
+                    ? $_SESSION['shop']['order_id_checkin']
+                    : false);
+        }
+        // Anything else is wrong.
         return false;
     }
 }

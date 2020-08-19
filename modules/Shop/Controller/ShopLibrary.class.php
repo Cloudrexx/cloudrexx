@@ -306,8 +306,8 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
         $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\Order'
         );
-        $arrSubstitution =
-            $orderRepo->getSubstitutionArray($order_id, $create_accounts);
+
+        $arrSubstitution = $orderRepo->getSubstitutionArray($order_id, $create_accounts);
         $customer_id = $arrSubstitution['CUSTOMER_ID'];
         $objCustomer = Customer::getById($customer_id);
         if (!$objCustomer) {

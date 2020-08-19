@@ -77,12 +77,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Category':
             case 'categories':
             case 'category_edit':
-            case 'Product':
-            case 'products':
-            case 'activate_products':
-            case 'deactivate_products':
-            case 'delProduct':
-            case 'deleteProduct':
             case 'Customer':
             case 'delcustomer':
             case 'customer_activate':
@@ -105,7 +99,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'mailtemplate_edit':
                 $mappedNavItems = array(
                     'Category' => 'categories',
-                    'Product' => 'products',
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
                     'Customer' => 'customers',
@@ -121,11 +114,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 $mappedCmdItems = array(
                     'categories' => 'Category',
                     'category_edit' => 'Category',
-                    'products' => 'Product',
-                    'activate_products' => 'Product',
-                    'deactivate_products' => 'Product',
-                    'delProduct' => 'Product',
-                    'deleteProduct' => 'Product',
                     'manage' => 'Manage',
                     'delcustomer' => 'Customer',
                     'customer_activate' => 'Customer',
@@ -213,7 +201,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             ),
             'Product' => array(
                 'children' => array(
-                    'Manage',
                     'Attribute',
                     'DiscountgroupCountName',
                     'ArticleGroup'
@@ -374,7 +361,21 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'PaymentProcessor'
                 )->getViewGeneratorOptions($options);
                 break;
+            case 'Cx\Modules\Shop\Model\Entity\Product':
+                $options = $this->getSystemComponentController()->getController(
+                    'Product'
+                )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier == $entityClassName) {
+                    $options = $this->setMultiActionsForProduct($options);
+                }
+                break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
+                if ($entityClassName == $dataSetIdentifier) {
+                    \JS::registerJS(
+                        $this->cx->getModuleFolderName()
+                        . '/Shop/View/Script/DiscountCoupon.js'
+                    );
+                }
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountCoupon'
                 )->getViewGeneratorOptions($options);
@@ -415,6 +416,35 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             'TXT_ACTION_IS_IRREVERSIBLE',
             $_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'],
             $scope
+        );
+
+        return $options;
+    }
+
+    /**
+     * Add multi actions to ViewGenerator options for products
+     *
+     * @param array $options ViewGenerator options
+     *
+     * @return array updated array with ViewGenerator options
+     */
+    protected function setMultiActionsForProduct($options)
+    {
+        global $_ARRAYLANG;
+
+        $options = $this->normalDelete(
+            $_ARRAYLANG['TXT_CONFIRM_DELETE_PRODUCT'],
+            $options
+        );
+
+        $options['multiActions']['activate'] = array(
+            'title' => $_ARRAYLANG['TXT_SHOP_ACTIVATE'],
+            'jsEvent' => 'activate:shopActivate'
+        );
+
+        $options['multiActions']['deactivate'] = array(
+            'title' => $_ARRAYLANG['TXT_SHOP_DEACTIVATE'],
+            'jsEvent' => 'deactivate:shopDeactivate'
         );
 
         return $options;

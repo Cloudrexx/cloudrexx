@@ -230,4 +230,14 @@ class DiscountgroupCountName extends \Cx\Model\Base\EntityBase implements \Gedmo
     {
         return $this->products;
     }
+
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
 }

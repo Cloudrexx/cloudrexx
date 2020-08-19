@@ -558,6 +558,11 @@ die("Failed to get Customer for ID $customer_id");
             }
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         // determine selected category and/or product
         $selectedCatId = 0;
         $objProduct = null;
@@ -571,10 +576,15 @@ die("Failed to get Customer for ID $customer_id");
             if (isset($_REQUEST['referer']) && $_REQUEST['referer'] == 'cart') {
                 $product_id = Cart::get_product_id($product_id);
             }
-            $objProduct = Product::getById($product_id);
+            $objProduct = $productRepo->find($product_id);
             if ($objProduct) {
-                $productCatIds = $objProduct->category_id();
-                if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', explode(',', $productCatIds)))) {
+                $categories = $objProduct->getCategories();
+                $productCatIds = array();
+                foreach ($categories as $category) {
+                    $productCatIds[] = $category->getId();
+                }
+                $productCatIds = implode(',', $productCatIds);
+                if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', $productCatIds))) {
                     $selectedCatId = $_SESSION['shop']['previous_category_id'];
                 } else {
                     $selectedCatId = preg_replace('/,.+$/', '', $productCatIds);
@@ -687,8 +697,8 @@ die("Failed to get Customer for ID $customer_id");
         // parse Product in shop_breadcrumb if a product is being viewed
         if ($product) {
             $objTpl->setVariable(array(
-                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->id()))->toString(),
-                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->name()),
+                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->getId()))->toString(),
+                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->getName()),
             ));
             $objTpl->parse('shop_breadcrumb_part');
         }
@@ -1128,8 +1138,12 @@ die("Failed to update the Cart!");
                     )
                 )
             ) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Product'
+                );
                 // Look for a picture in the Products.
-                $imageName = Products::getPictureByCategoryId($id);
+                $imageName = $productRepo->getPictureByCategoryId($id);
             }
             if (
                 !$imageName ||
@@ -1247,7 +1261,7 @@ die("Failed to update the Cart!");
 
         $flagSpecialoffer = intval(\Cx\Core\Setting\Controller\Setting::getValue('show_products_default','Shop'));
         if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'discounts') {
-            $flagSpecialoffer = Products::DEFAULT_VIEW_DISCOUNTS;
+            $flagSpecialoffer = \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS;
         }
         $flagLastFive = isset($_REQUEST['lastFive']);
         $product_id = (isset($_REQUEST['productId'])
@@ -1269,11 +1283,15 @@ die("Failed to update the Cart!");
             // in that it enables listing the subcategories
             $category_id = 0;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         // Validate parameters
         if ($product_id && empty($category_id)) {
-            $objProduct = Product::getById($product_id);
+            $objProduct = $productRepo->find($product_id);
             if ($objProduct && $objProduct->getStatus()) {
-                $category_id = $objProduct->category_id();
+                $categories = $objProduct->getCategories();
             } else {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('shop', '')
@@ -1281,8 +1299,8 @@ die("Failed to update the Cart!");
             }
             if (isset($_SESSION['shop']['previous_category_id'])) {
                 $category_id_previous = $_SESSION['shop']['previous_category_id'];
-                foreach (preg_split('/\s*,\s*/', $category_id) as $id) {
-                    if ($category_id_previous == intval($id)) {
+                foreach ($categories as $category) {
+                    if ($category_id_previous == $category->getId()) {
                         $category_id = $category_id_previous;
                     }
                 }
@@ -1300,7 +1318,6 @@ die("Failed to update the Cart!");
             }
         }
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $manufacturerRepo = $cx->getDb()->getEntityManager()->getRepository(
             '\Cx\Modules\Shop\Model\Entity\Manufacturer'
         );
@@ -1418,7 +1435,7 @@ die("Failed to update the Cart!");
             if ($term != '') {
                 $sortOrder = 'score1 DESC, score2 DESC, score3 DESC';
             }
-            $arrProduct = Products::getByShopParams(
+            $arrProduct = \Cx\Modules\Shop\Controller\ProductController::getByShopParams(
                 $count, \Paging::getPosition(),
                 $product_id, $category_id, $manufacturer_id, $term,
                 $flagSpecialoffer, $flagLastFive,
@@ -1465,7 +1482,7 @@ die("Failed to update the Cart!");
 // TODO: There are other cases of flag combinations that are not indivuidually
 // handled here yet.
             if ($term == '') {
-                if ($flagSpecialoffer == Products::DEFAULT_VIEW_DISCOUNTS) {
+                if ($flagSpecialoffer == \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS) {
                     self::$objTemplate->setVariable(
                         'SHOP_PRODUCTS_IN_CATEGORY',
                             $_ARRAYLANG['TXT_SHOP_PRODUCTS_SPECIAL_OFFER']);
@@ -1505,9 +1522,9 @@ die("Failed to update the Cart!");
         $isFileAttrExistsInPdt = false;
         $uploader = false;
         foreach ($arrProduct as $objProduct) {
-            $id = $objProduct->id();
+            $id = $objProduct->getId();
             $productSubmitFunction = '';
-            $arrPictures = Products::get_image_array_from_base64($objProduct->pictures());
+            $arrPictures = ProductController::get_image_array_from_base64($objProduct->getPicture());
             $havePicture = false;
             $arrProductImages = array();
             foreach ($arrPictures as $index => $image) {
@@ -1582,9 +1599,9 @@ die("Failed to update the Cart!");
                 $havePicture = true;
             }
             if (!empty($product_id)) {
-                static::$pageTitle = $objProduct->name();
-                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->short());
-                static::$pageMetaKeys = $objProduct->keywords();
+                static::$pageTitle = $objProduct->getName();
+                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->getShort());
+                static::$pageMetaKeys = $objProduct->getKeys();
                 if (count($arrProductImages)) {
                     static::$pageMetaImage = current($arrProductImages)['IMAGE_PATH'];
                 }
@@ -1605,7 +1622,7 @@ die("Failed to update the Cart!");
                 } else {
                     self::$objTemplate->setVariable(
                         'TXT_SEE_LARGE_PICTURE',
-                        contrexx_raw2xhtml($objProduct->name()));
+                        contrexx_raw2xhtml($objProduct->getName()));
                 }
                 if ($arrProductImage['POPUP_LINK']) {
                     self::$objTemplate->setVariable(
@@ -1622,8 +1639,8 @@ die("Failed to update the Cart!");
                 }
                 ++$i;
             }
-            $stock = ($objProduct->stock_visible()
-                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->stock())
+            $stock = ($objProduct->getStockVisible()
+                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->getStock())
                 : '');
             $price = $objProduct->get_custom_price(
                 self::$objCustomer,
@@ -1633,8 +1650,8 @@ die("Failed to update the Cart!");
             );
             // If there is a discountprice and it's enabled
             $discountPrice = '';
-            if (   $objProduct->discountprice() > 0
-                && $objProduct->discount_active()) {
+            if (   $objProduct->getDiscountprice() > 0
+                && $objProduct->getDiscountActive()) {
                 $price = '<s>'.$price.'</s>';
                 $discountPrice = $objProduct->get_custom_price(
                     self::$objCustomer,
@@ -1644,8 +1661,8 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $groupCountId = $objProduct->group_id();
-            $groupArticleId = $objProduct->article_id();
+            $groupCountId = $objProduct->getGroupId();
+            $groupArticleId = $objProduct->getArticleId();
             $groupCustomerId = 0;
             if (self::$objCustomer) {
                 $groupCustomerId = self::$objCustomer->group_id();
@@ -1673,15 +1690,15 @@ die("Failed to update the Cart!");
                 }
             }
 */
-            $short = $objProduct->short();
-            $longDescription = $objProduct->long();
+            $short = $objProduct->getShort();
+            $longDescription = $objProduct->getLong();
 
             $detailLink = null;
             // Detaillink is required for microdata (even when longdesc
             // is empty)
             $detail_url = \Cx\Core\Routing\Url::fromModuleAndCmd(
                 'Shop', 'details', FRONTEND_LANG_ID,
-                array('productId' => $objProduct->id()))->toString();
+                array('productId' => $objProduct->getId()))->toString();
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_DETAIL_URL', $detail_url);
             if (!$product_id && !empty($longDescription)) {
@@ -1746,8 +1763,8 @@ die("Failed to update the Cart!");
             }
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.$row,
-                'SHOP_PRODUCT_ID' => $objProduct->id(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_ID' => $objProduct->getId(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
                 'SHOP_PRODUCT_DESCRIPTION' => $short,
                 'SHOP_PRODUCT_DETAILDESCRIPTION' => $detailDescription,
                 'SHOP_PRODUCT_FORM_NAME' => $shopProductFormName,
@@ -1763,13 +1780,13 @@ die("Failed to update the Cart!");
                     ),
                 'SHOP_CURRENCY_CODE' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             ));
-            if ($objProduct->code()) {
+            if ($objProduct->getCode()) {
                 self::$objTemplate->setVariable(
                     'SHOP_PRODUCT_CUSTOM_ID', htmlentities(
-                        $objProduct->code(), ENT_QUOTES, CONTREXX_CHARSET));
+                        $objProduct->getCode(), ENT_QUOTES, CONTREXX_CHARSET));
             }
             $manufacturer_name = $manufacturer_url = $manufacturer_link = '';
-            $manufacturer_id = $objProduct->manufacturer_id();
+            $manufacturer_id = $objProduct->getManufacturerId();
             if ($manufacturer_id) {
                 $manufacturer = $manufacturerRepo->find($manufacturer_id);
                 $manufacturer_name =
@@ -1804,7 +1821,7 @@ die("Failed to update the Cart!");
             // This is now extended by the Manufacturer table and should thus
             // get a new purpose.  As it is product specific, it could be
             // renamed and reused as a link to individual Products!
-            $externalLink = $objProduct->uri();
+            $externalLink = $objProduct->getUri();
             if (!empty($externalLink)) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_EXTERNAL_LINK' =>
@@ -1860,7 +1877,7 @@ die("Failed to update the Cart!");
                         \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
             }
-            if ($objProduct->stock_visible()) {
+            if ($objProduct->getStockVisible()) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_STOCK' => $stock,
                 ));
@@ -1870,10 +1887,10 @@ die("Failed to update the Cart!");
                     'SHOP_PRODUCT_DETAILLINK' => $detailLink,
                 ));
             }
-            $distribution = $objProduct->distribution();
+            $distribution = $objProduct->getDistribution();
             $weight = '';
             if ($distribution == 'delivery') {
-                $weight = $objProduct->weight();
+                $weight = $objProduct->getWeight();
             }
 
             // Hide the weight if it is zero or disabled in the configuration
@@ -1892,13 +1909,13 @@ die("Failed to update the Cart!");
                             : $_ARRAYLANG['TXT_SHOP_VAT_PREFIX_EXCL']
                          ),
                     'SHOP_PRODUCT_TAX' =>
-                        Vat::getShort($objProduct->vat_id())
+                        Vat::getShort($objProduct->getVatId())
                 ));
             }
 
             // Add flag images for flagged Products
             $strImage = '';
-            $strFlags = $objProduct->flags();
+            $strFlags = $objProduct->getFlags();
             $arrVirtual = ShopCategories::getVirtualCategoryNameArray(FRONTEND_LANG_ID);
             foreach (explode(' ', $strFlags) as $strFlag) {
                 if (in_array($strFlag, $arrVirtual)) {
@@ -1913,18 +1930,18 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $minimum_order_quantity = $objProduct->minimum_order_quantity();
+            $minimum_order_quantity = $objProduct->getMinimumOrderQuantity();
             //Activate Quantity-Inputfield when minimum_order_quantity exists
             if (self::$objTemplate->blockExists('orderQuantity') && $minimum_order_quantity > 0) {
                 self::$objTemplate->setVariable(
-                        'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->minimum_order_quantity())
+                        'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->getMinimumOrderQuantity())
                 );
                 self::$objTemplate->touchBlock('orderQuantity');
             } elseif (self::$objTemplate->blockExists('orderQuantity') && !$minimum_order_quantity){
                 self::$objTemplate->hideBlock('orderQuantity');
             }
 
-            if ($objProduct->stock()) {
+            if ($objProduct->getStock()) {
                 if (self::$objTemplate->blockExists('shop_product_in_stock')) {
                     self::$objTemplate->touchBlock('shop_product_in_stock');
                 }
@@ -1977,8 +1994,12 @@ die("Failed to update the Cart!");
         if (empty($productIds)) {
             return $arrProduct;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach ($productIds as $productId) {
-            $product = Product::getById($productId);
+            $product = $productRepo->find($productId);
             if ($product && $product->getStatus()) {
                 $arrProduct[] = $product;
             }
@@ -4148,8 +4169,13 @@ die("Shop::processRedirect(): This method is obsolete!");
         // It may be necessary to refresh the cart here, as the customer
         // may return to the cart, then press "Back".
         self::_initPaymentDetails();
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
 // TODO: Implement a proper method
 //                unset(Cart::get_product_id($cart_id]);
@@ -4166,18 +4192,18 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $price_options,
                 $arrProduct['quantity']);
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             $weight = ($productDistribution == 'delivery'
-                ? Weight::getWeightString($objProduct->weight()) : '-');
-            $vatId = $objProduct->vat_id();
+                ? Weight::getWeightString($objProduct->getWeight()) : '-');
+            $vatId = $objProduct->getVatId();
             $vatRate = Vat::getRate($vatId);
             $vatPercent = Vat::getShort($vatId);
             $vatAmount = Vat::amount(
                 $vatRate, $price*$arrProduct['quantity']);
             self::$objTemplate->setVariable(array(
                 'SHOP_PRODUCT_ID' => $arrProduct['id'],
-                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->code(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->getCode(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
                 'SHOP_PRODUCT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $price*$arrProduct['quantity']),
                 'SHOP_PRODUCT_QUANTITY' => $arrProduct['quantity'],
@@ -4627,13 +4653,13 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
                 unset($_SESSION['shop']['order_id']);
                 return \Message::error($_ARRAYLANG['TXT_ERROR_LOOKING_UP_ORDER']);
             }
             $product_id = $arrProduct['id'];
-            $name = $objProduct->name();
+            $name = $objProduct->getName();
             $priceOptions = (!empty($arrProduct['optionPrice'])
                 ? $arrProduct['optionPrice'] : 0);
             $quantity = $arrProduct['quantity'];
@@ -4643,23 +4669,21 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $quantity);
             $item_total = $price*$quantity;
             $items_total += $item_total;
-            $productVatId = $objProduct->vat_id();
+            $productVatId = $objProduct->getVatId();
             $vat_rate = ($productVatId && Vat::getRate($productVatId)
                 ? Vat::getRate($productVatId) : '0.00');
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             if ($productDistribution == 'delivery') {
                 $_SESSION['shop']['isDelivery'] = true;
             }
             $weight = ($productDistribution == 'delivery'
-                ? $objProduct->weight() : 0); // grams
+                ? $objProduct->getWeight() : 0); // grams
             if ($weight == '') { $weight = 0; }
             // Add to order items table
 
-            $product = $productRepo->find($product_id);
-
             $objOrder->insertItem(
-                $product, $name, $price, $quantity, $vat_rate,
+                $objProduct, $name, $price, $quantity, $vat_rate,
                 $weight, $arrProduct['options']
             );
             // Store the Product Coupon, if applicable.

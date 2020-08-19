@@ -320,4 +320,14 @@ class Vat extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Trans
             static::$isReseller ? 1 : 0
         ];
     }
+
+    /**
+     * Get vat rate
+     *
+     * @return string vat rate
+     */
+    public function __toString()
+    {
+        return $this->getRate();
+    }
 }
