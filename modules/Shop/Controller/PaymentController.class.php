@@ -75,10 +75,6 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             'ord' => SORT_ASC,
         );
 
-        $options['functions']['status'] = array(
-            'field' => 'active'
-        );
-
         $options['order'] = array(
             'overview' => array(
                 'name',
@@ -156,6 +152,15 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
                 'storecallback' => array(
                     'adapter' => 'Payment',
                     'method' => 'storeZone',
+                ),
+            ),
+            'active' => array(
+                'header' => 'TXT_SHOP_PAYMENT_ACTIVE',
+                'editable' => true,
+                'validValues' => array(
+                    'all' => $_ARRAYLANG['TXT_ALL'],
+                    'reseller' => $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_RESELLER'],
+                    'none' => $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_NONE'],
                 ),
             ),
         );

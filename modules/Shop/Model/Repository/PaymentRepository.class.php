@@ -76,7 +76,7 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
         $payments = array();
 
         $qb = $this->_em->createQueryBuilder();
-        $query = $qb->select('p.id', 'p.processorId')->from(
+        $qb->select('p.id', 'p.processorId')->from(
             'Cx\Modules\Shop\Model\Entity\RelCountry', 'c'
         )->join(
             'c.zone', 'z', 'WITH',
@@ -84,10 +84,19 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
         )->join(
             'z.payments', 'p', 'WITH'
         )->where($qb->expr()->eq('c.countryId', '?1'))
-         ->andWhere($qb->expr()->eq('p.active', '1'))
          ->andWhere($qb->expr()->eq('z.active', '1'))
-         ->setParameter(1, intval($countryId))
-         ->getQuery();
+         ->setParameter(1, intval($countryId));
+        $customer = \Cx\Modules\Shop\Controller\Customer::getById(
+            \FWUser::getFWUserObject()->objUser->getId()
+        );
+        if ($customer->isReseller()) {
+            $qb->andWhere($qb->expr()->neq('p.active', '?2'));
+            $qb->setParameter(2, 'none');
+        } else {
+            $qb->andWhere($qb->expr()->eq('p.active', '?2'));
+            $qb->setParameter(2, 'all');
+        }
+        $query = $qb->getQuery();
         $results = $query->getArrayResult();
 
         foreach ($results as $result) {

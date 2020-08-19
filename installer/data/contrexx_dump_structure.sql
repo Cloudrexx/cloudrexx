@@ -3159,7 +3159,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `active` ENUM('none','all','reseller') NOT NULL DEFAULT 'all',
   `name` VARCHAR(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `IDX_96C3CFFE37BAC19A` (`processor_id`)

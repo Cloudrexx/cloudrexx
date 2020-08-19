@@ -48,6 +48,22 @@ namespace Cx\Modules\Shop\Model\Entity;
  * @version     5.0.0
  */
 class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable {
+
+    /**
+     * @var string Allows usage of this payment to all customers
+     */
+    const ACTIVE_ALL = 'all';
+
+    /**
+     * @var string Disallows usage of this payment to all customers
+     */
+    const ACTIVE_NONE = 'none';
+
+    /**
+     * @var string Allows usage of this payment to resellers only
+     */
+    const ACTIVE_RESELLER = 'reseller';
+
     /**
      * @var string
      */
@@ -84,9 +100,9 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     protected $ord;
 
     /**
-     * @var boolean
+     * @var string
      */
-    protected $active = true;
+    protected $active = self::ACTIVE_ALL;
 
     /**
      * @var string
@@ -250,7 +266,7 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * Set active
      *
-     * @param boolean $active
+     * @param string $active
      */
     public function setActive($active)
     {
@@ -260,7 +276,7 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * Get active
      *
-     * @return boolean 
+     * @return string 
      */
     public function getActive()
     {

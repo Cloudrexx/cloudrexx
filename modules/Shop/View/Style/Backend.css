@@ -455,10 +455,6 @@ table.adminlist td.discountgroup-name {
     width: 47% !important;
 }
 
-#discount-group-table tr td:nth-child(1) {
-    font-weight: bold;
-}
-
 .payment-processor-info .title {
     width: 20%;
     float: left;
