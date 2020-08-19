@@ -109,9 +109,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Product' => 'products',
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
-                    'DiscountgroupCountName' => 'discounts',
                     'Customer' => 'customers',
-                    'RelDiscountGroup' => 'discounts',
                     'Statistic' => 'statistics',
                     'Import' => 'import',
                     'Setting' => 'settings',
@@ -131,7 +129,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'delProduct' => 'Product',
                     'deleteProduct' => 'Product',
                     'manage' => 'Manage',
-                    'discounts' => 'DiscountgroupCountName',
                     'delcustomer' => 'Customer',
                     'customer_activate' => 'Customer',
                     'customer_deactivate' => 'Customer',
@@ -363,6 +360,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     ),
                 );
                 break;
+            case 'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName':
+                $options = $this->getSystemComponentController()->getController(
+                    'DiscountgroupCountName'
+                )->getViewGeneratorOptions($options);
+                break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountCoupon'
@@ -505,6 +507,14 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             return $this->getSystemComponentController()->getController(
                 'Order'
             )->parseOrderDetailPage($template, $entityClassName, $options);
+        } else if (
+            $entityName == 'RelDiscountGroup'
+        ) {
+            $options = parent::getViewGeneratorOptions($entityClassName);
+
+            return $this->getSystemComponentController()->getController(
+                'DiscountGroup'
+            )->parsePage($template, $options);
         }
 
         return parent::parsePage($template, $cmd,$isSingle);

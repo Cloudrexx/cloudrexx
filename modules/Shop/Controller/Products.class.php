@@ -1082,6 +1082,12 @@ class Products
     {
         global $objDatabase;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $discountRateRepo = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountRate'
+        );
+
         // create javascript array containing all products;
         // used to update the display when changing the product ID.
         // we need the VAT rate in there as well in order to be able to correctly change the products,
@@ -1108,6 +1114,19 @@ class Products
              WHERE `product`.`active`=1";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return Product::errorHandler();
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $discountCountRates = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findBy(
+            array(),
+            array('count' => 'DESC')
+        );
+
         while (!$objResult->EOF) {
             $id = $objResult->fields['id'];
             $distribution = $objResult->fields['distribution'];
@@ -1128,25 +1147,25 @@ class Products
                 $price = $objResult->fields['resellerprice'];
             }
             // Determine discounted price from customer and article group matrix
-            $discountCustomerRate = Discount::getDiscountRateCustomer(
+            $discountCustomerRate = $discountGroupRepo->getDiscountRateCustomer(
                 $groupCustomerId, $objResult->fields['article_id']
             );
             $price -= $price * $discountCustomerRate * 0.01;
-            // Determine prices for various count discounts, if any
-            $arrDiscountCountRate = Discount::getDiscountCountRateArray(
-                $objResult->fields['group_id']);
-//\DBG::log("Products::getJavascriptArray($groupCustomerId, $isReseller): Discount rate array: ".var_export($arrDiscountCountRate, true));
             // Order the counts in reverse, from highest to lowest
             $strJsArrPrice = '';
-            if (is_array($arrDiscountCountRate)) {
-                foreach ($arrDiscountCountRate as $count => $rate) {
+            if (is_array($discountCountRates)) {
+                foreach ($discountCountRates as $rate) {
                     // Deduct the customer type discount right away
 //\DBG::log("Products::getJavascriptArray(): price $price, rate $rate");
-                    $discountPrice = $price - ($price * $rate * 0.01);
+                    $discountPrice = $price - (
+                        $price * $rate->getRate() * 0.01
+                        );
                     $strJsArrPrice .=
                         ($strJsArrPrice ? ',' : '').
                         // Count followed by price
-                        $count.','.\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($discountPrice);
+                        $rate->getCount().','
+                        .\Cx\Modules\Shop\Controller\CurrencyController::
+                            getCurrencyPrice($discountPrice);
                 }
             }
             $strJsArrPrice .=

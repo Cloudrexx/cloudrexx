@@ -5157,15 +5157,29 @@ die("Shop::processRedirect(): This method is obsolete!");
     static function showDiscountInfo(
         $groupCustomerId, $groupArticleId, $groupCountId, $count
     ) {
-        // Pick the unit for this product (count, meter, kilo, ...)
-        $unit = Discount::getUnit($groupCountId);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $unit = '';
+        if (!empty($groupCountId)) {
+            $discountCountName = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+            )->find($groupCountId);
+
+            if (!empty($discountCountName)) {
+                // Pick the unit for this product (count, meter, kilo, ...)
+                $unit = $discountCountName->getUnit();
+            }
+        }
+
         if (!empty($unit)) {
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_UNIT', $unit
             );
         }
         if ($groupCustomerId > 0) {
-            $rateCustomer = Discount::getDiscountRateCustomer(
+            $rateCustomer = $discountGroupRepo->getDiscountRateCustomer(
                 $groupCustomerId, $groupArticleId
             );
             if ($rateCustomer > 0) {
@@ -5177,7 +5191,9 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
         }
         if ($groupCountId > 0) {
-            $rateCount = Discount::getDiscountRateCount($groupCountId, $count);
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
             $listCount = self::getDiscountCountString($groupCountId);
             if ($rateCount > 0) {
                 // Show discount rate if applicable
@@ -5208,15 +5224,30 @@ die("Shop::processRedirect(): This method is obsolete!");
     {
         global $_ARRAYLANG;
 
-        $arrDiscount = Discount::getDiscountCountArray();
-        $arrRate = Discount::getDiscountCountRateArray($groupCountId);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $discountCountNames = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findAll();
+        $discountCountRates = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findBy(
+            array(),
+            array('count' => 'DESC')
+        );;
+
         $strDiscounts = '';
         if (!empty($arrRate)) {
             $unit = '';
-            if (isset($arrDiscount[$groupCountId])) {
-                $unit = $arrDiscount[$groupCountId]['unit'];
+            foreach ($discountCountNames as $discountCountName) {
+                if ($discountCountName->getId() == $groupCountId) {
+                    $unit = $discountCountName->getUnit();
+                    break;
+                }
             }
-            foreach ($arrRate as $count => $rate) {
+            foreach ($discountCountRates as $discountCountRate) {
+                $count = $discountCountRate->getCount();
+                $rate = $discountCountRate->getRate();
                 $strDiscounts .=
                     ($strDiscounts != '' ? ', ' : '').
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_FROM'].' '.

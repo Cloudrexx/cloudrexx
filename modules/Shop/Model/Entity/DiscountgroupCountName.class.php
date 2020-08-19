@@ -59,7 +59,7 @@ class DiscountgroupCountName extends \Cx\Model\Base\EntityBase implements \Gedmo
     /**
      * @var integer
      */
-    protected $cumulative;
+    protected $cumulative = 1;
 
     /**
      * @var string

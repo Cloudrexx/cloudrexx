@@ -84,6 +84,9 @@ $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
 
 $_ARRAYLANG['name'] = 'Nombre';
+$_ARRAYLANG['cumulative'] = 'Pro Produkt';
+$_ARRAYLANG['unit'] = 'Unidad';
+$_ARRAYLANG['discountgroupCountRates'] = 'Cantidad m&iacute;nima';
 
 
 $_ARRAYLANG['TXT_ORDERS'] = "Pedidos";

@@ -104,6 +104,9 @@ $_ARRAYLANG['bank'] = 'Kreditinstitut';
 $_ARRAYLANG['blz'] = 'Bankleitzahl (BLZ)';
 
 $_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['cumulative'] = 'Pro Produkt';
+$_ARRAYLANG['unit'] = 'Einheit';
+$_ARRAYLANG['discountgroupCountRates'] = 'Mindestmenge';
 
 $_ARRAYLANG['DETAIL_ID'] = 'Auftragsnummer';
 $_ARRAYLANG['DETAIL_DATETIME'] = 'Bestelldatum';
@@ -131,7 +134,7 @@ $_ARRAYLANG['TXT_RESELLER'] = "Reseller";
 $_ARRAYLANG['TXT_SHOP_DETAIL_NETPRICE'] = 'Nettopreis';
 
 $_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'] = "Diese Aktion kann nicht rückgängig gemacht werden!";
-$_ARRAYLANG['TXT_CONFIRM_DELETE_ORDER'] = "Möchten Sie diese Bestellung(en) wirklich löschen?";
+$_ARRAYLANG['TXT_CEinheitONFIRM_DELETE_ORDER'] = "Möchten Sie diese Bestellung(en) wirklich löschen?";
 $_ARRAYLANG['TXT_SHOP_CONFIRM_RESET_STOCK'] = 'Soll der Lagerbestand zurückgesetzt werden?';
 
 $_ARRAYLANG['TXT_PRODUCT_ALREADY_PRESENT'] = "Dieses Produkt ist bereits auf der Bestellungsliste vorhanden!";
@@ -1218,3 +1221,5 @@ $_ARRAYLANG['countryId'] = 'Land';
 $_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Bestellung wurde gelöscht.';
 $_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Bestellungen wurden gelöscht.';
 $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'Status der Bestellung wurde geändert.';
+
+$_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='Die Einträge wurden erfolgreich aktualisiert.';

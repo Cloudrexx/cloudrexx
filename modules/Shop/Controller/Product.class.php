@@ -1541,14 +1541,21 @@ class Product
         if ($objCustomer) {
             $groupCustomerId = $objCustomer->group_id();
             if ($groupCustomerId) {
-                $rateCustomer = Discount::getDiscountRateCustomer(
-                    $groupCustomerId, $groupArticleId);
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+                );
+                $rateCustomer = $discountGroupRepo->getDiscountRateCustomer(
+                    $groupCustomerId, $groupArticleId
+                );
                 $price -= ($price * $rateCustomer * 0.01);
             }
         }
         $rateCount = 0;
         if ($count > 0) {
-            $rateCount = Discount::getDiscountRateCount($groupCountId, $count);
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
             $price -= ($price * $rateCount * 0.01);
         }
         $price = \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($price);

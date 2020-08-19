@@ -55,7 +55,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array(
             'Backend', 'Manufacturer', 'Category', 'Pdf', 'Pricelist',
             'JsonPriceList', 'Currency', 'JsonCurrency', 'DiscountCoupon',
-            'JsonDiscountCoupon', 'Order', 'JsonOrder'
+            'JsonDiscountCoupon', 'Order', 'JsonOrder', 'DiscountgroupCountName',
+            'DiscountGroup', 'JsonDiscountGroup'
         );
     }
 
@@ -69,10 +70,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * Avoid calculation of anything, just return an array!
      * @return array List of ComponentController classes
      */
-    public function getControllersAccessableByJson() {
+    public function getControllersAccessableByJson()
+    {
         return array(
             'JsonPriceListController', 'JsonCurrencyController',
-            'JsonDiscountCouponController', JsonOrderController
+            'JsonDiscountCouponController', 'JsonOrderController',
+            'JsonDiscountGroupController'
         );
     }
 

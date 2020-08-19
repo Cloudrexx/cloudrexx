@@ -2173,7 +2173,7 @@ if ($test === NULL) {
             'SHOP_CREATE_ACCOUNT_NO_CHECKED' =>
                 (empty($usergroup_ids) ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_DISCOUNT_GROUP_COUNT_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupCount($discount_group_count_id),
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::getMenuOptionsGroupCount($discount_group_count_id),
             'SHOP_DISCOUNT_GROUP_ARTICLE_MENU_OPTIONS' =>
                 \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupArticle($discount_group_article_id),
             'SHOP_KEYWORDS' => contrexx_raw2xhtml($keywords),
@@ -2986,10 +2986,6 @@ if ($test === NULL) {
                 self::$pageTitle = $_ARRAYLANG['TXT_ADD_PRODUCTS'];
                 $this->view_product_edit();
                 break;
-            case 'discounts':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUNT_GROUPS'];
-                $this->view_discount_groups_count();
-                break;
             default:
                 self::$pageTitle = $_ARRAYLANG['TXT_PRODUCT_CATALOG'];
                 $this->view_product_overview();
@@ -3408,153 +3404,6 @@ if ($test === NULL) {
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }
 
-
-    /**
-     * Show the count discount editing page
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_discount_groups_count()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_POST['discountStore'])) {
-            $this->store_discount_count();
-        }
-        if (isset($_GET['deleteDiscount'])) {
-            $this->delete_discount_count();
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE', 'shop_products_block', 'module_shop_discount_groups_count.html');
-
-        // Discounts overview
-        $arrDiscounts = Discount::getDiscountCountArray();
-        $i = 0;
-        foreach ($arrDiscounts as $id => $arrDiscount) {
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_ID' => $id,
-                'SHOP_DISCOUNT_GROUP_NAME' => contrexx_raw2xhtml($name),
-                'SHOP_DISCOUNT_GROUP_UNIT' => contrexx_raw2xhtml($unit),
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discount');
-        }
-
-        // Add/edit Discount
-        $id = 0;
-        $arrDiscountRates = array();
-        if (!empty($_GET['editDiscount'])) {
-            $id = intval($_GET['id']);
-            $arrDiscountRates = Discount::getDiscountCountRateArray($id);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => 'active',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'block',
-                'SHOP_DISCOUNT_LIST_CLASS' => '',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => '',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'none',
-                'SHOP_DISCOUNT_LIST_CLASS' => 'active',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('discountName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_ID_EDIT' => $id,
-            'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrDiscounts[$id])) {
-            $arrDiscount = $arrDiscounts[$id];
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_GROUP_NAME' => $name,
-                'SHOP_DISCOUNT_GROUP_UNIT' => $unit,
-            ));
-        }
-        self::$objTemplate->parse('discountName');
-        self::$objTemplate->setCurrentBlock('discountType');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_GROUP_TYPE_OPTIONS' =>
-            \Html::getRadioGroup(
-                'discountGroupType',
-                array(
-                    $_ARRAYLANG['TXT_YES'],
-                    $_ARRAYLANG['TXT_NO']
-                ),
-                Discount::isDiscountCumulative($id)
-            )
-        ));
-        self::$objTemplate->touchBlock('discountType');
-        self::$objTemplate->parse('discountType');
-        self::$objTemplate->setCurrentBlock('discountRate');
-        if (isset($arrDiscountRates)) {
-            $arrDiscountRates = array_reverse($arrDiscountRates, true);
-            foreach ($arrDiscountRates as $count => $rate) {
-                self::$objTemplate->setVariable(array(
-                    'SHOP_DISCOUNT_COUNT' => $count,
-                    'SHOP_DISCOUNT_RATE' => $rate,
-                    'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                    'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-                ));
-                self::$objTemplate->parse('discountRate');
-            }
-        }
-        // Add a few empty rows for adding new counts and rates
-        for ($j = 0; $j < 5; ++$j) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_COUNT' => '',
-                'SHOP_DISCOUNT_RATE' => '',
-                'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discountRate');
-        }
-        return true;
-    }
-
-
-    /**
-     * Store the count discounts after editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function store_discount_count()
-    {
-        if (!isset($_POST['discountId'])) return true;
-        $discountId = intval($_POST['discountId']);
-        $discountGroupType = contrexx_input2int($_POST['discountGroupType']);
-        $discountGroupName = contrexx_input2raw($_POST['discountGroupName']);
-        $discountGroupUnit = contrexx_input2raw($_POST['discountGroupUnit']);
-        $arrDiscountCount = contrexx_input2int($_POST['discountCount']);
-        $arrDiscountRate = contrexx_input2float($_POST['discountRate']);
-        return Discount::storeDiscountCount(
-            $discountId, $discountGroupType, $discountGroupName,
-            $discountGroupUnit, $arrDiscountCount, $arrDiscountRate
-        );
-    }
-
-
-    /**
-     * Delete the count discount selected by its ID from the GET request
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function delete_discount_count()
-    {
-        if (!isset($_GET['id'])) return true;
-        $discountId = $_GET['id'];
-        return Discount::deleteDiscountCount($discountId);
-    }
-
     /**
      * Show the customer and article group discounts for editing.
      *
@@ -3570,6 +3419,9 @@ if ($test === NULL) {
         self::$objTemplate->loadTemplateFile("module_shop_discount_customer.html");
         // Discounts overview
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroup = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
         $articleGroups = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\ArticleGroup'
         )->findAll();
@@ -3577,7 +3429,7 @@ if ($test === NULL) {
             'Cx\Modules\Shop\Model\Entity\CustomerGroup'
         )->findAll();
         $arrRate = null;
-        $arrRate = Discount::getDiscountRateCustomerArray();
+        $arrRate = $discountGroup->getDiscountRateCustomerArray();
         $i = 0;
         // Set up the customer groups header
         self::$objTemplate->setVariable(array(
@@ -3628,7 +3480,13 @@ if ($test === NULL) {
      */
     function store_discount_customer()
     {
-        return Discount::storeDiscountCustomer($_POST['discountRate']);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountCustomerRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        return $discountCustomerRepo->storeDiscountCustomer(
+            $_POST['discountRate']
+        );
     }
 
 

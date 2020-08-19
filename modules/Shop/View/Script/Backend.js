@@ -176,6 +176,16 @@ jQuery(document).ready(function($){
         cx.jQuery('.vg-searchSubmit').click();
     });
 
+    if (typeof document.getElementById('discount-group-table') != 'undefined') {
+        const titleRow = document.getElementById('discount-group-table').rows[1];
+
+        // Empty the column so that the input fields of the title row are not passed
+        let c = 1;
+        while (cell=titleRow.cells[c++]) {
+            cell.innerHTML = '';
+        }
+    }
+
     let previousStatusId;
     cx.jQuery('.order-status select').focus(function(e) {
         previousStatusId = cx.jQuery(this).val();

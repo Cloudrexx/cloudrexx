@@ -325,3 +325,11 @@ div#form-0-type div {
 .order #form-0-titleAddress th:last-child {
     padding-left: 0px;
 }
+
+table.adminlist td.discountgroup-name {
+    width: 47% !important;
+}
+
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
+}

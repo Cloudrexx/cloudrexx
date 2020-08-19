@@ -1071,7 +1071,7 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
             // Determine discounted price from customer and article group matrix
 
             $discountGroupRepo = $this->cx->getDb()->getEntityManager()->getRepository('\Cx\Modules\Shop\Model\Entity\RelDiscountGroup');
-            $discountCustomerGroup = $discountGroupRepo->findBy(
+            $discountCustomerGroup = $discountGroupRepo->findOneBy(
                 array(
                     'customerGroupId' => $groupCustomerId,
                     'articleGroup' => $articleId
