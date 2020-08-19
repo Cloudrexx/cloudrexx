@@ -2175,7 +2175,7 @@ if ($test === NULL) {
             'SHOP_DISCOUNT_GROUP_COUNT_MENU_OPTIONS' =>
                 Discount::getMenuOptionsGroupCount($discount_group_count_id),
             'SHOP_DISCOUNT_GROUP_ARTICLE_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupArticle($discount_group_article_id),
+                \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupArticle($discount_group_article_id),
             'SHOP_KEYWORDS' => contrexx_raw2xhtml($keywords),
             // Enable JavaScript functionality for the weight if enabled
             'SHOP_WEIGHT_ENABLED' => (\Cx\Core\Setting\Controller\Setting::getValue('weight_enable','Shop')
@@ -2984,10 +2984,6 @@ if ($test === NULL) {
                 self::$pageTitle = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUNT_GROUPS'];
                 $this->view_discount_groups_count();
                 break;
-            case 'groups':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_ARTICLE_GROUPS'];
-                $this->view_article_groups();
-                break;
             default:
                 self::$pageTitle = $_ARRAYLANG['TXT_PRODUCT_CATALOG'];
                 $this->view_product_overview();
@@ -3620,74 +3616,6 @@ if ($test === NULL) {
         return true;
     }
 
-
-    /**
-     * Show the article groups for editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_article_groups()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_GET['delete'])) {
-            Discount::deleteArticleGroup($_GET['id']);
-        }
-        if (isset($_POST['store'])) {
-            Discount::storeArticleGroup(
-                $_POST['groupName'], $_POST['id']
-            );
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE',
-            'shop_products_block', 'module_shop_discount_groups_article.html');
-        // Group overview
-        $arrGroups = Discount::getArticleGroupArray();
-        self::$objTemplate->setCurrentBlock('shopGroup');
-        $i = 0;
-        foreach ($arrGroups as $id => $arrGroup) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_GROUP_ID' => $id,
-                'SHOP_GROUP_NAME' => $arrGroup['name'],
-                'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parseCurrentBlock();
-        }
-        // Add/edit Group
-        $id = 0;
-        if (!empty($_GET['edit'])) {
-            $id = intval($_GET['id']);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => 'active',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'block',
-                'SHOP_GROUP_LIST_CLASS' => '',
-                'SHOP_GROUP_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => '',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'none',
-                'SHOP_GROUP_LIST_CLASS' => 'active',
-                'SHOP_GROUP_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('shopGroupName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_GROUP_ID_EDIT' => $id,
-            'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrGroups[$id])) {
-            self::$objTemplate->setVariable('SHOP_GROUP_NAME', $arrGroups[$id]['name']);
-        }
-        self::$objTemplate->parseCurrentBlock();
-        return true;
-    }
-
-
     /**
      * Show the customer and article group discounts for editing.
      *
@@ -3702,8 +3630,11 @@ if ($test === NULL) {
         }
         self::$objTemplate->loadTemplateFile("module_shop_discount_customer.html");
         // Discounts overview
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $articleGroups = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
         $arrCustomerGroups = Discount::getCustomerGroupArray();
-        $arrArticleGroups = Discount::getArticleGroupArray();
         $arrRate = null;
         $arrRate = Discount::getDiscountRateCustomerArray();
         $i = 0;
@@ -3722,11 +3653,11 @@ if ($test === NULL) {
             self::$objTemplate->touchBlock('article_group_header_column');
             self::$objTemplate->parse('article_group_header_column');
         }
-        foreach ($arrArticleGroups as $groupArticleId => $arrArticleGroup) {
+        foreach ($articleGroups as $articleGroup) {
 //DBG::log("Article group ID $groupArticleId");
             foreach ($arrCustomerGroups as $groupCustomerId => $arrCustomerGroup) {
-                $rate = (isset($arrRate[$groupCustomerId][$groupArticleId])
-                    ? $arrRate[$groupCustomerId][$groupArticleId] : 0);
+                $rate = (isset($arrRate[$groupCustomerId][$articleGroup->getId()])
+                    ? $arrRate[$groupCustomerId][$articleGroup->getId()] : 0);
                 self::$objTemplate->setVariable(array(
                     'SHOP_CUSTOMER_GROUP_ID' => $groupCustomerId,
                     'SHOP_DISCOUNT_RATE' => sprintf('%2.2f', $rate),
@@ -3735,8 +3666,8 @@ if ($test === NULL) {
                 self::$objTemplate->parse('discount_column');
             }
             self::$objTemplate->setVariable(array(
-                'SHOP_ARTICLE_GROUP_ID' => $groupArticleId,
-                'SHOP_ARTICLE_GROUP_NAME' => $arrArticleGroup['name'],
+                'SHOP_ARTICLE_GROUP_ID' => $articleGroup->getId(),
+                'SHOP_ARTICLE_GROUP_NAME' => $articleGroup->getName(),
                 'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
             ));
             self::$objTemplate->parse('article_group_row');

@@ -103,6 +103,8 @@ $_ARRAYLANG['holder'] = 'Kontoinhaber';
 $_ARRAYLANG['bank'] = 'Kreditinstitut';
 $_ARRAYLANG['blz'] = 'Bankleitzahl (BLZ)';
 
+$_ARRAYLANG['name'] = 'Name';
+
 $_ARRAYLANG['DETAIL_ID'] = 'Auftragsnummer';
 $_ARRAYLANG['DETAIL_DATETIME'] = 'Bestelldatum';
 $_ARRAYLANG['DETAIL_STATUS'] = 'Bestellstatus';

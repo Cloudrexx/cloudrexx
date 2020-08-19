@@ -83,6 +83,8 @@ $_ARRAYLANG['rate'] = 'Cambio';
 $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
 
+$_ARRAYLANG['name'] = 'Nombre';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Pedidos";
 $_ARRAYLANG['TXT_STOCK'] = "En stock";

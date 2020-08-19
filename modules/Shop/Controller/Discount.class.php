@@ -180,29 +180,6 @@ class Discount
             $objResult->MoveNext();
         }
 
-        $arrSqlName = \Text::getSqlSnippets(
-            '`discount`.`id`', FRONTEND_LANG_ID, 'Shop',
-            array('article' => self::TEXT_NAME_GROUP_ARTICLE));
-        $query = "
-            SELECT `discount`.`id`, ".$arrSqlName['field']."
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_article_group` AS `discount`
-                   ".$arrSqlName['join']."
-             ORDER BY `discount`.`id` ASC";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) return self::errorHandler();
-        self::$arrArticleGroup = array();
-        while (!$objResult->EOF) {
-            $group_id = $objResult->fields['id'];
-            $strName = $objResult->fields['article'];
-            if (is_null($strName)) {
-                $strName = \Text::getById($group_id, 'Shop',
-                    self::TEXT_NAME_GROUP_ARTICLE)->content();
-            }
-            self::$arrArticleGroup[$group_id] = array(
-                'name' => $strName,
-            );
-            $objResult->MoveNext();
-        }
 //DBG::log("Discount::init(): Made \$arrArticleGroup: ".var_export(self::$arrArticleGroup, true));
         $query = "
             SELECT `customer_group_id`, `article_group_id`, `rate`
@@ -519,36 +496,6 @@ class Discount
 
 
     /**
-     * Returns the HTML dropdown menu options with all of the
-     * article group names, plus a null option prepended
-     *
-     * Backend use only.
-     * @param   integer   $selectedId   The optional preselected ID
-     * @return  string                  The HTML dropdown menu options
-     * @static
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     */
-    static function getMenuOptionsGroupArticle($selectedId=0)
-    {
-        global $_ARRAYLANG;
-        static $arrArticleGroupName = null;
-
-//DBG::log("Discount::getMenuOptionsGroupArticle($selectedId): Entered");
-        if (is_null(self::$arrArticleGroup)) self::init();
-        if (is_null($arrArticleGroupName)) {
-            $arrArticleGroupName = array();
-            foreach (self::$arrArticleGroup as $id => $arrArticleGroup) {
-                $arrArticleGroupName[$id] = $arrArticleGroup['name'];
-//DBG::log("Discount::getMenuOptionsGroupArticle($selectedId): Adding ID $id => {$arrArticleGroup['name']}");
-            }
-        }
-        return \Html::getOptions(
-            array(0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'], )
-          + $arrArticleGroupName, $selectedId);
-    }
-
-
-    /**
      * Returns an array with all the customer group names
      * indexed by their ID
      *
@@ -562,22 +509,6 @@ class Discount
     {
         if (is_null(self::$arrCustomerGroup)) self::init();
         return self::$arrCustomerGroup;
-    }
-
-
-    /**
-     * Returns an array with all the article group names indexed by their ID
-     *
-     * Backend use only.
-     * @return  array                 The group name array on success,
-     *                                null otherwise
-     * @static
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     */
-    static function getArticleGroupArray()
-    {
-        if (is_null(self::$arrArticleGroup)) self::init();
-        return self::$arrArticleGroup;
     }
 
 
@@ -755,44 +686,6 @@ class Discount
         return $group_id;
     }
 
-
-    /**
-     * Store an article group in the database
-     * @param   string    $groupName    The group name
-     * @param   integer   $group_id     The optional group ID
-     * @return  integer                 The (new) group ID on success,
-     *                                  false otherwise
-     * @static
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     */
-    static function storeArticleGroup($groupName, $group_id=0)
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        if (is_null(self::$arrArticleGroup)) self::init();
-        $group_id = intval($group_id);
-        $query = "
-            REPLACE INTO `".DBPREFIX."module_shop".MODULE_INDEX."_article_group` (
-                `id`
-            ) VALUES (
-                " . ($group_id ? $group_id : 'NULL') . "
-            )";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_ERROR_STORING']);
-        }
-        if (empty($group_id)) {
-            $group_id = $objDatabase->Insert_Id();
-        }
-        if (!\Text::replace($group_id, FRONTEND_LANG_ID, 'Shop',
-            self::TEXT_NAME_GROUP_ARTICLE, $groupName)) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_ERROR_STORING']);
-        }
-        \Message::ok($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_STORED_SUCCESSFULLY']);
-        return $group_id;
-    }
-
-
     /**
      * Delete the customer group from the database
      *
@@ -831,45 +724,6 @@ class Discount
         }
         return \Message::ok($_ARRAYLANG['TXT_SHOP_DISCOUNT_CUSTOMER_GROUP_DELETED_SUCCESSFULLY']);
     }
-
-
-    /**
-     * Delete the article group from the database
-     *
-     * Backend use only.
-     * @param   integer   $group_id     The group ID
-     * @return  boolean                 True on success, false otherwise
-     * @static
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     */
-    static function deleteArticleGroup($group_id)
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        if (empty($group_id)) return false;
-        if (is_null(self::$arrArticleGroup)) self::init();
-        if (empty(self::$arrArticleGroup[$group_id])) return true;
-        // Remove related rates
-        $query = "
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_discount_group`
-             WHERE `article_group_id`=$group_id";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) return self::errorHandler();
-        // Remove the group
-        if (!\Text::deleteById(
-            $group_id, 'Shop', self::TEXT_NAME_GROUP_ARTICLE)) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_ERROR_DELETING']);
-        }
-        $query = "
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_article_group`
-             WHERE `id`=$group_id";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_ERROR_DELETING']);
-        }
-        return \Message::ok($_ARRAYLANG['TXT_SHOP_DISCOUNT_ARTICLE_GROUP_DELETED_SUCCESSFULLY']);
-    }
-
 
     /**
      * Tries to fix any database problems

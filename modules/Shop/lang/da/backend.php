@@ -83,6 +83,8 @@ $_ARRAYLANG['rate'] = 'Kurs';
 $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
 
+$_ARRAYLANG['name'] = 'Name';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Bestillinger";
 $_ARRAYLANG['TXT_STOCK'] = "Beholdning";

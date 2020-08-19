@@ -62,7 +62,6 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_ZONE'] = 'Zonen';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-Mail Vorlagen';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
 
-
 $_ARRAYLANG['borderOn'] = 'Rahmen';
 $_ARRAYLANG['headerOn'] = 'Kopfzeile anzeigen';
 $_ARRAYLANG['footerOn'] = 'Fusszeile anzeigen';
@@ -80,6 +79,9 @@ $_ARRAYLANG['symbol'] = 'Symbol';
 $_ARRAYLANG['rate'] = 'Kurs';
 $_ARRAYLANG['increment'] = 'Rundung';
 $_ARRAYLANG['default'] = 'Standard';
+
+$_ARRAYLANG['name'] = 'Name';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Bestellungen";
 $_ARRAYLANG['TXT_STOCK'] = "Bestand";

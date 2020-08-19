@@ -110,7 +110,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
                     'DiscountgroupCountName' => 'discounts',
-                    'ArticleGroup' => 'groups',
                     'Customer' => 'customers',
                     'CustomerGroup' => 'groups',
                     'RelDiscountGroup' => 'discounts',
@@ -133,7 +132,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'delProduct' => 'Product',
                     'deleteProduct' => 'Product',
                     'manage' => 'Manage',
-                    'groups' => 'ArticleGroup',
                     'discounts' => 'DiscountgroupCountName',
                     'delcustomer' => 'Customer',
                     'customer_activate' => 'Customer',
@@ -331,6 +329,24 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Currency'
                 )->getViewGeneratorOptions($options);
                 break;
+            case 'Cx\Modules\Shop\Model\Entity\ArticleGroup':
+                $options['functions']['editable'] = true;
+                $options['functions']['paging'] = false;
+                $options['functions']['sorting'] = false;
+                $options['fields'] = array(
+                    'name' => array(
+                        'editable' => true,
+                    ),
+                    'relDiscountGroups' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                    'products' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
+                );
+                break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountCoupon'
@@ -375,6 +391,37 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         );
 
         return $options;
+    }
+
+    /**
+     * Returns the HTML dropdown menu options with all of the
+     * article group names, plus a null option prepended
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupArticle($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $articleGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
+
+        $arrArticleGroupName = array();
+        foreach ($articleGroups as $articleGroup) {
+            $arrArticleGroupName[
+            $articleGroup->getId()
+            ] = $articleGroup->getName();
+        }
+        return \Html::getOptions(
+            array(0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'], )
+            + $arrArticleGroupName, $selectedId);
     }
 
     /**
