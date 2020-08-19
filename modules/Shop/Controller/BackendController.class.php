@@ -97,7 +97,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Setting':
             case 'settings':
             case 'Vat':
-            case 'Payment':
             case 'Shipper':
             case 'Relcountry':
             case 'Zone':
@@ -114,7 +113,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Import' => 'import',
                     'Setting' => 'settings',
                     'Vat' => 'vat',
-                    'Payment' => 'payment',
                     'Shipper' => 'shipment',
                     'RelCountry' => 'countries',
                     'Zone' => 'zones',
@@ -363,6 +361,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName':
                 $options = $this->getSystemComponentController()->getController(
                     'DiscountgroupCountName'
+                )->getViewGeneratorOptions($options);
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\Payment':
+                $options = $this->getSystemComponentController()->getController(
+                    'Payment'
                 )->getViewGeneratorOptions($options);
                 break;
             case 'Cx\Modules\Shop\Model\Entity\DiscountCoupon':

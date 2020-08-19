@@ -88,6 +88,11 @@ $_ARRAYLANG['cumulative'] = 'Pro Produkt';
 $_ARRAYLANG['unit'] = 'Einheit';
 $_ARRAYLANG['discountgroupCountRates'] = 'Mindestmenge';
 
+$_ARRAYLANG['fee']  = 'Gebühr';
+$_ARRAYLANG['freeFrom']  = 'Gebührenfrei ab';
+$_ARRAYLANG['paymentProcessor']  = 'Tjenste';
+$_ARRAYLANG['zones']  = 'Område';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Bestillinger";
 $_ARRAYLANG['TXT_STOCK'] = "Beholdning";

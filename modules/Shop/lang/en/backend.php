@@ -82,6 +82,14 @@ $_ARRAYLANG['cumulative'] = 'Per product';
 $_ARRAYLANG['unit'] = 'Unit';
 $_ARRAYLANG['discountgroupCountRates'] = 'Minimum quantity';
 
+$_ARRAYLANG['fee']  = 'Fee';
+$_ARRAYLANG['type']  = 'Fee type';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_FIX'] = 'CHF';
+$_ARRAYLANG['TXT_MODULE_SHOP_FEE_TYPE_PERCENT'] = 'Percent';
+$_ARRAYLANG['freeFrom']  = 'Free of charge from';
+$_ARRAYLANG['paymentProcessor']  = 'Payment provider';
+$_ARRAYLANG['zones']  = 'Zone';
+
 
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "The total weight of your order exceeds the available shipment conditions";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Accept changes";

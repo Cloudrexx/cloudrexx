@@ -232,7 +232,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         // Determine and verify the payment handler
         $payment_id = $order->getPaymentId();
 //if (!$payment_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Payment ID for Order ID $order_id");
-        $processor_id = \Cx\Modules\Shop\Controller\Payment::
+        $processor_id = \Cx\Modules\Shop\Controller\PaymentController::
             getPaymentProcessorId($payment_id);
 //if (!$processor_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor ID for Payment ID $payment_id");
         $processorName = \Cx\Modules\Shop\Controller\PaymentProcessing::
@@ -677,51 +677,51 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     $optionValues = array();
 //DBG::log("Attribute /$attribute_name/ => ".var_export($arrAttribute, true));
 // NOTE: The option price is optional and may be left out
-                    $option = array();
+                        $option = array();
                     $option_name = $orderAttribute->getOptionName();
                     $option_price = $orderAttribute->getPrice();
-                    $item_price += $option_price;
-                    // Recognize the names of uploaded files,
-                    // verify their presence and use the original name
-                    $option_name_stripped =
-                        \Cx\Modules\Shop\Controller\ShopLibrary::
-                            stripUniqidFromFilename($option_name);
-                    $path = \Cx\Modules\Shop\Model\Entity\Order::
-                            UPLOAD_FOLDER
-                        . $option_name;
-                    if (   $option_name != $option_name_stripped
-                        && \File::exists($path)) {
-                        $option_name = $option_name_stripped;
-                    }
-                    if ($attribute_name != $attribute_name_previous) {
-                        if ($attribute_name_previous) {
-                            $str_options .= '; ';
+                        $item_price += $option_price;
+                        // Recognize the names of uploaded files,
+                        // verify their presence and use the original name
+                        $option_name_stripped =
+                            \Cx\Modules\Shop\Controller\ShopLibrary::
+                                stripUniqidFromFilename($option_name);
+                        $path = \Cx\Modules\Shop\Model\Entity\Order::
+                                UPLOAD_FOLDER
+                            . $option_name;
+                        if (   $option_name != $option_name_stripped
+                            && \File::exists($path)) {
+                            $option_name = $option_name_stripped;
                         }
-                        $str_options .= $attribute_name.': '.$option_name;
-                        $attribute_name_previous = $attribute_name;
-                    } else {
-                        $str_options .= ', '.$option_name;
-                    }
-                    $option['PRODUCT_OPTIONS_VALUE'] = $option_name;
+                        if ($attribute_name != $attribute_name_previous) {
+                            if ($attribute_name_previous) {
+                                $str_options .= '; ';
+                            }
+                            $str_options .= $attribute_name.': '.$option_name;
+                            $attribute_name_previous = $attribute_name;
+                        } else {
+                            $str_options .= ', '.$option_name;
+                        }
+                        $option['PRODUCT_OPTIONS_VALUE'] = $option_name;
 // TODO: Add proper formatting with sprintf() and language entries
-                    if ($option_price != 0) {
-                        $str_options .=
-                            ' './/' ('.
-                            \Cx\Modules\Shop\Controller\CurrencyController::
-                            formatPrice($option_price)
-                            . ' ' .
-                            \Cx\Modules\Shop\Controller\CurrencyController::
-                                getActiveCurrencyCode()
+                        if ($option_price != 0) {
+                            $str_options .=
+                                ' './/' ('.
+                                \Cx\Modules\Shop\Controller\CurrencyController::
+                                formatPrice($option_price)
+                                . ' ' .
+                                \Cx\Modules\Shop\Controller\CurrencyController::
+                                    getActiveCurrencyCode()
 //                                .')'
-                        ;
-                        $option['PRODUCT_OPTIONS_PRICE'] =
-                            \Cx\Modules\Shop\Controller\CurrencyController::
-                                formatPrice($option_price);
-                        $option['PRODUCT_OPTIONS_CURRENCY'] =
-                            \Cx\Modules\Shop\Controller\CurrencyController::
-                                getActiveCurrencyCode();
-                    }
-                    $optionValues[] = $option;
+                            ;
+                            $option['PRODUCT_OPTIONS_PRICE'] =
+                                \Cx\Modules\Shop\Controller\CurrencyController::
+                                    formatPrice($option_price);
+                            $option['PRODUCT_OPTIONS_CURRENCY'] =
+                                \Cx\Modules\Shop\Controller\CurrencyController::
+                                    getActiveCurrencyCode();
+                        }
+                        $optionValues[] = $option;
                     $optionList[] = array(
                         'PRODUCT_OPTIONS_NAME' => $attribute_name,
                         'PRODUCT_OPTIONS_VALUES' => $optionValues,
@@ -745,50 +745,50 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 //DBG::log("Orders::getSubstitutionArray($order_id, $create_accounts): Adding article: ".var_export($arrProduct, true));
             $orderItemCount += $quantity;
             $total_item_price += $item_price*$quantity;
-                // Add an account for every single instance of every Product
-                for ($instance = 1; $instance <= $quantity; ++$instance) {
-                    // In case there are protected downloads in the cart,
-                    // collect the group IDs
-                    $arrUsergroupId = array();
+            // Add an account for every single instance of every Product
+            for ($instance = 1; $instance <= $quantity; ++$instance) {
+                // In case there are protected downloads in the cart,
+                // collect the group IDs
+                $arrUsergroupId = array();
                     if ($objProduct->getDistribution() == 'download') {
                         $usergroupIds = $objProduct->getUserGroupIds();
-                        if ($usergroupIds != '') {
-                            $arrUsergroupId = explode(',', $usergroupIds);
-                        }
+                    if ($usergroupIds != '') {
+                        $arrUsergroupId = explode(',', $usergroupIds);
                     }
-                    // create an account that belongs to all collected
-                    // user groups, if any.
-                    if (count($arrUsergroupId) > 0) {
-                        $username =
-                            self::usernamePrefix.
-                            "_${order_id}_${product_id}_${instance}";
+                }
+                // create an account that belongs to all collected
+                // user groups, if any.
+                if (count($arrUsergroupId) > 0) {
+                    $username =
+                        self::usernamePrefix.
+                        "_${order_id}_${product_id}_${instance}";
                     $userpass = '******';
                     if ($create_accounts && isset($userData[$username])) {
                         $userpass = $userData[$username];
-                        }
+                    }
                     if (empty($arrProduct['USER_DATA'])) {
-                            $arrProduct['USER_DATA'] = array();
+                        $arrProduct['USER_DATA'] = array();
                     }
-                        $arrProduct['USER_DATA'][] = array(
-                            'USER_NAME' => $username,
-                            'USER_PASS' => $userpass,
-                        );
-                    }
+                    $arrProduct['USER_DATA'][] = array(
+                        'USER_NAME' => $username,
+                        'USER_PASS' => $userpass,
+                    );
+                }
 //echo("Instance $instance");
                     if ($objProduct->getDistribution() == 'coupon') {
-                        if (empty($arrProduct['COUPON_DATA']))
-                            $arrProduct['COUPON_DATA'] = array();
+                    if (empty($arrProduct['COUPON_DATA']))
+                        $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
 
                         $validTo = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_END_TIME_UNLIMITED'];
                         if ($item->getDiscountCoupon()->getEndTime()) {
                             $validTo = date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getEndTime());
                         }
-                        $arrProduct['COUPON_DATA'][] = array(
+                    $arrProduct['COUPON_DATA'][] = array(
                             'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
-                        );
-                    }
+                    );
                 }
+            }
             if (empty($arrSubstitution['ORDER_ITEM']))
                 $arrSubstitution['ORDER_ITEM'] = array();
             $arrSubstitution['ORDER_ITEM'][] = $arrProduct;

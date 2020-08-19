@@ -38,6 +38,12 @@ Cx\Modules\Shop\Model\Entity\Payment:
         unsigned: true
         default: 0.00
       column: free_from
+    type:
+      type: enum
+      values: ['fix','percent']
+      column: type
+      options:
+        default: "fix"
     ord:
       type: integer
       options:

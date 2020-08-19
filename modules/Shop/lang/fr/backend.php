@@ -88,6 +88,11 @@ $_ARRAYLANG['cumulative'] = 'Pro Produkt';
 $_ARRAYLANG['unit'] = 'Unité';
 $_ARRAYLANG['discountgroupCountRates'] = 'Quantité minimum';
 
+$_ARRAYLANG['fee']  = 'Frais';
+$_ARRAYLANG['freeFrom']  = 'Exonéré de frais dès';
+$_ARRAYLANG['paymentProcessor']  = 'Revendeur';
+$_ARRAYLANG['zones']  = 'Zone';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Commandes";
 $_ARRAYLANG['TXT_STOCK'] = "Stock";

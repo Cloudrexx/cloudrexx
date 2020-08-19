@@ -2576,20 +2576,30 @@ die("Failed to update the Cart!");
             return 0;
         }
         // no payment fee if payment method is invalid
-        if (Payment::getProperty($payment_id, 'fee') === false) {
+        if (
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'fee'
+            ) === false
+        ) {
             return 0;
         }
         // no payment fee if order sum is greater then set boundary
         if (
-            Payment::getProperty($payment_id, 'free_from') > 0 &&
-            $totalPrice >= Payment::getProperty($payment_id, 'free_from')
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'free_from'
+            ) > 0 &&
+            $totalPrice >= \Cx\Modules\Shop\Controller\PaymentController::getProperty($payment_id, 'free_from')
         ) {
             return 0;
         }
 
         // fetch fee data
-        $type = Payment::getProperty($payment_id, 'type');
-        $fee = Payment::getProperty($payment_id, 'fee');
+        $type = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'type'
+        );
+        $fee = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'fee'
+        );
 
         // calculate fee based on selected payment method
         $paymentPrice = 0;
@@ -3490,7 +3500,11 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Determine any valid value for it
         if (   $cart_amount
             && empty($_SESSION['shop']['paymentId'])) {
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 $_SESSION['shop']['countryId'], \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray());
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
@@ -3676,13 +3690,17 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
         }
         if (empty($_SESSION['shop']['paymentId'])) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
             // Use the first Payment ID
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 $_SESSION['shop']['countryId'], \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
-        return Payment::getPaymentMenu(
+        return \Cx\Modules\Shop\Controller\PaymentController::getPaymentMenu(
             $_SESSION['shop']['paymentId'],
             "document.forms['shopForm'].submit()",
             // countryId is used for payment address
@@ -3769,7 +3787,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         $processor_id = 0;
         $processor_name = '';
         if (!empty($_SESSION['shop']['paymentId']))
-            $processor_id = Payment::getPaymentProcessorId($_SESSION['shop']['paymentId']);
+            $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getPaymentProcessorId($_SESSION['shop']['paymentId']);
         if (!empty($processor_id))
             $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
         return $processor_name;
@@ -3964,10 +3982,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // TODO: Check if the first line is not already checked above
             if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
                 &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods(
-                    // countryId is used for payment address
-                    $_SESSION['shop']['countryId']
-                )
+                &&  $paymentMethods = \Cx\Modules\Shop\Controller\PaymentController::getPaymentMethods($_SESSION['shop']['countryId'])
             ) {
                 foreach ($paymentMethods as $paymentId => $paymentName) {
                     self::$objTemplate->setVariable(array(
@@ -4215,7 +4230,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // order costs after discount subtraction (incl VAT) but without payment and shippment costs
             'SHOP_TOTALPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(Cart::get_price()),
             'SHOP_PAYMENT' =>
-                Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
+                \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'name'),
             // final order costs
             'SHOP_GRAND_TOTAL' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
@@ -4694,7 +4709,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
         \Message::restore();
 
-        $processor_id = Payment::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
+        $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
         $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
          // other payment methods
         PaymentProcessing::initProcessor($processor_id);
