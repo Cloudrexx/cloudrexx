@@ -3153,13 +3153,12 @@ CREATE TABLE `contrexx_module_shop_pricelists` (
   `footer_on` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `footer_left` text,
   `footer_right` text,
-  `categories` text NOT NULL,
+  `all_categories` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_products` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `picture` varchar(4096) DEFAULT NULL,
-  `category_id` varchar(255) NOT NULL DEFAULT '',
   `distribution` varchar(16) NOT NULL DEFAULT '',
   `normalprice` decimal(9,2) NOT NULL DEFAULT '0.00',
   `resellerprice` decimal(9,2) NOT NULL DEFAULT '0.00',
@@ -3179,13 +3178,27 @@ CREATE TABLE `contrexx_module_shop_products` (
   `flags` varchar(4096) DEFAULT NULL,
   `group_id` int(10) unsigned DEFAULT NULL,
   `article_id` int(10) unsigned DEFAULT NULL,
-  `usergroup_ids` varchar(4096) DEFAULT NULL,
   `minimum_order_quantity` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`),
   KEY `article_id` (`article_id`),
   FULLTEXT KEY `flags` (`flags`)
 ) ENGINE=InnoDB ;
+CREATE TABLE contrexx_module_shop_rel_category_pricelist (
+  category_id INT UNSIGNED NOT NULL,
+  pricelist_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY(category_id, pricelist_id)
+) ENGINE = InnoDB;
+CREATE TABLE contrexx_module_shop_rel_category_product (
+  category_id INT UNSIGNED NOT NULL,
+  product_id INT UNSIGNED NOT NULL,
+  PRIMARY KEY(category_id, product_id)
+) ENGINE = InnoDB;
+CREATE TABLE contrexx_module_shop_rel_product_user_group (
+  product_id INT UNSIGNED NOT NULL,
+  usergroup_id INT NOT NULL,
+  PRIMARY KEY(product_id, usergroup_id)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_module_shop_rel_countries` (
   `zone_id` int(10) unsigned NOT NULL DEFAULT '0',
   `country_id` int(10) unsigned NOT NULL DEFAULT '0',

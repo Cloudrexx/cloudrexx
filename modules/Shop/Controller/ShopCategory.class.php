@@ -514,6 +514,7 @@ class ShopCategory
             return false;
         }
         $this->id = $objDatabase->Insert_ID();
+        $this->insertPricelistRelation();
         return true;
     }
 
@@ -558,7 +559,49 @@ class ShopCategory
             return false;
         }
 
+        $this->deleteRelation();
         return true;
+    }
+
+    /**
+     * Delete entries in intermediate table
+     */
+    function deleteRelation()
+    {
+        global $objDatabase;
+
+        $arrRelation = array(
+            'pricelist',
+            'product'
+        );
+
+        foreach ($arrRelation as $relation) {
+            $objDatabase->Execute(
+                'DELETE FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_'
+                . $relation.' WHERE category_id = '.$this->id()
+            );
+        }
+    }
+
+    /**
+     * If pricelist has the attribute all_categories set to true, each newly
+     * created category is referenced to this pricelist.
+     */
+    function insertPricelistRelation()
+    {
+        global $objDatabase;
+
+        $query = 'INSERT INTO '.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel'
+                .'_category_pricelist (
+                    SELECT 
+                        '.$this->id().' AS category_id, 
+                        id AS pricelist_id 
+                    FROM 
+                        '.DBPREFIX.'module_shop' .MODULE_INDEX.'_pricelists 
+                    WHERE 
+                        all_categories = 1
+                )';
+        $objDatabase->Execute($query);
     }
 
 

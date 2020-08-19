@@ -1000,6 +1000,21 @@ class Product
         if (!$objResult) {
             return false;
         }
+
+        $objCatResult = $objDatabase->Execute('
+            DELETE FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_product
+                WHERE product_id='.$this->id
+        );
+
+        $objUserGroupResult = $objDatabase->Execute('
+            DELETE FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_product_user_group
+                WHERE product_id='.$this->id
+        );
+
+        if (!$objCatResult || !$objUserGroupResult) {
+            return false;
+        }
+
         \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
 
         return true;
@@ -1078,6 +1093,12 @@ class Product
                 )) return false;
                 }
             }
+        if (!$this->updateCategoryRelation()) {
+            return false;
+        }
+        if (!$this->updateUserGroupRelation()) {
+            return false;
+        }
         return true;
     }
 
@@ -1098,7 +1119,6 @@ class Product
         \Env::get('cx')->getEvents()->triggerEvent('model/preUpdate', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
         $args = array(
             $this->pictures,
-            $this->category_id,
             $this->distribution,
             $this->price,
             $this->resellerprice,
@@ -1116,7 +1136,6 @@ class Product
             $this->vat_id,
             $this->weight,
             addslashes($this->flags),
-            $this->usergroup_ids ? $this->usergroup_ids : 'NULL',
             $this->group_id ? $this->group_id : 'NULL',
             $this->article_id ? $this->article_id : 'NULL',
             $this->minimum_order_quantity ? $this->minimum_order_quantity : '0',
@@ -1128,7 +1147,6 @@ class Product
                 `' . DBPREFIX . 'module_shop' . MODULE_INDEX . '_products`
             SET
                 `picture` = ?,
-                `category_id` = ?,
                 `distribution` = ?,
                 `normalprice` = ?,
                 `resellerprice` = ?,
@@ -1146,7 +1164,6 @@ class Product
                 `vat_id` = ?,
                 `weight` = ?,
                 `flags` = ?,
-                `usergroup_ids` = ?,
                 `group_id` = ?,
                 `article_id` = ?,
                 `minimum_order_quantity` = ?
@@ -1161,7 +1178,39 @@ class Product
         }
         return false;
     }
+    /**
+     * Update usergroup-product relation in intermediate table.
+     *
+     * @param array array with all category ids
+     * @return bool
+     */
+    function updateUserGroupRelation()
+    {
+        $table = 'rel_product_user_group';
+        $attr = array('entity' => 'product_id', 'foreign' => 'usergroup_id');
+        $arrIdsInput = explode (',', $this->usergroup_ids);
 
+        return \Cx\Modules\Shop\Controller\ShopLibrary::updateRelation(
+            $table, $attr, $arrIdsInput, $this->id
+        );
+    }
+
+    /**
+     * Update category-product relation in intermediate table.
+     *
+     * @param array array with all category ids
+     * @return bool
+     */
+    function updateCategoryRelation()
+    {
+        $table = 'rel_category_product';
+        $attr = array('entity' => 'product_id', 'foreign' => 'category_id');
+        $arrIdsInput = explode (',', $this->category_id);
+
+        return \Cx\Modules\Shop\Controller\ShopLibrary::updateRelation(
+            $table, $attr, $arrIdsInput, $this->id
+        );
+    }
 
     /**
      * Insert this Product into the database.
@@ -1179,15 +1228,14 @@ class Product
         \Env::get('cx')->getEvents()->triggerEvent('model/prePersist', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
         $query = "
             INSERT INTO ".DBPREFIX."module_shop".MODULE_INDEX."_products (
-                picture, category_id, distribution,
+                picture, distribution,
                 normalprice, resellerprice,
                 stock, stock_visible, discountprice, discount_active,
                 active, b2b, b2c, date_start, date_end,
                 manufacturer_id, ord, vat_id, weight,
-                flags, usergroup_ids, group_id, article_id, minimum_order_quantity
+                flags, group_id, article_id, minimum_order_quantity
             ) VALUES (
                 '$this->pictures',
-                '".addslashes($this->category_id)."',
                 '$this->distribution',
                 $this->price, $this->resellerprice,
                 $this->stock, ".($this->stock_visible ? 1 : 0).",
@@ -1198,7 +1246,6 @@ class Product
                 $this->manufacturer_id,
                 $this->ord, $this->vat_id, $this->weight,
                 '".addslashes($this->flags)."',
-                '".($this->usergroup_ids ? $this->usergroup_ids : 'NULL')."',
                 ".($this->group_id ? $this->group_id : 'NULL').",
                 ".($this->article_id ? $this->article_id : 'NULL').",
                 ".($this->minimum_order_quantity ? $this->minimum_order_quantity : '0')."
@@ -1240,7 +1287,7 @@ class Product
             )
         );
         $query = "
-            SELECT `product`.`id`, `product`.`category_id`,
+            SELECT `product`.`id`,
                    `product`.`ord`, `product`.`active`, `product`.`weight`,
                    `product`.`picture`,
                    `product`.`normalprice`, `product`.`resellerprice`,
@@ -1252,7 +1299,6 @@ class Product
                    `product`.`b2b`, `product`.`b2c`,
                    `product`.`vat_id`,
                    `product`.`flags`,
-                   `product`.`usergroup_ids`,
                    `product`.`group_id`, `product`.`article_id`,
                    `product`.`minimum_order_quantity`, ".
                    $arrSql['field']."
@@ -1287,9 +1333,32 @@ class Product
         if ($strKeys === null) {
             $strKeys = \Text::getById($id, 'Shop', self::TEXT_KEYS)->content();
         }
+
+        $queryCategories = '
+            SELECT `category_id`
+              FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_product`
+              WHERE `product_id`='.$id;
+        $objResultCategories = $objDatabase->Execute($queryCategories);
+        $arrCategoryIds = array();
+        while (!$objResultCategories->EOF) {
+            $arrCategoryIds[] = $objResultCategories->fields['category_id'];
+            $objResultCategories->MoveNext();
+        }
+
+        $queryUserGroups = '
+            SELECT `usergroup_id`
+              FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_product_user_group`
+              WHERE `product_id`='.$id;
+        $objResultUserGroups = $objDatabase->Execute($queryUserGroups);
+        $arrUserGroupIds = array();
+        while (!$objResultUserGroups->EOF) {
+            $arrUserGroupIds[] = $objResultUserGroups->fields['usergroup_id'];
+            $objResultUserGroups->MoveNext();
+        }
+
         $objProduct = new Product(
             $strCode,
-            $objResult->fields['category_id'],
+            implode(',', $arrCategoryIds),
             $strName,
             $objResult->fields['distribution'],
             $objResult->fields['normalprice'],
@@ -1314,7 +1383,7 @@ class Product
         $objProduct->uri = $strUri;
         $objProduct->vat_id = $objResult->fields['vat_id'];
         $objProduct->flags = $objResult->fields['flags'];
-        $objProduct->usergroup_ids = $objResult->fields['usergroup_ids'];
+        $objProduct->usergroup_ids = implode(',', $arrUserGroupIds);
         $objProduct->group_id = $objResult->fields['group_id'];
         $objProduct->article_id = $objResult->fields['article_id'];
         $objProduct->keywords = $strKeys;
@@ -1520,12 +1589,10 @@ class Product
             'date_start' => array('type' => 'TIMESTAMP', 'default' => '0000-00-00 00:00:00', 'renamefrom' => 'startdate'),
             'date_end' => array('type' => 'TIMESTAMP', 'default' => '0000-00-00 00:00:00', 'renamefrom' => 'enddate'),
             'weight' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null),
-            'category_id' => array('type' => 'VARCHAR(255)', 'default' => '', 'renamefrom' => 'catid'),
             'vat_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null),
             'manufacturer_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null, 'renamefrom' => 'manufacturer'),
             'group_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null),
             'article_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => false, 'default' => null),
-            'usergroup_ids' => array('type' => 'VARCHAR(4096)', 'notnull' => false, 'default' => null),
             'ord' => array('type' => 'INT(10)', 'default' => '0', 'renamefrom' => 'sort_order'),
             'distribution' => array('type' => 'VARCHAR(16)', 'default' => '', 'renamefrom' => 'handler'),
             'picture' => array('type' => 'VARCHAR(4096)', 'notnull' => false, 'default' => null),

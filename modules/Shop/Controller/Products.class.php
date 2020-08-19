@@ -249,8 +249,10 @@ class Products
         $queryCount = "SELECT COUNT(*) AS `numof_products`";
         $queryJoin = '
             FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_products` AS `product`
-            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_categories` AS `category`
-              ON `category`.`id`=`product`.`category_id`'.
+            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_product` AS `category_product`
+              ON `category_product`.`product_id`=`product`.`id` 
+            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_categories` AS `category` 
+              ON `category_product`.`category_id`=`category`.`id` '.
             $arrSql['join'];
         $queryWhere = ' WHERE 1'.
             // Limit Products to available and active in the frontend
@@ -354,12 +356,8 @@ class Products
             // Limit Products by ShopCategory ID or IDs, if any
             // (Pricelists use comma separated values, for example)
             if ($category_id) {
-                $queryCategories = '';
-                foreach (preg_split('/\s*,\s*/', $category_id) as $id) {
-                    $queryCategories .=
-                        ($queryCategories ? ' OR ' : '')."
-                        FIND_IN_SET($id, `product`.`category_id`)";
-                }
+                $queryCategories = '`category_product`.`category_id` IN ('
+                    .$category_id.')';
                 $queryWhere .= ' AND ('.$queryCategories.')';
             }
             // Limit Products by search pattern, if any
@@ -643,15 +641,15 @@ class Products
 
         $category_id = intval($category_id);
         $query = "
-            SELECT `id`
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_products`
-             WHERE FIND_IN_SET($category_id, `category_id`)
-          ORDER BY `ord` ASC";
+            SELECT `product_id`
+              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_category_product`
+             WHERE  `category_id` = $category_id
+        ";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return false;
         $arrProductId = array();
         while (!$objResult->EOF) {
-            $arrProductId[] = $objResult->fields['id'];
+            $arrProductId[] = $objResult->fields['product_id'];
             $objResult->MoveNext();
         }
         return $arrProductId;

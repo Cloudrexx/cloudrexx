@@ -410,4 +410,72 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
         );
     }
 
+    /**
+     * Update relation between entity and foreign entity
+     *
+     * @param $table        string tablename
+     * @param $attr         array  entity attr and foreign attr
+     * @param $idsInput  array  with user input
+     * @param $entityId     int    id of entity
+     * @return bool
+     */
+    static function updateRelation($table, $attr, $idsInput, $entityId)
+    {
+        global $objDatabase;
+
+        $queryCategories = '
+            SELECT `'.$attr['foreign'].'`
+              FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_'.$table.'`
+              WHERE `'.$attr['entity'].'`='.$entityId;
+        $objSelectResult = $objDatabase->Execute($queryCategories);
+
+        $arrIdsDb = array();
+        while ($objSelectResult && !$objSelectResult->EOF) {
+            $arrIdsDb[] = $objSelectResult->fields[$attr['foreign']];
+            $objSelectResult->MoveNext();
+        }
+
+        // Get all ids where in
+        $newRelationIds = array_diff(
+            $idsInput,
+            $arrIdsDb
+        );
+
+        $deletedRelationIds = array_diff(
+            $arrIdsDb,
+            $idsInput
+        );
+
+        // $newRelationIds[0] is empty if no category is selected.
+        if (empty($newRelationIds) || empty($newRelationIds[0])
+            && empty($deletedRelationIds)) {
+            return true;
+        }
+
+        foreach ($newRelationIds as $foreignId) {
+            $updateArgs = array($entityId, $foreignId);
+            $updateQuery = 'INSERT INTO `' . DBPREFIX.'module_shop'.MODULE_INDEX
+                .'_'.$table.'` ('.$attr['entity'].', '.$attr['foreign'].')'
+                .' VALUES (?,?)';
+
+            $objResult = $objDatabase->Execute($updateQuery, $updateArgs);
+            if (!$objResult) {
+                return false;
+            }
+        }
+        foreach ($deletedRelationIds as $foreignId) {
+            $updateArgs = array($entityId, $foreignId);
+            $updateQuery = 'DELETE FROM `' .
+                DBPREFIX . 'module_shop' . MODULE_INDEX . '_'.$table.'`' .
+                'WHERE '.$attr['entity'].' = ? AND '.$attr['foreign'].' = ? ';
+
+            $objResult = $objDatabase->Execute($updateQuery, $updateArgs);
+            if (!$objResult) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }
