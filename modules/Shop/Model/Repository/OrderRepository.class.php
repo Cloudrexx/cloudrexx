@@ -747,45 +747,52 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 //DBG::log("Orders::getSubstitutionArray($order_id, $create_accounts): Adding article: ".var_export($arrProduct, true));
             $orderItemCount += $quantity;
             $total_item_price += $item_price*$quantity;
-                // Add an account for every single instance of every Product
-                for ($instance = 1; $instance <= $quantity; ++$instance) {
-                    // In case there are protected downloads in the cart,
-                    // collect the group IDs
-                    $arrUsergroupId = array();
-                    if ($objProduct->getDistribution() == 'download') {
-                        $usergroupIds = $objProduct->getUserGroupIds();
-                        if ($usergroupIds != '') {
-                            $arrUsergroupId = explode(',', $usergroupIds);
-                        }
+            // Add an account for every single instance of every Product
+            for ($instance = 1; $instance <= $quantity; ++$instance) {
+                // In case there are protected downloads in the cart,
+                // collect the group IDs
+                $arrUsergroupId = array();
+                if ($objProduct->getDistribution() == 'download') {
+                    $usergroupIds = $objProduct->getUserGroupIds();
+                    if ($usergroupIds != '') {
+                        $arrUsergroupId = explode(',', $usergroupIds);
                     }
-                    // create an account that belongs to all collected
-                    // user groups, if any.
-                    if (count($arrUsergroupId) > 0) {
-                        $username =
-                            self::usernamePrefix.
-                            "_${order_id}_${product_id}_${instance}";
+                }
+                // create an account that belongs to all collected
+                // user groups, if any.
+                if (count($arrUsergroupId) > 0) {
+                    $username =
+                        self::usernamePrefix.
+                        "_${order_id}_${product_id}_${instance}";
                     $userpass = '******';
                     if ($create_accounts && isset($userData[$username])) {
                         $userpass = $userData[$username];
-                        }
+                    }
                     if (empty($arrProduct['USER_DATA'])) {
-                            $arrProduct['USER_DATA'] = array();
+                        $arrProduct['USER_DATA'] = array();
                     }
-                        $arrProduct['USER_DATA'][] = array(
-                            'USER_NAME' => $username,
-                            'USER_PASS' => $userpass,
-                        );
-                    }
-//echo("Instance $instance");
-                    if ($objProduct->getDistribution() == 'coupon') {
-                        if (empty($arrProduct['COUPON_DATA']))
-                            $arrProduct['COUPON_DATA'] = array();
-//DBG::log("Orders::getSubstitutionArray(): Getting code");
-                        $arrProduct['COUPON_DATA'][] = array(
-                            'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
-                        );
-                    }
+                    $arrProduct['USER_DATA'][] = array(
+                        'USER_NAME' => $username,
+                        'USER_PASS' => $userpass,
+                    );
                 }
+//echo("Instance $instance");
+                if ($objProduct->getDistribution() == 'coupon') {
+                    if (empty($arrProduct['COUPON_DATA']))
+                        $arrProduct['COUPON_DATA'] = array();
+//DBG::log("Orders::getSubstitutionArray(): Getting code");
+                    $validTo = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_END_TIME_UNLIMITED'];
+                    if ($item->getDiscountCoupon()->getEndTime()) {
+                        $validTo = date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getEndTime());
+                    }
+                    $arrProduct['COUPON_DATA'][] = array(
+                        'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
+                        'COUPON_VALUE' => $item->getDiscountCoupon()->getDiscountAmount(),
+                        'COUPON_START_DATE' => date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getStartTime()),
+                        'COUPON_END_DATE' => $validTo,
+                    );
+                }
+            }
             if (empty($arrSubstitution['ORDER_ITEM']))
                 $arrSubstitution['ORDER_ITEM'] = array();
             $arrSubstitution['ORDER_ITEM'][] = $arrProduct;
