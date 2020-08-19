@@ -25,57 +25,45 @@
  */
 
 /**
- * Lsv Repository
- * Used for custom repository methods
+ * Event listener for all order events
  *
  * @copyright   Cloudrexx AG
  * @author      Sam Hawkes <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_shop
  */
-namespace Cx\Modules\Shop\Model\Repository;
+namespace Cx\Modules\Shop\Model\Event;
 
 /**
- * Lsv Repository
- * Used for custom repository methods
+ * Event listener for all order events
  *
  * @copyright   Cloudrexx AG
  * @author      Sam Hawkes <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_shop
  */
-class LsvRepository extends \Doctrine\ORM\EntityRepository
+class OrderEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener
 {
     /**
-     * Save lsv
+     * Send mail if param sendMail is true
      *
-     * @param array $values  lsv information
-     * @param int   $orderId id of associated order
+     * @param \Doctrine\ORM\Event\LifecycleEventArgs $args arguments for
+     *                                                     postUpdate
      *
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Exception
      */
-    public function save($values, $orderId)
+    public function postUpdate(\Doctrine\ORM\Event\LifecycleEventArgs $args)
     {
-        $lsv = $this->find($orderId);
-
-        if (empty($lsv)) {
-            $lsv = new $this->_entityName();
+        if (
+            $this->cx->getRequest()->hasParam('sendMail', false) &&
+            filter_var(
+                $this->cx->getRequest()->getParam('sendMail', false),
+                FILTER_VALIDATE_BOOLEAN
+            )
+        ) {
+            \Cx\Modules\Shop\Controller\ShopManager::sendProcessedMail(
+                $args->getEntity()->getId()
+            );
         }
-
-        $columnNames = $this->_em->getClassMetadata(
-            $this->_entityName
-        )->getColumnNames();
-
-        foreach ($columnNames as $columnName) {
-            $value = $values[$columnName];
-            if (empty($value)) {
-                continue;
-            }
-
-            $setter = 'set' . ucfirst($columnName);
-            $lsv->$setter($value);
-        }
-        $this->_em->persist($lsv);
-        $this->_em->flush();
     }
 }

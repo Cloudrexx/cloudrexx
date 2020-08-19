@@ -78,13 +78,13 @@ class PayrexxProcessor
 
         $successPage = \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'success');
         $successPageUrl = $successPage->toString();
-
-        $order = \Cx\Modules\Shop\Controller\Order::getById($_SESSION['shop']['order_id']);
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $currency = $cx->getDb()->getEntityManager()->getRepository(
-            '\Cx\Modules\Shop\Model\Entity\Currency'
-        )->find($order->currency_id());
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
+        $order = $orderRepo->find($_SESSION['shop']['order_id']);
+
+        $currency = $order->getCurrency();
 
         $payrexx = new \Payrexx\Payrexx($instanceName, $apiSecret);
         $gateway = new \Payrexx\Models\Request\Gateway();
@@ -97,15 +97,15 @@ class PayrexxProcessor
         $gateway->setFailedRedirectUrl($successPageUrl);
         $gateway->setAmount(intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)));
         $gateway->setCurrency($currency->getCode());
-        $gateway->addField('email', $order->billing_email());
-        $gateway->addField('company', $order->billing_company());
-        $gateway->addField('forename', $order->billing_firstname());
-        $gateway->addField('surname', $order->billing_lastname());
-        $gateway->addField('street', $order->billing_address());
-        $gateway->addField('postcode', $order->billing_zip());
-        $gateway->addField('place', $order->billing_city());
-        $gateway->addField('country', \Cx\Core\Country\Controller\Country::getAlpha2ById($order->billing_country_id()));
-        $gateway->addField('phone', $order->billing_phone());
+        $gateway->addField('email', $order->getBillingEmail());
+        $gateway->addField('company', $order->getBillingCompany());
+        $gateway->addField('forename', $order->getBillingFirstname());
+        $gateway->addField('surname', $order->getBillingLastname());
+        $gateway->addField('street', $order->getBillingAdress());
+        $gateway->addField('postcode', $order->getBillingZip());
+        $gateway->addField('place', $order->getBillingCity());
+        $gateway->addField('country', \Cx\Core\Country\Controller\Country::getAlpha2ById($order->getBillingCountryId()));
+        $gateway->addField('phone', $order->getBillingPhone());
 
         try {
             $response = $payrexx->create($gateway);

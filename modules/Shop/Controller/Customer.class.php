@@ -288,31 +288,37 @@ class Customer extends \User
      */
     function is_reseller($is_reseller=null)
     {
+        $this->isReseller();
+    }
+
+    public function isReseller() {
         // get defined groups in shop
-        $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+        $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller');
+
         if (empty($group_reseller)) {
             self::errorHandler();
             $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
         }
         $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                if (empty($group_customer)) {
-                    self::errorHandler();
-                    $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                }
+        if (empty($group_customer)) {
+            self::errorHandler();
+            $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
+        }
 
         // return the value
         if (!isset($is_reseller)) {
             return (in_array($group_reseller, $this->getAssociatedGroupIds()));
-            }
+        }
 
         // clean up associated groups by removing all shop groups from array
         $groups = $this->getAssociatedGroupIds();
         foreach ($groups as $i => $groupId) {
             if (!in_array($groupId, array($group_reseller, $group_customer))) {
                 continue;
-        }
+            }
             unset($groups[$i]);
-    }
+        }
 
         // add selected shop group
         if ($is_reseller) {
@@ -331,12 +337,26 @@ class Customer extends \User
      */
     function group_id($group_id=null)
     {
-        $index = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
-        if (!$index) return false;
+        if (!$index) {
+            return 0;
+        }
         if (isset($group_id)) {
             $this->setProfile(array($index => array(0 => $group_id)));
         }
         return $this->getProfileAttribute($index);
+    }
+
+    /**
+     * Get the Customer group ID
+     *
+     * @throws \Cx\Core\Setting\Controller\SettingException
+     */
+    public function getGroupId()
+    {
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+        return \Cx\Core\Setting\Controller\Setting::getValue(
+            'user_profile_attribute_customer_group_id'
+        );
     }
 
     /**
@@ -392,11 +412,18 @@ class Customer extends \User
      */
     function delete($deleteOwnAccount=false)
     {
-        global $_ARRAYLANG;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+        $orderRepo = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
 
-        if (!Orders::deleteByCustomerId($this->id)) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_CUSTOMER_DELETING_ORDERS']);
+        $orders = $orderRepo->findBy(array('customerId', $this->id));
+        foreach ($orders as $order) {
+            $em->remove($order);
         }
+        $em->flush();
+
         return parent::delete($deleteOwnAccount);
     }
 
@@ -689,7 +716,7 @@ class Customer extends \User
 //DBG::log("Customer::errorHandler(): Adding settings");
         ShopSettings::errorHandler();
 //        \Cx\Core\Country\Controller\Country::errorHandler(); // Called by Order::errorHandler();
-        Order::errorHandler();
+        \Cx\Modules\Shop\Controller\OrderController::errorHandler();
         Discount::errorHandler();
 
         \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
@@ -714,16 +741,16 @@ class Customer extends \User
 //DBG::log("Customer::errorHandler(): Made notes attribute: ".var_export($objProfileAttribute, true));
             if (!$objProfileAttribute->store()) {
                 throw new \Cx\Lib\Update_DatabaseException(
-                   "Failed to create User_Profile_Attribute 'notes'");
+                    "Failed to create User_Profile_Attribute 'notes'");
             }
 
             //Re initialize shop setting
             \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
 //DBG::log("Customer::errorHandler(): Stored notes attribute, ID ".$objProfileAttribute->getId());
             if (!(\Cx\Core\Setting\Controller\Setting::set('user_profile_attribute_notes', $objProfileAttribute->getId())
-               && \Cx\Core\Setting\Controller\Setting::update('user_profile_attribute_notes'))) {
+                && \Cx\Core\Setting\Controller\Setting::update('user_profile_attribute_notes'))) {
                 throw new \Cx\Lib\Update_DatabaseException(
-                   "Failed to update User_Profile_Attribute 'notes' setting");
+                    "Failed to update User_Profile_Attribute 'notes' setting");
             }
 //DBG::log("Customer::errorHandler(): Stored notes attribute ID setting");
         }
@@ -744,15 +771,15 @@ class Customer extends \User
             $objProfileAttribute->setProtection(array(1));
             if (!$objProfileAttribute->store()) {
                 throw new \Cx\Lib\Update_DatabaseException(
-                   "Failed to create User_Profile_Attribute 'notes'");
+                    "Failed to create User_Profile_Attribute 'notes'");
             }
 
             //Re initialize shop setting
             \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
             if (!(\Cx\Core\Setting\Controller\Setting::set('user_profile_attribute_customer_group_id', $objProfileAttribute->getId())
-               && \Cx\Core\Setting\Controller\Setting::update('user_profile_attribute_customer_group_id'))) {
+                && \Cx\Core\Setting\Controller\Setting::update('user_profile_attribute_customer_group_id'))) {
                 throw new \Cx\Lib\Update_DatabaseException(
-                   "Failed to update User_Profile_Attribute 'customer_group_id' setting");
+                    "Failed to update User_Profile_Attribute 'customer_group_id' setting");
             }
         }
 
@@ -787,7 +814,7 @@ class Customer extends \User
 //DBG::log("Group: ".var_export($objGroup, true));
         if (!$objGroup) {
             throw new \Cx\Lib\Update_DatabaseException(
-               "Failed to create UserGroup for customers");
+                "Failed to create UserGroup for customers");
         }
 //DBG::log("Customer::errorHandler(): Made customer usergroup: ".var_export($objGroup, true));
         if (!$objGroup->store() || !$objGroup->getId()) {
@@ -798,7 +825,7 @@ class Customer extends \User
         \Cx\Core\Setting\Controller\Setting::set('usergroup_id_customer', $objGroup->getId());
         if (!\Cx\Core\Setting\Controller\Setting::update('usergroup_id_customer')) {
             throw new \Cx\Lib\Update_DatabaseException(
-               "Failed to store UserGroup ID for customers");
+                "Failed to store UserGroup ID for customers");
         }
         $group_id_customer = $objGroup->getId();
         $objGroup = null;
@@ -819,7 +846,7 @@ class Customer extends \User
         }
         if (!$objGroup) {
             throw new \Cx\Lib\Update_DatabaseException(
-               "Failed to create UserGroup for resellers");
+                "Failed to create UserGroup for resellers");
         }
 //DBG::log("Customer::errorHandler(): Made reseller usergroup: ".var_export($objGroup, true));
         if (!$objGroup->store() || !$objGroup->getId()) {
@@ -829,7 +856,7 @@ class Customer extends \User
         \Cx\Core\Setting\Controller\Setting::set('usergroup_id_reseller', $objGroup->getId());
         if (!\Cx\Core\Setting\Controller\Setting::update('usergroup_id_reseller')) {
             throw new \Cx\Lib\Update_DatabaseException(
-               "Failed to store UserGroup ID for resellers");
+                "Failed to store UserGroup ID for resellers");
         }
         $group_id_reseller = $objGroup->getId();
 
@@ -873,7 +900,14 @@ class Customer extends \User
                 $objCustomer = self::getById($objUser->getId());
             }
             if (!$objCustomer) {
-                $lang_id = Order::getLanguageIdByCustomerId($old_customer_id);
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $order = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                )->findOneBy(
+                    array('customerId' => $old_customer_id),
+                    array('id' => 'DESC')
+                );
+                $lang_id = $order->getLangId();
                 if (!$lang_id) $lang_id = $default_lang_id;
                 $objCustomer = new Customer();
                 if (preg_match('/^(?:frau|mad|mme|signora|miss)/i',
@@ -926,10 +960,10 @@ class Customer extends \User
             if (!$objCustomer->store()) {
 //DBG::log(var_export($objCustomer, true));
                 throw new \Cx\Lib\Update_DatabaseException(
-                   "Failed to migrate existing Customer ID ".
-                   $old_customer_id.
-                   " to Users (Messages: ".
-                   join(', ', $objCustomer->error_msg).")");
+                    "Failed to migrate existing Customer ID ".
+                    $old_customer_id.
+                    " to Users (Messages: ".
+                    join(', ', $objCustomer->error_msg).")");
             }
             // Update the Orders table with the new Customer ID.
             // Note that we use the ambiguous old customer ID that may

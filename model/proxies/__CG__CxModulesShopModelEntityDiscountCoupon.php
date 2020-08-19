@@ -519,6 +519,50 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
     /**
      * {@inheritDoc}
      */
+    public function getUsedCount($customerId = 0)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsedCount', array($customerId));
+
+        return parent::getUsedCount($customerId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUsedAmount($customerId = NULL, $orderId = NULL)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsedAmount', array($customerId, $orderId));
+
+        return parent::getUsedAmount($customerId, $orderId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDiscountAmountOrRate($amount, $customerId = NULL)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountAmountOrRate', array($amount, $customerId));
+
+        return parent::getDiscountAmountOrRate($amount, $customerId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function redeem($orderId, $customerId, $amount, $uses = 1)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'redeem', array($orderId, $customerId, $amount, $uses));
+
+        return parent::redeem($orderId, $customerId, $amount, $uses);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 

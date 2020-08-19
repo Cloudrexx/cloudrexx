@@ -1,3 +1,90 @@
+cx.bind("delete", function (deleteIds) {
+    var scope = 'order';
+    if (confirm(
+        cx.variables.get('TXT_CONFIRM_DELETE_ORDER', scope)+'\n'+ cx.variables.get('TXT_ACTION_IS_IRREVERSIBLE', scope)
+    )) {
+        var stockUpdate = false;
+        if (confirm(
+            cx.variables.get('TXT_SHOP_CONFIRM_RESET_STOCK', scope)
+        )) {
+            stockUpdate = true;
+        }
+        cx.ajax(
+            'Order',
+            'deleteOrders',
+            {
+                type: 'POST',
+                data: {
+                    orderIds: deleteIds,
+                    updateStock: stockUpdate,
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        cx.tools.StatusMessage.showMessage(response.message);
+                        deleteIds.forEach(function(entityId) {console.log('entityId');
+                            document.getElementsByName('status-' + entityId)[0].selectedIndex = 2;
+                        });
+                    }
+                },
+                preError: function(xhr, status, error) {
+                    cx.tools.StatusMessage.showMessage(error);
+                }
+            },
+            cx.variables.get('language', 'contrexx')
+        );
+    }
+}, 'order');
+
+// Function to overwrite delete onclick event. See BackendController $option['functions]['onclick']['delete']
+function deleteOrder(deleteUrl) {
+    var scopeDelete = 'order';
+    if (confirm(
+        cx.variables.get('TXT_CONFIRM_DELETE_ORDER', scopeDelete)+'\n'+ cx.variables.get('TXT_ACTION_IS_IRREVERSIBLE', scopeDelete)
+    )) {
+        var stockUpdate = false;
+        if (confirm(
+            cx.variables.get('TXT_SHOP_CONFIRM_RESET_STOCK', scopeDelete)
+        )) {
+            stockUpdate = true;
+        }
+
+        const entityId = parseInt(getParameterByName('deleteid', deleteUrl));
+
+        cx.ajax(
+            'Order',
+            'deleteOrder',
+            {
+                type: 'POST',
+                data: {
+                    orderId: entityId,
+                    updateStock: stockUpdate,
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        cx.tools.StatusMessage.showMessage(response.message);
+                        document.getElementsByName('status-' + entityId)[0].selectedIndex = 2;
+                    }
+                },
+                preError: function(xhr, status, error) {
+                    cx.tools.StatusMessage.showMessage(error);
+                }
+            },
+            cx.variables.get('language', 'contrexx')
+        );
+    }
+}
+
+// https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 var scope = 'shopDelete';
 cx.bind("delete", function (deleteIds) {
     if (confirm(
@@ -16,8 +103,10 @@ function toggle_header()
         return;
     }
 
-    var disp = (document.getElementsByName('headerOn')[0].checked ? "block" : "none");
-    document.getElementById('headerLeft').parentNode.parentElement.parentElement.style.display = disp;
+    if (document.getElementsByName('headerOn')[0]) {
+        var disp = (document.getElementsByName('headerOn')[0].checked ? "block" : "none");
+        document.getElementById('headerLeft').parentNode.parentElement.parentElement.style.display = disp;
+    }
 }
 
 function toggle_footer()
@@ -26,8 +115,10 @@ function toggle_footer()
         return;
     }
 
-    var disp = (document.getElementsByName('footerOn')[0].checked ? "block" : "none");
-    document.getElementById('footerLeft').parentNode.parentElement.parentElement.style.display = disp;
+    if (document.getElementsByName('footerOn')[0]) {
+        var disp = (document.getElementsByName('footerOn')[0].checked ? "block" : "none");
+        document.getElementById('footerLeft').parentNode.parentElement.parentElement.style.display = disp;
+    }
 }
 
 function toggle_categories(status)
@@ -40,6 +131,9 @@ function toggle_categories(status)
 }
 
 jQuery(document).ready(function($){
+    // Add class to all orders with pending status
+    cx.jQuery('.order-status select option:selected[value="0"]').closest('tr').addClass('pending');
+
     $('.category').change(function(){
         var check = true;
         $('.category').each(function(){
@@ -70,14 +164,91 @@ jQuery(document).ready(function($){
         };
     }
 
-    if (typeof document.getElementsByName('headerOn')[0] != 'undefined') {
+    if (typeof document.getElementsByName('footerOn')[0] != 'undefined') {
         document.getElementById('footerRight').value = document.getElementById('form-0-footerRight').value;
 
         document.getElementById('footerRight').onchange = function () {
             document.getElementById('form-0-footerRight').value = document.getElementById('footerRight').value
         };
     }
+
+    cx.jQuery('#vg-0-filter-field-showAllPendentOrders').click(function() {
+        cx.jQuery('.vg-searchSubmit').click();
+    });
+
+    let previousStatusId;
+    cx.jQuery('.order-status select').focus(function(e) {
+        previousStatusId = cx.jQuery(this).val();
+    }).change(function () {
+        scope = 'order';
+        let updateStock = false;
+        let sendMailToCrm = false;
+        const statusId = cx.jQuery(this).find('option:selected').val();
+        if (confirm(cx.variables.get('TXT_SHOP_CONFIRM_UPDATE_STATUS', scope))) {
+            if (   shopOrder.isStockIncreasable(previousStatusId, statusId)
+                || shopOrder.isStockDecreasable(previousStatusId, statusId)) {
+                updateStock = true;
+            }
+            if (statusId == 4 && confirm(cx.variables.get('TXT_SHOP_SEND_TEMPLATE_TO_CUSTOMER', scope))) {
+                sendMailToCrm = true;
+            }
+
+            let togglePending = false;
+            if (statusId == 0 || previousStatusId == 0) {
+                togglePending = true;
+            }
+
+            const el = cx.jQuery(this);
+            cx.ajax(
+                'Order',
+                'updateOrderStatus',
+                {
+                    type: 'POST',
+                    data: {
+                        orderId: parseInt(cx.jQuery(this).parent().parent().find('.order-id').text()),
+                        statusId: statusId,
+                        oldStatusId: previousStatusId,
+                        updateStock: updateStock,
+                        sendMailToCrm: sendMailToCrm,
+                    },
+                    success: function(response) {
+                        if (response.status == 'success') {
+                            cx.tools.StatusMessage.showMessage(response.message);
+                            if (togglePending) {
+                                el.closest('tr').toggleClass('pending');
+                            }
+                            if (togglePending && (!getParameterByName('search') || !getParameterByName('search').includes('showAllPendentOrders=1'))) {
+                                el.closest('tr').remove();
+                            }
+                        }
+                    },
+                    preError: function(xhr, status, error) {
+                        cx.tools.StatusMessage.showMessage(error);
+                    }
+                },
+                cx.variables.get('language', 'contrexx')
+            );
+        } else {
+            cx.jQuery(this).val(previousStatusId);
+        }
+
+    })
 });
+
+var shopOrder = {
+    jq: cx.jQuery,
+    deletedStatus: [2, 3],
+    isStockIncreasable: function(oldStatus, newStatus) {
+        return    this.jq.inArray(parseInt(oldStatus), this.deletedStatus) == -1
+            && this.jq.inArray(parseInt(newStatus), this.deletedStatus) != -1
+            && confirm(cx.variables.get('TXT_SHOP_CONFIRM_RESET_STOCK', scope));
+    },
+    isStockDecreasable: function(oldStatus, newStatus) {
+        return     this.jq.inArray(parseInt(oldStatus), this.deletedStatus) != -1
+            && this.jq.inArray(parseInt(newStatus), this.deletedStatus) == -1
+            && confirm(cx.variables.get('TXT_SHOP_CONFIRM_REDUCE_STOCK', scope));
+    }
+};
 
 function updateDefault(defaultEntity) {
     cx.jQuery(".adminlist tbody tr").has('.id').each(function(index, el) {

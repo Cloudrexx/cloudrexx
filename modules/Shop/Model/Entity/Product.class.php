@@ -1043,4 +1043,94 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     {
         return $this->getName();
     }
+
+    public function getJsArray($groupCustomerId = 0, $isReseller = false)
+    {
+        $strJsArrProduct =
+            '{';
+
+        $products = $this->cx->getDb()->getEntityManager()->getRepository(
+            get_class($this)
+        )->findAll();
+
+        $counter = count($products) - 1;
+        foreach ($products as $product) {
+            $id = $product->getId();
+            $distribution = $product->getDistribution();
+            $code = $product->getCode();
+            $name = $product->getName();
+            $price = $product->getNormalprice();
+            $articleId = $product->getArticleId();
+
+            if ($product->getDiscountActive()) {
+                $price = $product->getDiscountprice();
+            } else if ($isReseller) {
+                $price = $product->getResellerprice();
+            }
+
+            // Determine discounted price from customer and article group matrix
+
+            $discountGroupRepo = $this->cx->getDb()->getEntityManager()->getRepository('\Cx\Modules\Shop\Model\Entity\RelDiscountGroup');
+            $discountCustomerGroup = $discountGroupRepo->findBy(
+                array(
+                    'customerGroupId' => $groupCustomerId,
+                    'articleGroup' => $articleId
+                )
+            );
+            $discountCustomerRate = 0;
+            if (!empty($discountCustomerGroup)) {
+                $discountCustomerRate = $discountCustomerGroup->getRate();
+            }
+
+            $price -= $price * $discountCustomerRate * 0.01;
+
+            // Determine prices for various count discounts, if any
+            $discountGroupRepo = $this->cx->getDb()->getEntityManager()->getRepository(
+                '\Cx\Modules\Shop\Model\Entity\DiscountgroupCountRate'
+            );
+            $discountGroupCountRates = $discountGroupRepo->findBy(
+                array(
+                    'groupId' => $product->getGroupId()
+                )
+            );
+
+            // Order the counts in reverse, from highest to lowest
+            $strJsArrPrice = '';
+            foreach ($discountGroupCountRates as $count => $discountGroupCountRate) {
+                $rate = $discountGroupCountRate->getRate();
+                // Deduct the customer type discount right away
+                $discountPrice = $price - ($price * $rate * 0.01);
+                $strJsArrPrice .=
+                    ($strJsArrPrice ? ',' : '')
+                    // Count followed by price
+                    .$count.','
+                    .\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice(
+                        $discountPrice
+                    );
+            }
+
+            $strJsArrPrice .=
+                ($strJsArrPrice ? ',' : '').
+                '0,'.\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($price);
+
+            $strJsArrProduct .=
+                '"'.$id.'": {'.
+                '"id": '.$id.','.
+                '"code":"'.$code.'",'.
+                '"title":"'.htmlspecialchars($name, ENT_QUOTES, CONTREXX_CHARSET).'",'.
+                '"percent":'.
+                // Use the VAT rate, not the ID, as it is not modified here
+                (!empty($product->getVat()) ? $product->getVat()->getRate() : '0') .','.
+                '"weight":'.($distribution == 'delivery'
+                    ? '"'.\Cx\Modules\Shop\Controller\Weight::getWeightString($product->getWeight()).'"'
+                    : '0' ).','.
+                '"price":['.$strJsArrPrice.']}';
+            if (!empty($counter--)) {
+                $strJsArrProduct .= ',';
+            }
+        }
+        $strJsArrProduct .= '}';
+
+        return $strJsArrProduct;
+    }
 }

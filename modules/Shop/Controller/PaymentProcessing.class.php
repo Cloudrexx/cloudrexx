@@ -719,21 +719,22 @@ if (empty ($return)) {
 //                                ? $_SESSION['shop']['order_id_checkin']
 //                                : NULL));
 //                    }
-                $order = Order::getById($order_id);
+
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
+                $order = $orderRepo->find($order_id);
                 $amount = $currency_id = $customer_email = NULL;
                 if ($order) {
                     $amount = $order->sum();
-                    $currency_id = $order->currency_id();
-                    $customer_id = $order->customer_id();
+                    $customer_id = $order->getCustomerId();
                     $customer = Customer::getById($customer_id);
                     if ($customer) {
-                        $customer_email = $customer->email();
+                        $customer_email = $customer->getEmail();
                     }
                 }
-                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-                $currency = $cx->getDb()->getEntityManager()->getRepository(
-                    '\Cx\Modules\Shop\Model\Entity\Currency'
-                )->find($currency_id);
+                $currency = $order->getCurrency();
                 $currency_code = $currency->getCode();
                 return \PayPal::ipnCheck($amount, $currency_code,
                     $order_id, $customer_email,

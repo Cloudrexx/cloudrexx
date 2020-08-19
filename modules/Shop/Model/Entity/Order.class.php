@@ -47,6 +47,16 @@ namespace Cx\Modules\Shop\Model\Entity;
  * @version     5.0.0
  */
 class Order extends \Cx\Model\Base\EntityBase {
+
+    const USERNAME_PREFIX = 'shop_customer';
+
+    /**
+     * Folder name for (image) file uploads in the Shop
+     *
+     * Note that this is prepended with the document root when necessary.
+     */
+    const UPLOAD_FOLDER = 'media/Shop/upload/';
+
     /**
      * @var integer
      */
@@ -1182,4 +1192,193 @@ class Order extends \Cx\Model\Base\EntityBase {
     {
         return $this->customer;
     }
+
+    /**
+     * Returns an array of items contained in this Order
+     * @global  ADONewConnection    $objDatabase
+     * @global  array               $_ARRAYLANG
+     * @return  array                               The items array on success,
+     *                                              false otherwise
+     * @todo    Let items be handled by their own class
+     */
+    function getItems($withHtmlNotation = true)
+    {
+        global $objDatabase, $_ARRAYLANG;
+
+        $query = "
+            SELECT `id`, `product_id`, `product_name`,
+                   `price`, `quantity`, `vat_rate`, `weight`
+              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_order_items`
+             WHERE `order_id`=?";
+        $objResult = $objDatabase->Execute($query, array($this->getId()));
+        if (!$objResult) {
+            return self::errorHandler();
+        }
+        $arrProductOptions = $this->getOptionArray($withHtmlNotation);
+        $items = array();
+        while (!$objResult->EOF) {
+            $item_id = $objResult->fields['id'];
+            $product_id = $objResult->fields['product_id'];
+            $name = $objResult->fields['product_name'];
+            $price = $objResult->fields['price'];
+            $quantity = $objResult->fields['quantity'];
+            $vat_rate = $objResult->fields['vat_rate'];
+            // Get missing product details
+            $objProduct = \Cx\Modules\Shop\Controller\Product::getById($product_id);
+            if (!$objProduct) {
+                \Message::warning(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_PRODUCT_NOT_FOUND'], $product_id));
+                $objProduct = new Product('', 0, $name, '', $price,
+                    0, 0, 0, $product_id);
+            }
+            $code = $objProduct->code();
+            $distribution = $objProduct->distribution();
+            $vat_id = $objProduct->vat_id();
+            $weight = '0';
+            if ($distribution != 'download') {
+                $weight = $objResult->fields['weight'];
+            }
+            $item = array(
+                'product_id' => $product_id,
+                'quantity' => $quantity,
+                'name' => $name,
+                'price' => $price,
+                'item_id' => $item_id,
+                'code' => $code,
+                'vat_id' => $vat_id,
+                'vat_rate' => $vat_rate,
+                'weight' => $weight,
+                'attributes' => array(),
+            );
+            if (isset($arrProductOptions[$item_id])) {
+                $item['attributes'] = $arrProductOptions[$item_id];
+            }
+            $items[] = $item;
+            $objResult->MoveNext();
+        }
+        return $items;
+    }
+
+
+    /**
+     * Returns an array of Attributes and chosen options for this Order
+     *
+     * Options for uploads are linked to their respective files
+     * The array looks like this:
+     *  array(
+     *    item ID => array(
+     *      "Attribute name" => array(
+     *        Attribute ID => array
+     *          'name' => "option name",
+     *          'price' => "price",
+     *         ),
+     *       [... more ...]
+     *      ),
+     *    ),
+     *    [... more ...]
+     *  )
+     * Note that the array may be empty.
+     * @return  array           The Attribute/option array on success,
+     *                          null otherwise
+     */
+    function getOptionArray($withHtmlNotation = true)
+    {
+        global $objDatabase;
+
+        $query = "
+            SELECT `attribute`.`id`, `attribute`.`item_id`, `attribute`.`attribute_name`,
+                   `attribute`.`option_name`, `attribute`.`price`
+              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_order_attributes` AS `attribute`
+              JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_order_items` AS `item`
+                ON `attribute`.`item_id`=`item`.`id`
+             WHERE `item`.`order_id`=".$this->getId()."
+             ORDER BY `attribute`.`attribute_name` ASC, `attribute`.`option_name` ASC";
+        $objResult = $objDatabase->Execute($query);
+        $arrProductOptions = array();
+        while (!$objResult->EOF) {
+            $option_full = $objResult->fields['option_name'];
+            $option = \Cx\Modules\Shop\Controller\ShopLibrary::stripUniqidFromFilename($option_full);
+            $path = Order::UPLOAD_FOLDER.$option_full;
+            // Link option names to uploaded files
+            if (   $option != $option_full
+                && \File::exists($path)) {
+                if ($withHtmlNotation) {
+                    $option =
+                        '<a href="'.$path.'" target="uploadFile">'.$option.'</a>';
+                }
+            }
+            $id = $objResult->fields['id'];
+            $price = $objResult->fields['price'];
+            $arrProductOptions[$objResult->fields['item_id']]
+            [$objResult->fields['attribute_name']][$id] = array(
+                'name' => $option,
+                'price' => $price,
+            );
+            $objResult->MoveNext();
+        }
+        return $arrProductOptions;
+    }
+
+
+    /**
+     * Inserts a single item into the database
+     *
+     * Note that all parameters are mandatory.
+     * All of $order_id, $product_id, and $quantity must be greater than zero.
+     * The $weight must not be negative.
+     * If there are no options, set $arrOptions to the empty array.
+     * Sets an error Message in case there is anything wrong.
+     * @global  ADONewConnection    $objDatabase
+     * @global  array   $_ARRAYLANG
+     * @param   integer $order_id       The Order ID
+     * @param   integer $product_id     The Product ID
+     * @param   string  $name           The item name
+     * @param   float   $price          The item price (one unit)
+     * @param   integer $quantity       The quantity (in units)
+     * @param   float   $vat_rate       The applicable VAT rate
+     * @param   integer $weight         The item weight (in grams, one unit)
+     * @param   array   $arrOptions     The array of selected options
+     * @return  boolean                 True on success, false otherwise
+     * @static
+     */
+    public function insertItem($product, $name, $price, $quantity,
+                               $vat_rate, $weight, $arrOptions
+    ) {
+        global $_ARRAYLANG;
+
+        $product_id = intval($product->getId());
+        if ($product_id <= 0) {
+            return \Message::error($_ARRAYLANG['TXT_SHOP_ORDER_ITEM_ERROR_INVALID_PRODUCT_ID']);
+        }
+        $quantity = intval($quantity);
+        if ($quantity <= 0) {
+            return \Message::error($_ARRAYLANG['TXT_SHOP_ORDER_ITEM_ERROR_INVALID_QUANTITY']);
+        }
+        $weight = intval($weight);
+        if ($weight < 0) {
+            return \Message::error($_ARRAYLANG['TXT_SHOP_ORDER_ITEM_ERROR_INVALID_WEIGHT']);
+        }
+
+        $orderItem = new \Cx\Modules\Shop\Model\Entity\OrderItem();
+        $orderItem->setOrderId($this->getId());
+        $orderItem->setOrder($this);
+        $orderItem->setProduct($product);
+        $orderItem->setProductId($product->getId());
+        $orderItem->setPrice($price);
+        $orderItem->setProductName($name);
+        $orderItem->setQuantity($quantity);
+        $orderItem->setWeight($weight);
+        $orderItem->setVatRate($vat_rate);
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $em->persist($orderItem);
+
+        foreach ($arrOptions as $attribute_id => $arrOptionIds) {
+            $orderItem->insertAttribute($attribute_id, $arrOptionIds);
+        }
+        $em->persist($orderItem);
+        $this->addOrderItem($orderItem);
+    }
+
 }

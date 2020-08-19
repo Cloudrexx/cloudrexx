@@ -302,8 +302,12 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
      */
     static function sendConfirmationMail($order_id, $create_accounts=true)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
         $arrSubstitution =
-            Orders::getSubstitutionArray($order_id, $create_accounts);
+            $orderRepo->getSubstitutionArray($order_id, $create_accounts);
         $customer_id = $arrSubstitution['CUSTOMER_ID'];
         $objCustomer = Customer::getById($customer_id);
         if (!$objCustomer) {

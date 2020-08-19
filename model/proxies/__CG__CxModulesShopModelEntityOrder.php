@@ -1179,6 +1179,39 @@ class Order extends \Cx\Modules\Shop\Model\Entity\Order implements \Doctrine\ORM
     /**
      * {@inheritDoc}
      */
+    public function getItems($withHtmlNotation = true)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getItems', array($withHtmlNotation));
+
+        return parent::getItems($withHtmlNotation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOptionArray($withHtmlNotation = true)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOptionArray', array($withHtmlNotation));
+
+        return parent::getOptionArray($withHtmlNotation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function insertItem($product, $name, $price, $quantity, $vat_rate, $weight, $arrOptions)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'insertItem', array($product, $name, $price, $quantity, $vat_rate, $weight, $arrOptions));
+
+        return parent::insertItem($product, $name, $price, $quantity, $vat_rate, $weight, $arrOptions);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 

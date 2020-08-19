@@ -278,7 +278,7 @@ class OrderItem extends \Cx\Model\Base\EntityBase {
      */
     public function removeOrderAttribute(\Cx\Modules\Shop\Model\Entity\OrderAttribute $orderAttribute)
     {
-        $this->orderAttributes->removeElement($orderAttributes);
+        $this->orderAttributes->removeElement($orderAttribute);
     }
 
     /**
@@ -329,5 +329,62 @@ class OrderItem extends \Cx\Model\Base\EntityBase {
     public function getProduct()
     {
         return $this->product;
+    }
+
+
+    /**
+     * Add the option IDs of the given Attribute ID to the Order item
+     *
+     * Will add error messages using {@see Message::error()}, if any.
+     * The $arrOptionIds array must have the form
+     *  array(attribute_id => array(option_id, ...))
+     * @param   integer   $item_id        The Order item ID
+     * @param   integer   $attribute_id   The Attribute ID
+     * @param   array     $arrOptionIds   The array of option IDs
+     * @return  boolean                   True on success, false otherwise
+     * @static
+     */
+    public function insertAttribute($attribute_id, $arrOptionIds)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attrRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Attribute'
+        );
+        $objAttribute = $attrRepo->find($attribute_id);
+
+        if (empty($objAttribute)) {
+            return \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_INVALID_ATTRIBUTE_ID']);
+        }
+        $name = $objAttribute->getName();
+        $_arrOptions = \Cx\Modules\Shop\Controller\Attributes::getOptionArrayByAttributeId($attribute_id);
+        foreach ($arrOptionIds as $option_id) {
+            $arrOption = null;
+            if ($objAttribute->getType() >= \Cx\Modules\Shop\Controller\Attribute::TYPE_TEXT_OPTIONAL) {
+                // There is exactly one option record for these
+                // types.  Use that and overwrite the empty name with
+                // the text or file name.
+                $arrOption = current($_arrOptions);
+                $arrOption['value'] = $option_id;
+            } else {
+                // Use the option record for the option ID given
+                $arrOption = $_arrOptions[$option_id];
+            }
+            if (!is_array($arrOption)) {
+                \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_INVALID_OPTION_ID']);
+                continue;
+            }
+            $orderAttr = new \Cx\Modules\Shop\Model\Entity\OrderAttribute();
+            $orderAttr->setItemId($this->getId());
+            $orderAttr->setOrderItem($this);
+            $orderAttr->setAttributeName(addslashes($name));
+            $orderAttr->setOptionName(addslashes($arrOption['value']));
+            $orderAttr->setPrice($arrOption['price']);
+
+            $cx->getDb()->getEntityManager()->persist($orderAttr);
+
+            $this->addOrderAttribute($orderAttr);
+        }
     }
 }

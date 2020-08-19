@@ -258,4 +258,65 @@ class Shipper extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     {
         return $this->zone;
     }
+
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Returns the shipment arrays (shippers and shipment costs) in JavaScript
+     * syntax.
+     * Backend use only.
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @return string The Shipment arrays definition
+     */
+    public function getJsArray()
+    {
+        $shippers = $this->cx->getDb()->getEntityManager()->getRepository(
+            get_class($this)
+        )->findAll();
+
+        $strJsArrays = '{';
+        $counter = count($shippers)-1;
+        foreach ($shippers as $shipper) {
+            $strJsArrays .= '"'. $shipper->getId()
+                . '":[';
+
+            $shipmentCost = $shipper->getShipmentCosts();
+            for ($i = count($shipmentCost); $i > 0; $i--) {
+                $index = $i - 1;
+                $strJsArrays .=
+                    '["'
+                    .$shipmentCost[$index]->getId().'", "'.
+                    \Cx\Modules\Shop\Controller\Weight::getWeightString(
+                        $shipmentCost[$index]->getMaxWeight()
+                    ).'","' .
+                    \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice(
+                        $shipmentCost[$index]->getFreeFrom()
+                    ). '","' .
+                    \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice(
+                        $shipmentCost[$index]->getFee()
+                    ) . '"]';
+                if (!empty($index)) {
+                    $strJsArrays .= ',';
+                }
+            }
+
+            $strJsArrays .= ']';
+
+            if (!empty($counter--)) {
+                $strJsArrays .= ',';
+            }
+        }
+        $strJsArrays .= '}';
+        return $strJsArrays;
+    }
+
 }

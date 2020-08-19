@@ -48,6 +48,9 @@ namespace Cx\Modules\Shop\Controller;
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController
 {
+    // Order Id to edit
+    protected $orderId = 0;
+
     /**
      * This is called by the ComponentController and does all the repeating work
      *
@@ -71,11 +74,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $tpl = $splitAct[1];
 
         switch($act)  {
-            case 'Order':
-            case 'editorder':
-            case 'orderdetails':
-            case 'delorder':
-            case 'orders':
             case 'Category':
             case 'categories':
             case 'category_edit':
@@ -106,9 +104,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             case 'Mail':
             case 'mailtemplate_overview':
             case 'mailtemplate_edit':
-            case '':
                 $mappedNavItems = array(
-                    'Order' => 'orders',
                     'Category' => 'categories',
                     'Product' => 'products',
                     'Manage' => 'manage',
@@ -127,13 +123,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'RelCountry' => 'countries',
                     'Zone' => 'zones',
                     'Mail' => 'mail',
-                    '' => 'orders'
                 );
                 $mappedCmdItems = array(
-                    'editorder' => 'Order',
-                    'orderdetails' => 'Order',
-                    'delorder' => 'Order',
-                    'orders' => 'Order',
                     'categories' => 'Category',
                     'category_edit' => 'Category',
                     'products' => 'Product',
@@ -292,16 +283,26 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '')
     {
         global $_ARRAYLANG;
+
         $options = parent::getViewGeneratorOptions(
             $entityClassName,
             $dataSetIdentifier
         );
 
         switch ($entityClassName) {
+            case 'Cx\Modules\Shop\Model\Entity\Order':
+                $options = $this->getSystemComponentController()->getController(
+                    'Order'
+                )->getViewGeneratorOptions($options);
+
+                break;
             case 'Cx\Modules\Shop\Model\Entity\Manufacturer':
                 $options = $this->getSystemComponentController()->getController(
                     'Manufacturer'
                 )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier != $entityClassName) {
+                    break;
+                }
                 $options = $this->normalDelete(
                     $_ARRAYLANG['TXT_SHOP_CONFIRM_DELETE_MANUFACTURER'],
                     $options
@@ -311,6 +312,9 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 $options = $this->getSystemComponentController()->getController(
                     'Category'
                 )->getViewGeneratorOptions($options);
+                if ($dataSetIdentifier != $entityClassName) {
+                    break;
+                }
                 // Delete event
                 $options = $this->normalDelete(
                     $_ARRAYLANG['TXT_CONFIRM_DELETE_SHOP_CATEGORIES'],
@@ -371,5 +375,45 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         );
 
         return $options;
+    }
+
+    /**
+     * Load custom view for order detail view
+     *
+     * @param \Cx\Core\Html\Sigma $template Backend template for this page
+     * @param array $cmd Supplied CMD
+     * @param bool $isSingle if page is single
+     */
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
+    {
+        // Last entry will be empty if we're on a nav-entry without children
+        // or on the first child of a nav-entry.
+        // The following code works fine as long as we don't want an entity
+        // view on the first child of a nav-entry or introduce a third
+        // nav-level. If we want either, we need to refactor getCommands() and
+        // parseNavigation().
+        $entityName = '';
+        if (!empty($cmd) && !empty($cmd[count($cmd) - 1])) {
+            $entityName = $cmd[count($cmd) - 1];
+        } else if (!empty($cmd)) {
+            $entityName = $cmd[0];
+        }
+
+        // Parse entity view generation pages
+        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\'
+            . $entityName;
+        if (
+            $entityName == 'Order' &&
+            $this->cx->getRequest()->hasParam('showid')
+        ) {
+            $options = parent::getViewGeneratorOptions($entityClassName);
+
+            return $this->getSystemComponentController()->getController(
+                'Order'
+            )->parseOrderDetailPage($template, $entityClassName, $options);
+        }
+
+        return parent::parsePage($template, $cmd,$isSingle);
+
     }
 }

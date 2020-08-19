@@ -55,7 +55,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array(
             'Backend', 'Manufacturer', 'Category', 'Pdf', 'Pricelist',
             'JsonPriceList', 'Currency', 'JsonCurrency', 'DiscountCoupon',
-            'JsonDiscountCoupon'
+            'JsonDiscountCoupon', 'Order', 'JsonOrder'
         );
     }
 
@@ -72,7 +72,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getControllersAccessableByJson() {
         return array(
             'JsonPriceListController', 'JsonCurrencyController',
-            'JsonDiscountCouponController'
+            'JsonDiscountCouponController', JsonOrderController
         );
     }
 
@@ -328,6 +328,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 'Currency',
                 'DiscountCoupon'
             ),
+            \Doctrine\ORM\Events::postUpdate => array(
+                'Order'
+            )
         );
 
         foreach ($modelEvents as $eventName => $entities) {

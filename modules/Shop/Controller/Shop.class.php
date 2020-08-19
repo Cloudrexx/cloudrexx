@@ -363,11 +363,15 @@ class Shop extends ShopLibrary
                 // Test with
                 // http://localhost/contrexx_300/de/index.php?section=Shop&act=testMail&key=&order_id=5
 //MailTemplate::errorHandler();die();
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
                 $order_id = (!empty($_GET['order_id']) ? $_GET['order_id'] : 10);
                 $key = (!empty($_GET['key']) ? $_GET['key'] : 'order_confirmation');
-                $arrSubstitution = Orders::getSubstitutionArray($order_id);
+                $arrSubstitution = $orderRepo->getSubstitutionArray($order_id);
                 $customer_id = $arrSubstitution['CUSTOMER_ID'];
-                $objCustomer = Customer::getById($customer_id);
+                $objCustomer = \Cx\Modules\Shop\Controller\Customer::getById($customer_id);
                 if (!$objCustomer) {
 die("Failed to get Customer for ID $customer_id");
                     return false;
@@ -4523,58 +4527,71 @@ die("Shop::processRedirect(): This method is obsolete!");
                 }
             }*/
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $currencyRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Currency');
+        $paymentRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Payment');
+        $productRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+        $shipperRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Shipper');
+        $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+
         $shipper_id = (empty($_SESSION['shop']['shipperId'])
             ? null : $_SESSION['shop']['shipperId']);
         $payment_id = (empty($_SESSION['shop']['paymentId'])
             ? null : $_SESSION['shop']['paymentId']);
-        $objOrder = new Order();
-        $objOrder->customer_id(self::$objCustomer->id());
-
-        $objOrder->billing_gender($_SESSION['shop']['gender']);
-        $objOrder->billing_firstname($_SESSION['shop']['firstname']);
-        $objOrder->billing_lastname($_SESSION['shop']['lastname']);
-        $objOrder->billing_company($_SESSION['shop']['company']);
-        $objOrder->billing_address($_SESSION['shop']['address']);
-        $objOrder->billing_city($_SESSION['shop']['city']);
-        $objOrder->billing_zip($_SESSION['shop']['zip']);
-        $objOrder->billing_country_id($_SESSION['shop']['countryId']);
-        $objOrder->billing_phone($_SESSION['shop']['phone']);
-        $objOrder->billing_fax($_SESSION['shop']['fax']);
-        $objOrder->billing_email($_SESSION['shop']['email']);
-
-        $objOrder->currency_id($_SESSION['shop']['currencyId']);
-        $objOrder->sum($_SESSION['shop']['grand_total_price']);
-        $objOrder->date_time(date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME));
-        $objOrder->status(0);
-        $objOrder->company($_SESSION['shop']['company2']);
-        $objOrder->gender($_SESSION['shop']['gender2']);
-        $objOrder->firstname($_SESSION['shop']['firstname2']);
-        $objOrder->lastname($_SESSION['shop']['lastname2']);
-        $objOrder->address($_SESSION['shop']['address2']);
-        $objOrder->city($_SESSION['shop']['city2']);
-        $objOrder->zip($_SESSION['shop']['zip2']);
+        $objOrder = new \Cx\Modules\Shop\Model\Entity\Order();
+        $objOrder->setCustomer($userRepo->find(self::$objCustomer->id()));
+        $objOrder->setCustomerId(self::$objCustomer->id());
+        $objOrder->setBillingGender($_SESSION['shop']['gender']);
+        $objOrder->setBillingFirstname($_SESSION['shop']['firstname']);
+        $objOrder->setBillingLastname($_SESSION['shop']['lastname']);
+        $objOrder->setBillingCompany($_SESSION['shop']['company']);
+        $objOrder->setBillingAddress($_SESSION['shop']['address']);
+        $objOrder->setBillingCity($_SESSION['shop']['city']);
+        $objOrder->setBillingZip($_SESSION['shop']['zip']);
+        $objOrder->setBillingCountryId($_SESSION['shop']['countryId']);
+        $objOrder->setBillingPhone($_SESSION['shop']['phone']);
+        $objOrder->setBillingFax($_SESSION['shop']['fax']);
+        $objOrder->setBillingEmail($_SESSION['shop']['email']);
+        $objOrder->setCurrencyId($_SESSION['shop']['currencyId']);
+        $objOrder->setCurrency($currencyRepo->find($_SESSION['shop']['currencyId']));
+        $objOrder->setSum($_SESSION['shop']['grand_total_price']);
+        $objOrder->setDateTime(new \DateTime(date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME)));
+        $objOrder->setStatus(0);
+        $objOrder->setCompany($_SESSION['shop']['company2']);
+        $objOrder->setGender($_SESSION['shop']['gender2']);
+        $objOrder->setFirstname($_SESSION['shop']['firstname2']);
+        $objOrder->setLastname($_SESSION['shop']['lastname2']);
+        $objOrder->setAddress($_SESSION['shop']['address2']);
+        $objOrder->setCity($_SESSION['shop']['city2']);
+        $objOrder->setZip($_SESSION['shop']['zip2']);
         if (!Cart::needs_shipment()) {
-            $objOrder->country_id(0);
+            $objOrder->setCountryId(0);
         } else {
-            $objOrder->country_id($_SESSION['shop']['countryId2']);
+            $objOrder->setCountryId($_SESSION['shop']['countryId2']);
         }
-        $objOrder->phone($_SESSION['shop']['phone2']);
-        $objOrder->vat_amount($_SESSION['shop']['vat_price']);
-        $objOrder->shipment_amount($_SESSION['shop']['shipment_price']);
-        $objOrder->shipment_id($shipper_id);
-        $objOrder->payment_id($payment_id);
-        $objOrder->payment_amount($_SESSION['shop']['payment_price']);
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $objOrder->ip(
+        $objOrder->setPhone($_SESSION['shop']['phone2']);
+        $objOrder->setVatAmount($_SESSION['shop']['vat_price']);
+        $objOrder->setShipmentAmount($_SESSION['shop']['shipment_price']);
+        if (!empty($shipper_id)) {
+            $objOrder->setShipmentId($shipper_id);
+            $objOrder->setShipper($shipperRepo->find($shipper_id));
+        }
+        $objOrder->setPaymentId($payment_id);
+        $objOrder->setPayment($paymentRepo->find($payment_id));
+        $objOrder->setPaymentAmount($_SESSION['shop']['payment_price']);
+
+        $objOrder->setIp(
             $cx->getComponent('Stats')->getCounterInstance()->getUniqueUserId()
         );
-        $objOrder->lang_id(FRONTEND_LANG_ID);
-        $objOrder->note($_SESSION['shop']['note']);
-        if (!$objOrder->insert()) {
-            // $order_id is unset!
-            return \Message::error($_ARRAYLANG['TXT_SHOP_ORDER_ERROR_STORING']);
-        }
-        $order_id = $objOrder->id();
+        $objOrder->setLangId(FRONTEND_LANG_ID);
+        $objOrder->setLang($localeRepo->find(FRONTEND_LANG_ID));
+        $objOrder->setNote($_SESSION['shop']['note']);
+
+        $em->persist($objOrder);
+        $em->flush();
+        $order_id = $objOrder->getId();
         $_SESSION['shop']['order_id'] = $order_id;
         // The products will be tested one by one below.
         // If any single one of them requires delivery, this
@@ -4623,14 +4640,13 @@ die("Shop::processRedirect(): This method is obsolete!");
                 ? $objProduct->weight() : 0); // grams
             if ($weight == '') { $weight = 0; }
             // Add to order items table
-            $result = $objOrder->insertItem(
-                $order_id, $product_id, $name, $price, $quantity,
-                $vat_rate, $weight, $arrProduct['options']);
-            if (!$result) {
-                unset($_SESSION['shop']['order_id']);
-// TODO: Verify error message set by Order::insertItem()
-                return false;
-            }
+
+            $product = $productRepo->find($product_id);
+
+            $objOrder->insertItem(
+                $product, $name, $price, $quantity, $vat_rate,
+                $weight, $arrProduct['options']
+            );
             // Store the Product Coupon, if applicable.
             // Note that it is not redeemed yet (uses=0)!
             if ($coupon_code) {
@@ -4647,6 +4663,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                 }
             }
         } // foreach product in cart
+        $em->persist($objOrder);
+        $em->flush();
         // Store the Global Coupon, if applicable.
         // Note that it is not redeemed yet (uses=0)!
 //\DBG::log("Shop::process(): Looking for global Coupon $coupon_code");
@@ -4777,24 +4795,24 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("success(): Restored Order ID ".var_export($order_id, true));
         // Default new order status: As long as it's pending (0, zero),
         // update_status() will choose the new value automatically.
-        $newOrderStatus = Order::STATUS_PENDING;
+        $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 
         $checkinresult = PaymentProcessing::checkIn();
 //\DBG::log("success(): CheckIn Result ".var_export($checkinresult, true));
 
         if ($checkinresult === false) {
             // Failed payment.  Cancel the order.
-            $newOrderStatus = Order::STATUS_CANCELLED;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED;
 //\DBG::log("success(): Order ID is *false*, new Status $newOrderStatus");
         } elseif ($checkinresult === true) {
             // True is returned for successful payments.
             // Update the status in any case.
-            $newOrderStatus = Order::STATUS_PENDING;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 //\DBG::log("success(): Order ID is *true*, new Status $newOrderStatus");
         } elseif ($checkinresult === null) {
             // checkIn() returns null if no change to the order status
             // is necessary or appropriate
-            $newOrderStatus = Order::STATUS_PENDING;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 //\DBG::log("success(): Order ID is *null* (new Status $newOrderStatus)");
         }
         // Verify the Order ID with the session, if available
@@ -4804,7 +4822,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // possibly faked one from the request!
 //\DBG::log("success(): Order ID $order_id is not ".$_SESSION['shop']['order_id_checkin'].", new Status $newOrderStatus");
             $order_id = $_SESSION['shop']['order_id_checkin'];
-            $newOrderStatus = Order::STATUS_CANCELLED;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED;
             $checkinresult = false;
         }
 //\DBG::log("success(): Verification complete, Order ID ".var_export($order_id, true).", Status: $newOrderStatus");
@@ -4812,24 +4830,28 @@ die("Shop::processRedirect(): This method is obsolete!");
             // The respective order state, if available, is updated.
             // The only exception is when $checkinresult is null.
             if (isset($checkinresult)) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
                 $newOrderStatus =
-                    Orders::update_status($order_id, $newOrderStatus);
+                    $orderRepo->update_status($order_id, $newOrderStatus);
 //\DBG::log("success(): Updated Order Status to $newOrderStatus (Order ID $order_id)");
             } else {
                 // The old status is the new status
                 $newOrderStatus = self::getOrderStatus($order_id);
             }
             switch ($newOrderStatus) {
-                case Order::STATUS_CONFIRMED:
-                case Order::STATUS_PAID:
-                case Order::STATUS_SHIPPED:
-                case Order::STATUS_COMPLETED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CONFIRMED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PAID:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_SHIPPED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_COMPLETED:
                     \Message::ok($_ARRAYLANG['TXT_ORDER_PROCESSED']);
                     // Custom.
                     // Enable if Discount class is customized and in use.
                     //self::showCustomerDiscount(Cart::get_price());
                     break;
-                case Order::STATUS_PENDING:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING:
                     // Pending orders must be stated as such.
                     // Certain payment methods (like PayPal with IPN) might
                     // be confirmed a little later and must cause the
@@ -4838,8 +4860,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                         $_ARRAYLANG['TXT_SHOP_ORDER_PENDING'].'<br /><br />'.
                         $_ARRAYLANG['TXT_SHOP_ORDER_WILL_BE_CONFIRMED']);
                     break;
-                case Order::STATUS_DELETED:
-                case Order::STATUS_CANCELLED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_DELETED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED:
                     \Message::error(
                         $_ARRAYLANG['TXT_SHOP_PAYMENT_FAILED'].'<br /><br />'.
                         $_ARRAYLANG['TXT_SHOP_ORDER_CANCELLED']);
@@ -5235,7 +5257,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (
             \Cx\Lib\FileSystem\FileSystem::exists(
                 $cx->getWebsiteDocumentRootPath() . '/' .
-                Order::UPLOAD_FOLDER . urldecode($fileName)
+                \Cx\Modules\Shop\Model\Entity\Order::UPLOAD_FOLDER . urldecode($fileName)
             )
         ) {
             return urldecode($fileName);
@@ -5257,7 +5279,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         $newFileName = $filename.'['.uniqid().']'.$fileext;
-        $newFilePath = Order::UPLOAD_FOLDER.$newFileName;
+        $newFilePath = \Cx\Modules\Shop\Model\Entity\Order::UPLOAD_FOLDER.$newFileName;
         //Move the uploaded file to the path specified in the variable $newFilePath
         try {
             $objFile = new \Cx\Lib\FileSystem\File($tmpFile);
