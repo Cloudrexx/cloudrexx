@@ -30,5 +30,6 @@ Cx\Modules\Shop\Model\Entity\DiscountgroupCountRate:
       targetEntity: Cx\Modules\Shop\Model\Entity\DiscountgroupCountName
       inversedBy: discountgroupCountRates
       joinColumn:
-        name: count
+        name: group_id
         referencedColumnName: id
+        nullable: false

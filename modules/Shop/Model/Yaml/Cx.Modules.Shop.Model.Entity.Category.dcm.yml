@@ -1,6 +1,7 @@
 Cx\Modules\Shop\Model\Entity\Category:
   type: entity
   table: module_shop_categories
+  repositoryClass: Cx\Modules\Shop\Model\Repository\CategoryRepository
   gedmo:
     translation:
       locale: locale
@@ -8,7 +9,6 @@ Cx\Modules\Shop\Model\Entity\Category:
   indexes:
     flags:
       columns: [ flags ]
-  repositoryClass: Cx\Modules\Shop\Model\Repository\CategoryRepository
   id:
     id:
       type: integer
@@ -19,9 +19,9 @@ Cx\Modules\Shop\Model\Entity\Category:
   fields:
     parentId:
       type: integer
+      nullable: true
       options:
         unsigned: true
-        default: 0
       column: parent_id
     ord:
       type: integer

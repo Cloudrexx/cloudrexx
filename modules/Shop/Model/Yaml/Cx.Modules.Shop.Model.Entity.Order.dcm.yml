@@ -21,9 +21,7 @@ Cx\Modules\Shop\Model\Entity\Order:
   fields:
     customerId:
       type: integer
-      options:
-        unsigned: true
-        default: '0'
+      nullable: true
       column: customer_id
     currencyId:
       type: integer
@@ -39,12 +37,13 @@ Cx\Modules\Shop\Model\Entity\Order:
         unsigned: true
         default: 0.00
     dateTime:
-      type: timestamp
+      type: datetime
       column: date_time
       options:
         default: '0000-00-00 00:00:00'
     status:
-      type: boolean
+      type: integer
+      length: 1
       options:
         unsigned: true
         default: 0
@@ -110,9 +109,9 @@ Cx\Modules\Shop\Model\Entity\Order:
       column: shipment_id
     paymentId:
       type: integer
+      nullable: true
       options:
         unsigned: true
-        default: '0'
       column: payment_id
     paymentAmount:
       type: decimal
@@ -130,13 +129,12 @@ Cx\Modules\Shop\Model\Entity\Order:
     langId:
       type: integer
       options:
-        unsigned: true
         default: '0'
       column: lang_id
     note:
       type: text
     modifiedOn:
-      type: timestamp
+      type: datetime
       nullable: true
       column: modified_on
     modifiedBy:
@@ -226,6 +224,7 @@ Cx\Modules\Shop\Model\Entity\Order:
       joinColumn:
         name: lang_id
         referencedColumnName: id
+        nullable: false
     currency:
       targetEntity: Cx\Modules\Shop\Model\Entity\Currency
       inversedBy: orders
@@ -246,8 +245,11 @@ Cx\Modules\Shop\Model\Entity\Order:
       joinColumn:
         name: payment_id
         referencedColumnName: id
+        nullable: false
     customer:
       targetEntity: Cx\Core\User\Model\Entity\User
       joinColumn:
         name: customer_id
         referencedColumnName: id
+        nullable: false
+        onDelete: "SET NULL"

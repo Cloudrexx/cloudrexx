@@ -474,7 +474,7 @@ class ShopCategory
 
         $query = "
             UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-              SET `parent_id`=$this->parent_id,
+              SET `parent_id`= ".($this->parent_id ? $this->parent_id : 'NULL').", 
                   `active`=".($this->active ? 1 : 0).",
                   `ord`=$this->ord,
                   `picture`='".addslashes($this->picture)."',
@@ -505,7 +505,7 @@ class ShopCategory
                 `picture`, `flags`
                 ".($this->id ? ', id' : '')."
             ) VALUES (
-                $this->parent_id, ".($this->active ? 1 : 0).", $this->ord,
+                ".($this->parent_id ? $this->parent_id : 'NULL').", ".($this->active ? 1 : 0).", $this->ord,
                 '".addslashes($this->picture)."', '".addslashes($this->flags)."'
                 ".($this->id ? ", $this->id" : '')."
             )";

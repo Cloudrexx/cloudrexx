@@ -69,7 +69,7 @@ class Currency extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     /**
      * @var string
      */
-    protected $rate;
+    protected $rate = '1.0000';
 
     /**
      * @var integer
@@ -79,7 +79,7 @@ class Currency extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var boolean
@@ -89,7 +89,7 @@ class Currency extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     /**
      * @var string
      */
-    protected $increment;
+    protected $increment = '0.01000';
 
     /**
      * @var string

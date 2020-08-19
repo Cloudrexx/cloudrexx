@@ -55,12 +55,12 @@ class DiscountgroupCountRate extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $count;
+    protected $count = 1;
 
     /**
      * @var string
      */
-    protected $rate;
+    protected $rate = '0.00';
 
     /**
      * @var \Cx\Modules\Shop\Model\Entity\DiscountgroupCountName

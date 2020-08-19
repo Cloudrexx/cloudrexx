@@ -1,11 +1,11 @@
 Cx\Modules\Shop\Model\Entity\Product:
   type: entity
   table: module_shop_products
+  repositoryClass: Cx\Modules\Shop\Model\Repository\ProductRepository
   gedmo:
     translation:
       locale: locale
       entity: Cx\Core\Locale\Model\Entity\Translation
-  repositoryClass: Cx\Modules\Shop\Model\Repository\ProductRepository
   indexes:
     group_id:
       columns: [ group_id ]
@@ -84,14 +84,12 @@ Cx\Modules\Shop\Model\Entity\Product:
         unsigned: true
         default: 1
     dateStart:
-      type: timestamp
-      options:
-        default: '0000-00-00 00:00:00'
+      type: datetime
+      nullable: true
       column: date_start
     dateEnd:
-      type: timestamp
-      options:
-        default: '0000-00-00 00:00:00'
+      type: datetime
+      nullable: true
       column: date_end
     manufacturerId:
       type: integer

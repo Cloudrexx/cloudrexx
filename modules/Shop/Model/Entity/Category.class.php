@@ -69,7 +69,7 @@ class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var string

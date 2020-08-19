@@ -52,6 +52,7 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
      * @var string
      */
     protected $locale;
+
     /**
      * @var integer
      */
@@ -65,12 +66,12 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var string
      */
-    protected $fee;
+    protected $fee = '0.00';
 
     /**
      * @var string
      */
-    protected $freeFrom;
+    protected $freeFrom = '0.00';
 
     /**
      * @var integer
@@ -80,7 +81,7 @@ class Payment extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var string

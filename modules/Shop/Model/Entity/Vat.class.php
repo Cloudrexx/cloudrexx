@@ -58,7 +58,7 @@ class Vat extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Trans
     /**
      * @var string
      */
-    protected $rate;
+    protected $rate = '0.00';
 
     /**
      * @var string

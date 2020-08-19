@@ -68,27 +68,27 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var string
      */
-    protected $normalprice;
+    protected $normalprice = '0.00';
 
     /**
      * @var string
      */
-    protected $resellerprice;
+    protected $resellerprice = '0.00';
 
     /**
      * @var integer
      */
-    protected $stock;
+    protected $stock = 10;
 
     /**
      * @var boolean
      */
-    protected $stockVisible;
+    protected $stockVisible = true;
 
     /**
      * @var string
      */
-    protected $discountprice;
+    protected $discountprice = '0.00';
 
     /**
      * @var boolean
@@ -98,17 +98,17 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var boolean
      */
-    protected $b2b;
+    protected $b2b = true;
 
     /**
      * @var boolean
      */
-    protected $b2c;
+    protected $b2c = true;
 
     /**
      * @var \DateTime

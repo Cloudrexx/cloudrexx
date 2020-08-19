@@ -321,7 +321,9 @@ class ShopCategories
             $query = "
                SELECT `id`
                  FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-                WHERE `parent_id` IN ($tempList)".
+                 WHERE `parent_id` ". (empty($parent_id) ? 'IS NULL' : 'IN(' . (
+                     $tempList
+                 ) . ')') .
                 ($active ? ' AND `active`=1' : '')."
                 ORDER BY `ord` ASC";
             $objResult = $objDatabase->Execute($query);
@@ -529,7 +531,7 @@ class ShopCategories
         $query = "
             SELECT `picture`, `id`
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-             WHERE `parent_id`=$catId
+              WHERE `parent_id` ". empty($parent_id) ? 'IS NULL' : '='.$catId ."
                AND `picture`!=''
           ORDER BY `ord` ASC";
         $objResult = $objDatabase->Execute($query);
@@ -821,11 +823,11 @@ class ShopCategories
     {
         global $objDatabase;
 
-        $parent_id = max(0, intval($parent_id));
+        $parent_id = max(null, intval($parent_id));
         $objResult = $objDatabase->Execute("
            SELECT `id`
              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_categories`
-            WHERE `parent_id`=?".
+            WHERE `parent_id` ". (is_null($parent_id) ? 'IS NULL' : '=?') .
             ($active ? ' AND `active`=1' : '')."
             ORDER BY `ord` ASC",
             array($parent_id));

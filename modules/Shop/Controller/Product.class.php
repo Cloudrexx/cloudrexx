@@ -604,14 +604,12 @@ class Product
         if (isset($date_start)) {
             $time_start = strtotime($date_start);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if (   $time_start
-                && $time_start != strtotime('0000-00-00 00:00:00')
-            ) {
+            if ($time_start) {
                 $this->date_start =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_start);
             } else {
 // TODO: Unused DATETIME should be NULL
-                $this->date_start = '0000-00-00 00:00:00';
+                $this->date_start = null;
             }
         }
         return $this->date_start;
@@ -628,14 +626,12 @@ class Product
         if (isset($date_end)) {
             $time_end = strtotime($date_end);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if (   $time_end
-                && $time_end != strtotime('0000-00-00 00:00:00')
-            ) {
+            if ($time_end) {
                 $this->date_end =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_end);
             } else {
 // TODO: Unused DATETIME should be NULL
-                $this->date_end = '0000-00-00 00:00:00';
+                $this->date_end = null;
             }
         }
         return $this->date_end;
@@ -651,7 +647,7 @@ class Product
     public function getActiveByScheduledPublishing()
     {
         $start = null;
-        if ($this->date_start() != '0000-00-00 00:00:00') {
+        if ($this->date_start()) {
             $start = \DateTime::createFromFormat(
                 ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME,
                 $this->date_start()
@@ -659,7 +655,7 @@ class Product
             $start->setTime(0, 0, 0);
         }
         $end = null;
-        if ($this->date_end() != '0000-00-00 00:00:00') {
+        if ($this->date_end()) {
             $end = \DateTime::createFromFormat(
                 ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME,
                 $this->date_end()
@@ -1136,8 +1132,8 @@ class Product
             $this->vat_id,
             $this->weight,
             addslashes($this->flags),
-            $this->group_id ? $this->group_id : 'NULL',
-            $this->article_id ? $this->article_id : 'NULL',
+            $this->group_id ? $this->group_id : null,
+            $this->article_id ? $this->article_id : null,
             $this->minimum_order_quantity ? $this->minimum_order_quantity : '0',
             $this->id
         );
@@ -1243,8 +1239,10 @@ class Product
                 ($this->active ? 1 : 0).", ".
                 ($this->b2b ? 1 : 0).", ".($this->b2c ? 1 : 0).",
                 '$this->date_start', '$this->date_end',
-                $this->manufacturer_id,
-                $this->ord, $this->vat_id, $this->weight,
+                ".($this->manufacturer_id ? $this->manufacturer_id : 'NULL').",
+                $this->ord, 
+                ".($this->vat_id ? $this->vat_id : 'NULL').", 
+                $this->weight,
                 '".addslashes($this->flags)."',
                 ".($this->group_id ? $this->group_id : 'NULL').",
                 ".($this->article_id ? $this->article_id : 'NULL').",

@@ -95,17 +95,17 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $minimumAmount;
+    protected $minimumAmount = '0.00';
 
     /**
      * @var string
      */
-    protected $discountAmount;
+    protected $discountAmount = '0.00';
 
     /**
      * @var string
      */
-    protected $discountRate;
+    protected $discountRate = '0';
 
     /**
      * @var \Cx\Modules\Shop\Model\Entity\Payment
@@ -421,4 +421,5 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     {
         return $this->customer;
     }
+
 }

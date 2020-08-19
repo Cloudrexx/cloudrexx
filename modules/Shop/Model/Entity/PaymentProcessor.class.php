@@ -54,7 +54,7 @@ class PaymentProcessor extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $type;
+    protected $type = 'internal';
 
     /**
      * @var string
@@ -74,7 +74,7 @@ class PaymentProcessor extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $status;
+    protected $status = true;
 
     /**
      * @var string

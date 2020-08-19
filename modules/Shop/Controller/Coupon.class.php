@@ -678,9 +678,9 @@ class Coupon
 
         $query = "
             DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_customer_coupon`
-             WHERE `code`='".addslashes($code)."'".
-            (isset($customer_id)
-                 ? " AND customer_id=".intval($customer_id) : '');
+             WHERE `code`='".addslashes($code)."' AND customer_id".
+            (!empty($customer_id)
+                 ? " =".intval($customer_id) : ' IS NULL');
         if (!$objDatabase->Execute($query)) {
             return \Message::error(sprintf(
                 $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_ERROR_DELETING_RELATIONS'],
@@ -688,9 +688,9 @@ class Coupon
         }
         $query = "
             DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_discount_coupon`
-             WHERE `code`='".addslashes($code)."'".
-            (isset($customer_id)
-                 ? " AND customer_id=".intval($customer_id) : '');
+             WHERE `code`='".addslashes($code)."' AND customer_id".
+            (!empty($customer_id)
+                 ? " =".intval($customer_id) : ' IS NULL');
         if (!$objDatabase->Execute($query)) {
             return \Message::error(sprintf(
                 $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_ERROR_DELETING'],
@@ -970,10 +970,10 @@ class Coupon
                  WHERE `code`=?
                    AND `customer_id`=?";
             if ($objDatabase->Execute($query, array(
-                $code, $payment_id, $minimum_amount,
+                $code, ($payment_id ? $payment_id : null), $minimum_amount,
                 $discount_rate, $discount_amount,
                 $start_time, $end_time, $uses, ($global ? 1 : 0),
-                $customer_id, $product_id,
+                ($customer_id ? $customer_id : null), ($product_id ? $product_id : null),
                 $code_prev, $customer_id_prev))) {
                 return \Message::ok(sprintf(
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_UPDATED_SUCCESSFULLY'],
@@ -991,10 +991,10 @@ class Coupon
                   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )";
             if ($objDatabase->Execute($query, array(
-                $code, $payment_id, $minimum_amount,
+                $code, ($payment_id ? $payment_id : null), $minimum_amount,
                 $discount_rate, $discount_amount,
                 $start_time, $end_time, $uses, ($global ? 1 : 0),
-                $customer_id, $product_id))) {
+                ($customer_id ? $customer_id : null), ($product_id ? $product_id : null)))) {
                 return \Message::ok(sprintf(
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_ADDED_SUCCESSFULLY'],
                     $code));
@@ -1472,8 +1472,9 @@ class Coupon
 
         $table_name = DBPREFIX.'module_shop_discount_coupon';
         $table_structure = array(
-            'code' => array('type' => 'varchar(20)', 'default' => '', 'primary' => true),
-            'customer_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0', 'primary' => true),
+            'id' => array('type' => 'INT(10)', 'auto_increment' => true, 'primary' => true),
+            'code' => array('type' => 'varchar(20)', 'default' => '', 'unique' => true),
+            'customer_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0', 'unique' => true),
             'payment_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0'),
             'product_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0'),
             'start_time' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0'),

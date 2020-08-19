@@ -198,6 +198,10 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
      */
     public function getId()
     {
+        if ($this->__isInitialized__ === false) {
+            return (int)  parent::getId();
+        }
+
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', array());
 
@@ -220,10 +224,6 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
      */
     public function getCode()
     {
-        if ($this->__isInitialized__ === false) {
-            return  parent::getCode();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCode', array());
 

@@ -71,7 +71,7 @@ class OrderAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $price;
+    protected $price = '0.00';
 
     /**
      * @var \Cx\Modules\Shop\Model\Entity\OrderItem

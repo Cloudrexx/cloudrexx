@@ -18,7 +18,6 @@ Cx\Modules\Shop\Model\Entity\Pricelist:
     langId:
       type: integer
       options:
-        unsigned: true
         default: 0
       column: lang_id
     borderOn:
@@ -73,3 +72,4 @@ Cx\Modules\Shop\Model\Entity\Pricelist:
       joinColumn:
         name: lang_id
         referencedColumnName: id
+        nullable: false

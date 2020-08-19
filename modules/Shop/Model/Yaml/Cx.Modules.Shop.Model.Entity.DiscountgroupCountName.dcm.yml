@@ -1,11 +1,11 @@
 Cx\Modules\Shop\Model\Entity\DiscountgroupCountName:
   type: entity
   table: module_shop_discountgroup_count_name
+  repositoryClass: Cx\Modules\Shop\Model\Repository\DiscountgroupCountNameRepository
   gedmo:
     translation:
       locale: locale
       entity: Cx\Core\Locale\Model\Entity\Translation
-  repositoryClass: Cx\Modules\Shop\Model\Repository\DiscountgroupCountNameRepository
   id:
     id:
       type: integer

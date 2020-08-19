@@ -74,6 +74,8 @@ class CustomerGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     }
 
     /**
+<<<<<<< HEAD
+=======
      * Set translatable locale
      *
      * @param $locale
@@ -86,6 +88,7 @@ class CustomerGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     }
 
     /**
+>>>>>>> CLX-2421-migrate-core-text-attributes
      * Get id
      *
      * @return integer 

@@ -23,9 +23,9 @@ Cx\Modules\Shop\Model\Entity\OrderItem:
       column: order_id
     productId:
       type: integer
+      nullable: true
       options:
         unsigned: true
-        default: 0
       column: product_id
     productName:
       type: string

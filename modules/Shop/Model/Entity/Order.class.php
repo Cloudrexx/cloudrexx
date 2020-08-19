@@ -65,12 +65,12 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $sum;
+    protected $sum = '0.00';
 
     /**
      * @var \DateTime
      */
-    protected $dateTime;
+    protected $dateTime = '0000-00-00 00:00:00';
 
     /**
      * @var boolean
@@ -125,12 +125,12 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $vatAmount;
+    protected $vatAmount = '0.00';
 
     /**
      * @var string
      */
-    protected $shipmentAmount;
+    protected $shipmentAmount = '0.00';
 
     /**
      * @var integer
@@ -145,7 +145,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $paymentAmount;
+    protected $paymentAmount = '0.00';
 
     /**
      * @var string
@@ -1167,7 +1167,6 @@ class Order extends \Cx\Model\Base\EntityBase {
      * Set customer
      *
      * @param \Cx\Core\User\Model\Entity\User $customer
-     * @return Orders
      */
     public function setCustomer(\Cx\Core\User\Model\Entity\User $customer = null)
     {

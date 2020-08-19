@@ -1,11 +1,11 @@
 Cx\Modules\Shop\Model\Entity\Option:
   type: entity
   table: module_shop_option
+  repositoryClass: Cx\Modules\Shop\Model\Repository\OptionRepository
   gedmo:
     translation:
       locale: locale
       entity: Cx\Core\Locale\Model\Entity\Translation
-  repositoryClass: Cx\Modules\Shop\Model\Repository\OptionRepository
   indexes:
     fk_contrexx_module_shop_option_contrexx_module_shop_attribu_idx:
       columns: [ attribute_id ]

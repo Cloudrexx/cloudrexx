@@ -157,7 +157,7 @@ class ArticleGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translata
      */
     public function addProduct(\Cx\Modules\Shop\Model\Entity\Product $product)
     {
-        $this->products[] = $products;
+        $this->products[] = $product;
     }
 
     /**
@@ -165,7 +165,7 @@ class ArticleGroup extends \Cx\Model\Base\EntityBase implements \Gedmo\Translata
      *
      * @param \Cx\Modules\Shop\Model\Entity\Product $product
      */
-    public function removeProduct(\Cx\Modules\Shop\Model\Entity\Product $produc)
+    public function removeProduct(\Cx\Modules\Shop\Model\Entity\Product $product)
     {
         $this->products->removeElement($product);
     }

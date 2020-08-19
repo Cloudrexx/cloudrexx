@@ -64,7 +64,7 @@ class Option extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Tr
     /**
      * @var string
      */
-    protected $price;
+    protected $price = '0.00';
 
     /**
      * @var string

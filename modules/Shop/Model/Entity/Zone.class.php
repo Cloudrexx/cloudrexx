@@ -59,7 +59,7 @@ class Zone extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Tran
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var string

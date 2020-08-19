@@ -60,7 +60,7 @@ class Shipper extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     /**
      * @var boolean
      */
-    protected $active;
+    protected $active = true;
 
     /**
      * @var integer

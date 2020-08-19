@@ -3337,8 +3337,8 @@ if ($test === NULL) {
         foreach ($arrProducts as $objProduct) {
             $productStatus = 'inactive';
             if ($objProduct->active()) {
-                $hasScheduledPublishing =   $objProduct->date_start() != '0000-00-00 00:00:00'
-                                         || $objProduct->date_end() != '0000-00-00 00:00:00';
+                $hasScheduledPublishing =   $objProduct->date_start()
+                                         || $objProduct->date_end();
                 $productStatus = 'active';
                 if ($hasScheduledPublishing) {
                     $productStatus =  $objProduct->getActiveByScheduledPublishing()

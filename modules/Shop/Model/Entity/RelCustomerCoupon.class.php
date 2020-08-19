@@ -46,6 +46,11 @@ namespace Cx\Modules\Shop\Model\Entity;
  */
 class RelCustomerCoupon extends \Cx\Model\Base\EntityBase {
     /**
+     * @var int
+     */
+    protected $id;
+
+    /**
      * @var string
      */
     protected $code;
@@ -68,7 +73,7 @@ class RelCustomerCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $amount;
+    protected $amount = '0.00';
 
     /**
      * @var \Cx\Modules\Shop\Model\Entity\Order
@@ -79,6 +84,16 @@ class RelCustomerCoupon extends \Cx\Model\Base\EntityBase {
      * @var \Cx\Core\User\Model\Entity\User
      */
     protected $customer;
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Set code
@@ -219,4 +234,5 @@ class RelCustomerCoupon extends \Cx\Model\Base\EntityBase {
     {
         return $this->customer;
     }
+
 }
