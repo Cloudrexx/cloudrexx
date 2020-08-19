@@ -669,6 +669,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             if ($item->getOrderAttributes()) {
                 $str_options = '  '; // '[';
                 $attribute_name_previous = '';
+                $orderAttributeIdx = 0;
                 foreach ($item->getOrderAttributes() as $orderAttribute) {
                     $attribute_name = $orderAttribute->getAttributeName();
                     $optionValues = array();
@@ -720,9 +721,11 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         }
                         $optionValues[] = $option;
                     $optionList[] = array(
+                        'PRODUCT_OPTIONS_IDX' => $orderAttributeIdx,
                         'PRODUCT_OPTIONS_NAME' => $attribute_name,
                         'PRODUCT_OPTIONS_VALUES' => $optionValues,
                     );
+                    $orderAttributeIdx++;
                 }
 //                $str_options .= ']';
             }
