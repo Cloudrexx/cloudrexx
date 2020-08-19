@@ -77,6 +77,12 @@ $_ARRAYLANG['headerRight'] = '';
 $_ARRAYLANG['footerRight'] = '';
 $_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
 
+$_ARRAYLANG['code'] = 'Code';
+$_ARRAYLANG['symbol'] = 'Symbole';
+$_ARRAYLANG['rate'] = 'Cours';
+$_ARRAYLANG['increment'] = 'Rundung';
+$_ARRAYLANG['default'] = 'Standard';
+
 
 $_ARRAYLANG['TXT_ORDERS'] = "Commandes";
 $_ARRAYLANG['TXT_STOCK'] = "Stock";

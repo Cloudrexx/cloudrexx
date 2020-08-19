@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2015
+ * @copyright Cloudrexx AG 2007-2018
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -26,32 +25,25 @@
  */
 
 /**
- * Currency class
- * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * CurrencyController to handle currencies
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Sam Hawkes <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_shop
- * @author      Reto Kohli <reto.kohli@comvation.com>
- * @version     3.0.0
- * @todo        Edit PHP DocBlocks!
  */
-
 namespace Cx\Modules\Shop\Controller;
 
 /**
- * Currency related static methods
- * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * CurrencyController to handle currencies
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Sam Hawkes <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_shop
- * @author      Reto Kohli <reto.kohli@comvation.com>
- * @version     3.0.0
  */
-class Currency
+class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
 {
-    /**
-     * Text key
-     */
-    const TEXT_NAME = 'currency_name';
-
     /**
      * class suffixes for active/inactive currencies
      */
@@ -88,6 +80,100 @@ class Currency
      */
     private static $defaultCurrencyId = false;
 
+    /**
+     * Get ViewGenerator options for Currency entity
+     *
+     * @param $options array predefined ViewGenerator options
+     * @return array includes ViewGenerator options for Currency entity
+     */
+    public function getViewGeneratorOptions($options)
+    {
+        $options['functions']['sortBy'] = array(
+            'field' => array('ord' => SORT_ASC)
+        );
+        $options['functions']['sorting'] = false;
+        $options['functions']['edit'] = false;
+        $options['functions']['editable'] = true;
+        $options['functions']['status'] = array(
+            'field' => 'active'
+        );
+        $options['order']['overview'] = array(
+            'id',
+            'code',
+            'symbol',
+            'name',
+            'rate',
+            'increment',
+            'default',
+            'active'
+        );
+        $options['order']['form'] = array(
+            'code',
+            'symbol',
+            'name',
+            'rate',
+            'increment',
+            'default',
+            'active'
+        );
+
+        $options['fields'] = array(
+            'id' => array(
+                'table' => array(
+                    'attributes' => array(
+                        'class' => 'id'
+                    ),
+                )
+            ),
+            'orders' => array(
+                'showOverview' => false,
+                'showDetail' => false,
+            ),
+            'ord' => array(
+                'showOverview' => false,
+                'showDetail' => false,
+            ),
+            'code' => array(
+                'formfield' => array(
+                    'adapter' => 'Currency',
+                    'method' => 'getCodeDropdown'
+                )
+            ),
+            'symbol' => array(
+                'editable' => true,
+            ),
+            'name' => array(
+                'editable' => true,
+            ),
+            'rate' => array(
+                'editable' => true,
+                'table' => array(
+                    'attributes' => array(
+                        'class' => 'rate'
+                    ),
+                ),
+            ),
+            'increment' => array(
+                'editable' => true,
+            ),
+            'default' => array(
+                'storecallback' => function($value) {
+                    return !empty($value);
+                },
+                'editable' => true,
+                'table' => array(
+                    'attributes' => array(
+                        'class' => 'default'
+                    ),
+                    'parse' => array(
+                        'adapter' => 'Currency',
+                        'method' => 'getDefaultButton'
+                    ),
+                ),
+            ),
+        );
+        return $options;
+    }
 
     /**
      * Initialize currencies
@@ -99,43 +185,27 @@ class Currency
      */
     static function init($active_currency_id=0)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $currencies = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->findBy(array(), array('ord' => 'ASC'));
 
-        $arrSqlName = \Text::getSqlSnippets(
-            '`currency`.`id`', FRONTEND_LANG_ID, 'Shop',
-            array('name' => self::TEXT_NAME));
-        $query = "
-            SELECT `currency`.`id`, `currency`.`code`, `currency`.`symbol`,
-                   `currency`.`rate`, `currency`.`increment`,
-                   `currency`.`ord`,
-                   `currency`.`active`, `currency`.`default`, ".
-                   $arrSqlName['field']."
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_currencies` AS `currency`".
-                   $arrSqlName['join']."
-             ORDER BY `currency`.`id` ASC";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) return self::errorHandler();
-        while (!$objResult->EOF) {
-            $id = $objResult->fields['id'];
-            $strName = $objResult->fields['name'];
-            if ($strName === null) {
-                $strName = \Text::getById($id, 'Shop', self::TEXT_NAME)->content();
-            }
-            self::$arrCurrency[$objResult->fields['id']] = array(
-                'id' => $objResult->fields['id'],
-                'code' => $objResult->fields['code'],
-                'symbol' => $objResult->fields['symbol'],
-                'name' => $strName,
-                'rate' => $objResult->fields['rate'],
-                'increment' => $objResult->fields['increment'],
-                'ord' => $objResult->fields['ord'],
-                'active' => $objResult->fields['active'],
-                'default' => $objResult->fields['default'],
+        foreach ($currencies as $currency) {
+            self::$arrCurrency[$currency->getId()] = array(
+                'id' => $currency->getId(),
+                'code' => $currency->getCode(),
+                'symbol' => $currency->getSymbol(),
+                'name' => $currency->getName(),
+                'rate' => $currency->getRate(),
+                'increment' => $currency->getIncrement(),
+                'ord' => $currency->getOrd(),
+                'active' => $currency->getActive(),
+                'default' => $currency->getDefault(),
             );
-            if ($objResult->fields['default'])
-                self::$defaultCurrencyId = $objResult->fields['id'];
-            $objResult->MoveNext();
+            if ($currency->getDefault())
+                self::$defaultCurrencyId = $currency->getId();
         }
+
         if (!isset($_SESSION['shop'])) {
             $_SESSION['shop'] = array();
         }
@@ -159,18 +229,6 @@ class Currency
         return true;
     }
 
-
-    /**
-     * Resets the $arrCurrency class array to null to enforce
-     * reinitialisation
-     *
-     * Call this after changing the database table
-     */
-    static function reset()
-    {
-        self::$arrCurrency = null;
-    }
-
     /**
      * Returns the currency array
      * @author  Reto Kohli <reto.kohli@comvation.com>
@@ -184,63 +242,6 @@ class Currency
         return self::$arrCurrency;
     }
 
-
-    /**
-     * Returns the default currency ID
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  integer     The ID of the default currency
-     */
-    static function getDefaultCurrencyId()
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$defaultCurrencyId;
-    }
-
-
-    /**
-     * Returns the default currency symbol
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  string      The string representing the default currency
-     */
-    static function getDefaultCurrencySymbol()
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$arrCurrency[self::$defaultCurrencyId]['symbol'];
-    }
-
-
-    /**
-     * Returns the default currency code
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  string      The string representing the default currency code
-     */
-    static function getDefaultCurrencyCode()
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$arrCurrency[self::$defaultCurrencyId]['code'];
-    }
-
-
-    /**
-     * Returns the active currency ID
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  integer     The ID of the active currency
-     */
-    static function getActiveCurrencyId()
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$activeCurrencyId;
-    }
-
-
     /**
      * Set the active currency ID
      * @param   integer     $currency_id    The active Currency ID
@@ -253,7 +254,6 @@ class Currency
         if (!is_array(self::$arrCurrency)) self::init($currency_id);
         self::$activeCurrencyId = $currency_id;
     }
-
 
     /**
      * Returns the active currency symbol
@@ -271,7 +271,6 @@ class Currency
         return self::$arrCurrency[self::$activeCurrencyId]['symbol'];
     }
 
-
     /**
      * Returns the active currency code
      *
@@ -287,35 +286,6 @@ class Currency
         if (!is_array(self::$arrCurrency)) self::init();
         return self::$arrCurrency[self::$activeCurrencyId]['code'];
     }
-
-
-    /**
-     * Returns the currency symbol for the given ID
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  string      The string representing the active currency
-     */
-    static function getCurrencySymbolById($currency_id)
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$arrCurrency[$currency_id]['symbol'];
-    }
-
-
-    /**
-     * Returns the currency code for the given ID
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @access  public
-     * @static
-     * @return  string      The string representing the active currency code
-     */
-    static function getCurrencyCodeById($currency_id)
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        return self::$arrCurrency[$currency_id]['code'];
-    }
-
 
     /**
      * Returns the amount converted from the default to the active currency
@@ -338,7 +308,6 @@ class Currency
         return self::formatPrice(round($price*$rate/$increment)*$increment);
     }
 
-
     /**
      * Returns the amount converted from the active to the default currency
      *
@@ -359,11 +328,14 @@ class Currency
         }
         $rate = self::$arrCurrency[self::$activeCurrencyId]['rate'];
         $defaultRate = self::$arrCurrency[self::$defaultCurrencyId]['rate'];
-        $defaultIncrement = self::$arrCurrency[self::$defaultCurrencyId]['increment'];
-        return self::formatPrice(round(
-            $price*$defaultRate/$rate/$defaultIncrement)*$defaultIncrement);
+        $defaultIncrement = self::$arrCurrency[
+            self::$defaultCurrencyId
+        ]['increment'];
+        return self::formatPrice(
+            round($price*$defaultRate/$rate/$defaultIncrement)
+            * $defaultIncrement
+        );
     }
-
 
     /**
      * Returns the formatted amount in a non-localized notation
@@ -390,7 +362,6 @@ class Currency
      */
     static function formatPrice($price, $length='', $padding='', $increment=null)
     {
-//\DBG::log("formatPrice($price, $length, $padding, $increment): Entered");
         $decimals = 2;
         if (empty ($increment)) {
             if (!is_array(self::$arrCurrency)) self::init();
@@ -403,10 +374,9 @@ class Currency
             $price = round($price/$increment)*$increment;
         }
         $price = sprintf('%'.$padding.$length.'.'.$decimals.'f', $price);
-//\DBG::log("formatPrice($price, $length, $padding, $increment): Decimals: $decimals");
+
         return $price;
     }
-
 
     /**
      * Returns the amount in a non-localized notation in cents,
@@ -431,7 +401,6 @@ class Currency
         $amount = preg_replace('/-/', '0', $amount);
         return intval($amount);
     }
-
 
     /**
      * Set up the Currency navbar
@@ -461,237 +430,6 @@ class Currency
         }
         return $strCurNavbar;
     }
-
-
-    /**
-     * Return the currency code for the ID given
-     *
-     * Mind that some methods rely on the return value being NULL for
-     * unknown Currencies, see {@see PaymentProcessing::checkIn()}.
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @static
-     * @param   integer   $currencyId   The currency ID
-     * @return  mixed                   The currency code on success,
-     *                                  NULL otherwise
-     * @global  ADONewConnection
-     */
-    static function getCodeById($currencyId)
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        if (isset(self::$arrCurrency[$currencyId]['code']))
-            return self::$arrCurrency[$currencyId]['code'];
-        return NULL;
-    }
-
-
-    /**
-     * Return the currency symbol for the ID given
-     * @author  Reto Kohli <reto.kohli@comvation.com>
-     * @static
-     * @param   integer   $currencyId   The currency ID
-     * @return  mixed                   The currency symbol on success,
-     *                                  false otherwise
-     * @global  ADONewConnection
-     */
-    static function getSymbolById($currencyId)
-    {
-        if (!is_array(self::$arrCurrency)) self::init();
-        if (isset(self::$arrCurrency[$currencyId]['symbol']))
-            return self::$arrCurrency[$currencyId]['symbol'];
-        return false;
-    }
-
-
-
-    /**
-     * Store the currencies as present in the post request
-     *
-     * See {@link deleteCurrency()}, {@link addCurrency()}, and
-     * {@link updateCurrencies()}.
-     * @return  boolean             The empty string if nothing was changed,
-     *                              boolean true upon storing everything
-     *                              successfully, or false otherwise
-     */
-    static function store()
-    {
-        if (empty(self::$arrCurrency)) self::init();
-        $total_result = true;
-        $result = self::deleteCurrency();
-        if ($result !== '') $total_result &= $result;
-        $result = self::addCurrency();
-        if ($result !== '') $total_result &= $result;
-        $result = self::updateCurrencies();
-        if ($result !== '') $total_result &= $result;
-        // Reinit after storing, or the user won't see any changes at first
-        self::init();
-        return $total_result;
-    }
-
-
-    /**
-     * Deletes a currency
-     *
-     * This method will fail if you try to delete the default Currency.
-     * @return  boolean             Null if nothing was deleted,
-     *                              boolean true upon deleting the currency
-     *                              successfully, or false otherwise
-     */
-    static function delete()
-    {
-        global $objDatabase;
-
-        if (empty($_GET['currencyId'])) return null;
-        self::init();
-        $currency_id = $_GET['currencyId'];
-        if ($currency_id == self::$defaultCurrencyId) return false;
-        if (!\Text::deleteById($currency_id, 'Shop', self::TEXT_NAME))
-            return false;
-        $objResult = $objDatabase->Execute("
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_currencies`
-             WHERE `id`=$currency_id");
-        if (!$objResult) return false;
-        unset(self::$arrCurrency[$currency_id]);
-
-        return true;
-    }
-
-
-    /**
-     * Add a new currency
-     *
-     * If the posted data is incomplete sets a message, and returns null.
-     * Returns false on database errors only.
-     * @return  boolean             Null if nothing was added,
-     *                              boolean true upon adding the currency
-     *                              successfully, or false otherwise
-     * @static
-     */
-    static function add()
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        if (empty($_POST['currency_add'])) return null;
-        if (empty($_POST['currencyNameNew'])
-         || empty($_POST['currencyCodeNew'])
-         || empty($_POST['currencySymbolNew'])
-         || empty($_POST['currencyRateNew'])
-         || empty($_POST['currencyIncrementNew'])) {
-            \Message::error($_ARRAYLANG['TXT_SHOP_CURRENCY_INCOMPLETE']);
-            return false;
-        }
-        $code = contrexx_input2raw($_POST['currencyCodeNew']);
-        foreach (self::$arrCurrency as $currency) {
-            if ($code == $currency['code']) {
-                \Message::error(sprintf(
-                    $_ARRAYLANG['TXT_SHOP_CURRENCY_EXISTS'],
-                    $code));
-                return null;
-            }
-        }
-        $active = (empty($_POST['currencyActiveNew']) ? 0 : 1);
-        $default = (empty($_POST['currencyDefaultNew']) ? 0 : 1);
-        $query = "
-            INSERT INTO `".DBPREFIX."module_shop".MODULE_INDEX."_currencies` (
-                `code`, `symbol`, `rate`, `increment`, `active`
-            ) VALUES (
-                '".contrexx_raw2db($code)."',
-                '".contrexx_input2db($_POST['currencySymbolNew'])."',
-                ".floatval($_POST['currencyRateNew']).",
-                ".floatval($_POST['currencyIncrementNew']).",
-                $active
-            )";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) return false;
-        $currency_id = $objDatabase->Insert_Id();
-        if (!\Text::replace($currency_id, FRONTEND_LANG_ID, 'Shop',
-            self::TEXT_NAME, contrexx_input2raw($_POST['currencyNameNew']))) {
-            return false;
-        }
-        if ($default) {
-            return self::setDefault($currency_id);
-        }
-        return true;
-    }
-
-
-    /**
-     * Update currencies
-     * @return  boolean             Null if nothing was changed,
-     *                              boolean true upon storing everything
-     *                              successfully, or false otherwise
-     * @static
-     */
-    static function update()
-    {
-        global $objDatabase;
-
-        if (empty($_POST['currency'])) return null;
-        self::init();
-        $default_id = (isset($_POST['currencyDefault'])
-            ? intval($_POST['currencyDefault']) : self::$defaultCurrencyId);
-        $changed = false;
-        foreach ($_POST['currencyCode'] as $currency_id => $code) {
-            $code = contrexx_input2raw($code);
-            $name = contrexx_input2raw($_POST['currencyName'][$currency_id]);
-            $symbol = contrexx_input2raw($_POST['currencySymbol'][$currency_id]);
-            $rate = floatval($_POST['currencyRate'][$currency_id]);
-            $increment = floatval($_POST['currencyIncrement'][$currency_id]);
-            if ($increment <= 0) $increment = 0.01;
-            $default = ($default_id == $currency_id ? 1 : 0);
-            $active = (empty ($_POST['currencyActive'][$currency_id]) ? 0 : 1);
-            // The default currency must be activated
-            $active = ($default ? 1 : $active);
-            if (   $code == self::$arrCurrency[$currency_id]['code']
-                && $name == self::$arrCurrency[$currency_id]['name']
-                && $symbol == self::$arrCurrency[$currency_id]['symbol']
-                && $rate == self::$arrCurrency[$currency_id]['rate']
-                && $increment == self::$arrCurrency[$currency_id]['increment']
-// NOTE: The ordinal is implemented, but not used yet
-//                && $ord == self::$arrCurrency[$currency_id]['ord']
-                && $active == self::$arrCurrency[$currency_id]['active']
-                && $default == self::$arrCurrency[$currency_id]['default']) {
-                continue;
-            }
-            $query = "
-                UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_currencies`
-                   SET `code`='".contrexx_raw2db($code)."',
-                       `symbol`='".contrexx_raw2db($symbol)."',
-                       `rate`=$rate,
-                       `increment`=$increment,
-                       `active`=$active
-                 WHERE `id`=$currency_id";
-            if (!$objDatabase->Execute($query)) return false;
-            $changed = true;
-            if (!\Text::replace($currency_id, FRONTEND_LANG_ID,
-                'Shop', self::TEXT_NAME,
-                contrexx_input2raw($_POST['currencyName'][$currency_id]))) {
-                return false;
-            }
-        } // end foreach
-        if ($changed) {
-            return self::setDefault($default_id);
-        }
-        return null;
-    }
-
-
-    static function setDefault($currency_id)
-    {
-        global $objDatabase;
-
-        $objResult = $objDatabase->Execute("
-            UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_currencies`
-               SET `default`=0
-             WHERE `id`!=$currency_id");
-        if (!$objResult) return false;
-        $objResult = $objDatabase->Execute("
-            UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_currencies`
-               SET `default`=1
-             WHERE `id`=$currency_id");
-        if (!$objResult) return false;
-        return true;
-    }
-
 
     /**
      * Returns the array of known currencies
@@ -895,7 +633,6 @@ class Currency
         );
     }
 
-
     /**
      * Returns the array of names for all known currencies indexed
      * by ISO 4217 code
@@ -912,12 +649,12 @@ class Currency
         if (empty($format)) $format = '%2$s (%1$s)';
         $arrName = array();
         foreach (self::known_currencies() as $currency) {
-            $arrName[$currency[0]] = sprintf($format,
-                $currency[0], $currency[1], $currency[2]);
+            $arrName[$currency[0]] = sprintf(
+                $format, $currency[0], $currency[1], $currency[2]
+            );
         }
         return $arrName;
     }
-
 
     /**
      * Returns the array of increments for all known currencies indexed
@@ -934,7 +671,6 @@ class Currency
         }
         return $arrIncrement;
     }
-
 
     /**
      * Handles database errors
@@ -976,7 +712,7 @@ class Currency
                 $objResult = \Cx\Lib\UpdateUtil::sql($query);
                 if (!$objResult) {
                     throw new \Cx\Lib\Update_DatabaseException(
-                       "Failed to query Currency names", $query);
+                        "Failed to query Currency names", $query);
                 }
                 while (!$objResult->EOF) {
                     $id = $objResult->fields['id'];
@@ -984,7 +720,7 @@ class Currency
                     if (!\Text::replace($id, $default_lang_id,
                         'Shop', self::TEXT_NAME, $name)) {
                         throw new \Cx\Lib\Update_DatabaseException(
-                           "Failed to migrate Currency name '$name'");
+                            "Failed to migrate Currency name '$name'");
                     }
                     $objResult->MoveNext();
                 }
@@ -1030,5 +766,4 @@ class Currency
         // Always
         return false;
     }
-
 }

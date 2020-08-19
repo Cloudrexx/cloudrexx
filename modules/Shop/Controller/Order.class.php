@@ -1185,8 +1185,8 @@ class Order
                         }
                     }
                 }
-                $price = Currency::formatPrice($price);
-                $productPrice = Currency::formatPrice($productPrice);
+                $price = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price);
+                $productPrice = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($productPrice);
                 $quantity = max(1,
                     intval($_REQUEST['productQuantity'][$orderItemId]));
                 $totalOrderSum += $price * $quantity;
@@ -1479,7 +1479,7 @@ class Order
                 price, quantity, vat_rate, weight
             ) VALUES (
                 $order_id, $product_id, '".addslashes($name)."',
-                '".Currency::formatPrice($price)."', $quantity,
+                '".\Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price)."', $quantity,
                 '".Vat::format($vat_rate)."', $weight
             )";
         $objResult = $objDatabase->Execute($query);
@@ -1542,7 +1542,7 @@ class Order
             UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
                SET `product_id`=$product_id,
                    `product_name`='".addslashes($name)."',
-                   `price`='".Currency::formatPrice($price)."',
+                   `price`='".\Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price)."',
                    `quantity`=$quantity,
                    `vat_rate`='".Vat::format($vat_rate)."',
                    `weight`=$weight
@@ -1685,6 +1685,13 @@ class Order
 //DBG::log("Orders::view_list(): loaded Template: ".$objTemplate->get());
         }
         $objOrder = Order::getById($order_id);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $currency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->find($objOrder->currency_id());
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
         if (!$objOrder) {
 //DBG::log("Shop::shopShowOrderdetails(): Failed to find Order ID $order_id");
             return \Message::error(sprintf(
@@ -1727,11 +1734,9 @@ class Order
         Vat::is_reseller($objCustomer->is_reseller());
         Vat::is_home_country(
             \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop') == $objOrder->country_id());
-        $currency = Currency::getCurrencySymbolById($objOrder->currency_id());
         $objTemplate->setGlobalVariable($_ARRAYLANG
           + array(
-            'SHOP_CURRENCY' =>
-                $currency));
+            'SHOP_CURRENCY' => $currency->getSymbol()));
 //DBG::log("Order sum: ".Currency::formatPrice($objOrder->sum()));
         $objTemplate->setVariable(array(
             'SHOP_CUSTOMER_ID' => $customer_id,
@@ -1750,8 +1755,8 @@ class Order
                 ? ($objOrder->status() != Order::STATUS_CONFIRMED
                     ? \Html::ATTRIBUTE_CHECKED : '')
                 : ''),
-            'SHOP_ORDER_SUM' => Currency::formatPrice($objOrder->sum()),
-            'SHOP_DEFAULT_CURRENCY' => Currency::getDefaultCurrencySymbol(),
+            'SHOP_ORDER_SUM' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objOrder->sum()),
+            'SHOP_DEFAULT_CURRENCY' => $defaultCurrency->getSymbol(),
             'SHOP_GENDER' => ($edit
                 ? Customer::getGenderMenu(
                     $objOrder->billing_gender(), 'billing_gender')
@@ -1865,7 +1870,7 @@ class Order
                 ? $_ARRAYLANG['TXT_TAX_PREFIX_INCL']
                 : $_ARRAYLANG['TXT_TAX_PREFIX_EXCL']);
             $objTemplate->setVariable(array(
-                'SHOP_TAX_PRICE' => Currency::formatPrice($total_vat_amount),
+                'SHOP_TAX_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($total_vat_amount),
                 'SHOP_PART_TAX_PROCENTUAL' => $tax_part_percentaged,
             ));
         //} else {
@@ -1905,7 +1910,7 @@ class Order
             $objTemplate->setVariable(array(
                 'SHOP_COUPON_NAME' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'],
                 'SHOP_COUPON_CODE' => $objCoupon->code(),
-                'SHOP_COUPON_AMOUNT' => Currency::formatPrice(
+                'SHOP_COUPON_AMOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     -$discount),
             ));
             $objTemplate->touchBlock('coupon_row');
@@ -1916,7 +1921,7 @@ class Order
                     'SHOP_COUPON_SHIPMENT_TXT' => sprintf(
                         $_ARRAYLANG['TXT_SHOP_COUPON_SHIPMENT_DEDUCTION'],
                         $objCoupon->code(),
-                        "$shipmentDiscountAmount $currency"
+                        $shipmentDiscountAmount . ' ' . $currency->getSymbol()
                     ),
                 ));
                 $objTemplate->touchBlock('coupon_shipment_info');
@@ -1936,7 +1941,7 @@ class Order
         $objTemplate->setVariable(array(
             'SHOP_ROWCLASS_NEW' => 'row'.(++$i % 2 + 1),
             'SHOP_TOTAL_WEIGHT' => Weight::getWeightString($total_weight),
-            'SHOP_NET_PRICE' => Currency::formatPrice($total_net_price),
+            'SHOP_NET_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($total_net_price),
 // See above
 //            'SHOP_ORDER_SUM' => Currency::formatPrice($order_sum),
         ));
@@ -2086,8 +2091,8 @@ class Order
                 'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
                 'SHOP_QUANTITY' => $quantity,
                 'SHOP_PRODUCT_NAME' => $name,
-                'SHOP_PRODUCT_PRICE' => Currency::formatPrice($price),
-                'SHOP_PRODUCT_SUM' => Currency::formatPrice($row_net_price),
+                'SHOP_PRODUCT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price),
+                'SHOP_PRODUCT_SUM' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($row_net_price),
                 'SHOP_P_ID' => ($edit
                     ? $item_id // Item ID
                     // If we're just showing the order details, the
@@ -2097,7 +2102,7 @@ class Order
                 // fill VAT field
                 'SHOP_PRODUCT_TAX_RATE' => ($edit
                     ? $vat_rate : Vat::format($vat_rate)),
-                'SHOP_PRODUCT_TAX_AMOUNT' => Currency::formatPrice($row_vat_amount),
+                'SHOP_PRODUCT_TAX_AMOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($row_vat_amount),
                 'SHOP_PRODUCT_WEIGHT' => Weight::getWeightString($weight),
                 'SHOP_ACCOUNT_VALIDITY' => \FWUser::getValidityString($weight),
             ));

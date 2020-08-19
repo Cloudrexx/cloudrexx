@@ -771,12 +771,17 @@ class Attributes
             'id="'.$name.'-'.$attribute_id.'" size="1"'.
             ($onchange ? ' onchange="'.$onchange.'"' : '').
             ($style ? ' style="'.$style.'"' : '').'>'."\n";
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
         foreach ($arrOptions as $option_id => $arrValue) {
             $menu .=
                 '<option value="'.$option_id.'"'.
                 ($selected_id == $option_id ? ' selected="selected"' : '').'>'.
                 $arrValue['value'].' ('.$arrValue['price'].' '.
-                Currency::getDefaultCurrencySymbol().')</option>'."\n";
+                $defaultCurrency->getSymbol().')</option>'."\n";
         }
         $menu .=
             '</select><br /><a href="javascript:{}" '.
@@ -943,13 +948,13 @@ class Attributes
                 $options_long[] =
                     sprintf($_ARRAYLANG['TXT_SHOP_OPTION_LONG_FORMAT'],
                     $option_name, $option_price,
-                    Currency::getActiveCurrencyCode(),
-                    Currency::getActiveCurrencySymbol());
+                    \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
+                    \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol());
                 $options_cart[] =
                     sprintf($_ARRAYLANG['TXT_SHOP_OPTION_CART_FORMAT'],
                     $option_name, $option_price,
-                    Currency::getActiveCurrencyCode(),
-                    Currency::getActiveCurrencySymbol());
+                    \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
+                    \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol());
                 $options_price += $option_price;
 //DBG::log("Attributes::getAsStrings(): Price + $option_price = $options_price");
             }

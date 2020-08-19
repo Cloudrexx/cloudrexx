@@ -263,10 +263,8 @@ class PdfController extends \Cx\Core\Core\Model\Entity\Controller
         }
         $objInit->backendLangId = $pricelist->getLangId();
         $_ARRAYLANG = $objInit->loadLanguageData('Shop');
-        \Cx\Modules\Shop\Controller\Currency::setActiveCurrencyId(
-            $currencyId, $pricelist->getLangId()
-        );
-        $currency_symbol = Currency::getActiveCurrencySymbol();
+        \Cx\Modules\Shop\Controller\CurrencyController::setActiveCurrencyId($currencyId, $pricelist->getLangId());
+        $currency_symbol = \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol();
         $category_ids = $repo->getCategoryIdsByPricelist($pricelist);
         if ($pricelist->getAllCategories()) $category_ids = array();
         $count = 1000; // Be sensible!
@@ -296,10 +294,9 @@ class PdfController extends \Cx\Core\Core\Model\Entity\Controller
                 'product_id' => self::decode($objProduct->id()),
                 'price' =>
                     ($objProduct->discount_active()
-                        ? "S " . Currency::formatPrice(
-                            $objProduct->discountprice()
-                        ) : Currency::formatPrice($objProduct->price())) . ' '
-                    . $currency_symbol,
+                        ? "S " . \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice())
+                        : \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price())) .
+                    ' ' . $currency_symbol,
             );
         }
         $objPdf->ezTable(

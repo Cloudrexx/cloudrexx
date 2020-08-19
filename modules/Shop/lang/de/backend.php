@@ -80,6 +80,12 @@ $_ARRAYLANG['headerRight'] = '';
 $_ARRAYLANG['footerRight'] = '';
 $_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'Alle Rubriken';
 
+$_ARRAYLANG['code'] = 'Code';
+$_ARRAYLANG['symbol'] = 'Symbol';
+$_ARRAYLANG['rate'] = 'Kurs';
+$_ARRAYLANG['increment'] = 'Rundung';
+$_ARRAYLANG['default'] = 'Standard';
+
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "Das Gesamtgewicht der Bestellung übersteigt die verfügbaren Versandmöglichkeiten.";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Änderungen übernehmen";
 $_ARRAYLANG['TXT_ACCOUNT_BANK'] = "Kreditinstitut";

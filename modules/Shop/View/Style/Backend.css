@@ -21,6 +21,12 @@ label.category {
 span.child:before {
     content: '|----';
 }
+.default {
+    padding-left: 30px !important;
+ }
+table[data-entity='Currency'] td {
+    padding-left: 10px;
+}
 span.child label.category {
     display: inline-block;
 }

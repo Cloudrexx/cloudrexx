@@ -439,7 +439,7 @@ class Coupon
             if (!self::hasMessage('TXT_SHOP_COUPON_UNAVAILABLE_FOR_AMOUNT')) {
                 \Message::information(sprintf(
                     $_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_FOR_AMOUNT'],
-                    $objCoupon->minimum_amount, Currency::getActiveCurrencyCode()));
+                    $objCoupon->minimum_amount, \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode()));
             }
             return null;
         }
@@ -1016,6 +1016,11 @@ class Coupon
 
 //DBG::activate(DBG_ADODB|DBG_LOG_FIREPHP|DBG_PHP);
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         $result = true;
         if (isset($_GET['delete'])) {
             list($code, $customer_id) = explode('-', $_GET['delete']);
@@ -1040,7 +1045,7 @@ class Coupon
         $discount_rate = intval(
             empty($_POST['discount_rate'])
                 ? 0 : floatval($_POST['discount_rate']));
-        $discount_amount = Currency::formatPrice(
+        $discount_amount = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
             empty($_POST['discount_amount'])
                 ? 0 : floatval($_POST['discount_amount']));
         if ($coupon_type == 'rate') {
@@ -1049,7 +1054,7 @@ class Coupon
         if ($coupon_type == 'amount') {
             $discount_rate = 0;
         }
-        $minimum_amount = Currency::formatPrice(
+        $minimum_amount = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
             empty($_POST['minimum_amount'])
                 ? 0 : floatval($_POST['minimum_amount']));
         $uses = empty($_POST['unlimited'])
@@ -1084,11 +1089,11 @@ class Coupon
             'end_time' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_END_TIME'],
             'minimum_amount' => sprintf(
                 $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_MINIMUM_AMOUNT_FORMAT'],
-                Currency::getDefaultCurrencyCode()),
+                $defaultCurrency->getCode()),
             'discount_rate' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_RATE'],
             'discount_amount' => sprintf(
                 $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_FORMAT'],
-                Currency::getDefaultCurrencyCode()),
+                $defaultCurrency->getCode()),
             'uses' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_USES'],
             'global' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_SCOPE'],
             'customer_id' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CUSTOMER'],
@@ -1102,11 +1107,11 @@ class Coupon
             'TXT_SHOP_DISCOUNT_COUPON_MINIMUM_AMOUNT_CURRENCY' =>
                 sprintf(
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_MINIMUM_AMOUNT_FORMAT'],
-                    Currency::getDefaultCurrencyCode()),
+                    $defaultCurrency->getCode()),
             'TXT_SHOP_DISCOUNT_COUPON_AMOUNT_CURRENCY' =>
                 sprintf(
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_FORMAT'],
-                    Currency::getDefaultCurrencyCode()),
+                    $defaultCurrency->getCode()),
             'TXT_SHOP_DISCOUNT_COUPON_ADD_OR_EDIT' =>
                 $_ARRAYLANG[$edit
                     ? 'TXT_SHOP_DISCOUNT_COUPON_EDIT'
@@ -1394,8 +1399,8 @@ class Coupon
         if (!$discount_amount) $discount_amount = $this->discount_amount;
         return sprintf(
             $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_STRING_FORMAT'],
-            Currency::formatPrice($discount_amount),
-            Currency::getActiveCurrencyCode());
+            \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($discount_amount),
+            \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode());
     }
 
 
@@ -1417,10 +1422,10 @@ class Coupon
     function getDiscountAmount($amount, $customer_id=NULL)
     {
         if ($this->discount_rate)
-            return Currency::formatPrice($amount * $this->discount_rate / 100);
+            return \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($amount * $this->discount_rate / 100);
         $amount_available = max(0,
             $this->discount_amount - $this->getUsedAmount($customer_id));
-        return Currency::formatPrice(
+        return \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
             min($amount, $amount_available));
     }
 
@@ -1437,7 +1442,7 @@ class Coupon
 
         return sprintf(
             $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL_STRING_FORMAT'],
-            Currency::formatPrice($amount), Currency::getActiveCurrencyCode()
+            \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($amount), \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode()
         );
     }
 

@@ -71,6 +71,12 @@ $_ARRAYLANG['headerRight'] = '';
 $_ARRAYLANG['footerRight'] = '';
 $_ARRAYLANG['TXT_SHOP_ALL_CATEGORIES'] = 'All categories';
 
+$_ARRAYLANG['code'] = 'Code';
+$_ARRAYLANG['symbol'] = 'Symbol';
+$_ARRAYLANG['rate'] = 'Rate';
+$_ARRAYLANG['increment'] = 'Rounding';
+$_ARRAYLANG['default'] = 'Default';
+
 
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "The total weight of your order exceeds the available shipment conditions";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Accept changes";

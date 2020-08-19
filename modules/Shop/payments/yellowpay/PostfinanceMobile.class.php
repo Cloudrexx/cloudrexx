@@ -103,7 +103,7 @@ class PostfinanceMobile
             );
             return false;
         }
-        $currency = \Cx\Modules\Shop\Controller\Currency::getActiveCurrencyCode();
+        $currency = \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode();
         if (empty($currency)) {
             self::$arrError[] = $_ARRAYLANG['TXT_SHOP_POSTFINANCE_MOBILE_ERROR_FAILED_TO_DETERMINE_ACTIVE_CURRENCY'];
             return false;

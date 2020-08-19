@@ -231,8 +231,8 @@ class Shipment
                     $strJsArrays .=
                         "arrShipments[$shipper_id][".$i++."] = new Array('$shipment_id', '".
                         $arrShipment['max_weight']."', '".   // string
-                        Currency::getCurrencyPrice($arrShipment['free_from'])."', '".
-                        Currency::getCurrencyPrice($arrShipment['fee'])."');\n";
+                        \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($arrShipment['free_from'])."', '".
+                        \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($arrShipment['fee'])."');\n";
                 }
             }
         }

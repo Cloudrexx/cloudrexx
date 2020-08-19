@@ -82,7 +82,6 @@ class ShopSettings
         self::$changed = false;
 
         self::storeGeneral();
-        self::storeCurrencies();
         self::storePayments();
         self::storeShipping();
         self::storeCountries();
@@ -242,43 +241,6 @@ class ShopSettings
                 \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, null, 'config');
         }
     }
-
-
-    /**
-     * Stores the Currencies as present in the POST request
-     *
-     * See {@see Currency::delete()},
-     * {@see Currency::add()}, and
-     * {@see Currency::update()}.
-     */
-    static function storeCurrencies()
-    {
-//DBG::log("start of storeCurrencies: ".self::$success.", changed: ".self::$changed);
-        $result = Currency::delete();
-        if (isset($result)) {
-            self::$changed = true;
-            self::$success &= $result;
-        }
-//DBG::log("after delete: ".self::$success.", changed: ".self::$changed);
-        $result = Currency::add();
-        if (isset($result)) {
-            self::$changed = true;
-            self::$success &= $result;
-        }
-//DBG::log("after add: ".self::$success.", changed: ".self::$changed);
-        $result = Currency::update();
-        if (isset($result)) {
-            self::$changed = true;
-            self::$success &= $result;
-        }
-//DBG::log("after update: ".self::$success.", changed: ".self::$changed);
-        if (self::$changed) {
-            // Remember to reinit the Currencies, or the User
-            // won't see changes instantly
-            Currency::reset();
-        }
-    }
-
 
     /**
      * Stores the Payments as present in the POST request
