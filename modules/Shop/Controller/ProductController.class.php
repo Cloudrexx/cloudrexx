@@ -257,6 +257,9 @@ class ProductController extends \Cx\Core\Core\Model\Entity\Controller
                     'method' => 'getDetailStock'
                 ),
             ),
+            'pdfTemplate' => array(
+                'showOverview' => false,
+            ),
             'distribution' => array(
                 'type' => 'select',
                 'formfield' => array(

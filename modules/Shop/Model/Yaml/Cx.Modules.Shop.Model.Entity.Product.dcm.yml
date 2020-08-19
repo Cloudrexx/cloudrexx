@@ -216,6 +216,12 @@ Cx\Modules\Shop\Model\Entity\Product:
         name: vat_id
         referencedColumnName: id
         nullable: true
+    pdfTemplate:
+      targetEntity: Cx\Core_Modules\Pdf\Model\Entity\PdfTemplate
+      joinColumn:
+        name: pdf_template_id
+        referencedColumnName: id
+        nullable: true
   manyToMany:
     categories:
       targetEntity: Cx\Modules\Shop\Model\Entity\Category
