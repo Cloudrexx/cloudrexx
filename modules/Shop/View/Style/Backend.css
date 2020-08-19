@@ -7,3 +7,10 @@ td.manufacturer-name {
 td.manufacturer-uri {
     width: 75%;
 }
+
+td.category-id {
+    width: 2%;
+}
+td.category-name {
+    width: 88%;
+}

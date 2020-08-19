@@ -287,14 +287,16 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * This function returns the ViewGeneration options for a given entityClass
      *
      * @access protected
-     * @global $_ARRAYLANG
-     * @param $entityClassName contains the FQCN from entity
-     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used
-     *                           for better partition
+     * @global array  $_ARRAYLANG containing the language variables
+     * @param  string $entityClassName contains the FQCN from entity
+     * @param  string $dataSetIdentifier if $entityClassName is DataSet, this is
+     *                                   used for better partition
+     * @throws \Exception catch controller errors
      * @return array with options
      */
     protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '')
     {
+        global $_ARRAYLANG;
         $options = parent::getViewGeneratorOptions(
             $entityClassName,
             $dataSetIdentifier
@@ -305,8 +307,59 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 $options = $this->getSystemComponentController()->getController(
                     'Manufacturer'
                 )->getViewGeneratorOptions($options);
+                $options = $this->normalDelete(
+                    $_ARRAYLANG['TXT_CONFIRM_DELETE_MANUFACTURER'],
+                    $options
+                );
+                break;
+            case 'Cx\Modules\Shop\Model\Entity\Category':
+                $options = $this->getSystemComponentController()->getController(
+                    'Category'
+                )->getViewGeneratorOptions($options);
+                // Delete event
+                $options = $this->normalDelete(
+                    $_ARRAYLANG['TXT_CONFIRM_DELETE_CATEGORY'],
+                    $options
+                );
                 break;
         }
+        return $options;
+    }
+
+    /**
+     * Set JavaScript variables for multi action delete.
+     *
+     * @param $message string message to display before delete
+     * @param $options array  ViewGenerator options
+     * @return array updated array with ViewGenerator options
+     */
+    protected function normalDelete($message, $options)
+    {
+        global $_ARRAYLANG;
+
+        $options['multiActions']['delete'] = array(
+            'title' => $_ARRAYLANG['TXT_DELETE'],
+            'jsEvent' => 'delete:shopDelete'
+        );
+
+        // Delete Event
+        $scope = 'shopDelete';
+        \ContrexxJavascript::getInstance()->setVariable(
+            'CSRF_PARAM',
+            \Cx\Core\Csrf\Controller\Csrf::code(),
+            $scope
+        );
+        \ContrexxJavascript::getInstance()->setVariable(
+            'TXT_CONFIRM_DELETE',
+            $message,
+            $scope
+        );
+        \ContrexxJavascript::getInstance()->setVariable(
+            'TXT_ACTION_IS_IRREVERSIBLE',
+            $_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'],
+            $scope
+        );
+
         return $options;
     }
 }

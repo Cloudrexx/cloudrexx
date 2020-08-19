@@ -60,6 +60,14 @@ $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_MAIL'] = 'E-Mail Vorlagen';
 $_ARRAYLANG['TXT_MODULE_SHOP_ACT_SETTING_DISCOUNTCOUPON'] = 'Gutschein Codes';
 
 
+$_ARRAYLANG['id'] = 'ID';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['active'] = 'Aktiv';
+$_ARRAYLANG['parentCategory'] = 'Übergeordnete Rubrik';
+$_ARRAYLANG['picture'] = 'Kategoriebild';
+$_ARRAYLANG['shortDescription'] = 'Kurzbeschreibung';
+$_ARRAYLANG['description'] = 'Beschreibung';
+
 $_ARRAYLANG['SHOP_SHIPMENT_TOO_HEAVY'] = "Das Gesamtgewicht der Bestellung übersteigt die verfügbaren Versandmöglichkeiten.";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Änderungen übernehmen";
 $_ARRAYLANG['TXT_ACCOUNT_BANK'] = "Kreditinstitut";

@@ -71,29 +71,6 @@ class ManufacturerController extends \Cx\Core\Core\Model\Entity\Controller
             'uri'
         );
 
-        $options['multiActions']['delete'] = array(
-            'title' => $_ARRAYLANG['TXT_DELETE'],
-            'jsEvent' => 'delete:manufacturer'
-        );
-
-        // Delete Event
-        $scope = 'order';
-        \ContrexxJavascript::getInstance()->setVariable(
-            'CSRF_PARAM',
-            \Cx\Core\Csrf\Controller\Csrf::code(),
-            $scope
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'TXT_CONFIRM_DELETE_MANUFACTURER',
-            $_ARRAYLANG['TXT_CONFIRM_DELETE_MANUFACTURER'],
-            $scope
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'TXT_ACTION_IS_IRREVERSIBLE',
-            $_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'],
-            $scope
-        );
-
         $options['fields'] = array(
             'id' => array(
                 'table' => array(

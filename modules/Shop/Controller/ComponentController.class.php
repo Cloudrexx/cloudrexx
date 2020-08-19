@@ -52,7 +52,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllerClasses()
     {
-        return array('Backend', 'Manufacturer');
+        return array('Backend', 'Manufacturer', 'Category');
     }
 
     /**
