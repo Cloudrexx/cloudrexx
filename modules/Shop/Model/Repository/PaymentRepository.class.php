@@ -61,6 +61,7 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
     {
         if (isset($_SESSION['shop']['paymentId'])) {
             $payment_id = $_SESSION['shop']['paymentId'];
+            $processor_id = null;
             if (!empty($payment_id)) {
                 $payment = $this->find($payment_id);
                 $processor_id = $payment->getPaymentProcessor()->getId();
