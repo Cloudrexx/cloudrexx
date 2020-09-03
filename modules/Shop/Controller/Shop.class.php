@@ -148,7 +148,7 @@ class Shop extends ShopLibrary
      * @var array List of field names
      */
     protected static $errorFields = array();
-    
+
     /**
      * List of mandatory fields of account page
      *
@@ -2926,7 +2926,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (!empty($_POST['shop_birthday_day'])) {
                 $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
             }
-            if (!empty($_POST['shop_birthday_month'])) { 
+            if (!empty($_POST['shop_birthday_month'])) {
                 $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
             }
             if (!empty($_POST['shop_birthday_year'])) {
@@ -4351,7 +4351,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             $couponRepo = $em->getRepository(
                 'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
             );
-            $customerId = self::$objCustomer ? self::$objCustomer->getId() : null; 
+            $customerId = self::$objCustomer ? self::$objCustomer->getId() : null;
             $objCoupon = $couponRepo->available(
                 $_SESSION['shop']['coupon_code'],
                 Cart::get_price(),

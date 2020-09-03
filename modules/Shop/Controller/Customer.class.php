@@ -301,24 +301,24 @@ class Customer extends \User
             $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
         }
         $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                if (empty($group_customer)) {
-                    self::errorHandler();
-                    $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                }
+        if (empty($group_customer)) {
+            self::errorHandler();
+            $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
+        }
 
         // return the value
         if (!isset($isReseller)) {
             return (in_array($group_reseller, $this->getAssociatedGroupIds()));
-            }
+        }
 
         // clean up associated groups by removing all shop groups from array
         $groups = $this->getAssociatedGroupIds();
         foreach ($groups as $i => $groupId) {
             if (!in_array($groupId, array($group_reseller, $group_customer))) {
                 continue;
-        }
+            }
             unset($groups[$i]);
-    }
+        }
 
         // add selected shop group
         if ($isReseller) {
