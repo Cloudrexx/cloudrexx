@@ -695,14 +695,11 @@ class Cart
                 }
             }
 
-            // Calculate the VAT amount if it's excluded.
-            // We might add it later:
-            // - If it's included, we don't care.
-            // - If it's disabled, it's set to zero.
-            $vat_amount = Vat::amount($product['vat_rate'],
-                $product['price']
-              - $product['discount_amount']
-            );
+            // Calculate the VAT amount on the full product price.
+            // - If included, remember it
+            // - If excluded, also add it to the Product price below
+            // - If disabled, it's set to zero (DC)
+            $vat_amount = Vat::amount($product['vat_rate'], $product['price']);
             if (Vat::isEnabled() && !Vat::isIncluded()) {
                 self::$products[$cart_id]['price'] += $vat_amount;
                 self::$products[$cart_id]['price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(self::$products[$cart_id]['price']);
@@ -740,36 +737,11 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
+                // The VAT amount is not affected by this.
+                // The VAT is paid for by the Coupon.
                 $total_discount_amount = $objCoupon->getDiscountAmountOrRate(
                     $total_price, $customer_id
                 );
-                // in case VAT is being used, we have to subtract the VAT of
-                // the discount from the total VAT amount of the products
-                $couponVatDiscount = 0;
-                if (Vat::isEnabled()) {
-                    if ($objCoupon->getDiscountAmount() > 0) {
-                        $vatRate = current($usedVatRates);
-                        // in case coupon is a discount of value, then we
-                        // have to subtract the VAT amount of that value
-                        if (Vat::isIncluded()) {
-                            $couponVatDiscount =
-                                $total_discount_amount
-                                / (1 + $vatRate / 100) * $vatRate / 100;
-                        } else {
-                            $couponVatDiscount =
-                                $total_discount_amount
-                                * $vatRate / 100;
-                        }
-                    } else {
-                        // in case coupon is a discount in percent, then we
-                        // have to subtract the same percentage from the total
-                        // VAT amount
-                        $couponVatDiscount =
-                            $total_vat_amount
-                            * $objCoupon->getDiscountRate() / 100;
-                    }
-                }
-                $total_vat_amount -= $couponVatDiscount;
             }
         }
 
@@ -1421,6 +1393,6 @@ die("Cart::view(): ERROR: No template");
             array(
                 'code' => $_SESSION['shop']['cart']['coupon_code']
             )
-        ); 
+        );
     }
 }
