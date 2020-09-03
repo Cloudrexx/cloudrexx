@@ -70,8 +70,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         global $_CORELANG, $subMenuTitle, $intAccessIdOffset, $objTemplate;
 
         $splitAct = explode('/', $_GET['act']);
-        $act = $splitAct[0];
-        $tpl = $splitAct[1];
+        $act = $splitAct[0] ?? '';
+        $tpl = $splitAct[1] ?? '';
 
         switch($act)  {
             case 'Category':
