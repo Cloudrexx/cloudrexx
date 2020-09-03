@@ -190,6 +190,7 @@ class Vat
             );
             $objResult->MoveNext();
         }
+        \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
         self::$arrVatEnabled = array(
             // Foreign countries
             0 => array(

@@ -288,34 +288,40 @@ class Customer extends \User
      */
     function is_reseller($is_reseller=null)
     {
+        return $this->isReseller($is_reseller);
+    }
+
+    public function isReseller($isReseller = null) {
         // get defined groups in shop
-        $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+        $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller');
+
         if (empty($group_reseller)) {
             self::errorHandler();
             $group_reseller = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_reseller','Shop');
         }
         $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                if (empty($group_customer)) {
-                    self::errorHandler();
-                    $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
-                }
+        if (empty($group_customer)) {
+            self::errorHandler();
+            $group_customer = \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop');
+        }
 
         // return the value
-        if (!isset($is_reseller)) {
+        if (!isset($isReseller)) {
             return (in_array($group_reseller, $this->getAssociatedGroupIds()));
-            }
+        }
 
         // clean up associated groups by removing all shop groups from array
         $groups = $this->getAssociatedGroupIds();
         foreach ($groups as $i => $groupId) {
             if (!in_array($groupId, array($group_reseller, $group_customer))) {
                 continue;
-        }
+            }
             unset($groups[$i]);
-    }
+        }
 
         // add selected shop group
-        if ($is_reseller) {
+        if ($isReseller) {
             $groups[] = $group_reseller;
         } else {
             $groups[] = $group_customer;
@@ -328,15 +334,31 @@ class Customer extends \User
      * @param   integer   $group_id       The optional group ID
      * @return  integer                   The group ID
      * @author  Reto Kohli <reto.kohli@comvation.com>
+     * @todo    Replace with get/setGroupId()
      */
     function group_id($group_id=null)
     {
-        $index = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
-        if (!$index) return false;
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+        $index = \Cx\Core\Setting\Controller\Setting::getValue(
+            'user_profile_attribute_customer_group_id'
+        );
+        if (!$index) {
+            return 0;
+        }
         if (isset($group_id)) {
             $this->setProfile(array($index => array(0 => $group_id)));
         }
         return $this->getProfileAttribute($index);
+    }
+
+    /**
+     * Get the Customer group ID
+     *
+     * @throws \Cx\Core\Setting\Controller\SettingException
+     */
+    public function getGroupId()
+    {
+        return $this->group_id();
     }
 
     /**
@@ -392,11 +414,18 @@ class Customer extends \User
      */
     function delete($deleteOwnAccount=false)
     {
-        global $_ARRAYLANG;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+        $orderRepo = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
 
-        if (!Orders::deleteByCustomerId($this->id)) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_CUSTOMER_DELETING_ORDERS']);
+        $orders = $orderRepo->findBy(array('customerId', $this->id));
+        foreach ($orders as $order) {
+            $em->remove($order);
         }
+        $em->flush();
+
         return parent::delete($deleteOwnAccount);
     }
 
@@ -436,7 +465,7 @@ class Customer extends \User
     public function getUsers(
         $filter=null, $search=null, $arrSort=null, $arrAttributes=null,
         $limit=null, $offset=0
-    ) {
+    ) {/*
         if (!empty($filter) && is_array($filter)) {
             if (isset($filter['group']) && is_array($filter['group'])) {
                 $arrUserId = array();
@@ -454,7 +483,7 @@ class Customer extends \User
                     ? array_unique($arrUserId) : array(0));
                 unset($filter['group']);
             }
-        }
+        }*/
 //DBG::log("Customer::getUsers(): Filter: ".var_export($filter, true));
         if ($this->loadUsers($filter, $search, $arrSort, $arrAttributes, $limit, $offset)) {
             return $this;
@@ -689,7 +718,7 @@ class Customer extends \User
 //DBG::log("Customer::errorHandler(): Adding settings");
         ShopSettings::errorHandler();
 //        \Cx\Core\Country\Controller\Country::errorHandler(); // Called by Order::errorHandler();
-        Order::errorHandler();
+        \Cx\Modules\Shop\Controller\OrderController::errorHandler();
         Discount::errorHandler();
 
         \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
@@ -873,7 +902,14 @@ class Customer extends \User
                 $objCustomer = self::getById($objUser->getId());
             }
             if (!$objCustomer) {
-                $lang_id = Order::getLanguageIdByCustomerId($old_customer_id);
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $order = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                )->findOneBy(
+                    array('customerId' => $old_customer_id),
+                    array('id' => 'DESC')
+                );
+                $lang_id = $order->getLangId();
                 if (!$lang_id) $lang_id = $default_lang_id;
                 $objCustomer = new Customer();
                 if (preg_match('/^(?:frau|mad|mme|signora|miss)/i',

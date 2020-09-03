@@ -55,6 +55,15 @@ class Products
     const DEFAULT_VIEW_DISCOUNTS = 2;
     const DEFAULT_VIEW_LASTFIVE = 3;
     const DEFAULT_VIEW_COUNT = 4;
+    /**
+     * Text keys
+     */
+    const TEXT_NAME  = 'product_name';
+    const TEXT_SHORT = 'product_short';
+    const TEXT_LONG  = 'product_long';
+    const TEXT_CODE  = 'product_code';
+    const TEXT_URI   = 'product_uri';
+    const TEXT_KEYS  = 'product_keys';
 
     /**
      * Sorting order strings according to the corresponding setting
@@ -240,8 +249,8 @@ class Products
         $arrSql = \Text::getSqlSnippets(
             '`product`.`id`', FRONTEND_LANG_ID, 'Shop',
             array(
-                'name' => Product::TEXT_NAME,
-                'code' => Product::TEXT_CODE,
+                'name' => Products::TEXT_NAME,
+                'code' => Products::TEXT_CODE,
             )
         );
         $querySelect = "
@@ -249,8 +258,10 @@ class Products
         $queryCount = "SELECT COUNT(*) AS `numof_products`";
         $queryJoin = '
             FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_products` AS `product`
-            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_categories` AS `category`
-              ON `category`.`id`=`product`.`category_id`'.
+            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_rel_category_product` AS `category_product`
+              ON `category_product`.`product_id`=`product`.`id` 
+            LEFT JOIN `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_categories` AS `category` 
+              ON `category_product`.`category_id`=`category`.`id` '.
             $arrSql['join'];
         $queryWhere = ' WHERE 1'.
             // Limit Products to available and active in the frontend
@@ -261,11 +272,11 @@ class Products
                     '.($category_id ? '' : 'AND `category`.`active`=1' )/*only check if active when not in category view*/.'
                     AND (
                         `product`.`date_start` <= CURRENT_DATE()
-                     OR `product`.`date_start` = 0
+                     OR `product`.`date_start` IS NULL
                     )
                     AND (
-                        `product`.`date_end` >= CURRENT_DATE()
-                     OR `product`.`date_end` = 0
+                        `product`.`date_end` >= CURRENT_DATE() 
+                     OR `product`.`date_end` IS NULL
                     )'
             ).
             // Limit Products visible to resellers or non-resellers
@@ -321,7 +332,7 @@ class Products
 
         $querySpecialOffer = '';
         if (   $flagLastFive
-            || $flagSpecialoffer === self::DEFAULT_VIEW_LASTFIVE) {
+            || $flagSpecialoffer === \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_LASTFIVE) {
             // Select last five (or so) products added to the database
 // TODO: Extend for searching for most recently modified Products
             $limit = ($flagLastFive === true ? 5 : $flagLastFive);
@@ -330,10 +341,10 @@ class Products
         } else {
             // Build standard full featured query
             $querySpecialOffer =
-                (   $flagSpecialoffer === self::DEFAULT_VIEW_DISCOUNTS
+                (   $flagSpecialoffer === \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS
                  || $flagSpecialoffer === true // Old behavior!
                   ? ' AND `product`.`discount_active`=1'
-                  : ($flagSpecialoffer === self::DEFAULT_VIEW_MARKED
+                  : ($flagSpecialoffer === \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_MARKED
                       ? " AND `product`.`flags` LIKE '%__SHOWONSTARTPAGE__%'" : '')
                 );
             // Limit by Product ID (unused by getByShopParameters()!)
@@ -354,12 +365,8 @@ class Products
             // Limit Products by ShopCategory ID or IDs, if any
             // (Pricelists use comma separated values, for example)
             if ($category_id) {
-                $queryCategories = '';
-                foreach (preg_split('/\s*,\s*/', $category_id) as $id) {
-                    $queryCategories .=
-                        ($queryCategories ? ' OR ' : '')."
-                        FIND_IN_SET($id, `product`.`category_id`)";
-                }
+                $queryCategories = '`category_product`.`category_id` IN ('
+                    .(is_array($category_id) ? implode(',',$category_id) : $category_id).')';
                 $queryWhere .= ' AND ('.$queryCategories.')';
             }
             // Limit Products by search pattern, if any
@@ -367,10 +374,10 @@ class Products
                 $arrSqlPattern = \Text::getSqlSnippets(
                     '`product`.`id`', FRONTEND_LANG_ID, 'Shop',
                     array(
-                        'short' => Product::TEXT_SHORT,
-                        'long' => Product::TEXT_LONG,
-                        'keys' => Product::TEXT_KEYS,
-                        'uri' => Product::TEXT_URI,
+                        'short' => Products::TEXT_SHORT,
+                        'long' => Products::TEXT_LONG,
+                        'keys' => Products::TEXT_KEYS,
+                        'uri' => Products::TEXT_URI,
                     )
                 );
 
@@ -452,7 +459,6 @@ class Products
         $queryTail = $queryJoin.$queryWhere.$querySpecialOffer;
         return array($querySelect, $queryCount, $queryTail, $queryOrder);
     }
-
 
     /**
      * Delete Products from the ShopCategory given by its ID.
@@ -643,15 +649,15 @@ class Products
 
         $category_id = intval($category_id);
         $query = "
-            SELECT `id`
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_products`
-             WHERE FIND_IN_SET($category_id, `category_id`)
-          ORDER BY `ord` ASC";
+            SELECT `product_id`
+              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_category_product`
+             WHERE  `category_id` = $category_id
+        ";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) return false;
         $arrProductId = array();
         while (!$objResult->EOF) {
-            $arrProductId[] = $objResult->fields['id'];
+            $arrProductId[] = $objResult->fields['product_id'];
             $objResult->MoveNext();
         }
         return $arrProductId;
@@ -675,8 +681,10 @@ class Products
         $category_id = intval($category_id);
         $query = "
             SELECT `picture`
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_products`
-             WHERE FIND_IN_SET($category_id, `category_id`)
+              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_products` AS `p`
+              LEFT JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_rel_category_product` 
+              AS `cp` ON `cp`.`product_id` = `p`.`id`
+             WHERE FIND_IN_SET($category_id, `cp`.`category_id`)
                AND `picture`!=''
              ORDER BY `ord` ASC";
         $objResult = $objDatabase->SelectLimit($query, 1);
@@ -706,8 +714,10 @@ class Products
         global $objDatabase;
 
         $query = "
-            SELECT DISTINCT category_id
-              FROM ".DBPREFIX."module_shop".MODULE_INDEX."_products
+            SELECT DISTINCT `cp`.`category_id`
+              FROM ".DBPREFIX."module_shop".MODULE_INDEX."_products AS `p`
+              LEFT JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_rel_category_product` 
+              AS `cp` ON `cp`.`product_id` = `p`.`id`
              WHERE flags LIKE '%$strName%'
           ORDER BY category_id ASC";
         $objResult = $objDatabase->Execute($query);
@@ -1144,12 +1154,12 @@ class Products
                     $strJsArrPrice .=
                         ($strJsArrPrice ? ',' : '').
                         // Count followed by price
-                        $count.','.Currency::getCurrencyPrice($discountPrice);
+                        $count.','.\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($discountPrice);
                 }
             }
             $strJsArrPrice .=
                 ($strJsArrPrice ? ',' : '').
-                '0,'.Currency::getCurrencyPrice($price);
+                '0,'.\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($price);
             $strJsArrProduct .=
                 'arrProducts['.$id.'] = {'.
                 'id:'.$id.','.

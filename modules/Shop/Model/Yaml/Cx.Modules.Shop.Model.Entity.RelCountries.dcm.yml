@@ -1,0 +1,27 @@
+Cx\Modules\Shop\Model\Entity\RelCountries:
+  type: entity
+  table: module_shop_rel_countries
+  repositoryClass: Cx\Modules\Shop\Model\Repository\RelCountriesRepository
+  indexes:
+    fk_contrexx_module_shop_rel_countries_contrexx_module_shop__idx:
+      columns: [ zone_id ]
+  id:
+    zoneId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: zone_id
+    countryId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: country_id
+  manyToOne:
+    zones:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Zones
+      inversedBy: relCountries
+      joinColumn:
+        name: zone_id
+        referencedColumnName: id

@@ -1,0 +1,252 @@
+Cx\Modules\Shop\Model\Entity\Orders:
+  type: entity
+  table: module_shop_orders
+  repositoryClass: Cx\Modules\Shop\Model\Repository\OrdersRepository
+  indexes:
+    status:
+      columns: [ status ]
+    fk_module_shop_orders_module_shop_payment1_idx:
+      columns: [ payment_id ]
+    fk_module_shop_orders_module_shop_currencies1_idx:
+      columns: [ currency_id ]
+    fk_module_shop_orders_module_shop_shipper1_idx:
+      columns: [ shipment_id ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    customerId:
+      type: integer
+      options:
+        default: '0'
+      column: customer_id
+    currencyId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: currency_id
+    sum:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+    dateTime:
+      type: datetime
+      column: date_time
+      options:
+        default: '0000-00-00 00:00:00'
+    status:
+      type: integer
+      length: 1
+      options:
+        unsigned: true
+        default: 0
+    gender:
+      type: string
+      length: 50
+      nullable: true
+    company:
+      type: string
+      length: 100
+      nullable: true
+    firstname:
+      type: string
+      length: 40
+      nullable: true
+    lastname:
+      type: string
+      length: 100
+      nullable: true
+    address:
+      type: string
+      length: 40
+      nullable: true
+    city:
+      type: string
+      length: 50
+      nullable: true
+    zip:
+      type: string
+      length: 10
+      nullable: true
+    countryId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: country_id
+    phone:
+      type: string
+      length: 20
+      nullable: true
+    vatAmount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: vat_amount
+    shipmentAmount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: shipment_amount
+    shipmentId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: shipment_id
+    paymentId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: payment_id
+    paymentAmount:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: payment_amount
+    ip:
+      type: string
+      length: 50
+      options:
+        default: ''
+    langId:
+      type: integer
+      options:
+        default: '0'
+      column: lang_id
+    note:
+      type: text
+    modifiedOn:
+      type: datetime
+      nullable: true
+      column: modified_on
+    modifiedBy:
+      type: string
+      length: 50
+      nullable: true
+      column: modified_by
+    billingGender:
+      type: string
+      length: 50
+      nullable: true
+      column: billing_gender
+    billingCompany:
+      type: string
+      length: 100
+      nullable: true
+      column: billing_company
+    billingFirstname:
+      type: string
+      length: 40
+      nullable: true
+      column: billing_firstname
+    billingLastname:
+      type: string
+      length: 100
+      nullable: true
+      column: billing_lastname
+    billingAddress:
+      type: string
+      length: 40
+      nullable: true
+      column: billing_address
+    billingCity:
+      type: string
+      length: 50
+      nullable: true
+      column: billing_city
+    billingZip:
+      type: string
+      length: 10
+      nullable: true
+      column: billing_zip
+    billingCountryId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: billing_country_id
+    billingPhone:
+      type: string
+      length: 20
+      nullable: true
+      column: billing_phone
+    billingFax:
+      type: string
+      length: 20
+      nullable: true
+      column: billing_fax
+    billingEmail:
+      type: string
+      length: 255
+      nullable: true
+      column: billing_email
+  oneToMany:
+    lsvs:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Lsv
+      mappedBy: orders
+      joinColumn:
+        name: id
+        referencedColumnName: order_id
+    orderItems:
+      targetEntity: Cx\Modules\Shop\Model\Entity\OrderItems
+      mappedBy: orders
+      joinColumn:
+        name: id
+        referencedColumnName: order_id
+    relCustomerCoupons:
+      targetEntity: Cx\Modules\Shop\Model\Entity\RelCustomerCoupon
+      mappedBy: orders
+      joinColumn:
+        name: id
+        referencedColumnName: order_id
+  manyToOne:
+    lang:
+      targetEntity: Cx\Core\Locale\Model\Entity\Locale
+      mappedBy: orders
+      joinColumn:
+        name: lang_id
+        referencedColumnName: id
+    currencies:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Currencies
+      inversedBy: orders
+      joinColumn:
+        name: currency_id
+        referencedColumnName: id
+        nullable: true
+    shipper:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Shipper
+      inversedBy: orders
+      joinColumn:
+        name: shipment_id
+        referencedColumnName: id
+        nullable: true
+    payment:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Payment
+      inversedBy: orders
+      joinColumn:
+        name: payment_id
+        referencedColumnName: id
+    customer:
+      targetEntity: Cx\Core\User\Model\Entity\User
+      joinColumn:
+        name: customer_id
+        referencedColumnName: id

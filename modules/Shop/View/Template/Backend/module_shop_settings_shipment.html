@@ -32,23 +32,23 @@ function delete_shipment(cid)
         <th colspan="7" class="f_bold">{TXT_SHIPPING_METHODS}</th>
       </tr>
 <!-- BEGIN shopShipper -->
-      <tr class="row1">
-        <td width="20%" class="f_bold">
+      <tr class="row3">
+        <td width="20%">
           {TXT_SHIPPING_METHOD}</td>
-        <td width="10%" class="f_bold">
+        <td width="10%">
           {TXT_ZONE}</td>
-        <td width="10%" class="a_center f_bold">
+        <td width="10%" class="a_center">
           {TXT_ACTIVE}
         </td>
-        <td width="20%" class="f_bold">
+        <td width="20%">
           {TXT_SHIPPING_MAX_WEIGHT}
           <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MAX_WEIGHT_TIP}</span>
         </td>
-        <td width="20%" class="f_bold">
+        <td width="20%">
           {TXT_FREE_OF_CHARGE}
           <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FREE_OF_CHARGE_TIP}</span>
         </td>
-        <td width="20%" class="f_bold">
+        <td width="20%">
           {TXT_SHIPPING_FEE}</td>
         <td width="5%">&nbsp;</td>
       </tr>
@@ -102,6 +102,9 @@ function delete_shipment(cid)
         <td><input type="text" name="free_from_new[{SHOP_SHIPPER_ID}]" value="0.00" size="15" maxlength="50" />&nbsp;{SHOP_CURRENCY}</td>
         <td><input type="text" name="fee_new[{SHOP_SHIPPER_ID}]" value="0.00" size="15" maxlength="50" />&nbsp;{SHOP_CURRENCY}</td>
         <td>&nbsp;</td>
+      </tr>
+      <tr style="height:44px;">
+        <td colspan="7">&nbsp;</td>
       </tr>
 <!-- END shopShipper -->
     </table>
