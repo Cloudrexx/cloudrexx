@@ -1,0 +1,84 @@
+Cx\Modules\Shop\Model\Entity\OrderItem:
+  type: entity
+  table: module_shop_order_items
+  repositoryClass: Cx\Modules\Shop\Model\Repository\OrderItemRepository
+  indexes:
+    order:
+      columns: [ order_id ]
+    fk_contrexx_module_shop_order_items_contrexx_module_shop_pr_idx:
+      columns: [ product_id ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    orderId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: order_id
+    productId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: product_id
+    productName:
+      type: string
+      length: 255
+      options:
+        default: ''
+      column: product_name
+    price:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+    quantity:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+    vatRate:
+      type: decimal
+      precision: 5
+      scale: 2
+      nullable: true
+      options:
+        unsigned: true
+      column: vat_rate
+    weight:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+  oneToOne:
+    discountCoupon:
+      targetEntity: Cx\Modules\Shop\Model\Entity\DiscountCoupon
+      mappedBy: orderItem
+  oneToMany:
+    orderAttributes:
+      targetEntity: Cx\Modules\Shop\Model\Entity\OrderAttribute
+      mappedBy: orderItem
+      joinColumn:
+        name: id
+        referencedColumnName: item_id
+  manyToOne:
+    order:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Order
+      inversedBy: orderItems
+      joinColumn:
+        name: order_id
+        referencedColumnName: id
+    product:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Product
+      inversedBy: orderItems
+      joinColumn:
+        name: product_id
+        referencedColumnName: id

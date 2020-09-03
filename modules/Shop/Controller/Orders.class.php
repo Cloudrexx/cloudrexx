@@ -215,9 +215,19 @@ class Orders
         // searching or sorting by Customer name.
         $query_join = "
             LEFT JOIN `".DBPREFIX."access_users` AS `user`
-              ON `order`.`customer_id`=`user`.`id`
+              ON `order`.`customer_id`=`user`.`id`";
+
+        // this is a nasty hack
+        if (
+            isset($filter['letter']) ||
+            isset($filter['term']) ||
+            preg_match('/customer_name/', $order)
+        ) {
+            $query_join = "
             LEFT JOIN `".DBPREFIX."access_user_profile` AS `profile`
               ON `user`.`id`=`profile`.`user_id`";
+        }
+
         // The order *SHOULD* contain the direction.  Defaults to DESC here!
         $direction = (preg_match('/\sASC$/i', $order) ? 'ASC' : 'DESC');
         if (preg_match('/customer_name/', $order)) {
@@ -392,6 +402,12 @@ class Orders
         }
 //DBG::log("Orders::view_list(): Order complete: $txt_order_complete");
 //DBG::log("Orders::view_list(): URI: $uri");
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         $objTemplate->setGlobalVariable(array(
             'SHOP_SEARCH_TERM' => (isset($filter['term'])
                 ? $filter['term'] : ''),
@@ -400,7 +416,7 @@ class Orders
             'SHOP_ACTION_URI_SEARCH_ENCODED' => $uri_search,
             'SHOP_ACTION_URI_ENCODED' => $uri,
             'SHOP_ACTION_URI' => html_entity_decode($uri),
-            'SHOP_CURRENCY', Currency::getDefaultCurrencySymbol()
+            'SHOP_CURRENCY', $defaultCurrency->getSymbol()
         ));
         $count = 0;
         $limit = \Cx\Core\Setting\Controller\Setting::getValue('numof_orders_per_page_backend','Shop');
@@ -482,7 +498,7 @@ if (!$limit) {
                 'SHOP_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
                     strtotime($objOrder->date_time())),
                 'SHOP_NAME' => $customer_name,
-                'SHOP_ORDER_SUM' => Currency::getDefaultCurrencyPrice(
+                'SHOP_ORDER_SUM' => \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice(
                     $objOrder->sum()),
                 'SHOP_ORDER_STATUS' => ($backend
                     ? self::getStatusMenu(
@@ -617,7 +633,9 @@ if (!$limit) {
                        A.quantity AS shopColumn2,
                        A.price AS sum,
                        B.stock AS shopColumn3,
-                       C.currency_id, ".
+                       C.currency_id,
+                       DATE_FORMAT(C.date_time, '%m') AS month,
+                       DATE_FORMAT(C.date_time, '%Y') AS year, ".
                 $arrSql['field']."
                   FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items AS A
                   JOIN ".DBPREFIX."module_shop".MODULE_INDEX."_orders AS C
@@ -644,7 +662,9 @@ if (!$limit) {
                 SELECT A.sum AS sum,
                        A.currency_id AS currency_id,
                        sum(B.quantity) AS shopColumn3,
-                       A.customer_id AS id
+                       A.customer_id AS id,
+                       DATE_FORMAT(A.date_time, '%m') AS month,
+                       DATE_FORMAT(A.date_time, '%Y') AS year
                   FROM ".DBPREFIX."module_shop".MODULE_INDEX."_orders AS A
                   JOIN ".DBPREFIX."module_shop".MODULE_INDEX."_order_items AS B
                     ON A.id=B.order_id
@@ -653,7 +673,7 @@ if (!$limit) {
                    AND (   A.status=".Order::STATUS_CONFIRMED."
                         OR A.status=".Order::STATUS_COMPLETED.")
                  GROUP BY B.order_id
-                 ORDER BY sum DESC";
+                 ORDER BY sum DESC, shopColumn3 DESC, A.id";
         } else {
             // Order statistic (default); sales per month
             $objTemplate->setVariable(array(
@@ -688,11 +708,16 @@ if (!$limit) {
         }
         $sumColumn3 = $sumColumn4 = 0;
         $sumColumn2 = '';
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
         if ($selectedStat == 2) {
             // Product statistc
             while (!$objResult->EOF) {
                 // set currency id
-                Currency::setActiveCurrencyId($objResult->fields['currency_id']);
+                \Cx\Modules\Shop\Controller\CurrencyController::setActiveCurrencyId($objResult->fields['currency_id']);
                 $key = $objResult->fields['id'];
                 if (!isset($arrayResults[$key])) {
                     $arrayResults[$key] = array(
@@ -711,7 +736,7 @@ if (!$limit) {
                   + $objResult->fields['shopColumn2'];
                 $arrayResults[$key]['column4'] +=
                   + $objResult->fields['shopColumn2']
-                  * Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+                  * \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
                 $objResult->MoveNext();
             }
             if (is_array($arrayResults)) {
@@ -725,7 +750,7 @@ if (!$limit) {
         } elseif ($selectedStat == 3) {
             // Customer statistic
             while (!$objResult->EOF) {
-                Currency::setActiveCurrencyId($objResult->fields['currency_id']);
+                \Cx\Modules\Shop\Controller\CurrencyController::setActiveCurrencyId($objResult->fields['currency_id']);
                 $key = $objResult->fields['id'];
                 if (!isset($arrayResults[$key])) {
                     $objUser = \FWUser::getFWUserObject()->objUser;
@@ -749,9 +774,9 @@ if (!$limit) {
                     );
                 }
                 $arrayResults[$key]['column3'] += $objResult->fields['shopColumn3'];
-                $arrayResults[$key]['column4'] += Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+                $arrayResults[$key]['column4'] += \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
                 $sumColumn3 += $objResult->fields['shopColumn3'];
-                $sumColumn4 += Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+                $sumColumn4 += \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
                 $objResult->MoveNext();
             }
         } else {
@@ -770,10 +795,10 @@ if (!$limit) {
                 $arrayResults[$key]['column1'] = $arrayMonths[intval($objResult->fields['month'])-1].' '.$objResult->fields['year'];
                 $arrayResults[$key]['column2'] = $arrayResults[$key]['column2'] + 1;
                 $arrayResults[$key]['column3'] = $arrayResults[$key]['column3'] + $objResult->fields['shopColumn3'];
-                $arrayResults[$key]['column4'] = $arrayResults[$key]['column4'] + Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+                $arrayResults[$key]['column4'] = $arrayResults[$key]['column4'] + \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
                 $sumColumn2 = $sumColumn2 + 1;
                 $sumColumn3 = $sumColumn3 + $objResult->fields['shopColumn3'];
-                $sumColumn4 = $sumColumn4 + Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+                $sumColumn4 = $sumColumn4 + \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
                 $objResult->MoveNext();
             }
             krsort($arrayResults, SORT_NUMERIC);
@@ -788,8 +813,8 @@ if (!$limit) {
                     'SHOP_COLUMN_2' => $entry['column2'],
                     'SHOP_COLUMN_3' => $entry['column3'],
                     'SHOP_COLUMN_4' =>
-                        Currency::formatPrice($entry['column4']).' '.
-                        Currency::getDefaultCurrencySymbol(),
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($entry['column4']).' '.
+                        $defaultCurrency->getSymbol(),
                 ));
                 $objTemplate->parse('statisticRow');
             }
@@ -829,7 +854,7 @@ if (!$limit) {
         $arrShopMonthSum = array();
         $objResult = $objDatabase->Execute($query);
         while (!$objResult->EOF) {
-            $orderSum = Currency::getDefaultCurrencyPrice($objResult->fields['sum']);
+            $orderSum = \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($objResult->fields['sum']);
             if (!isset($arrShopMonthSum[$objResult->fields['year']][$objResult->fields['month']])) {
                 $arrShopMonthSum[$objResult->fields['year']][$objResult->fields['month']] = 0;
             }
@@ -850,19 +875,19 @@ if (!$limit) {
         $objTemplate->setVariable(array(
             'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
             'SHOP_TOTAL_SUM' =>
-                Currency::formatPrice($totalOrderSum).' '.
-                Currency::getDefaultCurrencySymbol(),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($totalOrderSum).' '.
+                $defaultCurrency->getSymbol(),
             'SHOP_MONTH' => $bestMonthDate,
             'SHOP_MONTH_SUM' =>
-                Currency::formatPrice($bestMonthSum).' '.
-                Currency::getDefaultCurrencySymbol(),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($bestMonthSum).' '.
+                $defaultCurrency->getSymbol(),
             'SHOP_TOTAL_ORDERS' => $totalOrders,
             'SHOP_SOLD_ARTICLES' => $totalSoldProducts,
             'SHOP_SUM_COLUMN_2' => $sumColumn2,
             'SHOP_SUM_COLUMN_3' => $sumColumn3,
             'SHOP_SUM_COLUMN_4' =>
-                Currency::formatPrice($sumColumn4).' '.
-                Currency::getDefaultCurrencySymbol(),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($sumColumn4).' '.
+                $defaultCurrency->getSymbol(),
         ));
         return true;
     }
@@ -1070,14 +1095,20 @@ if (!$limit) {
         // Determine and verify the payment handler
         $payment_id = $objResult->fields['payment_id'];
 //if (!$payment_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Payment ID for Order ID $order_id");
-        $processor_id = Payment::getPaymentProcessorId($payment_id);
-//if (!$processor_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor ID for Payment ID $payment_id");
-        $processorName = PaymentProcessing::getPaymentProcessorName($processor_id);
+
+        // use internal processor as default for the case when the order did
+        // use any payment method at all
+        $processorName = 'internal';
+        if ($payment_id) {
+            $processor_id = Payment::getPaymentProcessorId($payment_id);
+    //if (!$processor_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor ID for Payment ID $payment_id");
+            $processorName = PaymentProcessing::getPaymentProcessorName($processor_id);
+        }
 //if (!$processorName) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor Name for Processor ID $processor_id");
         // The payment processor *MUST* match the handler returned.
         if (!preg_match("/^$handler/i", $processorName)) {
 //DBG::log("update_status($order_id, $newOrderStatus): Mismatching Handlers: Order $processorName, Request ".$_GET['handler']);
-            \DBG::log('Invalid paymentprocessor. Registered: ' . $processorName . ' / Supplied: ' . $handle);
+            \DBG::log('Invalid paymentprocessor. Registered: ' . $processorName . ' / Supplied: ' . $handler);
             return Order::STATUS_CANCELLED;
         }
         // Only if the optional new order status argument is zero,
@@ -1249,6 +1280,11 @@ if (!$limit) {
             // Order not found
             return false;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $currency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->find($objOrder->currency_id());
+
         $lang_id = $objOrder->lang_id();
         $status = $objOrder->status();
         $customer_id = $objOrder->customer_id();
@@ -1277,7 +1313,7 @@ if (!$limit) {
                     strtotime($objOrder->modified_on())),
             'REMARKS' => $objOrder->note(),
             'ORDER_SUM' => sprintf('% 9.2f', $objOrder->sum()),
-            'CURRENCY' => Currency::getCodeById($objOrder->currency_id()),
+            'CURRENCY' => $currency->getCode(),
         );
         $arrSubstitution += $customer->getSubstitutionArray();
         if ($shipment_id) {
@@ -1322,9 +1358,13 @@ if (!$limit) {
         // in this method, but only if $create_accounts is true.
         $coupon_code = NULL;
         $coupon_amount = 0;
-        $objCoupon = Coupon::getByOrderId($order_id);
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+        $objCoupon = $couponRepo->find($order_id);
+
         if ($objCoupon) {
-            $coupon_code = $objCoupon->code();
+            $coupon_code = $objCoupon->getCode();
         }
         $orderItemCount = 0;
         $total_item_price = 0;
@@ -1390,12 +1430,12 @@ if (!$limit) {
                         if ($option_price != 0) {
                             $str_options .=
                                 ' './/' ('.
-                                Currency::formatPrice($option_price).
-                                ' '.Currency::getActiveCurrencyCode()
+                                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($option_price).
+                                ' '.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode()
 //                                .')'
                                 ;
-                            $option['PRODUCT_OPTIONS_PRICE'] = Currency::formatPrice($option_price);
-                            $option['PRODUCT_OPTIONS_CURRENCY'] = Currency::getActiveCurrencyCode();
+                            $option['PRODUCT_OPTIONS_PRICE'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($option_price);
+                            $option['PRODUCT_OPTIONS_CURRENCY'] = \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode();
                         }
                         $optionValues[] = $option;
                     }
@@ -1408,8 +1448,8 @@ if (!$limit) {
             }
 
             $productGroupName = '';
-            if (isset($arrProductGroups[$objProduct->article_id()])) {
-                $productGroupName = $arrProductGroups[$objProduct->article_id()]['name'];
+            if (isset($arrProductGroups[$objProduct->getArticleId()])) {
+                $productGroupName = $arrProductGroups[$objProduct->getArticleId()]['name'];
             }
 
             // Product details
@@ -1490,10 +1530,18 @@ if (!$limit) {
                         if (empty($arrProduct['COUPON_DATA']))
                             $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
-                        $code = Coupon::getNewCode();
-//DBG::log("Orders::getSubstitutionArray(): Got code: $code, calling Coupon::addCode($code, 0, 0, 0, $item_price)");
-                        Coupon::storeCode(
-                            $code, 0, 0, 0, $item_price, 0, 0, 1e10, true);
+                        $code = \Cx\Modules\Shop\Controller\DiscountCouponController::getNewCode();
+
+                        $newCoupon = new \Cx\Modules\Shop\Model\Entity\DiscountCoupon();
+                        $newCoupon->setCode($code);
+                        $newCoupon->setDiscountAmount($item_price);
+                        $newCoupon->setGlobal(true);
+                        $newCoupon->setUses(1e10);
+
+                        $em = $cx->getDb()->getEntityManager();
+                        $em->persist($newCoupon);
+                        $em->flush();
+
                         $arrProduct['COUPON_DATA'][] = array(
                             'COUPON_CODE' => $code
                         );
@@ -1501,12 +1549,12 @@ if (!$limit) {
                 }
                 // Redeem the *product* Coupon, if possible for the Product
                 if ($coupon_code) {
-                    $objCoupon = Coupon::available($coupon_code,
+                    $objCoupon = $couponRepo->available($coupon_code,
                         $item_price*$quantity, $customer_id, $product_id,
                         $payment_id);
                     if ($objCoupon) {
                         $coupon_code = NULL;
-                        $coupon_amount = $objCoupon->getDiscountAmount(
+                        $coupon_amount = $objCoupon->getDiscountAmountOrRate(
                             $item_price, $customer_id);
                         if ($create_accounts) {
                             $objCoupon->redeem($order_id, $customer_id,
@@ -1525,10 +1573,10 @@ if (!$limit) {
         $arrSubstitution['ORDER_ITEM_COUNT'] = sprintf('% 4u', $orderItemCount);
         // Redeem the *global* Coupon, if possible for the Order
         if ($coupon_code) {
-            $objCoupon = Coupon::available($coupon_code,
+            $objCoupon = $couponRepo->available($coupon_code,
                 $total_item_price, $customer_id, null, $payment_id);
             if ($objCoupon) {
-                $coupon_amount = $objCoupon->getDiscountAmount(
+                $coupon_amount = $objCoupon->getDiscountAmountOrRate(
                     $total_item_price, $customer_id);
                 if ($create_accounts) {
                     $objCoupon->redeem($order_id, $customer_id, $total_item_price);
@@ -1538,7 +1586,7 @@ if (!$limit) {
         \Message::restore();
         // Fill in the Coupon block with proper discount and amount
         if ($objCoupon) {
-            $coupon_code = $objCoupon->code();
+            $coupon_code = $objCoupon->getCode();
 //\DBG::log("Orders::getSubstitutionArray(): Coupon $coupon_code, amount $coupon_amount");
         }
         if ($coupon_amount) {

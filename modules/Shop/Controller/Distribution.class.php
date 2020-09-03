@@ -65,6 +65,16 @@ class Distribution
     );
 
     /**
+     * Get an array with all distribution types
+     *
+     * @return array all distribution types
+     */
+    static function getArrDistributionTypes()
+    {
+        return self::$arrDistributionTypes;
+    }
+
+    /**
      * The default distribution type
      *
      * Must be set to one of the values of {@link $arrDistributionTypes}.

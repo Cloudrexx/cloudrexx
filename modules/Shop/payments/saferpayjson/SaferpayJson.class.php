@@ -233,6 +233,7 @@ class SaferpayJson
         if (
             !isset($result['Transaction'])
         ) {
+            \DBG::dump($result);
             return false;
         }
         $result['Transaction'] = (array) $result['Transaction'];
@@ -241,6 +242,7 @@ class SaferpayJson
             empty($result['Transaction']['Id']) ||
             $result['Transaction']['Status'] != 'AUTHORIZED'
         ) {
+            \DBG::dump($result);
             return false;
         }
 
@@ -280,6 +282,7 @@ class SaferpayJson
             empty($result['Liability']['ThreeDs']['LiabilityShift']) ||
             !$result['Liability']['ThreeDs']['LiabilityShift']
         ) {
+            \DBG::dump($result);
             return false;
         }
 
@@ -301,6 +304,7 @@ class SaferpayJson
                 ),
             )
         );
+        \DBG::dump($result);
         return !empty($result['Status']) && $result['Status'] == 'CAPTURED';
     }
 

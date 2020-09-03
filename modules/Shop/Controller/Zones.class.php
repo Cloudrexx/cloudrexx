@@ -235,7 +235,7 @@ class Zones
              WHERE zone_id=$zone_id");
         if (!$objResult) return false;
         $objResult = $objDatabase->Execute("
-            UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper
+            UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_shipper
                SET zone_id=1
              WHERE zone_id=$zone_id");
         if (!$objResult) return false;
@@ -364,11 +364,10 @@ class Zones
         global $objDatabase;
 
         $objResult = $objDatabase->Execute("
-            REPLACE INTO ".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper (
-               `zone_id`, `shipper_id`
-             ) VALUES (
-               $zone_id, $shipper_id
-             )");
+            UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_shipper 
+            SET `zone_id` = $zone_id
+            WHERE `id` = $shipper_id
+        ");
         return (boolean)$objResult;
     }
 
@@ -423,13 +422,11 @@ class Zones
     {
         global $objDatabase;
 
-        $query = "
-            SELECT `relation`.`zone_id`
-              FROM `".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper` AS `relation`
-              JOIN `".DBPREFIX."module_shop".MODULE_INDEX."_zones` AS `zone`
-                ON `zone`.`id`=`relation`.`zone_id`
-             WHERE `zone`.`active`=1
-               AND `relation`.`shipper_id`=$shipper_id";
+        $query = '
+            SELECT `zone_id` 
+                FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_shipper` 
+                WHERE `id` ='.$shipper_id;
+
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) {
             return self::errorHandler();
@@ -495,19 +492,6 @@ class Zones
             }
         }
         \Cx\Lib\UpdateUtil::table($table_name, $table_structure, $table_index);
-
-        $table_name_old = DBPREFIX.'module_shop_rel_shipment';
-        $table_name_new = DBPREFIX.'module_shop_rel_shipper';
-        if (   !\Cx\Lib\UpdateUtil::table_exist($table_name_new)
-            && \Cx\Lib\UpdateUtil::table_exist($table_name_old)) {
-            \Cx\Lib\UpdateUtil::table_rename($table_name_old, $table_name_new);
-        }
-        $table_structure = array(
-            'shipper_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'primary' => true, 'renamefrom' => 'shipment_id'),
-            'zone_id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'renamefrom' => 'zones_id'),
-        );
-        $table_index = array();
-        \Cx\Lib\UpdateUtil::table($table_name_new, $table_structure, $table_index);
 
         $table_name = DBPREFIX.'module_shop_rel_countries';
         $table_structure = array(

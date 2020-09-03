@@ -302,8 +302,12 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
      */
     static function sendConfirmationMail($order_id, $create_accounts=true)
     {
-        $arrSubstitution =
-            Orders::getSubstitutionArray($order_id, $create_accounts);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
+
+        $arrSubstitution = $orderRepo->getSubstitutionArray($order_id, $create_accounts);
         $customer_id = $arrSubstitution['CUSTOMER_ID'];
         $objCustomer = Customer::getById($customer_id);
         if (!$objCustomer) {
@@ -345,7 +349,38 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
 //        //$file->makeWritable(); // Fails on win32
 //        $file->write($template);
 ///
+        // Cache order item substitutions as we parse PDFs for individual order items
+        $orderItemSubstitutions = array();
+        foreach ($arrSubstitution['ORDER_ITEM'] as $orderItemSubstitution) {
+            $orderItemSubstitutions[$orderItemSubstitution['PRODUCT_ID']] =
+                $orderItemSubstitution;
+        }
+
+        // loop over products
+        $i = 1;
+        $objOrder = $orderRepo->find($order_id);
+        foreach ($objOrder->getOrderItems() as $orderItem) {
+            // generate pdfs of products
+            if (!$orderItem->getProduct()->getPdfTemplate()) {
+                continue;
+            }
+            $arrSubstitution['ORDER_ITEM'] = array(
+                $orderItemSubstitutions[$orderItem->getProduct()->getId()]
+            );
+            $productPdf = $cx->getComponent('Pdf')->generatePDF(
+                $orderItem->getProduct()->getPdfTemplate()->getId(),
+                $arrSubstitution,
+                $arrMailTemplate['key']
+            );
+            // add pdfs to $arrMailTemplate['attachments']
+            if (!isset($arrMailTemplate['attachments'])) {
+                $arrMailTemplate['attachments'] = array();
+            }
+            $arrMailTemplate['attachments'][$productPdf['filePath']] = $productPdf['fileName'];
+            $i++;
+        }
         if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) return false;
+        $arrSubstitution['ORDER_ITEM'] = array_values($orderItemSubstitutions);
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }
 
@@ -408,6 +443,74 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
             'SHOP_HOMEPAGE' => \Cx\Core\Routing\Url::fromModuleAndCmd(
                 'Shop', '', FRONTEND_LANG_ID)->toString(),
         );
+    }
+
+    /**
+     * Update relation between entity and foreign entity
+     *
+     * @param $table        string tablename
+     * @param $attr         array  entity attr and foreign attr
+     * @param $idsInput  array  with user input
+     * @param $entityId     int    id of entity
+     * @return bool
+     */
+    static function updateRelation($table, $attr, $idsInput, $entityId)
+    {
+        global $objDatabase;
+
+        $queryCategories = '
+            SELECT `'.$attr['foreign'].'`
+              FROM `'.DBPREFIX.'module_shop'.MODULE_INDEX.'_'.$table.'`
+              WHERE `'.$attr['entity'].'`='.$entityId;
+        $objSelectResult = $objDatabase->Execute($queryCategories);
+
+        $arrIdsDb = array();
+        while ($objSelectResult && !$objSelectResult->EOF) {
+            $arrIdsDb[] = $objSelectResult->fields[$attr['foreign']];
+            $objSelectResult->MoveNext();
+        }
+
+        // Get all ids where in
+        $newRelationIds = array_diff(
+            $idsInput,
+            $arrIdsDb
+        );
+
+        $deletedRelationIds = array_diff(
+            $arrIdsDb,
+            $idsInput
+        );
+
+        // $newRelationIds[0] is empty if no category is selected.
+        if (empty($newRelationIds) || empty($newRelationIds[0])
+            && empty($deletedRelationIds)) {
+            return true;
+        }
+
+        foreach ($newRelationIds as $foreignId) {
+            $updateArgs = array($entityId, $foreignId);
+            $updateQuery = 'INSERT INTO `' . DBPREFIX.'module_shop'.MODULE_INDEX
+                .'_'.$table.'` ('.$attr['entity'].', '.$attr['foreign'].')'
+                .' VALUES (?,?)';
+
+            $objResult = $objDatabase->Execute($updateQuery, $updateArgs);
+            if (!$objResult) {
+                return false;
+            }
+        }
+        foreach ($deletedRelationIds as $foreignId) {
+            $updateArgs = array($entityId, $foreignId);
+            $updateQuery = 'DELETE FROM `' .
+                DBPREFIX . 'module_shop' . MODULE_INDEX . '_'.$table.'`' .
+                'WHERE '.$attr['entity'].' = ? AND '.$attr['foreign'].' = ? ';
+
+            $objResult = $objDatabase->Execute($updateQuery, $updateArgs);
+            if (!$objResult) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

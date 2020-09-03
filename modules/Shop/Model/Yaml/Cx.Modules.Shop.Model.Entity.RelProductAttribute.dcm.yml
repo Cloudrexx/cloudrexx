@@ -1,0 +1,37 @@
+Cx\Modules\Shop\Model\Entity\RelProductAttribute:
+  type: entity
+  table: module_shop_rel_product_attribute
+  repositoryClass: Cx\Modules\Shop\Model\Repository\RelProductAttributeRepository
+  indexes:
+    fk_contrexx_module_shop_rel_product_attribute_contrexx_modu_idx:
+      columns: [ option_id ]
+  id:
+    productId:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+      column: product_id
+    optionId:
+      type: integer
+      options:
+        unsigned: true
+      column: option_id
+  fields:
+    ord:
+      type: integer
+      options:
+        default: 0
+  manyToOne:
+    product:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Product
+      inversedBy: relProductAttributes
+      joinColumn:
+        name: product_id
+        referencedColumnName: id
+    option:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Option
+      inversedBy: relProductAttributes
+      joinColumn:
+        name: option_id
+        referencedColumnName: id

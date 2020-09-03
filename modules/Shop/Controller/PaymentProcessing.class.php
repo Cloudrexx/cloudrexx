@@ -263,12 +263,6 @@ class PaymentProcessing
         $return = '';
         // @since 3.0.5: Names are now lowercase, i.e. "internal" instead of "Internal"
         switch (self::getPaymentProcessorName()) {
-            case 'internal':
-                \Cx\Core\Csrf\Controller\Csrf::redirect(
-                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
-                        array('result' => 1, 'handler' => 'internal')
-                    )
-                );
             case 'internal_lsv':
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
@@ -322,14 +316,17 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 break;
             // Added 20081117 -- Reto Kohli
             case 'datatrans':
-                $return = self::getDatatransForm(Currency::getActiveCurrencyCode());
+                $return = self::getDatatransForm(\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode());
                 break;
             case 'paypal':
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $currency = $cx->getDb()->getEntityManager()->getRepository(
+                    '\Cx\Modules\Shop\Model\Entity\Currency'
+                )->find($_SESSION['shop']['currencyId']);
                 $order_id = $_SESSION['shop']['order_id'];
                 $account_email = \Cx\Core\Setting\Controller\Setting::getValue('paypal_account_email','Shop');
                 $item_name = $_ARRAYLANG['TXT_SHOP_PAYPAL_ITEM_NAME'];
-                $currency_code = Currency::getCodeById(
-                    $_SESSION['shop']['currencyId']);
+                $currency_code = $currency->getCode();
                 $amount = $_SESSION['shop']['grand_total_price'];
                 $return = \PayPal::getForm($account_email, $order_id,
                     $currency_code, $amount, $item_name);
@@ -341,6 +338,15 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 break;
             case 'dummy':
                 $return = \Dummy::getForm();
+                break;
+
+            case 'internal':
+            default:
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
+                        array('result' => 1, 'handler' => 'internal')
+                    )
+                );
                 break;
         }
         // shows the payment picture
@@ -388,7 +394,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
 
         $arrShopOrder = array(
             'AMOUNT'        => str_replace('.', '', $_SESSION['shop']['grand_total_price']),
-            'CURRENCY'      => Currency::getActiveCurrencyCode(),
+            'CURRENCY'      => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             'ORDERID'       => $_SESSION['shop']['order_id'],
             'ACCOUNTID'     => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'),
             'SUCCESSLINK'   => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
@@ -511,7 +517,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
         $arrShopOrder = array(
             'order_id'  => $_SESSION['shop']['order_id'],
             'amount'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
-            'currency'  => Currency::getActiveCurrencyCode(),
+            'currency'  => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
         );
 
         switch ($processMethod) {
@@ -557,7 +563,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
 // 20111227 - Note that all parameter names should now be uppercase only
             'ORDERID'   => $_SESSION['shop']['order_id'],
             'AMOUNT'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
-            'CURRENCY'  => Currency::getActiveCurrencyCode(),
+            'CURRENCY'  => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             'PARAMPLUS' => 'section=Shop'.MODULE_INDEX.'&cmd=success&handler=yellowpay',
 // Custom code for adding more Customer data to the form.
 // Enable as needed.
@@ -638,7 +644,7 @@ if (empty ($return)) {
             \Cx\Core\Setting\Controller\Setting::getValue('datatrans_merchant_id','Shop'),
             $_SESSION['shop']['order_id'],
             $_SESSION['shop']['grand_total_price'],
-            Currency::getActiveCurrencyCode()
+            \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode()
         );
         return
             $_ARRAYLANG['TXT_ORDER_LINK_PREPARED'].'<br/><br/>'."\n".
@@ -679,7 +685,7 @@ if (empty ($return)) {
                 $arrShopOrder = array(
                     'order_id'  => $_SESSION['shop']['order_id'],
                     'amount'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
-                    'currency'  => Currency::getActiveCurrencyCode(),
+                    'currency'  => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
                     'note'      => $_SESSION['shop']['note']
                 );
                 $response = \PaymillHandler::processRequest($_REQUEST['paymillToken'], $arrShopOrder);
@@ -716,18 +722,23 @@ if (empty ($return)) {
 //                                ? $_SESSION['shop']['order_id_checkin']
 //                                : NULL));
 //                    }
-                $order = Order::getById($order_id);
+
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
+                $order = $orderRepo->find($order_id);
                 $amount = $currency_id = $customer_email = NULL;
                 if ($order) {
                     $amount = $order->sum();
-                    $currency_id = $order->currency_id();
-                    $customer_id = $order->customer_id();
+                    $customer_id = $order->getCustomerId();
                     $customer = Customer::getById($customer_id);
                     if ($customer) {
-                        $customer_email = $customer->email();
+                        $customer_email = $customer->getEmail();
                     }
                 }
-                $currency_code = Currency::getCodeById($currency_id);
+                $currency = $order->getCurrency();
+                $currency_code = $currency->getCode();
                 return \PayPal::ipnCheck($amount, $currency_code,
                     $order_id, $customer_email,
                     \Cx\Core\Setting\Controller\Setting::getValue('paypal_account_email','Shop'));

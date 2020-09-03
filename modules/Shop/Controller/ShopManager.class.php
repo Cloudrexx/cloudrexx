@@ -83,7 +83,7 @@ class ShopManager extends ShopLibrary
         self::$objTemplate->setGlobalVariable(
             $_ARRAYLANG
           + array(
-            'SHOP_CURRENCY' => Currency::getActiveCurrencySymbol(),
+            'SHOP_CURRENCY' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             'CSRF_PARAM' => \Cx\Core\Csrf\Controller\Csrf::param()
         ));
     }
@@ -193,8 +193,10 @@ class ShopManager extends ShopLibrary
 
     /**
      * Set up the shop admin page
+     *
+     * @param \Cx\Core\Html\Sigma $navigation
      */
-    function getPage()
+    function getPage($navigation)
     {
         global $objTemplate, $_ARRAYLANG;
 
@@ -226,19 +228,6 @@ class ShopManager extends ShopLibrary
                 $this->delete_product();
                 $this->view_products();
                 break;
-            case 'orders':
-                $this->view_order_overview();
-                break;
-            case 'orderdetails':
-                $this->view_order_details();
-                break;
-            case 'editorder':
-                $this->view_order_details(true);
-                break;
-            case 'delorder':
-                // Redirects back to Order overview
-                $this->delete_order();
-                break;
             case 'delcustomer':
                 $this->delete_customer();
                 $this->view_customers();
@@ -261,13 +250,10 @@ class ShopManager extends ShopLibrary
                 break;
             case 'statistics':
                 self::$pageTitle = $_ARRAYLANG['TXT_STATISTIC'];
-                Orders::view_statistics(self::$objTemplate);
+                \Cx\Modules\Shop\Controller\OrderController::view_statistics(self::$objTemplate);
                 break;
             case 'import':
                 $this->_import();
-                break;
-            case 'manufacturer':
-                $this->view_manufacturers();
                 break;
             default:
                 $this->view_order_overview();
@@ -280,119 +266,9 @@ class ShopManager extends ShopLibrary
             'ADMIN_CONTENT' => self::$objTemplate->get(),
         ));
         $this->act = (isset ($_REQUEST['act']) ? $_REQUEST['act'] : '');
-        $this->setNavigation();
+
+        $objTemplate->setVariable('CONTENT_NAVIGATION', $navigation);
     }
-
-
-    /**
-     * Manages manufacturers
-     */
-    function view_manufacturers()
-    {
-        global $_ARRAYLANG;
-
-        self::update_manufacturers();
-
-        self::$pageTitle = $_ARRAYLANG['TXT_SHOP_MANUFACTURER'];
-        self::$objTemplate->loadTemplateFile('module_shop_manufacturer.html');
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-
-        $uri = \Html::getRelativeUri();
-        \Html::stripUriParam($uri, 'delete');
-        $arrSorting = array(
-          'id' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_ID'],
-          'name' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_NAME'],
-          'url' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_URL'],
-        );
-        $objSorting = new \Sorting($uri, $arrSorting, true, 'order_manufacturer');
-        self::$objTemplate->setVariable(array(
-            'SHOP_HEADER_ID' => $objSorting->getHeaderForField('id'),
-            'SHOP_HEADER_NAME' => $objSorting->getHeaderForField('name'),
-            'SHOP_HEADER_URL' => $objSorting->getHeaderForField('url'),
-        ));
-
-        $count = 0;
-// TODO: Implement the filter in the Manufacturer class
-        $filter = null;
-        $limit = \Cx\Core\Setting\Controller\Setting::getValue('numof_manufacturers_per_page_backend','Shop');
-        $arrManufacturers = Manufacturer::getArray($count,
-            $objSorting->getOrder(), \Paging::getPosition(), $limit, $filter);
-        $i = 0;
-        foreach ($arrManufacturers as $manufacturer_id => $arrManufacturer) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_MANUFACTURER_ID' => $manufacturer_id,
-                'SHOP_MANUFACTURER_NAME' => $arrManufacturer['name'],
-                'SHOP_MANUFACTURER_URL' => $arrManufacturer['url'],
-                'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse("manufacturerRow");
-        }
-        $manufacturer_id = (!empty($_REQUEST['id']) ? intval($_REQUEST['id']) : 0);
-        $name = $url = '';
-        if (isset($arrManufacturers[$manufacturer_id])) {
-            $name = $arrManufacturers[$manufacturer_id]['name'];
-            $url = $arrManufacturers[$manufacturer_id]['url'];
-        }
-        if (!empty($_POST['name'])) $name = contrexx_input2raw($_POST['name']);
-        if (!empty($_POST['url'])) $url = contrexx_input2raw($_REQUEST['url']);
-
-        $currentUrl = clone \Env::get('Resolver')->getUrl();
-        self::$objTemplate->setVariable(array(
-            'SHOP_MANUFACTURER_PAGING' => \Paging::get($currentUrl, $_ARRAYLANG['TXT_SHOP_MANUFACTURER'], $count, $limit),
-            'SHOP_EDIT_MANUFACTURER' => ($manufacturer_id
-                ? $_ARRAYLANG['TXT_SHOP_MANUFACTURER_EDIT']
-                : $_ARRAYLANG['TXT_SHOP_MANUFACTURER_ADD']),
-            'SHOP_MANUFACTURER_NAME' => $name,
-            'SHOP_MANUFACTURER_URL' => $url,
-            'SHOP_MANUFACTURER_ID' => $manufacturer_id,
-        ));
-    }
-
-
-    /**
-     * Updates the Manufacturers in the database
-     *
-     * Stores or deletes records depending on the contents of the
-     * current request
-     * @return  boolean           True on success, null on noop, false otherwise
-     */
-    static function update_manufacturers()
-    {
-        global $_ARRAYLANG;
-
-        // Delete any single manufacturer, if requested to
-        if (!empty($_GET['delete'])) {
-            $manufacturer_id = intval($_GET['delete']);
-            return Manufacturer::delete($manufacturer_id);
-        }
-        // Multiaction: Only deleting implemented
-        if (   !empty($_POST['multi_action'])
-            && !empty($_POST['selected_manufacturer_id'])
-            && is_array($_POST['selected_manufacturer_id'])) {
-            switch ($_POST['multi_action']) {
-              case 'delete':
-                // Delete multiple selected manufacturers
-                return Manufacturer::delete($_POST['selected_manufacturer_id']);
-            }
-        }
-        if (!isset($_POST['bstore'])) return null;
-        if (empty($_POST['name'])) {
-            return \Message::error($_ARRAYLANG['TXT_SHOP_MANUFACTURER_ERROR_EMPTY_NAME']);
-        }
-        $manufacturer_id = (empty($_POST['id']) ? null : intval($_POST['id']));
-        $name = (empty($_POST['name']) ? '' : contrexx_input2raw($_POST['name']));
-        $url = (empty($_REQUEST['url']) ? '' : contrexx_input2raw($_REQUEST['url']));
-//DBG::log("ShopManager::update_manufacturers(): Storing Manufacturer: $name, $url, $manufacturer_id");
-        $result = Manufacturer::store($name, $url, $manufacturer_id);
-        if ($result) {
-            // Do not set up the same Manufacturer for editing again after
-            // storing it successfully
-            $_REQUEST['id'] = $_POST['name'] = $_POST['url'] = null;
-            Manufacturer::flush();
-        }
-        return $result;
-    }
-
 
     /**
      * Import and Export data from/to csv
@@ -960,6 +836,11 @@ class ShopManager extends ShopLibrary
             ));
             self::$objTemplate->parseCurrentBlock();
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         // The same for a new Attribute
         $uri_param = '&cmd=Shop&act=products&tpl=attributes';
         self::$objTemplate->setVariable(array(
@@ -968,7 +849,7 @@ class ShopManager extends ShopLibrary
                     0, 0, 'updateOptionList(0)'),
             'SHOP_PRODUCT_ATTRIBUTE_JS_VARS' =>
                 Attributes::getAttributeJSVars(),
-            'SHOP_PRODUCT_ATTRIBUTE_CURRENCY' => Currency::getDefaultCurrencySymbol(),
+            'SHOP_PRODUCT_ATTRIBUTE_CURRENCY' => $defaultCurrency->getSymbol(),
             'SHOP_PAGING' => \Paging::get($uri_param,
                 $_ARRAYLANG['TXT_PRODUCT_CHARACTERISTICS'], $count, $limit),
         ));
@@ -988,6 +869,12 @@ class ShopManager extends ShopLibrary
     {
         $i = 0;
         $count = 0;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         // If a Product is selected, check those Product Attribute values
         // associated with it
         $arrRelation = Attributes::getRelationArray($product_id);
@@ -1007,7 +894,7 @@ class ShopManager extends ShopLibrary
                     'SHOP_PRODUCTS_ATTRIBUTE_ID' => $attribute_id,
                     'SHOP_PRODUCTS_ATTRIBUTE_VALUE_ID' => $option_id,
                     'SHOP_PRODUCTS_ATTRIBUTE_VALUE_TEXT' => $arrOption['value'].
-                        ' ('.$arrOption['price'].' '.Currency::getDefaultCurrencySymbol().')',
+                        ' ('.$arrOption['price'].' '.$defaultCurrency->getSymbol().')',
                     'SHOP_PRODUCTS_ATTRIBUTE_VALUE_SELECTED' => ($valueSelected ? \Html::ATTRIBUTE_CHECKED : ''),
                 ));
                 self::$objTemplate->parse('optionList');
@@ -1220,9 +1107,6 @@ class ShopManager extends ShopLibrary
         self::$objTemplate->loadTemplateFile('module_shop_settings.html');
         if (empty($_GET['tpl'])) $_GET['tpl'] = '';
         switch ($_GET['tpl']) {
-            case 'currency':
-                self::view_settings_currency();
-                break;
             case 'payment':
                 Payment::view_settings(self::$objTemplate);
                 break;
@@ -1252,59 +1136,21 @@ class ShopManager extends ShopLibrary
         }
     }
 
-
-    /**
-     * The currency settings view
-     */
-    static function view_settings_currency()
-    {
-        self::$objTemplate->addBlockfile('SHOP_SETTINGS_FILE',
-            'settings_block', 'module_shop_settings_currency.html');
-        $i = 0;
-        foreach (Currency::getCurrencyArray() as $currency) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_CURRENCY_STYLE' => 'row'.(++$i % 2 + 1),
-                'SHOP_CURRENCY_ID' => $currency['id'],
-                'SHOP_CURRENCY_CODE' => $currency['code'],
-                'SHOP_CURRENCY_SYMBOL' => $currency['symbol'],
-                'SHOP_CURRENCY_NAME' => $currency['name'],
-                'SHOP_CURRENCY_RATE' => $currency['rate'],
-                'SHOP_CURRENCY_INCREMENT' => $currency['increment'],
-                'SHOP_CURRENCY_ACTIVE' => ($currency['active']
-                    ? \Html::ATTRIBUTE_CHECKED : ''),
-                'SHOP_CURRENCY_STANDARD' => ($currency['default']
-                    ? \Html::ATTRIBUTE_CHECKED : ''),
-            ));
-            self::$objTemplate->parse('shopCurrency');
-        }
-        $str_js = '';
-        foreach (Currency::get_known_currencies_increment_array()
-                as $code => $increment) {
-            // This seems like a sensible default for the few unknown ones
-            if (!is_numeric($increment)) $increment = 0.01;
-            $str_js .=
-                ($str_js ? ',' : '').
-                '"'.$code.'":"'.$increment.'"';
-        };
-        self::$objTemplate->setVariable(array(
-            'SHOP_CURRENCY_NAME_MENUOPTIONS' => \Html::getOptions(
-                Currency::get_known_currencies_name_array()),
-            'SHOP_CURRENCY_INCREMENT_JS_ARRAY' =>
-                'var currency_increment = {'.$str_js.'};',
-        ));
-    }
-
-
     /**
      * The shipment settings view
      */
     static function view_settings_shipment()
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         // start show shipment
         self::$objTemplate->addBlockfile('SHOP_SETTINGS_FILE',
             'settings_block', 'module_shop_settings_shipment.html');
         self::$objTemplate->setGlobalVariable(
-            'SHOP_CURRENCY', Currency::getDefaultCurrencySymbol()
+            'SHOP_CURRENCY', $defaultCurrency->getSymbol()
         );
         $arrShipments = Shipment::getShipmentsArray();
         $i = 0;
@@ -1558,6 +1404,11 @@ if ($test === NULL) {
     \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
 }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
         self::$objTemplate->setVariable(array(
             'SHOP_CONFIRMATION_EMAILS' => \Cx\Core\Setting\Controller\Setting::getValue('email_confirmation','Shop'),
             'SHOP_CONTACT_EMAIL' => \Cx\Core\Setting\Controller\Setting::getValue('email','Shop'),
@@ -1567,7 +1418,7 @@ if ($test === NULL) {
             'SHOP_CONTACT_FAX' => \Cx\Core\Setting\Controller\Setting::getValue('fax','Shop'),
             // Country settings
             'SHOP_GENERAL_COUNTRY_MENUOPTIONS' => \Cx\Core\Country\Controller\Country::getMenuoptions(
-                \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop')),
+                \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop'), false),
             // Thumbnail settings
             'SHOP_THUMBNAIL_MAX_WIDTH' => \Cx\Core\Setting\Controller\Setting::getValue('thumbnail_max_width','Shop'),
             'SHOP_THUMBNAIL_MAX_HEIGHT' => \Cx\Core\Setting\Controller\Setting::getValue('thumbnail_max_height','Shop'),
@@ -1579,13 +1430,12 @@ if ($test === NULL) {
                 \Cx\Core\Setting\Controller\Setting::getValue('show_products_default','Shop')),
             'SHOP_PRODUCT_SORTING_MENUOPTIONS' => Products::getProductSortingMenuoptions(),
             // Order amount upper limit
-            'SHOP_ORDERITEMS_AMOUNT_MAX' => Currency::formatPrice(
+            'SHOP_ORDERITEMS_AMOUNT_MAX' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                 \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_max','Shop')),
             // Order amount lower limit
-            'SHOP_ORDERITEMS_AMOUNT_MIN' => Currency::formatPrice(
+            'SHOP_ORDERITEMS_AMOUNT_MIN' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                 \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_min','Shop')),
-            'SHOP_CURRENCY_CODE' => Currency::getCurrencyCodeById(
-                Currency::getDefaultCurrencyId()),
+            'SHOP_CURRENCY_CODE' => $defaultCurrency->getCode(),
             // New extended settings in V3.0.0
             'SHOP_SETTING_CART_USE_JS' =>
                 \Html::getCheckbox('use_js_cart', 1, false,
@@ -1667,12 +1517,6 @@ if ($test === NULL) {
     {
         global $_ARRAYLANG;
 
-        if (   isset ($_REQUEST['tpl'])) {
-            if (   $_REQUEST['tpl'] == 'pricelists'
-                || $_REQUEST['tpl'] == 'pricelist_edit') {
-                return self::view_pricelists();
-            }
-        }
         $this->delete_categories();
         $this->store_category();
         $this->update_categories();
@@ -1988,6 +1832,8 @@ if ($test === NULL) {
         // so subcategories are removed first
         $arrCategoryId = array_reverse($arrCategoryId);
 //DBG::log("delete_categories($category_id): Got ".var_export($arrCategoryId, true));
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
         foreach ($arrCategoryId as $category_id) {
             // Check whether this category has subcategories
             $arrChildId =
@@ -2000,21 +1846,24 @@ if ($test === NULL) {
                 continue;
             }
             // Get Products in this category
-            $count = 1e9;
-            $arrProducts = Products::getByShopParams($count, 0, null,
-                $category_id, null, null, false, false, '', null, true);
-//DBG::log("delete_categories($category_id): Products in $category_id: ".var_export($arrProducts, true));
+            $qb = $em->createQueryBuilder();
+            $qb->select('p.id');
+            $qb->from('Cx\Modules\Shop\Model\Entity\Product', 'p');
+            $qb->join('p.categories', 'c');
+            $qb->where($qb->expr()->eq('c.id', ':catId'));
+            $qb->setParameter('catId', $category_id);
+            $productIds = $qb->getQuery()->getScalarResult();
             // Delete the products in the category
-            foreach ($arrProducts as $objProduct) {
+            foreach ($productIds as &$productId) {
+                $productId = $productId['id'];
                 // delete products of category in case the user requested
                 // to do so
                 if ($deleteProducts) {
                     // Check whether there are orders with this Product ID
-                    $product_id = $objProduct->id();
-                    $query = "
+                    $query = '
                         SELECT 1
-                          FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
-                         WHERE product_id=$product_id";
+                          FROM '.DBPREFIX.'module_shop'.MODULE_INDEX.'_order_items
+                         WHERE product_id=' . contrexx_raw2db($productId);
                     $objResult = $objDatabase->Execute($query);
                     if (!$objResult || $objResult->RecordCount()) {
                         \Message::error(
@@ -2024,32 +1873,8 @@ if ($test === NULL) {
                                 $category_id).")");
                         continue 2;
                     }
-                } else {
-                    // remove product from category
-
-                    $categoryIdsOfProduct = array_flip(
-                        preg_split('/\s*,\s*/',
-                            $objProduct->category_id(), null,
-                            PREG_SPLIT_NO_EMPTY
-                        )
-                    );
-                    unset($categoryIdsOfProduct[$category_id]);
-                    $objProduct->category_id(
-                        join(',', array_keys($categoryIdsOfProduct))
-                    );
-                    if (!$objProduct->store()) {
-                        return false;
                     }
                 }
-            }
-            if (
-                $deleteProducts &&
-                Products::deleteByShopCategory($category_id) === false
-            ) {
-                \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
-                    "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
-                continue;
-            }
             // Delete the Category now
             $result = ShopCategories::deleteById($category_id);
             if ($result === null) {
@@ -2059,6 +1884,18 @@ if ($test === NULL) {
                 return self::error_database();
             }
             $deleted = true;
+            if ($deleteProducts && count($productIds)) {
+                $qb = $em->createQueryBuilder();
+                $qb->delete('Cx\Modules\Shop\Model\Entity\Product', 'p');
+                $qb->where($qb->expr()->in('p.id', ':productIds'));
+                $qb->setParameter('productIds', $productIds);
+                $result = $qb->getQuery()->getResult();
+                if (!$result) {
+                    \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
+                        "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
+                    continue;
+                }
+            }
         }
         if (!$deleted) {
             return null;
@@ -2242,6 +2079,7 @@ if ($test === NULL) {
 //DBG::log("Dates from ".$objProduct->date_start()." ($start_time, $start_date) to ".$objProduct->date_start()." ($end_time, $end_date)");
         $websiteImagesShopPath    = $cx->getWebsiteImagesShopPath() . '/';
         $websiteImagesShopWebPath = $cx->getWebsiteImagesShopWebPath() . '/';
+
         self::$objTemplate->setVariable(array(
             'SHOP_PRODUCT_ID' => (isset($_REQUEST['new']) ? 0 : $objProduct->id()),
             'SHOP_PRODUCT_CODE' => contrexx_raw2xhtml($objProduct->code()),
@@ -2251,11 +2089,11 @@ if ($test === NULL) {
             'SHOP_CATEGORIES_ASSIGNED' => $arrAssignedCategories['assigned'],
             'SHOP_CATEGORIES_AVAILABLE' => $arrAssignedCategories['available'],
             'SHOP_CUSTOMER_PRICE' => contrexx_raw2xhtml(
-                Currency::formatPrice($objProduct->price())),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price())),
             'SHOP_RESELLER_PRICE' => contrexx_raw2xhtml(
-                Currency::formatPrice($objProduct->resellerprice())),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->resellerprice())),
             'SHOP_DISCOUNT' => contrexx_raw2xhtml(
-                Currency::formatPrice($objProduct->discountprice())),
+                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice())),
             'SHOP_SPECIAL_OFFER' => ($objProduct->discount_active() ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_VAT_MENUOPTIONS' => Vat::getMenuoptions(
                 $objProduct->vat_id(), true),
@@ -2279,7 +2117,7 @@ if ($test === NULL) {
             'SHOP_STOCK_VISIBILITY' => ($objProduct->stock_visible()
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                Manufacturer::getMenuoptions($objProduct->manufacturer_id(), true),
+                \Cx\Modules\Shop\Controller\ManufacturerController::getMenuoptions($objProduct->manufacturer_id(), true),
             'SHOP_PICTURE1_IMG_SRC' =>
                 (   !empty($arrImages[1]['img'])
                  && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
@@ -2959,22 +2797,39 @@ if ($test === NULL) {
         }
 // TODO: TEST
         $count = NULL;
-        $orders = Orders::getArray($count, NULL, array('customer_id' => $objCustomer->id()), \Paging::getPosition(),
-                \Cx\Core\Setting\Controller\Setting::getValue('numof_orders_per_page_backend','Shop'));
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
+        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->getDefaultCurrency();
+
+        $orders = $orderRepo->findBy(
+            array('customerId' => $objCustomer->id()),
+            null,
+            \Cx\Core\Setting\Controller\Setting::getValue(
+                'numof_orders_per_page_backend','Shop'
+            ),
+            \Paging::getPosition()
+        );
+
         $i = 1;
+
         foreach ($orders as $order) {
-            Currency::init($order->currency_id());
+            \Cx\Modules\Shop\Controller\CurrencyController::init($order->getCurrencyId());
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
-                'SHOP_ORDER_ID' => $order->id(),
+                'SHOP_ORDER_ID' => $order->getId(),
                 'SHOP_ORDER_ID_CUSTOM' => ShopLibrary::getCustomOrderId(
-                    $order->id(), $order->date_time()),
-                'SHOP_ORDER_DATE' => $order->date_time(),
+                    $order->getId(), $order->getDateTime()->format(ASCMS_DATE_FORMAT_DATETIME)),
+                'SHOP_ORDER_DATE' => $order->getDateTime()->format(ASCMS_DATE_FORMAT_DATETIME),
                 'SHOP_ORDER_STATUS' =>
-                    $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_'.$order->status()],
+                    $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_'.$order->getStatus()],
                 'SHOP_ORDER_SUM' =>
-                    Currency::getDefaultCurrencySymbol().' '.
-                    Currency::getDefaultCurrencyPrice($order->sum()),
+                    $defaultCurrency->getSymbol().' '.
+                    \Cx\Modules\Shop\Controller\CurrencyController::getDefaultCurrencyPrice($order->getSum()),
             ));
             self::$objTemplate->parse('orderRow');
         }
@@ -3080,7 +2935,7 @@ if ($test === NULL) {
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
                 Discount::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
@@ -3337,8 +3192,8 @@ if ($test === NULL) {
         foreach ($arrProducts as $objProduct) {
             $productStatus = 'inactive';
             if ($objProduct->active()) {
-                $hasScheduledPublishing =   $objProduct->date_start() != '0000-00-00 00:00:00'
-                                         || $objProduct->date_end() != '0000-00-00 00:00:00';
+                $hasScheduledPublishing =   $objProduct->date_start()
+                                         || $objProduct->date_end();
                 $productStatus = 'active';
                 if ($hasScheduledPublishing) {
                     $productStatus =  $objProduct->getActiveByScheduledPublishing()
@@ -3357,9 +3212,9 @@ if ($test === NULL) {
                 'SHOP_PRODUCT_ID' => $objProduct->id(),
                 'SHOP_PRODUCT_CODE' => $objProduct->code(),
                 'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->name()),
-                'SHOP_PRODUCT_PRICE1' => Currency::formatPrice($objProduct->price()),
-                'SHOP_PRODUCT_PRICE2' => Currency::formatPrice($objProduct->resellerprice()),
-                'SHOP_PRODUCT_DISCOUNT' => Currency::formatPrice($objProduct->discountprice()),
+                'SHOP_PRODUCT_PRICE1' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price()),
+                'SHOP_PRODUCT_PRICE2' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->resellerprice()),
+                'SHOP_PRODUCT_DISCOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice()),
                 'SHOP_PRODUCT_SPECIAL_OFFER' => $discount_active,
                 'SHOP_SPECIAL_OFFER_VALUE_OLD' => $specialOfferValue,
                 'SHOP_PRODUCT_VAT_MENU' => Vat::getShortMenuString(
@@ -3613,127 +3468,6 @@ if ($test === NULL) {
         return null;
     }
 
-
-    /**
-     * Shows an overview of all pricelists
-     *
-     * Also processes requests for deleting one or more Pricelists.
-     * @global  array           $_ARRAYLANG
-     * @global  ADOConnection   $objDatabase    Database connection object
-     */
-    function view_pricelists()
-    {
-        global $_ARRAYLANG;
-
-        self::$pageTitle = $_ARRAYLANG['TXT_PDF_OVERVIEW'];
-        // Note that the "list_id" index may be set but empty in order to
-        // create a new pricelist.
-        if (isset($_REQUEST['list_id'])) {
-            return self::view_pricelist_edit();
-        }
-        PriceList::deleteByRequest();
-        self::$objTemplate->loadTemplateFile("module_shop_pricelist_overview.html");
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-        $arrName = PriceList::getNameArray();
-        $i = 0;
-        foreach ($arrName as $list_id => $name) {
-            $url = PriceList::getUrl($list_id);
-//DBG::log("URL: $url");
-            self::$objTemplate->setVariable(array(
-                'SHOP_PRICELIST_ROWCLASS' => 'row'.(++$i % 2 + 1),
-                'SHOP_PRICELIST_ID' => $list_id,
-                'SHOP_PRICELIST_NAME' => contrexx_raw2xhtml($name),
-                'SHOP_PRICELIST_LINK_PDF' =>
-                    "<a href='$url' target='_blank'".
-                    " title='".$_ARRAYLANG['TXT_DISPLAY']."'>$url</a>",
-            ));
-            self::$objTemplate->parse('shop_pricelist');
-        }
-    }
-
-
-    /**
-     * Edit a pricelist
-     * @global  ADOConnection   $objDatabase
-     * @global  array           $_ARRAYLANG
-     * @return  boolean                         True on success, false otherwise
-     */
-    static function view_pricelist_edit()
-    {
-        global $_ARRAYLANG;
-
-        $list_id = null;
-        $objList = PriceList::getFromPost();
-        if ($objList) {
-            $result = $objList->store();
-            if ($result) {
-                if (isset ($_REQUEST['list_id']))
-                    unset($_REQUEST['list_id']);
-//die("Showing lists");
-                return self::view_pricelists();
-            }
-        }
-        $list_id = (isset($_GET['list_id']) ? $_GET['list_id'] : null);
-        $objList = PriceList::getById($list_id);
-        if (!$objList) $objList = new PriceList(null);
-        $list_id = $objList->id();
-        self::$objTemplate->loadTemplateFile("module_shop_pricelist_details.html");
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-        self::$objTemplate->setVariable(array(
-            'SHOP_PRICELIST_EDIT' => $_ARRAYLANG[($list_id
-                ? 'TXT_SHOP_PRICELIST_EDIT' : 'TXT_SHOP_PRICELIST_ADD')],
-            'SHOP_PRICELIST_ID' => $list_id,
-            'SHOP_PRICELIST_LINK_PDF' =>
-                ($list_id ? PriceList::getUrl($list_id) : ''),
-            'SHOP_PRICELIST_NAME' => $objList->name(),
-            'SHOP_PRICELIST_LANGUAGE_MENUOPTIONS' => \Html::getOptions(
-                \FWLanguage::getNameArray(), $objList->lang_id()),
-            'SHOP_PRICELIST_BORDER_CHECKED' => ($objList->border()
-                ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_PRICELIST_HEADER_CHECKED' => ($objList->header()
-                ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_PRICELIST_HEADER_LEFT' => $objList->header_left(),
-            'SHOP_PRICELIST_HEADER_RIGHT' => $objList->header_right(),
-            'SHOP_PRICELIST_FOOTER_CHECKED' => ($objList->footer()
-                ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_PRICELIST_FOOTER_LEFT' => $objList->footer_left(),
-            'SHOP_PRICELIST_FOOTER_RIGHT' => $objList->footer_right(),
-        ));
-        $category_ids = $objList->category_ids();
-        $category_all = false;
-        if (empty($category_ids) || $category_ids == '*') {
-            $category_all = true;
-            self::$objTemplate->setVariable(
-                'SHOP_PRICELIST_CATEGORY_ALL_CHECKED', \Html::ATTRIBUTE_CHECKED);
-        }
-        // Get all categories
-        $arrCategories = ShopCategories::getTreeArray(true, false);
-        if (empty($arrCategories)) {
-            Message::warning($_ARRAYLANG['TXT_SHOP_WARNING_NO_CATEGORIES']);
-        }
-        $i = 0;
-        foreach ($arrCategories as $objCategory) {
-            $category_id = $objCategory['id'];
-            $selected =
-                (   $category_all
-                 || preg_match('/(?:^|,)\s*'.$category_id.'\s*(?:,|$)/',
-                        $category_ids));
-//DBG::log("Category ID $category_id, ".($selected ? "selected" : "NOT"));
-            self::$objTemplate->setVariable(array(
-                'SHOP_CATEGORY_ID' => contrexx_raw2xhtml($category_id),
-                'SHOP_CATEGORY_NAME' => contrexx_raw2xhtml($objCategory['name']),
-                'SHOP_CATEGORY_LEVELSPACE' => str_repeat('|----', $objCategory['level']),
-                'SHOP_CATEGORY_DISABLED' => ($category_all
-                    ? \Html::ATTRIBUTE_DISABLED : ''),
-                'SHOP_CATEGORY_CHECKED' => ($selected ? \Html::ATTRIBUTE_CHECKED : ''),
-                'SHOP_CATEGORY_ROWCLASS' => 'row'.(++$i% 2 + 1),
-            ));
-            self::$objTemplate->parse('shop_category');
-        }
-        return true;
-    }
-
-
     /**
      * Send an e-mail to the Customer with the confirmation that the Order
      * with the given Order ID has been processed
@@ -3742,8 +3476,12 @@ if ($test === NULL) {
      */
     static function sendProcessedMail($order_id)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Order'
+        );
         $arrSubstitution =
-              Orders::getSubstitutionArray($order_id, false, false)
+            $orderRepo->getSubstitutionArray($order_id, false, false)
             + self::getSubstitutionArray();
         $lang_id = $arrSubstitution['LANG_ID'];
         // Select template for: "Your order has been processed"

@@ -52,7 +52,33 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllerClasses()
     {
-        return array('Backend');
+        return array(
+            'Backend', 'Manufacturer', 'Category', 'Pdf', 'Pricelist',
+            'JsonPriceList', 'Currency', 'JsonCurrency', 'DiscountCoupon',
+            'JsonDiscountCoupon', 'Order', 'JsonOrder', 'DiscountgroupCountName',
+            'DiscountGroup', 'JsonDiscountGroup', 'Payment', 'JsonPayment',
+            'PaymentProcessor', 'Product', 'JsonProduct',
+        );
+    }
+
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * The array values might be a class name without namespace. In that case
+     * the namespace \Cx\{component_type}\{component_name}\Controller is used.
+     * If the array value starts with a backslash, no namespace is added.
+     *
+     * Avoid calculation of anything, just return an array!
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array(
+            'JsonPriceListController', 'JsonCurrencyController',
+            'JsonDiscountCouponController', 'JsonOrderController',
+            'JsonDiscountGroupController', 'JsonPaymentController',
+            'JsonProductController'
+        );
     }
 
     /**
@@ -103,7 +129,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
-    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) 
+    {
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 // Show the Shop navbar in the Shop, or on every page if configured to do so
@@ -146,7 +173,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param array $parts List of additional path parts
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
      */
-    public function resolve($parts, $page) {
+    public function resolve($parts, $page) 
+    {
         $canonicalUrl = \Cx\Core\Routing\Url::fromPage($page, $this->cx->getRequest()->getUrl()->getParamArray());
         header('Link: <' . $canonicalUrl->toString() . '>; rel="canonical"');
     }
@@ -172,6 +200,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'Link',
             '<' . $canonicalUrl->toString() . '>; rel="canonical"'
         );
+        return;
 
         if (
             !$page ||
@@ -200,6 +229,84 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
+     * Returns a list of command mode commands provided by this component
+     *
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode()
+    {
+        return array(
+            'generatePdfPricelist' => new
+            \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array('http', 'https'), // allowed protocols
+                array(
+                    'get',
+                    'post',
+                    'put',
+                    'delete',
+                    'trace',
+                    'options',
+                    'head',
+                ),   // allowed methods
+                false,  // requires login
+                array(),
+                array()
+            ),
+        );
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     *
+     * @param string  $command The name of the command to fetch the description from
+     * @param boolean $short   Wheter to return short or long description
+     *
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false)
+    {
+        switch ($command) {
+            case 'generatePdfPricelist':
+                if ($short) {
+                    return 'Generates Pdf for a pricelist';
+                }
+                return 'Generates Pdf for a pricelist with all related 
+                    categories and their products.';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Execute one of the commands listed in getCommandsForCommandMode()
+     *
+     * @param string $command       Name of command to execute
+     * @param array  $arguments     List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     *
+     * @see getCommandsForCommandMode()
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array())
+    {
+        try {
+            switch ($command) {
+                case 'generatePdfPricelist':
+                    if (empty($arguments['id'])) {
+                        return;
+                    }
+                    $this->getController('Pdf')->generatePdfPricelist(
+                        intval($arguments['id']),1
+                    );
+                    break;
+            }
+        } catch (\Exception $e) {
+            http_response_code(400); // BAD REQUEST
+            echo 'Exception of type "' . get_class($e) . '" with message "' .
+                $e->getMessage() . '"';
+        }
+    }
+
+    /**
      * Register your event listeners here
      *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
@@ -209,10 +316,53 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * list statements like
      * $this->cx->getEvents()->addEventListener($eventName, $listener);
      */
-    public function registerEventListeners() {
+    public function registerEventListeners()
+    {
         $eventListener = new \Cx\Modules\Shop\Model\Event\ShopEventListener($this->cx);
+        $eventListenerTemp = new \Cx\Modules\Shop\Model\Event\RolloutTextSyncListener($this->cx);
         $this->cx->getEvents()->addEventListener('SearchFindContent',$eventListener);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+        $this->cx->getEvents()->addEventListener('TmpShopText:Replace', $eventListenerTemp);
+        $this->cx->getEvents()->addEventListener('TmpShopText:Delete', $eventListenerTemp);
+
+        $modelEvents = array(
+            \Doctrine\ORM\Events::prePersist => array(
+                'Currency',
+                'DiscountCoupon'
+            ),
+            \Doctrine\ORM\Events::preUpdate => array(
+                'Currency',
+                'DiscountCoupon'
+            ),
+            \Doctrine\ORM\Events::postUpdate => array(
+                'Order'
+            )
+        );
+
+        foreach ($modelEvents as $eventName => $entities) {
+            foreach ($entities as $entity) {
+                $modelEventListener = '\\Cx\\Modules\\Shop\\Model\\Event\\' .
+                    $entity . 'EventListener';
+
+                $this->cx->getEvents()->addModelListener(
+                    $eventName,
+                    'Cx\\Modules\\Shop\\Model\\Entity\\' . $entity,
+                    new $modelEventListener($this->cx)
+                );
+            }
+        }
+    }
+
+    /**
+     * Register your events here
+     *
+     * Do not do anything else here than list statements like
+     * $this->cx->getEvents()->addEvent($eventName);
+     */
+    public function registerEvents()
+    {
+        $this->cx->getEvents()->addEvent('TmpShopText:Replace');
+        $this->cx->getEvents()->addEvent('TmpShopText:Delete');
     }
 
     public function preFinalize(\Cx\Core\Html\Sigma $template)

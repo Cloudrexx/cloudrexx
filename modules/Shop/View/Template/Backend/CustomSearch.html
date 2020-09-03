@@ -1,0 +1,44 @@
+<form method="get" id="vg-{VG_ID}-searchForm" data-vg-id="{VG_ID}"></form>
+
+<div id="vg-{VG_ID}-customSearch">
+    <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
+        <tbody>
+        <tr>
+            <th colspan="2" valign="top">{TXT_SEARCH}</th>
+        </tr>
+        <tr class="row1">
+            <td>
+                <!-- BEGIN search -->
+                <input type="text" name="term" placeholder="{TXT_CORE_SEARCH_TERM}" class="vg-encode" form="vg-{VG_ID}-searchForm">
+                <!-- END search -->
+                <!-- BEGIN filter -->
+                    <!-- BEGIN filter-field -->
+                        {FIELD_FILTER_OPTIONS}
+                    <!-- END filter-field -->
+                <!-- END filter -->
+                <input type="submit" value="{TXT_SEARCH}" class="vg-searchSubmit" form="vg-{VG_ID}-searchForm">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- BEGIN filter-alphabetical -->
+<div id="vg-{VG_ID}-alphabeticalSearch">
+    <ul class="vg-alphabeticalSearch">
+        <!-- BEGIN letter -->
+        <li <!-- BEGIN selected -->class="selected"<!-- END selected -->>
+        <a href="{ALPHABETICAL_URL}">{LETTER}</a>
+        </li>
+        <!-- END letter -->
+    </ul>
+</div>
+<!-- END filter-alphabetical -->
+<!-- BEGIN no-entries -->
+<p class="vg-noresult">{TXT_NO_RESULT}</p>
+<!-- END no-entries -->
+<!-- BEGIN table -->
+{TABLE}<br />
+{PAGING}
+<!-- END table -->
+{ADD_BUTTON}
