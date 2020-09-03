@@ -334,9 +334,14 @@ class Customer extends \User
      * @param   integer   $group_id       The optional group ID
      * @return  integer                   The group ID
      * @author  Reto Kohli <reto.kohli@comvation.com>
+     * @todo    Replace with get/setGroupId()
      */
     function group_id($group_id=null)
     {
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+        $index = \Cx\Core\Setting\Controller\Setting::getValue(
+            'user_profile_attribute_customer_group_id'
+        );
         if (!$index) {
             return 0;
         }
@@ -353,10 +358,7 @@ class Customer extends \User
      */
     public function getGroupId()
     {
-        \Cx\Core\Setting\Controller\Setting::init('Shop');
-        return \Cx\Core\Setting\Controller\Setting::getValue(
-            'user_profile_attribute_customer_group_id'
-        );
+        return $this->group_id();
     }
 
     /**
