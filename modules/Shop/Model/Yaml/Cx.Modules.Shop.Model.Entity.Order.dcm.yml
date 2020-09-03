@@ -103,6 +103,14 @@ Cx\Modules\Shop\Model\Entity\Order:
         unsigned: true
         default: 0.00
       column: shipment_amount
+    shipmentCost:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+      column: shipment_cost
     shipmentId:
       type: integer
       nullable: true

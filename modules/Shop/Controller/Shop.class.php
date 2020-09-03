@@ -3592,8 +3592,9 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['cancellation_terms'] = \Html::ATTRIBUTE_CHECKED;
         }
 
-        // reset applied discount on shipment costs
-        // before recalculating them below
+        // reset shipment cost and applied discount before recalculating
+        $_SESSION['shop']['shipment_cost'] = 0; // Original fee
+        $_SESSION['shop']['shipment_price'] = 0; // Possibly discounted fee
         unset($_SESSION['shop']['shipment_discount_amount']);
 
         // if shipperId is not set, there is no use in trying to determine a shipment_price
@@ -3606,8 +3607,8 @@ die("Shop::processRedirect(): This method is obsolete!");
             // anything wrong with this kind of shipping?
             if ($shipmentPrice == -1) {
                 unset($_SESSION['shop']['shipperId']);
-                $_SESSION['shop']['shipment_price'] = '0.00';
             } else {
+                $_SESSION['shop']['shipment_cost'] = $shipmentPrice;
                 // deduct global coupon (if one is set)
                 $coupon = Cart::getCoupon();
 
@@ -3671,8 +3672,6 @@ die("Shop::processRedirect(): This method is obsolete!");
                 // update shipment costs (after deducting coupon discount)
                 $_SESSION['shop']['shipment_price'] = $shipmentPrice;
             }
-        } else {
-            $_SESSION['shop']['shipment_price'] = '0.00';
         }
 
         // calculate payment costs based on set payment method
@@ -4762,6 +4761,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
         $objOrder->setPhone($_SESSION['shop']['phone2']);
         $objOrder->setVatAmount($_SESSION['shop']['vat_price']);
+        $objOrder->setShipmentCost($_SESSION['shop']['shipment_cost']);
         $objOrder->setShipmentAmount($_SESSION['shop']['shipment_price']);
         if (!empty($shipper_id)) {
             $objOrder->setShipmentId($shipper_id);

@@ -3100,6 +3100,7 @@ CREATE TABLE `contrexx_module_shop_orders` (
   `phone` varchar(20) DEFAULT NULL,
   `vat_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `shipment_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
+  `shipment_cost` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `shipment_id` int(10) unsigned DEFAULT NULL,
   `payment_id` int(10) unsigned NOT NULL DEFAULT '0',
   `payment_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',

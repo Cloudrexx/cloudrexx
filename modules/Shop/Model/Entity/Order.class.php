@@ -143,6 +143,11 @@ class Order extends \Cx\Model\Base\EntityBase {
     protected $shipmentAmount = '0.00';
 
     /**
+     * @var string
+     */
+    protected $shipmentCost = '0.00';
+
+    /**
      * @var integer
      */
     protected $shipmentId;
@@ -290,7 +295,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -310,7 +315,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get customerId
      *
-     * @return integer 
+     * @return integer
      */
     public function getCustomerId()
     {
@@ -330,7 +335,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get currencyId
      *
-     * @return integer 
+     * @return integer
      */
     public function getCurrencyId()
     {
@@ -350,7 +355,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get sum
      *
-     * @return string 
+     * @return string
      */
     public function getSum()
     {
@@ -373,7 +378,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get dateTime
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDateTime()
     {
@@ -396,7 +401,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get status
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getStatus()
     {
@@ -416,7 +421,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get gender
      *
-     * @return string 
+     * @return string
      */
     public function getGender()
     {
@@ -436,7 +441,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get company
      *
-     * @return string 
+     * @return string
      */
     public function getCompany()
     {
@@ -456,7 +461,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get firstname
      *
-     * @return string 
+     * @return string
      */
     public function getFirstname()
     {
@@ -476,7 +481,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastname
      *
-     * @return string 
+     * @return string
      */
     public function getLastname()
     {
@@ -496,7 +501,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get address
      *
-     * @return string 
+     * @return string
      */
     public function getAddress()
     {
@@ -516,7 +521,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get city
      *
-     * @return string 
+     * @return string
      */
     public function getCity()
     {
@@ -536,7 +541,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get zip
      *
-     * @return string 
+     * @return string
      */
     public function getZip()
     {
@@ -556,7 +561,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get countryId
      *
-     * @return integer 
+     * @return integer
      */
     public function getCountryId()
     {
@@ -576,7 +581,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get phone
      *
-     * @return string 
+     * @return string
      */
     public function getPhone()
     {
@@ -596,7 +601,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get vatAmount
      *
-     * @return string 
+     * @return string
      */
     public function getVatAmount()
     {
@@ -616,11 +621,31 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get shipmentAmount
      *
-     * @return string 
+     * @return string
      */
     public function getShipmentAmount()
     {
         return $this->shipmentAmount;
+    }
+
+    /**
+     * Set shipmentCost
+     *
+     * @param string $shipmentCost
+     */
+    public function setShipmentCost($shipmentCost)
+    {
+        $this->shipmentCost = $shipmentCost;
+    }
+
+    /**
+     * Get shipmentCost
+     *
+     * @return string
+     */
+    public function getShipmentCost()
+    {
+        return $this->shipmentCost;
     }
 
     /**
@@ -636,7 +661,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get shipmentId
      *
-     * @return integer 
+     * @return integer
      */
     public function getShipmentId()
     {
@@ -656,7 +681,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get paymentId
      *
-     * @return integer 
+     * @return integer
      */
     public function getPaymentId()
     {
@@ -676,7 +701,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get paymentAmount
      *
-     * @return string 
+     * @return string
      */
     public function getPaymentAmount()
     {
@@ -696,7 +721,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get ip
      *
-     * @return string 
+     * @return string
      */
     public function getIp()
     {
@@ -716,7 +741,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get langId
      *
-     * @return integer 
+     * @return integer
      */
     public function getLangId()
     {
@@ -736,7 +761,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get note
      *
-     * @return string 
+     * @return string
      */
     public function getNote()
     {
@@ -756,7 +781,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get modifiedOn
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getModifiedOn()
     {
@@ -776,7 +801,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get modifiedBy
      *
-     * @return string 
+     * @return string
      */
     public function getModifiedBy()
     {
@@ -796,7 +821,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingGender
      *
-     * @return string 
+     * @return string
      */
     public function getBillingGender()
     {
@@ -816,7 +841,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingCompany
      *
-     * @return string 
+     * @return string
      */
     public function getBillingCompany()
     {
@@ -856,7 +881,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingLastname
      *
-     * @return string 
+     * @return string
      */
     public function getBillingLastname()
     {
@@ -876,7 +901,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingAddress
      *
-     * @return string 
+     * @return string
      */
     public function getBillingAddress()
     {
@@ -896,7 +921,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingCity
      *
-     * @return string 
+     * @return string
      */
     public function getBillingCity()
     {
@@ -916,7 +941,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingZip
      *
-     * @return string 
+     * @return string
      */
     public function getBillingZip()
     {
@@ -936,7 +961,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingCountryId
      *
-     * @return integer 
+     * @return integer
      */
     public function getBillingCountryId()
     {
@@ -956,7 +981,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingPhone
      *
-     * @return string 
+     * @return string
      */
     public function getBillingPhone()
     {
@@ -976,7 +1001,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingFax
      *
-     * @return string 
+     * @return string
      */
     public function getBillingFax()
     {
@@ -996,7 +1021,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get billingEmail
      *
-     * @return string 
+     * @return string
      */
     public function getBillingEmail()
     {
@@ -1026,7 +1051,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get lsvs
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getLsvs()
     {
@@ -1056,7 +1081,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderItems
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getOrderItems()
     {
@@ -1086,7 +1111,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get relCustomerCoupons
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getRelCustomerCoupons()
     {
@@ -1146,7 +1171,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get shipper
      *
-     * @return \Cx\Modules\Shop\Model\Entity\Shipper 
+     * @return \Cx\Modules\Shop\Model\Entity\Shipper
      */
     public function getShipper()
     {
@@ -1166,7 +1191,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     /**
      * Get payment
      *
-     * @return \Cx\Modules\Shop\Model\Entity\Payment 
+     * @return \Cx\Modules\Shop\Model\Entity\Payment
      */
     public function getPayment()
     {
