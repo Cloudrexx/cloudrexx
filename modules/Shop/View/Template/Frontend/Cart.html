@@ -109,93 +109,14 @@
         </div>
         <div class="cart-buttons">
             <input class="btn btn-default" type="submit" name="update" value="{TXT_UPDATE}" />
-            <input class="btn btn-default" type="submit" name="continue" class="continue-button" value="{TXT_NEXT} &gt;&gt;" />
+            <!-- BEGIN continue -->
+                <input class="btn btn-default" type="submit" name="continue" class="continue-button" value="{TXT_NEXT} &gt;&gt;" />
+            <!-- END continue -->
         </div>
     </form>
+    <!-- END shopCart -->
     <div class="cart-links">
         <a href="index.php?section=Shop" title="{TXT_CONTINUE_SHOPPING}">{TXT_CONTINUE_SHOPPING}</a><br />
         <a href="index.php?section=Shop&amp;act=destroy" title="{TXT_EMPTY_CART}">{TXT_EMPTY_CART}</a>
     </div>
-    <!-- END shopCart -->
-    <!-- BEGIN shopCartEmpty -->
-    <h2>{TXT_EMPTY_SHOPPING_CART}</h2>
-    <div class="cart-links">
-      <a href="index.php?section=Shop" title="{TXT_CONTINUE_SHOPPING}">{TXT_CONTINUE_SHOPPING}</a><br />
-    </div>
-    <!-- END shopCartEmpty -->
-
-    <!-- BEGIN products -->
-    <h2>{TXT_SHOP_PRODUCTS_LAST_VISITED}</h2>
-    <!-- BEGIN shopProductRow -->
-    <div class="product">
-      <div class="row">
-        <form role="form" id="{SHOP_PRODUCT_FORM_NAME}" name="{SHOP_PRODUCT_FORM_NAME}" action="index.php?section=Shop&amp;cmd=cart" method="post" {SHOP_FORM_ENCTYPE}>
-          <input type="hidden" name="productId" value="{SHOP_PRODUCT_ID}" />
-          <div class="container-fluid">
-            <div class="row">
-              <div class="images col-md-3">
-                <!-- BEGIN productImage1 -->
-                <a href="{SHOP_PRODUCT_THUMBNAIL_LINK_1}">
-                  <img class="img-thumbnail" border="0" src="{SHOP_PRODUCT_THUMBNAIL_1}" alt="{TXT_SEE_LARGE_PICTURE}" />
-                </a>
-                <!-- END productImage1 -->
-              </div>
-              <div class="info col-md-9">
-                <h3>{SHOP_PRODUCT_TITLE}</h3>
-                <div class="short-description">
-                  {SHOP_PRODUCT_DESCRIPTION}
-                  <!-- BEGIN shopProductOptionsRow -->
-                  <div class="shop_options">
-                    {SHOP_PRODUCT_OPTIONS_TITLE}<br />
-                    <div id="product_options_layer{SHOP_PRODUCT_ID}" style="display: none;">
-                      <div class="shop_options_click">
-                        <!-- BEGIN shopProductOptionsValuesRow -->
-                        <strong>
-                          {SHOP_PRODUCT_OPTIONS_NAME}
-                          <!-- BEGIN product_attribute_mandatory -->
-                          <span class="mandatory">&nbsp;*</span>
-                          <!-- END product_attribute_mandatory -->
-                        </strong><br />
-                        {SHOP_PRODCUT_OPTION}
-                        <!-- END shopProductOptionsValuesRow -->
-                      </div>
-                    </div>
-                  </div>
-                  <!-- END shopProductOptionsRow -->
-                </div>
-                <div class="details">
-                  <button class="btn btn-primary details-button" type="button" onclick="location.href = '{SHOP_PRODUCT_DETAIL_URL}'">{TXT_SHOP_PRODUCT_DETAILS}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="functions">
-                        <button class="add-to-cart btn btn-primary" type="submit" onclick="{SHOP_PRODUCT_SUBMIT_FUNCTION}" name="{SHOP_PRODUCT_SUBMIT_NAME}">{TXT_ADD_TO_CARD}</button>
-            <div class="price">
-              <!-- BEGIN price -->
-              <span itemprop="priceCurrency">{SHOP_PRODUCT_PRICE_UNIT}</span> <span itemprop="price">{SHOP_PRODUCT_PRICE}</span>
-              <!-- END price -->
-              <!-- BEGIN price_discount -->
-              {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_1} <span itemprop="price">{SHOP_PRODUCT_PRICE}</span>
-              <span class="discount">
-                  {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_2} <span itemprop="priceCurrency">{SHOP_PRODUCT_DISCOUNTPRICE_UNIT}</span> <span itemprop="price">{SHOP_PRODUCT_DISCOUNTPRICE}</span>
-              </span>
-              <!-- END price_discount -->
-            </div>
-            <!-- BEGIN orderQuantity -->
-            <div class="order-quanity-container">
-              <div class="input-group input-group-sm ">
-                <span class="input-group-addon" id="sizing-addon3">{TXT_SHOP_ORDER_QUANTITY}</span>
-                <input type="number" value="1" class="form-control min-order-quantity" name="orderQuanity" data-minimum-order-quantity="{SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY}">
-              </div>
-              <div class="clearfix"></div>
-              <span id="helpBlock" class="help-block">{TXT_SHOP_MINIMUM_ORDER_QUANTITY}: {SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY}</span>
-            </div>
-            <!-- END orderQuantity -->
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- END shopProductRow -->
-    <!-- END products -->
 </div>

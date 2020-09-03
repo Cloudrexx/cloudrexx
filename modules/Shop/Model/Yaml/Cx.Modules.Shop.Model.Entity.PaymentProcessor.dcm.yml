@@ -1,0 +1,47 @@
+Cx\Modules\Shop\Model\Entity\PaymentProcessor:
+  type: entity
+  table: module_shop_payment_processors
+  repositoryClass: Cx\Modules\Shop\Model\Repository\PaymentProcessorRepository
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    type:
+      type: enum
+      values: ['internal', 'external']
+      options:
+        default: 'internal'
+    name:
+      type: string
+      length: 255
+      options:
+        default: ''
+    description:
+      type: text
+    companyUrl:
+      type: string
+      length: 255
+      options:
+        default: ''
+      column: company_url
+    status:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    picture:
+      type: string
+      length: 255
+      options:
+        default: ''
+  oneToMany:
+    payments:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Payment
+      mappedBy: paymentProcessor
+      joinColumn:
+        name: id
+        referencedColumnName: processor_id

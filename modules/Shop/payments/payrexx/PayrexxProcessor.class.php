@@ -81,6 +81,11 @@ class PayrexxProcessor
 
         $order = \Cx\Modules\Shop\Controller\Order::getById($_SESSION['shop']['order_id']);
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $currency = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Currency'
+        )->find($order->currency_id());
+
         $payrexx = new \Payrexx\Payrexx($instanceName, $apiSecret);
         $gateway = new \Payrexx\Models\Request\Gateway();
         $gateway->setReferenceId('Shop-' . $order->id());
@@ -91,7 +96,7 @@ class PayrexxProcessor
         $gateway->setSuccessRedirectUrl($successPageUrl);
         $gateway->setFailedRedirectUrl($successPageUrl);
         $gateway->setAmount(intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)));
-        $gateway->setCurrency(\Cx\Modules\Shop\Controller\Currency::getCodeById($order->currency_id()));
+        $gateway->setCurrency($currency->getCode());
         $gateway->addField('email', $order->billing_email());
         $gateway->addField('company', $order->billing_company());
         $gateway->addField('forename', $order->billing_firstname());
@@ -171,7 +176,7 @@ EOF;
         // Return null in any other case than 'confirmed'.
         // This shall enure compatability with payrexx as the gateway sends
         // status notifications of all events including when a card is
-        // declined and more.
+        // declined and more.   
         if ($_POST['transaction']['status'] !== 'confirmed') {
             return null;
         }

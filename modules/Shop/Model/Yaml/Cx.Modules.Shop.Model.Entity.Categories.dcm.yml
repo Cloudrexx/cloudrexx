@@ -1,0 +1,82 @@
+Cx\Modules\Shop\Model\Entity\Categories:
+  type: entity
+  table: module_shop_categories
+  repositoryClass: Cx\Modules\Shop\Model\Repository\CategoriesRepository
+  indexes:
+    flags:
+      columns: [ flags ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    parentId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: parent_id
+    ord:
+      type: integer
+      options:
+        unsigned: true
+        default: 0
+    active:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    picture:
+      type: string
+      length: 255
+      options:
+        default: ''
+    flags:
+      type: string
+      length: 255
+      options:
+        default: ''
+    name:
+      type: string
+      length: 255
+      options:
+        default: ''
+    description:
+      type: text
+  manyToMany:
+    pricelists:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Pricelists
+      inversedBy: categories
+      joinTable:
+        name: module_shop_rel_category_pricelist
+        joinColumns:
+          category_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          pricelist_id:
+            referencedColumnName: id
+    products:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Products
+      inversedBy: categories
+      joinTable:
+        name: module_shop_rel_category_product
+        joinColumns:
+          category_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          product_id:
+            referencedColumnName: id
+  oneToMany:
+    children:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Categories
+      mappedBy: parentCategory
+  manyToOne:
+    parentCategory:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Categories
+      inversedBy: children
+      joinColumn:
+        name: parent_id
+        referencedColumnName: id

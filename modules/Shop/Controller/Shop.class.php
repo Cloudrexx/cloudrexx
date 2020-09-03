@@ -172,16 +172,16 @@ class Shop extends ShopLibrary
      */
     static function init()
     {
+        global $_ARRAYLANG, $objInit;
+
         if (self::$initialized) {
             return;
         }
         self::init_session();
-        if (   empty($_REQUEST['section'])
-            || $_REQUEST['section'] != 'Shop'.MODULE_INDEX) {
-            global $_ARRAYLANG, $objInit;
-            $_ARRAYLANG = array_merge($_ARRAYLANG,
-                $objInit->loadLanguageData('Shop'));
-        }
+        $_ARRAYLANG = array_merge(
+            $_ARRAYLANG,
+            $objInit->loadLanguageData('Shop')
+        );
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         self::$defaultImage = file_exists(
             $cx->getWebsiteImagesShopPath() . '/' . ShopLibrary::noPictureName)
@@ -304,8 +304,8 @@ class Shop extends ShopLibrary
         // Global placeholders that are used on (almost) all pages.
         // Add more as desired.
         self::$objTemplate->setGlobalVariable(array(
-            'SHOP_CURRENCY_CODE' => Currency::getActiveCurrencyCode(),
-            'SHOP_CURRENCY_SYMBOL' => Currency::getActiveCurrencySymbol(),
+            'SHOP_CURRENCY_CODE' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
+            'SHOP_CURRENCY_SYMBOL' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
         ));
         if (!isset($_GET['cmd'])) $_GET['cmd'] = '';
         if (!isset($_GET['act'])) $_GET['act'] = $_GET['cmd'];
@@ -363,11 +363,15 @@ class Shop extends ShopLibrary
                 // Test with
                 // http://localhost/contrexx_300/de/index.php?section=Shop&act=testMail&key=&order_id=5
 //MailTemplate::errorHandler();die();
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
                 $order_id = (!empty($_GET['order_id']) ? $_GET['order_id'] : 10);
                 $key = (!empty($_GET['key']) ? $_GET['key'] : 'order_confirmation');
-                $arrSubstitution = Orders::getSubstitutionArray($order_id);
+                $arrSubstitution = $orderRepo->getSubstitutionArray($order_id);
                 $customer_id = $arrSubstitution['CUSTOMER_ID'];
-                $objCustomer = Customer::getById($customer_id);
+                $objCustomer = \Cx\Modules\Shop\Controller\Customer::getById($customer_id);
                 if (!$objCustomer) {
 die("Failed to get Customer for ID $customer_id");
                     return false;
@@ -405,10 +409,6 @@ die("Failed to get Customer for ID $customer_id");
                     ),
                 ));
                 die("Done!");
-
-            case 'pricelist':
-                self::send_pricelist();
-                break;
             case 'terms':
                 // Static content only (fttb)
                 break;
@@ -428,6 +428,12 @@ die("Failed to get Customer for ID $customer_id");
             default:
                 self::view_product_overview();
         }
+
+        // we must force user based cache as the prices and available
+        // products depend on the user role (b2b/b2c)
+        $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->forceUserbasedPageCache();
+
         // Note that the Shop Navbar *MUST* be set up *after* the request
         // has been processed, otherwise the cart info won't be up to date!
         self::setNavbar();
@@ -552,11 +558,16 @@ die("Failed to get Customer for ID $customer_id");
         // Currencies
         if (self::$show_currency_navbar
          && $objTpl->blockExists('shopCurrencies')) {
-            $curNavbar = Currency::getCurrencyNavbar();
+            $curNavbar = \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyNavbar();
             if (!empty($curNavbar)) {
                 $objTpl->setVariable('SHOP_CURRENCIES', $curNavbar);
             }
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
 
         // determine selected category and/or product
         $selectedCatId = 0;
@@ -571,13 +582,20 @@ die("Failed to get Customer for ID $customer_id");
             if (isset($_REQUEST['referer']) && $_REQUEST['referer'] == 'cart') {
                 $product_id = Cart::get_product_id($product_id);
             }
-            $objProduct = Product::getById($product_id);
-            if ($objProduct) {
-                $productCatIds = $objProduct->category_id();
-                if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', explode(',', $productCatIds)))) {
-                    $selectedCatId = $_SESSION['shop']['previous_category_id'];
-                } else {
-                    $selectedCatId = preg_replace('/,.+$/', '', $productCatIds);
+            if ($product_id !== null) {
+                $objProduct = $productRepo->find($product_id);
+                if ($objProduct) {
+                    $categories = $objProduct->getCategories();
+                    $productCatIds = array();
+                    foreach ($categories as $category) {
+                        $productCatIds[] = $category->getId();
+                    }
+                    $productCatIds = implode(',', $productCatIds);
+                    if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', $productCatIds))) {
+                        $selectedCatId = $_SESSION['shop']['previous_category_id'];
+                    } else {
+                        $selectedCatId = preg_replace('/,.+$/', '', $productCatIds);
+                    }
                 }
             }
         }
@@ -687,8 +705,8 @@ die("Failed to get Customer for ID $customer_id");
         // parse Product in shop_breadcrumb if a product is being viewed
         if ($product) {
             $objTpl->setVariable(array(
-                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->id()))->toString(),
-                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->name()),
+                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->getId()))->toString(),
+                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->getName()),
             ));
             $objTpl->parse('shop_breadcrumb_part');
         }
@@ -838,7 +856,7 @@ die("Failed to get Customer for ID $customer_id");
             Cart::get_item_count().' '.
             $_ARRAYLANG['TXT_SHOPPING_CART_VALUE'].' '.
             Cart::get_price().' '.
-            Currency::getActiveCurrencySymbol();
+            \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol();
         $cartInfo =
             '<a href="'.
             \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'cart').
@@ -928,6 +946,11 @@ die("Failed to update the Cart!");
         }
     }
 
+    static function initVat() {
+        Vat::is_home_country(
+               empty($_SESSION['shop']['countryId2'])
+            || $_SESSION['shop']['countryId2'] == \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop'));
+    }
 
     /**
      * Updates the session with all data relevant to the current order
@@ -954,25 +977,25 @@ die("Failed to update the Cart!");
             // VAT included?
             if (Vat::isIncluded()) {
                 // home country equals shop country; VAT is included already
-                if (Vat::is_home_country()) {
-                    $_SESSION['shop']['vat_price'] = Currency::formatPrice(
+                //if (Vat::is_home_country()) {
+                    $_SESSION['shop']['vat_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                         Cart::get_vat_amount() +
                         Vat::calculateOtherTax(
                               $_SESSION['shop']['payment_price']
                             + $_SESSION['shop']['shipment_price']
                         )
                     );
-                    $_SESSION['shop']['grand_total_price'] = Currency::formatPrice(
+                    $_SESSION['shop']['grand_total_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                           Cart::get_price()
                         + $_SESSION['shop']['payment_price']
                         + $_SESSION['shop']['shipment_price']
                     );
                     $_SESSION['shop']['vat_products_txt'] = $_ARRAYLANG['TXT_TAX_INCLUDED'];
                     $_SESSION['shop']['vat_grand_txt'] = $_ARRAYLANG['TXT_TAX_INCLUDED'];
-                } else {
+                /*} else {
                     // Foreign country; subtract VAT from grand total price.
                     $_SESSION['shop']['vat_price'] = Cart::get_vat_amount();
-                    $_SESSION['shop']['grand_total_price'] = Currency::formatPrice(
+                    $_SESSION['shop']['grand_total_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                           Cart::get_price()
                         + $_SESSION['shop']['payment_price']
                         + $_SESSION['shop']['shipment_price']
@@ -980,7 +1003,7 @@ die("Failed to update the Cart!");
                     );
                     $_SESSION['shop']['vat_products_txt'] = $_ARRAYLANG['TXT_TAX_INCLUDED'];
                     $_SESSION['shop']['vat_grand_txt'] = $_ARRAYLANG['TXT_TAX_EXCLUDED'];
-                }
+                }*/
             } else {
                 // VAT is excluded
 // When the VAT is excluded, but enabled for foreign countries,
@@ -990,13 +1013,13 @@ die("Failed to update the Cart!");
                     // home country equals shop country; add VAT.
                     // the VAT on the products has already been calculated and set in the cart.
                     // now we add the default VAT to the shipping and payment cost.
-                    $_SESSION['shop']['vat_price'] = Currency::formatPrice(
+                    $_SESSION['shop']['vat_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                         Cart::get_vat_amount() +
                         Vat::calculateOtherTax(
                             $_SESSION['shop']['payment_price'] +
                             $_SESSION['shop']['shipment_price']
                         ));
-                    $_SESSION['shop']['grand_total_price'] = Currency::formatPrice(
+                    $_SESSION['shop']['grand_total_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                           Cart::get_price()
                         + $_SESSION['shop']['payment_price']
                         + $_SESSION['shop']['shipment_price']
@@ -1019,7 +1042,7 @@ die("Failed to update the Cart!");
             $_SESSION['shop']['vat_price'] = '0.00';
             $_SESSION['shop']['vat_products_txt'] = '';
             $_SESSION['shop']['vat_grand_txt'] = '';
-            $_SESSION['shop']['grand_total_price'] = Currency::formatPrice(
+            $_SESSION['shop']['grand_total_price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   Cart::get_price()
                 + $_SESSION['shop']['payment_price']
                 + $_SESSION['shop']['shipment_price']);
@@ -1060,7 +1083,11 @@ die("Failed to update the Cart!");
                     'SHOP_CATEGORY_CURRENT_DESCRIPTION' => $description,
                 ));
                 static::$pageTitle = $objCategory->name();
-                static::$pageMetaDesc = contrexx_html2plaintext($objCategory->shortDescription());
+                if (!empty($objCategory->shortDescription())) {
+                    static::$pageMetaDesc = contrexx_html2plaintext($objCategory->shortDescription());
+                } else {
+                    static::$pageMetaDesc = contrexx_html2plaintext($objCategory->description());
+                }
                 if ($imageName) {
                     self::$objTemplate->setVariable(array(
                         'SHOP_CATEGORY_CURRENT_IMAGE'       => $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
@@ -1218,7 +1245,7 @@ die("Failed to update the Cart!");
             }
             if (self::$objTemplate->blockExists('subCategories')) {
                 self::$objTemplate->parse('subCategories');
-                if (++$cell % $categoriesPerRow == 0) {
+                if (!$categoriesPerRow || ++$cell % $categoriesPerRow == 0) {
                     self::$objTemplate->parse('subCategoriesRow');
                 }
             }
@@ -1247,7 +1274,7 @@ die("Failed to update the Cart!");
 
         $flagSpecialoffer = intval(\Cx\Core\Setting\Controller\Setting::getValue('show_products_default','Shop'));
         if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'discounts') {
-            $flagSpecialoffer = Products::DEFAULT_VIEW_DISCOUNTS;
+            $flagSpecialoffer = \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS;
         }
         $flagLastFive = isset($_REQUEST['lastFive']);
         $product_id = (isset($_REQUEST['productId'])
@@ -1269,11 +1296,15 @@ die("Failed to update the Cart!");
             // in that it enables listing the subcategories
             $category_id = 0;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         // Validate parameters
         if ($product_id && empty($category_id)) {
-            $objProduct = Product::getById($product_id);
+            $objProduct = $productRepo->find($product_id);
             if ($objProduct && $objProduct->getStatus()) {
-                $category_id = $objProduct->category_id();
+                $categories = $objProduct->getCategories();
             } else {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('shop', '')
@@ -1281,17 +1312,17 @@ die("Failed to update the Cart!");
             }
             if (isset($_SESSION['shop']['previous_category_id'])) {
                 $category_id_previous = $_SESSION['shop']['previous_category_id'];
-                foreach (preg_split('/\s*,\s*/', $category_id) as $id) {
-                    if ($category_id_previous == intval($id)) {
+                foreach ($categories as $category) {
+                    if ($category_id_previous == $category->getId()) {
                         $category_id = $category_id_previous;
                     }
                 }
             }
         }
         // Remember visited Products
-        if ($product_id) {
+        /*if ($product_id) {
             self::rememberVisitedProducts($product_id);
-        }
+        }*/
         $objCategory = null;
         if ($category_id && empty($product_id)) {
             $objCategory = ShopCategory::getById($category_id);
@@ -1299,6 +1330,12 @@ die("Failed to update the Cart!");
                 $category_id = null;
             }
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $manufacturerRepo = $cx->getDb()->getEntityManager()->getRepository(
+            '\Cx\Modules\Shop\Model\Entity\Manufacturer'
+        );
+
         $shopMenu =
             '<form method="post" action="'.
             \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', '').'">'.
@@ -1308,7 +1345,7 @@ die("Failed to update the Cart!");
             '<select name="catId" style="width:150px;">'.
             '<option value="0">'.$_ARRAYLANG['TXT_ALL_PRODUCT_GROUPS'].
             '</option>'.ShopCategories::getMenuoptions($category_id).
-            '</select>&nbsp;'.Manufacturer::getMenu(
+            '</select>&nbsp;'.\Cx\Modules\Shop\Controller\ManufacturerController::getMenu(
                 'manufacturerId', $manufacturer_id, true).
             '<input type="submit" name="bsubmit" value="'.$_ARRAYLANG['TXT_SEARCH'].
             '" style="width:66px;" />'.
@@ -1322,7 +1359,7 @@ die("Failed to update the Cart!");
             'SHOP_CATEGORIES_MENUOPTIONS' =>
                 ShopCategories::getMenuoptions($category_id, true, 0, true),
             'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                Manufacturer::getMenuoptions($manufacturer_id, true),
+                \Cx\Modules\Shop\Controller\ManufacturerController::getMenuoptions($manufacturer_id, true),
         ));
         // Only show the cart info when the JS cart is not active!
         global $_CONFIGURATION;
@@ -1412,7 +1449,7 @@ die("Failed to update the Cart!");
             if ($term != '') {
                 $sortOrder = 'score1 DESC, score2 DESC, score3 DESC';
             }
-            $arrProduct = Products::getByShopParams(
+            $arrProduct = \Cx\Modules\Shop\Controller\ProductController::getByShopParams(
                 $count, \Paging::getPosition(),
                 $product_id, $category_id, $manufacturer_id, $term,
                 $flagSpecialoffer, $flagLastFive,
@@ -1459,7 +1496,7 @@ die("Failed to update the Cart!");
 // TODO: There are other cases of flag combinations that are not indivuidually
 // handled here yet.
             if ($term == '') {
-                if ($flagSpecialoffer == Products::DEFAULT_VIEW_DISCOUNTS) {
+                if ($flagSpecialoffer == \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS) {
                     self::$objTemplate->setVariable(
                         'SHOP_PRODUCTS_IN_CATEGORY',
                             $_ARRAYLANG['TXT_SHOP_PRODUCTS_SPECIAL_OFFER']);
@@ -1499,9 +1536,9 @@ die("Failed to update the Cart!");
         $isFileAttrExistsInPdt = false;
         $uploader = false;
         foreach ($arrProduct as $objProduct) {
-            $id = $objProduct->id();
+            $id = $objProduct->getId();
             $productSubmitFunction = '';
-            $arrPictures = Products::get_image_array_from_base64($objProduct->pictures());
+            $arrPictures = ProductController::get_image_array_from_base64($objProduct->getPicture());
             $havePicture = false;
             $arrProductImages = array();
             foreach ($arrPictures as $index => $image) {
@@ -1576,9 +1613,9 @@ die("Failed to update the Cart!");
                 $havePicture = true;
             }
             if (!empty($product_id)) {
-                static::$pageTitle = $objProduct->name();
-                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->short());
-                static::$pageMetaKeys = $objProduct->keywords();
+                static::$pageTitle = $objProduct->getName();
+                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->getShort());
+                static::$pageMetaKeys = $objProduct->getKeys();
                 if (count($arrProductImages)) {
                     static::$pageMetaImage = current($arrProductImages)['IMAGE_PATH'];
                 }
@@ -1599,7 +1636,7 @@ die("Failed to update the Cart!");
                 } else {
                     self::$objTemplate->setVariable(
                         'TXT_SEE_LARGE_PICTURE',
-                        contrexx_raw2xhtml($objProduct->name()));
+                        contrexx_raw2xhtml($objProduct->getName()));
                 }
                 if ($arrProductImage['POPUP_LINK']) {
                     self::$objTemplate->setVariable(
@@ -1616,8 +1653,8 @@ die("Failed to update the Cart!");
                 }
                 ++$i;
             }
-            $stock = ($objProduct->stock_visible()
-                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->stock())
+            $stock = ($objProduct->getStockVisible()
+                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->getStock())
                 : '');
             $price = $objProduct->get_custom_price(
                 self::$objCustomer,
@@ -1627,8 +1664,8 @@ die("Failed to update the Cart!");
             );
             // If there is a discountprice and it's enabled
             $discountPrice = '';
-            if (   $objProduct->discountprice() > 0
-                && $objProduct->discount_active()) {
+            if (   $objProduct->getDiscountprice() > 0
+                && $objProduct->getDiscountActive()) {
                 $price = '<s>'.$price.'</s>';
                 $discountPrice = $objProduct->get_custom_price(
                     self::$objCustomer,
@@ -1638,8 +1675,8 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $groupCountId = $objProduct->group_id();
-            $groupArticleId = $objProduct->article_id();
+            $groupCountId = $objProduct->getGroupId();
+            $groupArticleId = $objProduct->getArticleId();
             $groupCustomerId = 0;
             if (self::$objCustomer) {
                 $groupCustomerId = self::$objCustomer->group_id();
@@ -1667,15 +1704,15 @@ die("Failed to update the Cart!");
                 }
             }
 */
-            $short = $objProduct->short();
-            $longDescription = $objProduct->long();
+            $short = $objProduct->getShort();
+            $longDescription = $objProduct->getLong();
 
             $detailLink = null;
             // Detaillink is required for microdata (even when longdesc
             // is empty)
             $detail_url = \Cx\Core\Routing\Url::fromModuleAndCmd(
                 'Shop', 'details', FRONTEND_LANG_ID,
-                array('productId' => $objProduct->id()))->toString();
+                array('productId' => $objProduct->getId()))->toString();
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_DETAIL_URL', $detail_url);
             if (!$product_id && !empty($longDescription)) {
@@ -1740,8 +1777,8 @@ die("Failed to update the Cart!");
             }
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.$row,
-                'SHOP_PRODUCT_ID' => $objProduct->id(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_ID' => $objProduct->getId(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
                 'SHOP_PRODUCT_DESCRIPTION' => $short,
                 'SHOP_PRODUCT_DETAILDESCRIPTION' => $detailDescription,
                 'SHOP_PRODUCT_FORM_NAME' => $shopProductFormName,
@@ -1755,20 +1792,29 @@ die("Failed to update the Cart!");
                         ? $_ARRAYLANG['TXT_SHOP_PRODUCT_METER']
                         : $_ARRAYLANG['TXT_SHOP_PRODUCT_COUNT']
                     ),
-                'SHOP_CURRENCY_CODE' => Currency::getActiveCurrencyCode(),
+                'SHOP_CURRENCY_CODE' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             ));
-            if ($objProduct->code()) {
+            // show or hide template-block for detail description
+            if (self::$objTemplate->blockExists('shop_product_detaildescription')) {
+                if ($longDescription) {
+                    self::$objTemplate->touchBlock('shop_product_detaildescription');
+                } else {
+                    self::$objTemplate->hideBlock('shop_product_detaildescription');
+                }
+            }
+            if ($objProduct->getCode()) {
                 self::$objTemplate->setVariable(
                     'SHOP_PRODUCT_CUSTOM_ID', htmlentities(
-                        $objProduct->code(), ENT_QUOTES, CONTREXX_CHARSET));
+                        $objProduct->getCode(), ENT_QUOTES, CONTREXX_CHARSET));
             }
             $manufacturer_name = $manufacturer_url = $manufacturer_link = '';
-            $manufacturer_id = $objProduct->manufacturer_id();
+            $manufacturer_id = $objProduct->getManufacturerId();
             if ($manufacturer_id) {
+                $manufacturer = $manufacturerRepo->find($manufacturer_id);
                 $manufacturer_name =
-                    Manufacturer::getNameById($manufacturer_id, FRONTEND_LANG_ID);
+                    $manufacturer->getName();
                 $manufacturer_url =
-                    Manufacturer::getUrlById($manufacturer_id, FRONTEND_LANG_ID);
+                    $manufacturer->getUri();
             }
             if (!empty($manufacturer_url) || !empty($manufacturer_name)) {
                 if (empty($manufacturer_name)) {
@@ -1797,7 +1843,7 @@ die("Failed to update the Cart!");
             // This is now extended by the Manufacturer table and should thus
             // get a new purpose.  As it is product specific, it could be
             // renamed and reused as a link to individual Products!
-            $externalLink = $objProduct->uri();
+            $externalLink = $objProduct->getUri();
             if (!empty($externalLink)) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_EXTERNAL_LINK' =>
@@ -1816,7 +1862,7 @@ die("Failed to update the Cart!");
             if ($price) {
                 self::$objTemplate->setGlobalVariable(array(
                     'SHOP_PRODUCT_PRICE' => $price,
-                    'SHOP_PRODUCT_PRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+                    'SHOP_PRODUCT_PRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
             }
             // Only show the discount price if it's actually in use,
@@ -1824,7 +1870,7 @@ die("Failed to update the Cart!");
             if ($discountPrice) {
                 self::$objTemplate->setGlobalVariable(array(
                     'SHOP_PRODUCT_DISCOUNTPRICE' => $discountPrice,
-                    'SHOP_PRODUCT_DISCOUNTPRICE_UNIT' => Currency::getActiveCurrencySymbol(),
+                    'SHOP_PRODUCT_DISCOUNTPRICE_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                     'SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_1' => $_ARRAYLANG['TXT_SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_1'],
                     'SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_2' => $_ARRAYLANG['TXT_SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_2'],
                 ));
@@ -1846,14 +1892,14 @@ die("Failed to update the Cart!");
                     'TXT_SHOP_PRICE_TODAY' =>
                         $_ARRAYLANG['TXT_SHOP_PRICE_TODAY'],
                     'SHOP_PRICE_TODAY' =>
-                        Currency::getCurrencyPrice(
+                        \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice(
                             $objProduct->getDiscountedPrice()
                         ),
                     'SHOP_PRICE_TODAY_UNIT' =>
-                        Currency::getActiveCurrencySymbol(),
+                        \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
             }
-            if ($objProduct->stock_visible()) {
+            if ($objProduct->getStockVisible()) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_STOCK' => $stock,
                 ));
@@ -1863,10 +1909,10 @@ die("Failed to update the Cart!");
                     'SHOP_PRODUCT_DETAILLINK' => $detailLink,
                 ));
             }
-            $distribution = $objProduct->distribution();
+            $distribution = $objProduct->getDistribution();
             $weight = '';
             if ($distribution == 'delivery') {
-                $weight = $objProduct->weight();
+                $weight = $objProduct->getWeight();
             }
 
             // Hide the weight if it is zero or disabled in the configuration
@@ -1885,13 +1931,13 @@ die("Failed to update the Cart!");
                             : $_ARRAYLANG['TXT_SHOP_VAT_PREFIX_EXCL']
                          ),
                     'SHOP_PRODUCT_TAX' =>
-                        Vat::getShort($objProduct->vat_id())
+                        Vat::getShort($objProduct->getVatId())
                 ));
             }
 
             // Add flag images for flagged Products
             $strImage = '';
-            $strFlags = $objProduct->flags();
+            $strFlags = $objProduct->getFlags();
             $arrVirtual = ShopCategories::getVirtualCategoryNameArray(FRONTEND_LANG_ID);
             foreach (explode(' ', $strFlags) as $strFlag) {
                 if (in_array($strFlag, $arrVirtual)) {
@@ -1906,18 +1952,19 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $minimum_order_quantity = $objProduct->minimum_order_quantity();
+            $minimum_order_quantity = $objProduct->getMinimumOrderQuantity();
             //Activate Quantity-Inputfield when minimum_order_quantity exists
             if (self::$objTemplate->blockExists('orderQuantity') && $minimum_order_quantity > 0) {
-                self::$objTemplate->setVariable(
-                        'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->minimum_order_quantity())
-                );
+                self::$objTemplate->setVariable(array(
+                    'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY' => contrexx_raw2xhtml($objProduct->getMinimumOrderQuantity()),
+                    'SHOP_PRODUCT_MAXIMUM_ORDER_QUANTITY' => $objProduct->getStock() ? $objProduct->getStock() : '',
+                ));
                 self::$objTemplate->touchBlock('orderQuantity');
             } elseif (self::$objTemplate->blockExists('orderQuantity') && !$minimum_order_quantity){
                 self::$objTemplate->hideBlock('orderQuantity');
             }
 
-            if ($objProduct->stock()) {
+            if ($objProduct->getStock()) {
                 if (self::$objTemplate->blockExists('shop_product_in_stock')) {
                     self::$objTemplate->touchBlock('shop_product_in_stock');
                 }
@@ -1933,17 +1980,8 @@ die("Failed to update the Cart!");
                 }
             }
 
+            // TODO: migrate to new model
             // list assigned categories
-            if (self::$objTemplate->blockExists('shop_product_categories')) {
-                $categoryIds = $objProduct->category_id();
-                foreach (preg_split('/\s*,\s*/', $categoryIds) as $catId) {
-                    self::$objTemplate->setVariable(
-                        'SHOP_PRODUCT_CATEGORY_ID',
-                        $catId
-                    );
-                    self::$objTemplate->parse('shop_product_categories');
-                }
-            }
 
             if (self::$objTemplate->blockExists('shopProductRow')) {
                 self::$objTemplate->parse('shopProductRow');
@@ -1970,8 +2008,12 @@ die("Failed to update the Cart!");
         if (empty($productIds)) {
             return $arrProduct;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach ($productIds as $productId) {
-            $product = Product::getById($productId);
+            $product = $productRepo->find($productId);
             if ($product && $product->getStatus()) {
                 $arrProduct[] = $product;
             }
@@ -2234,8 +2276,8 @@ die("Failed to update the Cart!");
                         if ($arrOption['price'] != 0) {
                             $pricePrefix = $arrOption['price'] > 0 ? '+' : '';
                             $option_price =
-                                '&nbsp;('.$pricePrefix.Currency::getCurrencyPrice($arrOption['price']).
-                                '&nbsp;'.Currency::getActiveCurrencySymbol().')';
+                                '&nbsp;('.$pricePrefix.\Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($arrOption['price']).
+                                '&nbsp;'.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol().')';
                         }
                         // mark the option value as selected if it was before
                         // and this page was requested from the cart
@@ -2544,7 +2586,7 @@ die("Failed to update the Cart!");
         $shipmentPrice = Shipment::calculateShipmentPrice(
             $shipperId, $price, $weight
         );
-        return Currency::getCurrencyPrice($shipmentPrice);
+        return \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($shipmentPrice);
     }
 
 
@@ -2569,20 +2611,30 @@ die("Failed to update the Cart!");
             return 0;
         }
         // no payment fee if payment method is invalid
-        if (Payment::getProperty($payment_id, 'fee') === false) {
+        if (
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'fee'
+            ) === false
+        ) {
             return 0;
         }
         // no payment fee if order sum is greater then set boundary
         if (
-            Payment::getProperty($payment_id, 'free_from') > 0 &&
-            $totalPrice >= Payment::getProperty($payment_id, 'free_from')
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'free_from'
+            ) > 0 &&
+            $totalPrice >= \Cx\Modules\Shop\Controller\PaymentController::getProperty($payment_id, 'free_from')
         ) {
             return 0;
         }
 
         // fetch fee data
-        $type = Payment::getProperty($payment_id, 'type');
-        $fee = Payment::getProperty($payment_id, 'fee');
+        $type = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'type'
+        );
+        $fee = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'fee'
+        );
 
         // calculate fee based on selected payment method
         $paymentPrice = 0;
@@ -2597,7 +2649,7 @@ die("Failed to update the Cart!");
                 break;
         }
 
-        return Currency::getCurrencyPrice($paymentPrice);
+        return \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($paymentPrice);
     }
 
 
@@ -2874,7 +2926,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (!empty($_POST['shop_birthday_day'])) {
                 $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
             }
-            if (!empty($_POST['shop_birthday_month'])) {
+            if (!empty($_POST['shop_birthday_month'])) { 
                 $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
             }
             if (!empty($_POST['shop_birthday_year'])) {
@@ -2895,16 +2947,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ACCOUNT_ACTION' =>
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'),
             // New template - since 2.1.0
-            // countryId is used for payment address, therefore we must
-            // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
             // Old template
             // Compatibility with 2.0 and older versions
-            // countryId is used for payment address, therefore we must
-            // list all countries here (and not restrict to shipping countries)
-            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
+            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id),
         ));
+
 
         // parse birthday fields
         if (self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY')) {
@@ -3474,34 +3523,79 @@ die("Shop::processRedirect(): This method is obsolete!");
 
     static function _initPaymentDetails()
     {
-        // Uses the active currency
+        // coupon to be redeemed
+        $coupon = null;
+
+        // total cost of the products in the cart after redemption of a coupon
+        // note: Uses the active currency
         $cart_amount = Cart::get_price();
+
         // The Payment ID must be known and up to date when the cart is
-        // parsed in order to consider payment dependent Coupons
-        if (isset($_POST['paymentId']))
+        // parsed in order to consider payment dependent Coupons.
+        // Therefore, we do have to call Cart::update() again at the end of
+        // this method.
+        if (isset($_POST['paymentId'])) {
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
-        // Determine any valid value for it
-        if (   $cart_amount
-            && empty($_SESSION['shop']['paymentId'])) {
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+        }
+
+        // Initial initialization of the payment method based on the customers
+        // country.
+        // However, payment is only initialized if the order costs anything at
+        // all.
+        //
+        // note: we have to check for greater than 0 as PHP does evaluate a
+        // float of 0.00 as true
+        if (
+            (
+                $cart_amount > 0 || (
+                    isset($_SESSION['shop']['shipment_price']) &&
+                    $_SESSION['shop']['shipment_price'] > 0
+                )
+            ) &&
+            empty($_SESSION['shop']['paymentId'])
+        ) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 // countryId is used for payment address
                 $_SESSION['shop']['countryId'],
-                Currency::getCurrencyArray()
+                \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
-        if (empty($_SESSION['shop']['paymentId']))
+        // unset payment method in case the order (incl. shipping) is free of
+        // charge
+        elseif (
+            $cart_amount == 0 &&
+            $_SESSION['shop']['shipment_price'] == 0
+        ) {
             $_SESSION['shop']['paymentId'] = null;
+        }
+
+        // force unsetting of payment method in case it has been set to 0
+        if (empty($_SESSION['shop']['paymentId'])) {
+            $_SESSION['shop']['paymentId'] = null;
+        }
+
         // hide currency navbar
         self::$show_currency_navbar = false;
-        if (isset($_POST['customer_note']))
+        if (isset($_POST['customer_note'])) {
             $_SESSION['shop']['note'] =
                 trim(strip_tags(contrexx_input2raw($_POST['customer_note'])));
-        if (isset($_POST['agb']))
+        }
+        if (isset($_POST['agb'])) {
             $_SESSION['shop']['agb'] = \Html::ATTRIBUTE_CHECKED;
-        if (isset($_POST['cancellation_terms']))
+        }
+        if (isset($_POST['cancellation_terms'])) {
             $_SESSION['shop']['cancellation_terms'] = \Html::ATTRIBUTE_CHECKED;
+        }
+
+        // reset applied discount on shipment costs
+        // before recalculating them below
         unset($_SESSION['shop']['shipment_discount_amount']);
+
         // if shipperId is not set, there is no use in trying to determine a shipment_price
         if (isset($_SESSION['shop']['shipperId'])) {
             $shipmentPrice = self::_calculateShipmentPrice(
@@ -3517,15 +3611,23 @@ die("Shop::processRedirect(): This method is obsolete!");
                 // deduct global coupon (if one is set)
                 $coupon = Cart::getCoupon();
 
-                // verify VAT of shipment
-                // ensure each VAT rate only occurs once
-                $usedVatRates = array_unique(
-                    array_merge(
-                        $_SESSION['shop']['cart']['item_vat_rates']->toArray(),
-                        // VAT for shipment
-                        array(Vat::getOtherRate())
-                    )
+                // Collect used VAT rates for the order being processed.
+                // This will be used to ensure that only one VAT rate is being
+                // used. Otherwise we will not be able to apply the coupon on
+                // the shipment costs.
+                $usedVatRates = array(
+                    // VAT for shipment
+                    Vat::getOtherRate()
                 );
+                // VAT of ordered items
+                if (isset($_SESSION['shop']['cart']['item_vat_rates'])) {
+                    $usedVatRates = array_unique(
+                        array_merge(
+                            $_SESSION['shop']['cart']['item_vat_rates']->toArray(),
+                            $usedVatRates
+                        )
+                    );
+                }
 
                 // check if we have to apply a discount on the shipment costs
                 $shipmentDiscount = 0;
@@ -3538,10 +3640,10 @@ die("Shop::processRedirect(): This method is obsolete!");
                     // ...and a coupon is being redeemed...
                     $coupon &&
                     // ...and the coupon is of type amount (not percentage)...
-                    $coupon->discount_amount() > 0 &&
+                    $coupon->getDiscountAmount() > 0 &&
                     // ...and the cost of the selected items does not cover the
                     // full discount...
-                    $coupon->discount_amount() - $coupon->getUsedAmount() - Cart::get_discount_amount() > 0 &&
+                    $coupon->getDiscountAmount() - $coupon->getUsedAmount() - Cart::get_discount_amount() > 0 &&
                     // ...and either VAT is not being used or everything uses the
                     // same VAT rate...
                     (
@@ -3551,7 +3653,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 ) {
                     // ...then do calculate the discount on the shipment costs.
                     $shipmentDiscount =
-                        $coupon->discount_amount()
+                        $coupon->getDiscountAmount()
                         - $coupon->getUsedAmount()
                         - Cart::get_discount_amount();
 
@@ -3572,14 +3674,35 @@ die("Shop::processRedirect(): This method is obsolete!");
         } else {
             $_SESSION['shop']['shipment_price'] = '0.00';
         }
+
+        // calculate payment costs based on set payment method
         $_SESSION['shop']['payment_price'] =
             self::_calculatePaymentPrice(
                 $_SESSION['shop']['paymentId'],
                 $cart_amount,
                 $shipmentPrice
             );
+
+        // Revalidate any entered coupons to match up with the set payment
+        // method. This is done by Cart::update().
         Cart::update(self::$objCustomer);
         self::update_session();
+
+        // recalculate payment costs in case the customer entered a new coupon
+        // or removed one again
+        if (Cart::getCoupon() != $coupon) {
+            return static::_initPaymentDetails();
+        }
+
+        // recalculate payment costs in case a coupon has been applied on the
+        // shipment costs and does make the payment method now obsolete
+        if (
+            Cart::get_price() == 0 &&
+            $_SESSION['shop']['shipment_price'] == 0 &&
+            !empty($_SESSION['shop']['paymentId'])
+        ) {
+            return static::_initPaymentDetails();
+        }
     }
 
 
@@ -3672,15 +3795,19 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
         }
         if (empty($_SESSION['shop']['paymentId'])) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
             // Use the first Payment ID
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 // countryId is used for payment address
                 $_SESSION['shop']['countryId'],
-                Currency::getCurrencyArray()
+                \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
-        return Payment::getPaymentMenu(
+        return \Cx\Modules\Shop\Controller\PaymentController::getPaymentMenu(
             $_SESSION['shop']['paymentId'],
             "document.forms['shopForm'].submit()",
             // countryId is used for payment address
@@ -3767,9 +3894,9 @@ die("Shop::processRedirect(): This method is obsolete!");
         $processor_id = 0;
         $processor_name = '';
         if (!empty($_SESSION['shop']['paymentId']))
-            $processor_id = Payment::getPaymentProcessorId($_SESSION['shop']['paymentId']);
+            $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getPaymentProcessorId($_SESSION['shop']['paymentId']);
         if (!empty($processor_id))
-            $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+            $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
         return $processor_name;
     }
 
@@ -3885,7 +4012,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             unset($_SESSION['shop']['shipperId']);
         } else {
             self::$objTemplate->setVariable(array(
-                'SHOP_SHIPMENT_PRICE' => Currency::formatPrice(
+                'SHOP_SHIPMENT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $_SESSION['shop']['shipment_price']),
                 'SHOP_SHIPMENT_MENU' => self::_getShipperMenu(),
             ));
@@ -3947,22 +4074,22 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
             static::viewShipmentDiscount();
         }
-        if (   Cart::get_price()
-            || $_SESSION['shop']['shipment_price']
-            || $_SESSION['shop']['vat_price']
+        // note: we have to check for greater than 0 as PHP does evaluate a
+        // float of 0.00 as true
+        if (
+            Cart::get_price() > 0 ||
+            $_SESSION['shop']['shipment_price'] > 0
         ) {
             self::$objTemplate->setVariable(array(
-                'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
+                'SHOP_PAYMENT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $_SESSION['shop']['payment_price']),
                 'SHOP_PAYMENT_MENU' => self::get_payment_menu(),
             ));
 
-            // If cart has a value or needs a shipment (which might cost) we
-            // need to parse payment options
-            // TODO: Check if the first line is not already checked above
-            if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
-                &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods(
+            // parse payment methods, if any matches
+            if (
+                self::$objTemplate->blockExists('shop_payment_payment_methods') &&
+                $paymentMethods = \Cx\Modules\Shop\Controller\PaymentController::getPaymentMethods(
                     // countryId is used for payment address
                     $_SESSION['shop']['countryId']
                 )
@@ -3984,6 +4111,10 @@ die("Shop::processRedirect(): This method is obsolete!");
                     self::$objTemplate->parse('shop_payment_payment_methods');
                 }
             }
+
+            self::$objTemplate->touchBlock('shop_payment');
+        } else {
+            self::$objTemplate->hideBlock('shop_payment');
         }
 
         if (empty($_SESSION['shop']['coupon_code'])) {
@@ -3996,23 +4127,27 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_DISCOUNT_COUPON_TOTAL' =>
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
                 'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' =>
-                    Currency::formatPrice(-$total_discount_amount),
-                'SHOP_COUPON_UNIT' => Currency::getActiveCurrencySymbol(),
+                    \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(-$total_discount_amount),
+                'SHOP_COUPON_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             ));
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
         // Show the Coupon code field only if there is at least one defined
-        if (Coupon::count_available()) {
+        if ($couponRepo->count_available()) {
             self::$objTemplate->setVariable(array(
                 'SHOP_DISCOUNT_COUPON_CODE' => $_SESSION['shop']['coupon_code'],
             ));
         }
         self::$objTemplate->setVariable(array(
-            'SHOP_UNIT' => Currency::getActiveCurrencySymbol(),
+            'SHOP_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             'SHOP_TOTALITEM' => Cart::get_item_count(),
-            'SHOP_TOTALPRICE' => Currency::formatPrice(
+            'SHOP_TOTALPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   Cart::get_price()
                 + Cart::get_discount_amount()),
-            'SHOP_GRAND_TOTAL' => Currency::formatPrice(
+            'SHOP_GRAND_TOTAL' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
             'SHOP_CUSTOMERNOTE' => $_SESSION['shop']['note'],
             'SHOP_AGB' => $_SESSION['shop']['agb'],
@@ -4022,7 +4157,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             self::$objTemplate->setVariable(array(
                 'SHOP_TAX_PRICE' =>
                     $_SESSION['shop']['vat_price'].
-                    '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                    '&nbsp;'.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 'SHOP_TAX_PRICE_NO_SYMBOL' =>
                     $_SESSION['shop']['vat_price'],
                 'SHOP_TAX_PRODUCTS_TXT' => $_SESSION['shop']['vat_products_txt'],
@@ -4037,7 +4172,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (Vat::isIncluded()) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_GRAND_TOTAL_EXCL_TAX' =>
-                        Currency::formatPrice(
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                         $_SESSION['shop']['grand_total_price'] - $_SESSION['shop']['vat_price']
                     ),
                 ));
@@ -4130,8 +4265,19 @@ die("Shop::processRedirect(): This method is obsolete!");
         // It may be necessary to refresh the cart here, as the customer
         // may return to the cart, then press "Back".
         self::_initPaymentDetails();
+
+        // abort in case the cart is empty
+        if (empty(Cart::get_products_array())) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', ''));
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
 // TODO: Implement a proper method
 //                unset(Cart::get_product_id($cart_id]);
@@ -4148,23 +4294,23 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $price_options,
                 $arrProduct['quantity']);
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             $weight = ($productDistribution == 'delivery'
-                ? Weight::getWeightString($objProduct->weight()) : '-');
-            $vatId = $objProduct->vat_id();
+                ? Weight::getWeightString($objProduct->getWeight()) : '-');
+            $vatId = $objProduct->getVatId();
             $vatRate = Vat::getRate($vatId);
             $vatPercent = Vat::getShort($vatId);
             $vatAmount = Vat::amount(
                 $vatRate, $price*$arrProduct['quantity']);
             self::$objTemplate->setVariable(array(
                 'SHOP_PRODUCT_ID' => $arrProduct['id'],
-                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->code(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
-                'SHOP_PRODUCT_PRICE' => Currency::formatPrice(
+                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->getCode(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
+                'SHOP_PRODUCT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $price*$arrProduct['quantity']),
                 'SHOP_PRODUCT_QUANTITY' => $arrProduct['quantity'],
-                'SHOP_PRODUCT_ITEMPRICE' => Currency::formatPrice($price),
-                'SHOP_UNIT' => Currency::getActiveCurrencySymbol(),
+                'SHOP_PRODUCT_ITEMPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($price),
+                'SHOP_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             ));
             if (   $attributes
                 && self::$objTemplate->blockExists('attributes')) {
@@ -4181,8 +4327,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_TAX_RATE' => $vatPercent,
                     'SHOP_PRODUCT_TAX_AMOUNT' =>
-                        Currency::formatPrice($vatAmount).
-                        '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($vatAmount).
+                        '&nbsp;'.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
             }
             self::$objTemplate->parse("shopCartRow");
@@ -4196,25 +4342,56 @@ die("Shop::processRedirect(): This method is obsolete!");
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
                 // total discount amount
                 'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' =>
-                    Currency::formatPrice(-$total_discount_amount),
+                    \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(-$total_discount_amount),
                 'SHOP_DISCOUNT_COUPON_CODE' => $_SESSION['shop']['coupon_code'],
             ));
+            // try to load the coupon object
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $couponRepo = $em->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+            );
+            $customerId = self::$objCustomer ? self::$objCustomer->getId() : null; 
+            $objCoupon = $couponRepo->available(
+                $_SESSION['shop']['coupon_code'],
+                Cart::get_price(),
+                $customerId,
+                null,
+                $_SESSION['shop']['paymentId']
+            );
+            // add placeholders if the coupon is not pro rata
+            if ($objCoupon && $objCoupon->getDiscountAmount() > 0) {
+                self::$objTemplate->touchBlock('discount_coupon_type_amount');
+                self::$objTemplate->setVariable(array(
+                    'SHOP_DISCOUNT_COUPON_REMAINING_AMOUNT' => sprintf(
+                        '% 9.2f',
+                        // as the order is not yet persisted at this point we
+                        // need to substract the current discount as well:
+                        // total amount - used amount - current order's discount
+                        $objCoupon->getDiscountAmount() -
+                        $objCoupon->getUsedAmount(
+                            $customerId
+                        ) - $total_discount_amount
+                    ),
+                    'SHOP_DISCOUNT_COUPON_INITIAL_AMOUNT' => sprintf(
+                        '% 9.2f',
+                        $objCoupon->getDiscountAmount()
+                    ),
+                ));
+            } else {
+                self::$objTemplate->hideBlock('discount_coupon_type_amount');
+            }
         }
         self::$objTemplate->setVariable(array(
-            'SHOP_UNIT' => Currency::getActiveCurrencySymbol(),
+            'SHOP_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             'SHOP_TOTALITEM' => Cart::get_item_count(),
-            // costs for payment handler (CC, invoice, etc.)
-            'SHOP_PAYMENT_PRICE' => Currency::formatPrice(
-                $_SESSION['shop']['payment_price']),
             // costs of all goods (before subtraction of discount) without payment and shippment costs
-            'SHOP_PRODUCT_TOTAL_GOODS' => Currency::formatPrice(
+            'SHOP_PRODUCT_TOTAL_GOODS' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   Cart::get_price() + Cart::get_discount_amount()),
             // order costs after discount subtraction (incl VAT) but without payment and shippment costs
-            'SHOP_TOTALPRICE' => Currency::formatPrice(Cart::get_price()),
-            'SHOP_PAYMENT' =>
-                Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
+            'SHOP_TOTALPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(Cart::get_price()),
             // final order costs
-            'SHOP_GRAND_TOTAL' => Currency::formatPrice(
+            'SHOP_GRAND_TOTAL' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
             'SHOP_COMPANY' => stripslashes($_SESSION['shop']['company']),
 // Old
@@ -4232,6 +4409,21 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
         ));
+
+        // parse set payment method
+        if ($_SESSION['shop']['paymentId']) {
+            self::$objTemplate->setVariable(array(
+            // costs for payment handler (CC, invoice, etc.)
+            'SHOP_PAYMENT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
+                $_SESSION['shop']['payment_price']),
+            'SHOP_PAYMENT' =>
+                \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'name'),
+            ));
+
+            self::$objTemplate->touchBlock('shop_payment');
+        } else {
+            self::$objTemplate->hideBlock('shop_payment');
+        }
 
         // only parse birthday if it had been set
         if (!empty($_SESSION['shop']['birthday'])) {
@@ -4269,7 +4461,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             self::$objTemplate->setVariable(array(
                 'TXT_TAX_RATE' => $_ARRAYLANG['TXT_SHOP_VAT_RATE'],
                 // total VAT on products (after subtraction of discount)
-                'SHOP_TAX_PRICE' => Currency::formatPrice(
+                'SHOP_TAX_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $_SESSION['shop']['vat_price']),
                 'SHOP_TAX_PRODUCTS_TXT' => $_SESSION['shop']['vat_products_txt'],
                 'SHOP_TAX_GRAND_TXT' => $_SESSION['shop']['vat_grand_txt'],
@@ -4284,7 +4476,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     // final order costs without VAT, but including
                     // payment and shipping costs
                     'SHOP_GRAND_TOTAL_EXCL_TAX' =>
-                        Currency::formatPrice(
+                        \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                             $_SESSION['shop']['grand_total_price']
                             - $_SESSION['shop']['vat_price']
                     ),
@@ -4353,7 +4545,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'payment'));
             }
             self::$objTemplate->setVariable(array(
-                'SHOP_SHIPMENT_PRICE' => Currency::formatPrice(
+                'SHOP_SHIPMENT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $_SESSION['shop']['shipment_price']),
                 'SHOP_SHIPMENT' =>
                     Shipment::getShipperName($_SESSION['shop']['shipperId']),
@@ -4524,58 +4716,73 @@ die("Shop::processRedirect(): This method is obsolete!");
                 }
             }*/
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $currencyRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Currency');
+        $paymentRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Payment');
+        $productRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+        $shipperRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Shipper');
+        $localeRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+
         $shipper_id = (empty($_SESSION['shop']['shipperId'])
             ? null : $_SESSION['shop']['shipperId']);
         $payment_id = (empty($_SESSION['shop']['paymentId'])
             ? null : $_SESSION['shop']['paymentId']);
-        $objOrder = new Order();
-        $objOrder->customer_id(self::$objCustomer->id());
-
-        $objOrder->billing_gender($_SESSION['shop']['gender']);
-        $objOrder->billing_firstname($_SESSION['shop']['firstname']);
-        $objOrder->billing_lastname($_SESSION['shop']['lastname']);
-        $objOrder->billing_company($_SESSION['shop']['company']);
-        $objOrder->billing_address($_SESSION['shop']['address']);
-        $objOrder->billing_city($_SESSION['shop']['city']);
-        $objOrder->billing_zip($_SESSION['shop']['zip']);
-        $objOrder->billing_country_id($_SESSION['shop']['countryId']);
-        $objOrder->billing_phone($_SESSION['shop']['phone']);
-        $objOrder->billing_fax($_SESSION['shop']['fax']);
-        $objOrder->billing_email($_SESSION['shop']['email']);
-
-        $objOrder->currency_id($_SESSION['shop']['currencyId']);
-        $objOrder->sum($_SESSION['shop']['grand_total_price']);
-        $objOrder->date_time(date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME));
-        $objOrder->status(0);
-        $objOrder->company($_SESSION['shop']['company2']);
-        $objOrder->gender($_SESSION['shop']['gender2']);
-        $objOrder->firstname($_SESSION['shop']['firstname2']);
-        $objOrder->lastname($_SESSION['shop']['lastname2']);
-        $objOrder->address($_SESSION['shop']['address2']);
-        $objOrder->city($_SESSION['shop']['city2']);
-        $objOrder->zip($_SESSION['shop']['zip2']);
+        $objOrder = new \Cx\Modules\Shop\Model\Entity\Order();
+        $objOrder->setCustomer($userRepo->find(self::$objCustomer->id()));
+        $objOrder->setCustomerId(self::$objCustomer->id());
+        $objOrder->setBillingGender($_SESSION['shop']['gender']);
+        $objOrder->setBillingFirstname($_SESSION['shop']['firstname']);
+        $objOrder->setBillingLastname($_SESSION['shop']['lastname']);
+        $objOrder->setBillingCompany($_SESSION['shop']['company']);
+        $objOrder->setBillingAddress($_SESSION['shop']['address']);
+        $objOrder->setBillingCity($_SESSION['shop']['city']);
+        $objOrder->setBillingZip($_SESSION['shop']['zip']);
+        $objOrder->setBillingCountryId($_SESSION['shop']['countryId']);
+        $objOrder->setBillingPhone($_SESSION['shop']['phone']);
+        $objOrder->setBillingFax($_SESSION['shop']['fax']);
+        $objOrder->setBillingEmail($_SESSION['shop']['email']);
+        $objOrder->setCurrencyId($_SESSION['shop']['currencyId']);
+        $objOrder->setCurrency($currencyRepo->find($_SESSION['shop']['currencyId']));
+        $objOrder->setSum($_SESSION['shop']['grand_total_price']);
+        $objOrder->setDateTime(new \DateTime(date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME)));
+        $objOrder->setStatus(0);
+        $objOrder->setCompany($_SESSION['shop']['company2']);
+        $objOrder->setGender($_SESSION['shop']['gender2']);
+        $objOrder->setFirstname($_SESSION['shop']['firstname2']);
+        $objOrder->setLastname($_SESSION['shop']['lastname2']);
+        $objOrder->setAddress($_SESSION['shop']['address2']);
+        $objOrder->setCity($_SESSION['shop']['city2']);
+        $objOrder->setZip($_SESSION['shop']['zip2']);
         if (!Cart::needs_shipment()) {
-            $objOrder->country_id(0);
+            $objOrder->setCountryId(0);
         } else {
-            $objOrder->country_id($_SESSION['shop']['countryId2']);
+            $objOrder->setCountryId($_SESSION['shop']['countryId2']);
         }
-        $objOrder->phone($_SESSION['shop']['phone2']);
-        $objOrder->vat_amount($_SESSION['shop']['vat_price']);
-        $objOrder->shipment_amount($_SESSION['shop']['shipment_price']);
-        $objOrder->shipment_id($shipper_id);
-        $objOrder->payment_id($payment_id);
-        $objOrder->payment_amount($_SESSION['shop']['payment_price']);
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $objOrder->ip(
+        $objOrder->setPhone($_SESSION['shop']['phone2']);
+        $objOrder->setVatAmount($_SESSION['shop']['vat_price']);
+        $objOrder->setShipmentAmount($_SESSION['shop']['shipment_price']);
+        if (!empty($shipper_id)) {
+            $objOrder->setShipmentId($shipper_id);
+            $objOrder->setShipper($shipperRepo->find($shipper_id));
+        }
+        if ($payment_id) {
+            $objOrder->setPaymentId($payment_id);
+            $objOrder->setPayment($paymentRepo->find($payment_id));
+            $objOrder->setPaymentAmount($_SESSION['shop']['payment_price']);
+        }
+
+        $objOrder->setIp(
             $cx->getComponent('Stats')->getCounterInstance()->getUniqueUserId()
         );
-        $objOrder->lang_id(FRONTEND_LANG_ID);
-        $objOrder->note($_SESSION['shop']['note']);
-        if (!$objOrder->insert()) {
-            // $order_id is unset!
-            return \Message::error($_ARRAYLANG['TXT_SHOP_ORDER_ERROR_STORING']);
-        }
-        $order_id = $objOrder->id();
+        $objOrder->setLangId(FRONTEND_LANG_ID);
+        $objOrder->setLang($localeRepo->find(FRONTEND_LANG_ID));
+        $objOrder->setNote($_SESSION['shop']['note']);
+
+        $em->persist($objOrder);
+        $em->flush();
+        $order_id = $objOrder->getId();
         $_SESSION['shop']['order_id'] = $order_id;
         // The products will be tested one by one below.
         // If any single one of them requires delivery, this
@@ -4589,16 +4796,20 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("Cart::update(): Coupon Code: $coupon_code");
         $items_total = 0;
 
+        $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
                 unset($_SESSION['shop']['order_id']);
                 return \Message::error($_ARRAYLANG['TXT_ERROR_LOOKING_UP_ORDER']);
             }
             $product_id = $arrProduct['id'];
-            $name = $objProduct->name();
+            $name = $objProduct->getName();
             $priceOptions = (!empty($arrProduct['optionPrice'])
                 ? $arrProduct['optionPrice'] : 0);
             $quantity = $arrProduct['quantity'];
@@ -4608,30 +4819,27 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $quantity);
             $item_total = $price*$quantity;
             $items_total += $item_total;
-            $productVatId = $objProduct->vat_id();
+            $productVatId = $objProduct->getVatId();
             $vat_rate = ($productVatId && Vat::getRate($productVatId)
                 ? Vat::getRate($productVatId) : '0.00');
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             if ($productDistribution == 'delivery') {
                 $_SESSION['shop']['isDelivery'] = true;
             }
             $weight = ($productDistribution == 'delivery'
-                ? $objProduct->weight() : 0); // grams
+                ? $objProduct->getWeight() : 0); // grams
             if ($weight == '') { $weight = 0; }
             // Add to order items table
-            $result = $objOrder->insertItem(
-                $order_id, $product_id, $name, $price, $quantity,
-                $vat_rate, $weight, $arrProduct['options']);
-            if (!$result) {
-                unset($_SESSION['shop']['order_id']);
-// TODO: Verify error message set by Order::insertItem()
-                return false;
-            }
+
+            $objOrder->insertItem(
+                $objProduct, $name, $price, $quantity, $vat_rate,
+                $weight, $arrProduct['options']
+            );
             // Store the Product Coupon, if applicable.
             // Note that it is not redeemed yet (uses=0)!
             if ($coupon_code) {
-                $objCoupon = Coupon::available($coupon_code, $item_total,
+                $objCoupon = $couponRepo->available($coupon_code, $item_total,
                     self::$objCustomer->id(), $product_id, $payment_id);
                 if ($objCoupon) {
 //\DBG::log("Shop::process(): Got Coupon for Product ID $product_id: ".var_export($objCoupon, true));
@@ -4644,6 +4852,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                 }
             }
         } // foreach product in cart
+        $em->persist($objOrder);
+        $em->flush();
         // Store the Global Coupon, if applicable.
         // Note that it is not redeemed yet (uses=0)!
 //\DBG::log("Shop::process(): Looking for global Coupon $coupon_code");
@@ -4662,7 +4872,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
 
             // verify that the coupon to redeem has not been redeemed meanwhile
-            $objCoupon = Coupon::available($coupon_code, $items_total,
+            $objCoupon = $couponRepo->available($coupon_code, $items_total,
                 self::$objCustomer->id(), null, $payment_id);
             if ($objCoupon) {
 //\DBG::log("Shop::process(): Got global Coupon: ".var_export($objCoupon, true));
@@ -4673,10 +4883,10 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
         \Message::restore();
 
-        $processor_id = Payment::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
-        $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+        $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
+        $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
          // other payment methods
-        PaymentProcessing::initProcessor($processor_id);
+        \Cx\Modules\Shop\Controller\PaymentProcessorController::initProcessor($processor_id);
 // TODO: These arguments are no longer valid.  Set them up later?
 //            Currency::getActiveCurrencyCode(),
 //            FWLanguage::getLanguageParameter(FRONTEND_LANG_ID, 'lang'));
@@ -4710,7 +4920,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         $_SESSION['shop']['order_id_checkin'] = $order_id;
-        $strProcessorType = PaymentProcessing::getCurrentPaymentProcessorType();
+        $strProcessorType = \Cx\Modules\Shop\Controller\PaymentProcessorController::getCurrentPaymentProcessorType();
 
         // Test whether the selected payment method can be
         // considered an instant or deferred one.
@@ -4739,7 +4949,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // from this page in checkOut():
         // 'internal', 'internal_lsv'
         self::$objTemplate->setVariable(
-            'SHOP_PAYMENT_PROCESSING', PaymentProcessing::checkOut()
+            'SHOP_PAYMENT_PROCESSING', \Cx\Modules\Shop\Controller\PaymentProcessorController::checkOut()
         );
         // Clear the order ID.
         // The order may be resubmitted and the payment retried.
@@ -4767,31 +4977,31 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Use the Order ID stored in the session, if possible.
         // Otherwise, get it from the payment processor.
         $order_id = (empty($_SESSION['shop']['order_id_checkin'])
-            ? PaymentProcessing::getOrderId()
+            ? \Cx\Modules\Shop\Controller\PaymentProcessorController::getOrderId()
             : $_SESSION['shop']['order_id_checkin']);
 //\DBG::deactivate();
 //\DBG::activate(DBG_LOG_FILE);
 //\DBG::log("success(): Restored Order ID ".var_export($order_id, true));
         // Default new order status: As long as it's pending (0, zero),
         // update_status() will choose the new value automatically.
-        $newOrderStatus = Order::STATUS_PENDING;
+        $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 
-        $checkinresult = PaymentProcessing::checkIn();
+        $checkinresult = \Cx\Modules\Shop\Controller\PaymentProcessorController::checkIn();
 //\DBG::log("success(): CheckIn Result ".var_export($checkinresult, true));
 
         if ($checkinresult === false) {
             // Failed payment.  Cancel the order.
-            $newOrderStatus = Order::STATUS_CANCELLED;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED;
 //\DBG::log("success(): Order ID is *false*, new Status $newOrderStatus");
         } elseif ($checkinresult === true) {
             // True is returned for successful payments.
             // Update the status in any case.
-            $newOrderStatus = Order::STATUS_PENDING;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 //\DBG::log("success(): Order ID is *true*, new Status $newOrderStatus");
         } elseif ($checkinresult === null) {
             // checkIn() returns null if no change to the order status
             // is necessary or appropriate
-            $newOrderStatus = Order::STATUS_PENDING;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 //\DBG::log("success(): Order ID is *null* (new Status $newOrderStatus)");
         }
         // Verify the Order ID with the session, if available
@@ -4801,7 +5011,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // possibly faked one from the request!
 //\DBG::log("success(): Order ID $order_id is not ".$_SESSION['shop']['order_id_checkin'].", new Status $newOrderStatus");
             $order_id = $_SESSION['shop']['order_id_checkin'];
-            $newOrderStatus = Order::STATUS_CANCELLED;
+            $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED;
             $checkinresult = false;
         }
 //\DBG::log("success(): Verification complete, Order ID ".var_export($order_id, true).", Status: $newOrderStatus");
@@ -4809,24 +5019,28 @@ die("Shop::processRedirect(): This method is obsolete!");
             // The respective order state, if available, is updated.
             // The only exception is when $checkinresult is null.
             if (isset($checkinresult)) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $orderRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Order'
+                );
                 $newOrderStatus =
-                    Orders::update_status($order_id, $newOrderStatus);
+                    $orderRepo->update_status($order_id, $newOrderStatus);
 //\DBG::log("success(): Updated Order Status to $newOrderStatus (Order ID $order_id)");
             } else {
                 // The old status is the new status
                 $newOrderStatus = self::getOrderStatus($order_id);
             }
             switch ($newOrderStatus) {
-                case Order::STATUS_CONFIRMED:
-                case Order::STATUS_PAID:
-                case Order::STATUS_SHIPPED:
-                case Order::STATUS_COMPLETED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CONFIRMED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PAID:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_SHIPPED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_COMPLETED:
                     \Message::ok($_ARRAYLANG['TXT_ORDER_PROCESSED']);
                     // Custom.
                     // Enable if Discount class is customized and in use.
                     //self::showCustomerDiscount(Cart::get_price());
                     break;
-                case Order::STATUS_PENDING:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING:
                     // Pending orders must be stated as such.
                     // Certain payment methods (like PayPal with IPN) might
                     // be confirmed a little later and must cause the
@@ -4835,8 +5049,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                         $_ARRAYLANG['TXT_SHOP_ORDER_PENDING'].'<br /><br />'.
                         $_ARRAYLANG['TXT_SHOP_ORDER_WILL_BE_CONFIRMED']);
                     break;
-                case Order::STATUS_DELETED:
-                case Order::STATUS_CANCELLED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_DELETED:
+                case \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_CANCELLED:
                     \Message::error(
                         $_ARRAYLANG['TXT_SHOP_PAYMENT_FAILED'].'<br /><br />'.
                         $_ARRAYLANG['TXT_SHOP_ORDER_CANCELLED']);
@@ -4891,7 +5105,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (!$coupon) {
             return; // No Coupon used
         }
-        if (!$coupon->discount_amount()) {
+        if (!$coupon->getDiscountAmount()) {
             return; // Coupon has no amount
         }
         // May Coupons be applied to Shipment cost at all?
@@ -5069,10 +5283,10 @@ die("Shop::processRedirect(): This method is obsolete!");
 //                'TXT_SHOP_CUSTOMER_DISCOUNT_AMOUNT' => $_ARRAYLANG['TXT_SHOP_CUSTOMER_DISCOUNT_AMOUNT'],
 //                'TXT_SHOP_CUSTOMER_NEW_TOTAL_ORDER_AMOUNT' => $_ARRAYLANG['TXT_SHOP_CUSTOMER_NEW_TOTAL_ORDER_AMOUNT'],
 //                'TXT_SHOP_CUSTOMER_NEW_DISCOUNT_AMOUNT' => $_ARRAYLANG['TXT_SHOP_CUSTOMER_NEW_DISCOUNT_AMOUNT'],
-                'SHOP_CUSTOMER_TOTAL_ORDER_AMOUNT' => number_format($totalOrderAmount, 2, '.', '').' '.Currency::getActiveCurrencySymbol(),
-                'SHOP_CUSTOMER_DISCOUNT_AMOUNT' => number_format($discountAmount, 2, '.', '').' '.Currency::getActiveCurrencySymbol(),
-                'SHOP_CUSTOMER_NEW_TOTAL_ORDER_AMOUNT' => number_format($newTotalOrderAmount, 2, '.', '').' '.Currency::getActiveCurrencySymbol(),
-                'SHOP_CUSTOMER_NEW_DISCOUNT_AMOUNT' => number_format($newDiscountAmount, 2, '.', '').' '.Currency::getActiveCurrencySymbol(),
+                'SHOP_CUSTOMER_TOTAL_ORDER_AMOUNT' => number_format($totalOrderAmount, 2, '.', '').' '.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
+                'SHOP_CUSTOMER_DISCOUNT_AMOUNT' => number_format($discountAmount, 2, '.', '').' '.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
+                'SHOP_CUSTOMER_NEW_TOTAL_ORDER_AMOUNT' => number_format($newTotalOrderAmount, 2, '.', '').' '.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
+                'SHOP_CUSTOMER_NEW_DISCOUNT_AMOUNT' => number_format($newDiscountAmount, 2, '.', '').' '.\Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             ));
         }
         return true;
@@ -5094,8 +5308,8 @@ die("Shop::processRedirect(): This method is obsolete!");
 // TODO: Should be set by the calling view, if any
             global $_ARRAYLANG;
             self::$objTemplate->setGlobalVariable($_ARRAYLANG + array(
-                'SHOP_CURRENCY_SYMBOL' => Currency::getActiveCurrencySymbol(),
-                'SHOP_CURRENCY_CODE' => Currency::getActiveCurrencyCode(),
+                'SHOP_CURRENCY_SYMBOL' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
+                'SHOP_CURRENCY_CODE' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             ));
             $arrShipment = Shipment::getShipmentConditions();
             foreach ($arrShipment as $strShipperName => $arrContent) {
@@ -5132,15 +5346,29 @@ die("Shop::processRedirect(): This method is obsolete!");
     static function showDiscountInfo(
         $groupCustomerId, $groupArticleId, $groupCountId, $count
     ) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $unit = '';
+        if (!empty($groupCountId)) {
+            $discountCountName = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+            )->find($groupCountId);
+
+            if (!empty($discountCountName)) {
         // Pick the unit for this product (count, meter, kilo, ...)
-        $unit = Discount::getUnit($groupCountId);
+                $unit = $discountCountName->getUnit();
+            }
+        }
+
         if (!empty($unit)) {
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_UNIT', $unit
             );
         }
         if ($groupCustomerId > 0) {
-            $rateCustomer = Discount::getDiscountRateCustomer(
+            $rateCustomer = $discountGroupRepo->getDiscountRateCustomer(
                 $groupCustomerId, $groupArticleId
             );
             if ($rateCustomer > 0) {
@@ -5152,7 +5380,9 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
         }
         if ($groupCountId > 0) {
-            $rateCount = Discount::getDiscountRateCount($groupCountId, $count);
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
             $listCount = self::getDiscountCountString($groupCountId);
             if ($rateCount > 0) {
                 // Show discount rate if applicable
@@ -5183,15 +5413,30 @@ die("Shop::processRedirect(): This method is obsolete!");
     {
         global $_ARRAYLANG;
 
-        $arrDiscount = Discount::getDiscountCountArray();
-        $arrRate = Discount::getDiscountCountRateArray($groupCountId);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $discountCountNames = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findAll();
+        $discountCountRates = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findBy(
+            array(),
+            array('count' => 'DESC')
+        );;
+
         $strDiscounts = '';
         if (!empty($arrRate)) {
             $unit = '';
-            if (isset($arrDiscount[$groupCountId])) {
-                $unit = $arrDiscount[$groupCountId]['unit'];
+            foreach ($discountCountNames as $discountCountName) {
+                if ($discountCountName->getId() == $groupCountId) {
+                    $unit = $discountCountName->getUnit();
+                    break;
             }
-            foreach ($arrRate as $count => $rate) {
+            }
+            foreach ($discountCountRates as $discountCountRate) {
+                $count = $discountCountRate->getCount();
+                $rate = $discountCountRate->getRate();
                 $strDiscounts .=
                     ($strDiscounts != '' ? ', ' : '').
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_FROM'].' '.
@@ -5232,7 +5477,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (
             \Cx\Lib\FileSystem\FileSystem::exists(
                 $cx->getWebsiteDocumentRootPath() . '/' .
-                Order::UPLOAD_FOLDER . urldecode($fileName)
+                \Cx\Modules\Shop\Model\Entity\Order::UPLOAD_FOLDER . urldecode($fileName)
             )
         ) {
             return urldecode($fileName);
@@ -5254,7 +5499,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         $newFileName = $filename.'['.uniqid().']'.$fileext;
-        $newFilePath = Order::UPLOAD_FOLDER.$newFileName;
+        $newFilePath = \Cx\Modules\Shop\Model\Entity\Order::UPLOAD_FOLDER.$newFileName;
         //Move the uploaded file to the path specified in the variable $newFilePath
         try {
             $objFile = new \Cx\Lib\FileSystem\File($tmpFile);

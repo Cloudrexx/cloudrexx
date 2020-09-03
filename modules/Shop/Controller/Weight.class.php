@@ -44,7 +44,7 @@ namespace Cx\Modules\Shop\Controller;
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
  * @access      public
- * @version     3.0.0
+ * @version     5.0.0
  * @package     cloudrexx
  * @subpackage  module_shop
  */
@@ -56,7 +56,7 @@ class Weight
      * @access  private
      * @var     array
      */
-    private static $arrUnits = array(
+    protected static $arrUnits = array(
         'g',    //$_ARRAYLANG['TXT_WEIGHT_UNIT_GRAM'],
         'kg',   //$_ARRAYLANG['TXT_WEIGHT_UNIT_KILOGRAM'],
         't',    //$_ARRAYLANG['TXT_WEIGHT_UNIT_TONNE'],
@@ -64,7 +64,8 @@ class Weight
 
 
     /**
-     * Return a string with the weight converted from grams to an appropriate unit.
+     * Return a string with the weight converted from grams to an appropriate
+     * unit.
      *
      * The weight is converted, and the unit chosen as follows:
      * - weight in  [        0 ..         1'000[ -> 0 .. 999     grams,
@@ -82,14 +83,14 @@ class Weight
         // weight too small, too big, or no integer
         if ($grams < 1 || $grams >= 1000000000 || $grams != intval($grams))
             return '0 g';
-        $unit_index = intval(log10($grams)/3);
+        $unitIndex = intval(log10($grams)/3);
         // unit_index shouldn't be out of range, as the weight range
         // is verified above
-        if ($unit_index < 0 || $unit_index > count(self::$arrUnits))
+        if ($unitIndex < 0 || $unitIndex > count(static::$arrUnits))
             return '';
         // scale weight and append unit
-        $weight = $grams/pow(1000, $unit_index);
-        $unit = self::$arrUnits[$unit_index];
+        $weight = $grams/pow(1000, $unitIndex);
+        $unit = static::$arrUnits[$unitIndex];
         return "$weight $unit";
     }
 
@@ -107,9 +108,9 @@ class Weight
      * 'NULL' will be returned.
      * Note that, as weights are stored as integers, they are
      * rounded *down* to whole grams.
-     * @access  public
-     * @param   string  $weight The weight with any or no unit
-     * @return  integer         The weight in grams, or null on error
+     *
+     * @param   string  $weightString The weight with any or no unit
+     * @return  integer               The weight in grams, or null on error
      */
     static function getWeight($weightString)
     {
@@ -131,15 +132,15 @@ class Weight
             $grams = intval($weight+1e-8);
         } else {
             // unit is set, look if it's known
-            $unit_index = array_search($unit, self::$arrUnits);
+            $unitIndex = array_search($unit, static::$arrUnits);
             // if the unit is set, but unknown, return NULL
-            if ($unit_index === false) {
+            if ($unitIndex === false) {
                 return null;
             }
             // have to correct and cast to integer here, because there are
             // precision issues for some numbers otherwise (i.e. "1.001 kg"
             // yields 1000 instead of 1001 grams)!
-            $grams = intval($weight*pow(1000, $unit_index)+1e-8);
+            $grams = intval($weight*pow(1000, $unitIndex)+1e-8);
         }
         // $grams is set to an integer now, in any case.
         // check whether the weight is too small, or too big

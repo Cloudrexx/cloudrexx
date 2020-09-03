@@ -1,0 +1,241 @@
+Cx\Modules\Shop\Model\Entity\Product:
+  type: entity
+  table: module_shop_products
+  repositoryClass: Cx\Modules\Shop\Model\Repository\ProductRepository
+  gedmo:
+    translation:
+      locale: locale
+      entity: Cx\Core\Locale\Model\Entity\Translation
+  indexes:
+    group_id:
+      columns: [ group_id ]
+    article_id:
+      columns: [ article_id ]
+    fk_contrexx_module_shop_products_contrexx_module_shop_manuf_idx:
+      columns: [ manufacturer_id ]
+    fk_contrexx_module_shop_product_contrexx_module_shop_vat1_idx:
+      columns: [ vat_id ]
+    flags:
+      columns: [ flags ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    picture:
+      type: string
+      length: 4096
+      nullable: true
+    distribution:
+      type: enum
+      values: ['delivery', 'download', 'none', 'coupon']
+      options:
+        default: 'delivery'
+    normalprice:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        default: 0.00
+    resellerprice:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        default: 0.00
+    stock:
+      type: integer
+      options:
+        default: 10
+    stockVisible:
+      type: boolean
+      options:
+        unsigned: true
+        default: 0
+      column: stock_visible
+    discountprice:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        default: 0.00
+    discountActive:
+      type: boolean
+      options:
+        unsigned: true
+        default: 0
+      column: discount_active
+    active:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    b2b:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    b2c:
+      type: boolean
+      options:
+        unsigned: true
+        default: 1
+    dateStart:
+      type: datetime
+      nullable: true
+      column: date_start
+    dateEnd:
+      type: datetime
+      nullable: true
+      column: date_end
+    manufacturerId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: manufacturer_id
+    ord:
+      type: integer
+      options:
+        default: 0
+    vatId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: vat_id
+    weight:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+    flags:
+      type: string
+      length: 4096
+      nullable: true
+    groupId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: group_id
+    articleId:
+      type: integer
+      nullable: true
+      options:
+        unsigned: true
+      column: article_id
+    minimumOrderQuantity:
+      type: integer
+      options:
+        default: 0
+      column: minimum_order_quantity
+    uri:
+      type: string
+      length: 255
+      gedmo:
+        - translatable
+      options:
+        default: ''
+    short:
+      type: text
+      gedmo:
+        - translatable
+    long:
+      type: text
+      gedmo:
+        - translatable
+      column: `long`
+    name:
+      type: string
+      length: 255
+      gedmo:
+        - translatable
+      options:
+        default: ''
+    keys:
+      type: text
+      gedmo:
+        - translatable
+      column: `keys`
+    code:
+      type: string
+      length: 255
+      gedmo:
+        - translatable
+      options:
+        default: ''
+  oneToMany:
+    discountCoupons:
+      targetEntity: Cx\Modules\Shop\Model\Entity\DiscountCoupon
+      mappedBy: product
+      joinColumn:
+        name: id
+        referencedColumnName: product_id
+    orderItems:
+      targetEntity: Cx\Modules\Shop\Model\Entity\OrderItem
+      mappedBy: product
+      joinColumn:
+        name: id
+        referencedColumnName: product_id
+    relProductAttributes:
+      targetEntity: Cx\Modules\Shop\Model\Entity\RelProductAttribute
+      mappedBy: product
+      joinColumn:
+        name: id
+        referencedColumnName: product_id
+  manyToOne:
+    manufacturer:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Manufacturer
+      inversedBy: products
+      joinColumn:
+        name: manufacturer_id
+        referencedColumnName: id
+        nullable: true
+    discountgroupCountName:
+      targetEntity: Cx\Modules\Shop\Model\Entity\DiscountgroupCountName
+      inversedBy: products
+      joinColumn:
+        name: group_id
+        referencedColumnName: id
+        nullable: true
+    articleGroup:
+          targetEntity: Cx\Modules\Shop\Model\Entity\ArticleGroup
+          inversedBy: products
+          joinColumn:
+            name: article_id
+            referencedColumnName: id
+            nullable: true
+    vat:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Vat
+      inversedBy: products
+      joinColumn:
+        name: vat_id
+        referencedColumnName: id
+        nullable: true
+    pdfTemplate:
+      targetEntity: Cx\Core_Modules\Pdf\Model\Entity\PdfTemplate
+      joinColumn:
+        name: pdf_template_id
+        referencedColumnName: id
+        nullable: true
+  manyToMany:
+    categories:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Category
+      mappedBy: products
+      joinTable:
+        name: module_shop_rel_category_product
+    userGroups:
+      targetEntity: Cx\Core\User\Model\Entity\Group
+      joinTable:
+        name: module_shop_rel_product_user_group
+        joinColumns:
+          product_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          usergroup_id:
+            referencedColumnName: group_id
+

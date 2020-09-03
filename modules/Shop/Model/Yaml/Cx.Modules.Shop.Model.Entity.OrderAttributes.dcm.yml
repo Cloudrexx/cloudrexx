@@ -1,0 +1,43 @@
+Cx\Modules\Shop\Model\Entity\OrderAttributes:
+  type: entity
+  table: module_shop_order_attributes
+  repositoryClass: Cx\Modules\Shop\Model\Repository\OrderAttributesRepository
+  indexes:
+    item_id:
+      columns: [ item_id ]
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    itemId:
+      type: integer
+      options:
+        unsigned: true
+        default: '0'
+      column: item_id
+    attributeName:
+      type: string
+      length: 255
+      options:
+        default: ''
+      column: attribute_name
+    optionName:
+      type: text
+      column: option_name
+    price:
+      type: decimal
+      precision: 9
+      scale: 2
+      options:
+        default: 0.00
+  manyToOne:
+    orderItems:
+      targetEntity: Cx\Modules\Shop\Model\Entity\OrderItems
+      inversedBy: orderAttributes
+      joinColumn:
+        name: item_id
+        referencedColumnName: id

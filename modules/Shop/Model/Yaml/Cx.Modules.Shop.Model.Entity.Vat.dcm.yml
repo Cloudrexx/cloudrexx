@@ -1,0 +1,37 @@
+Cx\Modules\Shop\Model\Entity\Vat:
+  type: entity
+  table: module_shop_vat
+  repositoryClass: Cx\Modules\Shop\Model\Repository\VatRepository
+  gedmo:
+    translation:
+      locale: locale
+      entity: Cx\Core\Locale\Model\Entity\Translation
+  id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    rate:
+      type: decimal
+      precision: 5
+      scale: 2
+      options:
+        unsigned: true
+        default: 0.00
+    class:
+      type: string
+      gedmo:
+        - translatable
+      length: 255
+      options:
+        default: ''
+  oneToMany:
+    products:
+      targetEntity: Cx\Modules\Shop\Model\Entity\Product
+      mappedBy: vat
+      joinColumn:
+        name: id
+        referencedColumnName: vat_id
