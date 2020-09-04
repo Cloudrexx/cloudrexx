@@ -466,7 +466,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
         $em = $cx->getDb()->getEntityManager();
         return $em->getRepository(
             'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        )->getUsedCount($this->code, $customerId);
+        )->getUsedCount($this, $customerId);
     }
 
     /**
@@ -490,7 +490,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
         $em = $cx->getDb()->getEntityManager();
         return $em->getRepository(
             'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        )->getUsedAmount($this->code, $customerId, $orderId);
+        )->getUsedAmount($this, $customerId, $orderId);
     }
 
     /**
@@ -511,7 +511,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
      * @return  string                  The applicable discount amount
      * @throws \Doctrine\ORM\ORMException handle orm interaction fails
      */
-    function getDiscountAmountOrRate($amount, $customerId=NULL)
+    function getDiscountAmountOrRate($amount, $customerId = 0)
     {
         if ($this->getDiscountRate()) {
             return \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
@@ -558,7 +558,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     public function redeem($orderId, $customerId, $amount, $uses=1)
     {
         // Applicable discount amount
-        $amount = $this->getDiscountAmountOrRate($amount);
+        $amount = $this->getDiscountAmountOrRate($amount, $customerId);
         $uses = intval((boolean)$uses);
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();

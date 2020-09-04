@@ -47,73 +47,67 @@ namespace Cx\Modules\Shop\Model\Repository;
 class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
-     * Returns the count of the uses for the given code
+     * Return the use count of the given Coupon
      *
-     * The optional $customer_id limits the result to the uses of that
-     * Customer.
+     * The optional $customerId limits the result to the uses of that
+     * Customer, except for "global" Coupons.
      * Returns 0 (zero) for codes not present in the relation (yet).
-     *
-     * @param   string    $code           code of coupon
-     * @param   integer   $customerId     The optional Customer ID
-     *
-     * @return  mixed                     The number of uses of the code
-     *                                    on success, false otherwise
+     * @param   DiscountCoupon  $coupon         The Coupon
+     * @param   int             $customerId     The optional Customer ID
+     * @return  int                             The number of uses
      */
-    public function getUsedCount($code, $customerId = 0)
+    public function getUsedCount(
+        \Cx\Modules\Shop\Model\Entity\DiscountCoupon $coupon,
+        $customerId = 0)
     {
+        $code = $coupon->getCode();
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(rcc.count) as uses')
             ->from($this->_entityName, 'rcc')
             ->where($qb->expr()->eq('rcc.code', '?1'))
             ->setParameter(1, $code);
-        if (!empty($customerId)) {
+        if (!$coupon->getGlobal() && $customerId) {
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customerId);
         }
-
-        if (!empty($qb->getQuery()->getResult()[0]['uses'])) {
-            return $qb->getQuery()->getResult()[0]['uses'];
-        }
-        return 0;
+        $result = $qb->getQuery()->getSingleScalarResult();
+        return (int) $result;
     }
 
 
     /**
-     * Returns the discount amount used with this Coupon
+     * Return the discount amount used with the given Coupon
      *
-     * The optional $customer_id and $order_id limit the result to the uses
-     * of that Customer and Order.
+     * The optional $customerId limits the result to the uses of that
+     * Customer, except for "global" Coupons.
+     * The $orderId limits to that Order.
      * Returns 0 (zero) for Coupons that have not been used with the given
      * parameters, and thus are not present in the relation.
-     *
-     * @param   string    $code          The Coupon Code
-     * @param   integer   $customerId    The optional Customer ID
-     * @param   integer   $orderId       The optional Order ID
-     *
-     * @return  mixed                    The amount used with this Coupon
-     *                                   on success, false otherwise
+     * @param   DiscountCoupon  $coupon         The Coupon
+     * @param   int             $customerId     The optional Customer ID
+     * @param   int             $orderId        The optional Order ID
+     * @return  float                           The amount used
      */
-    public function getUsedAmount($code, $customerId=NULL, $orderId=NULL)
-    {
+    public function getUsedAmount(
+        \Cx\Modules\Shop\Model\Entity\DiscountCoupon $coupon,
+        $customerId = 0, $orderId = 0
+    ) {
+        $code = $coupon->getCode();
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(rcc.amount) as amount')
             ->from($this->_entityName, 'rcc')
             ->where($qb->expr()->eq('rcc.code', '?1'))
             ->setParameter(1, $code);
-        if (!empty($customerId)) {
+        if (!$coupon->getGlobal() && $customerId) {
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customerId);
         }
-        if (!empty($orderId)) {
+        if ($orderId) {
             $qb->andWhere($qb->expr()->eq('rcc.orderId', '?3'))
                 ->setParameter(3, $orderId);
         }
-
-        if (!empty($qb->getQuery()->getResult()[0]['amount'])) {
-            // The Coupon has been used for so much already
-            return $qb->getQuery()->getResult()[0]['amount'];
-        }
-        return 0;
+        $result = $qb->getQuery()->getSingleScalarResult();
+        return (float) $result;
     }
 
     /**

@@ -92,7 +92,8 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
      *                             on success, false on error, or null otherwise
      */
     public function available(
-        $code, $orderAmount, $customerId=null, $productId=null, $paymentId=null
+        $code, $orderAmount,
+        $customerId = 0, $productId = 0, $paymentId = 0
     ) {
         global $_ARRAYLANG;
 
@@ -105,26 +106,24 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
         // Verify "ownership" first.  No point in setting status messages
         // that are inappropriate for other users.
         if ($objCoupon->getCustomerId()
-            && $objCoupon->getCustomerId() != intval($customerId)) {
-
+            && $objCoupon->getCustomerId() !== $customerId) {
             return null;
         }
-        if ($objCoupon->getProductId() != intval($productId)) {
-            if ($objCoupon->getProductId()) {
-                if (!$this->hasMessage(
-                    'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT'
-                )) {
-                    \Message::information(
-                        $_ARRAYLANG[
-                            'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT'
-                        ]
-                    );
-                }
+        if ($objCoupon->getProductId()
+            && $objCoupon->getProductId() !== $productId) {
+            if (!$this->hasMessage(
+                'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT'
+            )) {
+                \Message::information(
+                    $_ARRAYLANG[
+                        'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT'
+                    ]
+                );
             }
             return null;
         }
         if ($objCoupon->getPaymentId()
-            && $objCoupon->getPaymentId() != intval($paymentId)) {
+            && $objCoupon->getPaymentId() !== $paymentId) {
             if (!$this->hasMessage(
                 'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PAYMENT'
             )) {
@@ -152,15 +151,7 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
             }
             return null;
         }
-        // Deduct amounts already redeemed
-        if (floatval($objCoupon->getDiscountAmount()) > 0 &&
-            $objCoupon->getUsedAmount($customerId) >=
-            $objCoupon->getDiscountAmount()
-        ) {
-            return null;
-        }
-        if ($objCoupon->getMinimumAmount() > floatval($orderAmount)) {
-
+        if ($objCoupon->getMinimumAmount() > $orderAmount) {
             if (!$this->hasMessage('TXT_SHOP_COUPON_UNAVAILABLE_FOR_AMOUNT')) {
                 \Message::information(
                     sprintf(
@@ -173,21 +164,20 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
             }
             return null;
         }
-
+        // Is any amount left?
+        $usedAmount = $objCoupon->getUsedAmount($customerId);
+        if ($objCoupon->getDiscountAmount() > 0
+            && $objCoupon->getDiscountAmount() - $usedAmount <= 0
+        ) {
+            return null;
+        }
         // Unlimited uses
-        if ($objCoupon->getUses() > 1e9) return $objCoupon;
-
-        // Deduct the number of times the Coupon has been redeemed already:
-        // - If the Coupon's customer_id is empty, subtract all uses
-        // - Otherwise, subtract the current customer's uses only
-        $objCoupon->setUses(
-            $objCoupon->getUses()
-            - $objCoupon->getUsedCount(
-                ($objCoupon->getCustomerId() ? $customerId : null)
-            )
-        );
-        if ($objCoupon->getUses() <= 0) {
-
+        if ($objCoupon->getUses() > 1e9) {
+            return $objCoupon;
+        }
+        // Is any use left?
+        $useCount = $objCoupon->getUsedCount($customerId);
+        if ($objCoupon->getUses() - $useCount <= 0) {
             if (!$this->hasMessage(
                 'TXT_SHOP_COUPON_UNAVAILABLE_CAUSE_USED_UP'
             )) {

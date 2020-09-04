@@ -498,7 +498,10 @@ class Cart
             ? $_SESSION['shop']['coupon_code'] : '');
         $payment_id = (isset($_SESSION['shop']['paymentId'])
             ? $_SESSION['shop']['paymentId'] : 0);
-        $customer_id = ($objCustomer ? $objCustomer->id() : 0);
+        // The arbitrary, nonexistent ID -1 excludes other Coupon uses
+        // from counts and amounts, and prevents other Customer's Coupons
+        // being matched.  Does not apply to "global" Coupons.
+        $customer_id = $objCustomer ? $objCustomer->id() : -1;
         self::$products = array();
         $items = 0;
         $total_price = 0;
