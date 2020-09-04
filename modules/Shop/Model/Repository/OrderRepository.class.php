@@ -428,6 +428,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     $newCoupon->setDiscountAmount($item_price);
                     $newCoupon->setGlobal(true);
                     $newCoupon->setUses(1e10);
+                    $newCoupon->setSubjectToVat(true);
                     $newCoupon->setOrderItem($item);
 
                     $this->_em->persist($newCoupon);

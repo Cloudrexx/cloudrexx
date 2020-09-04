@@ -70,6 +70,7 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'minimumAmount',
             'discountRate',
             'discountAmount',
+            'subjectToVat',
             'uses',
             'global',
             'customer',
@@ -88,6 +89,7 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'type',
             'discountRate',
             'discountAmount',
+            'subjectToVat',
             'uses',
             'global',
             'product',
@@ -240,13 +242,25 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
                         'method' => 'showDiscountAmount'
                     )
                 ),
-                'tooltip' => '<strong>' .
-                    $_ARRAYLANG['TXT_SHOP_DISCOUNTS_SALE_NOTE_TITLE'] .
-                    '</strong><br/>' . $_ARRAYLANG['TXT_SHOP_DISCOUNTS_SALE_NOTE_TEXT'] .
-                    '<br/><br/><strong>' .
-                    $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TITLE'] .
-                    '</strong> <br/>' .
-                    $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TEXT']
+                'tooltip' =>
+                    '<strong>'
+                    . $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TITLE']
+                    . '</strong><br />'
+                    . $_ARRAYLANG['TXT_SHOP_DISCOUNTS_MULTIPLE_VAT_NOTE_TEXT']
+            ),
+            'subjectToVat' => array(
+                'formfield' => array(
+                    'adapter' => 'DiscountCoupon',
+                    'method' => 'getSubjectToVatCheckbox'
+                ),
+                'table' => array(
+                    'parse' => array(
+                        'adapter' => 'DiscountCoupon',
+                        'method' => 'getSubjectToVat',
+                    ),
+                ),
+                'tooltip' =>
+                    $_ARRAYLANG['TXT_MODULE_SHOP_DISCOUNT_COUPON_SUBJECT_TO_VAT_INFO'],
             ),
             'orderItem' => array(
                 'showOverview' => false,
