@@ -630,6 +630,7 @@ class Cart
         // Loop 2: Calculate Coupon discounts and VAT
         $objCoupon = null;
         $hasCoupon = false;
+        $couponVatIncluded = false;
         $discount_amount = 0;
         $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
@@ -646,6 +647,7 @@ class Cart
                     $product['id'], $payment_id);
                 if ($objCoupon) {
                     $hasCoupon = true;
+                    $couponVatIncluded = $objCoupon->getVatIncluded();
                     $discount_amount = $objCoupon->getDiscountAmountOrRate(
                         $product['price'], $customer_id
                     );
@@ -695,11 +697,16 @@ class Cart
                 }
             }
 
-            // Calculate the VAT amount on the full product price.
+            // Calculate the VAT amount on the product price,
+            // minus the discount amount if that excludes VAT.
             // - If included, remember it
             // - If excluded, also add it to the Product price below
             // - If disabled, it's set to zero (DC)
-            $vat_amount = Vat::amount($product['vat_rate'], $product['price']);
+            $vat_amount = Vat::amount(
+                $product['vat_rate'],
+                $product['price']
+                - ($couponVatIncluded ? 0 : $product['discount_amount'])
+            );
             if (Vat::isEnabled() && !Vat::isIncluded()) {
                 self::$products[$cart_id]['price'] += $vat_amount;
                 self::$products[$cart_id]['price'] = \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(self::$products[$cart_id]['price']);
@@ -737,11 +744,35 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
-                // The VAT amount is not affected by this.
-                // The VAT is paid for by the Coupon.
                 $total_discount_amount = $objCoupon->getDiscountAmountOrRate(
                     $total_price, $customer_id
                 );
+                // Subtract the VAT of the discount from the total VAT amount,
+                // if applicable
+                $couponVatDiscount = 0;
+                if (Vat::isEnabled()) {
+                    if ($objCoupon->getDiscountAmount() > 0) {
+                        if (!$objCoupon->getVatIncluded()) {
+                            $vatRate = current($usedVatRates);
+                            // VAT included in the discount amount
+                            if (Vat::isIncluded()) {
+                                $couponVatDiscount =
+                                    $total_discount_amount
+                                    / (1 + $vatRate / 100) * $vatRate / 100;
+                            } else {
+                                $couponVatDiscount =
+                                    $total_discount_amount
+                                    * $vatRate / 100;
+                            }
+                        }
+                    } else {
+                        // VAT reduced by the discount rate
+                        $couponVatDiscount =
+                            $total_vat_amount
+                            * $objCoupon->getDiscountRate() / 100;
+                    }
+                }
+                $total_vat_amount -= $couponVatDiscount;
             }
         }
 
