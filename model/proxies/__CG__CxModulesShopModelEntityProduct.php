@@ -73,10 +73,10 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'pdfTemplate', 'categories', 'userGroups', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'pdfTemplate', 'categories', 'userGroups', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -563,6 +563,28 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function setPdfTemplate($pdfTemplate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPdfTemplate', array($pdfTemplate));
+
+        return parent::setPdfTemplate($pdfTemplate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPdfTemplate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPdfTemplate', array());
+
+        return parent::getPdfTemplate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setWeight($weight)
     {
 
@@ -602,6 +624,39 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFlags', array());
 
         return parent::getFlags();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeFlag($flag)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeFlag', array($flag));
+
+        return parent::removeFlag($flag);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addFlag($flag)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addFlag', array($flag));
+
+        return parent::addFlag($flag);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function testFlag($flag)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'testFlag', array($flag));
+
+        return parent::testFlag($flag);
     }
 
     /**
@@ -1003,6 +1058,28 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function addCategories(\Cx\Modules\Shop\Model\Entity\Category $category)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCategories', array($category));
+
+        return parent::addCategories($category);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeCategories(\Cx\Modules\Shop\Model\Entity\Category $category)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeCategories', array($category));
+
+        return parent::removeCategories($category);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function removeCategory(\Cx\Modules\Shop\Model\Entity\Category $category)
     {
 
@@ -1069,12 +1146,100 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function getUserGroupIds()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserGroupIds', array());
+
+        return parent::getUserGroupIds();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getJsArray($groupCustomerId = 0, $isReseller = false)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getJsArray', array($groupCustomerId, $isReseller));
 
         return parent::getJsArray($groupCustomerId, $isReseller);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStatus()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getStatus', array());
+
+        return parent::getStatus();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function get_custom_price($objCustomer = NULL, $price_options = 0, $count = 1, $ignore_special_offer = false)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'get_custom_price', array($objCustomer, $price_options, $count, $ignore_special_offer));
+
+        return parent::get_custom_price($objCustomer, $price_options, $count, $ignore_special_offer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getActiveByScheduledPublishing()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getActiveByScheduledPublishing', array());
+
+        return parent::getActiveByScheduledPublishing();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function shown_on_startpage($shown_on_startpage = NULL)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'shown_on_startpage', array($shown_on_startpage));
+
+        return parent::shown_on_startpage($shown_on_startpage);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function is_outlet()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'is_outlet', array());
+
+        return parent::is_outlet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOutletDiscountRate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOutletDiscountRate', array());
+
+        return parent::getOutletDiscountRate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDiscountedPrice()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountedPrice', array());
+
+        return parent::getDiscountedPrice();
     }
 
     /**
@@ -1113,6 +1278,17 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -1130,6 +1306,17 @@ class Product extends \Cx\Modules\Shop\Model\Entity\Product implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }

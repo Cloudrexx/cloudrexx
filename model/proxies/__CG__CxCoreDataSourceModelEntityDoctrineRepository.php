@@ -73,10 +73,10 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
+            return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual');
+        return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -496,6 +496,17 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

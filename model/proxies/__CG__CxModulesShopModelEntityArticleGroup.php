@@ -73,10 +73,10 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'name', 'relDiscountGroups', 'products', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'name', 'relDiscountGroups', 'products', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'name', 'relDiscountGroups', 'products', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'name', 'relDiscountGroups', 'products', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -299,6 +299,17 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
     /**
      * {@inheritDoc}
      */
+    public function __toString()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+
+        return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -332,6 +343,17 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -354,12 +376,12 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
     /**
      * {@inheritDoc}
      */
-    public function __toString()
+    public function getTranslatedFieldValue($fieldName)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
 
-        return parent::__toString();
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }

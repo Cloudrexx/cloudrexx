@@ -73,10 +73,10 @@ class RelProductAttribute extends \Cx\Modules\Shop\Model\Entity\RelProductAttrib
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'productId', 'optionId', 'ord', 'product', 'option', 'validators', 'virtual');
+            return array('__isInitialized__', 'productId', 'optionId', 'ord', 'product', 'option', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'productId', 'optionId', 'ord', 'product', 'option', 'validators', 'virtual');
+        return array('__isInitialized__', 'productId', 'optionId', 'ord', 'product', 'option', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -336,6 +336,17 @@ class RelProductAttribute extends \Cx\Modules\Shop\Model\Entity\RelProductAttrib
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -353,6 +364,17 @@ class RelProductAttribute extends \Cx\Modules\Shop\Model\Entity\RelProductAttrib
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

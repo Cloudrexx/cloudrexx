@@ -73,10 +73,10 @@ class Lsv extends \Cx\Modules\Shop\Model\Entity\Lsv implements \Doctrine\ORM\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'orderId', 'holder', 'bank', 'blz', 'order', 'validators', 'virtual');
+            return array('__isInitialized__', 'orderId', 'holder', 'bank', 'blz', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'orderId', 'holder', 'bank', 'blz', 'order', 'validators', 'virtual');
+        return array('__isInitialized__', 'orderId', 'holder', 'bank', 'blz', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -332,6 +332,17 @@ class Lsv extends \Cx\Modules\Shop\Model\Entity\Lsv implements \Doctrine\ORM\Pro
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -349,6 +360,17 @@ class Lsv extends \Cx\Modules\Shop\Model\Entity\Lsv implements \Doctrine\ORM\Pro
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

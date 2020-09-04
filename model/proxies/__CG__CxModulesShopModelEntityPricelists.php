@@ -73,10 +73,10 @@ class Pricelists extends \Cx\Modules\Shop\Model\Entity\Pricelists implements \Do
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -508,6 +508,17 @@ class Pricelists extends \Cx\Modules\Shop\Model\Entity\Pricelists implements \Do
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -525,6 +536,17 @@ class Pricelists extends \Cx\Modules\Shop\Model\Entity\Pricelists implements \Do
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

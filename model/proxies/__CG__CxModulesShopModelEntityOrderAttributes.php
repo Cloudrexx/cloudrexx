@@ -73,10 +73,10 @@ class OrderAttributes extends \Cx\Modules\Shop\Model\Entity\OrderAttributes impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'itemId', 'attributeName', 'optionName', 'price', 'orderItems', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'itemId', 'attributeName', 'optionName', 'price', 'orderItems', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'itemId', 'attributeName', 'optionName', 'price', 'orderItems', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'itemId', 'attributeName', 'optionName', 'price', 'orderItems', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -343,6 +343,17 @@ class OrderAttributes extends \Cx\Modules\Shop\Model\Entity\OrderAttributes impl
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -360,6 +371,17 @@ class OrderAttributes extends \Cx\Modules\Shop\Model\Entity\OrderAttributes impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

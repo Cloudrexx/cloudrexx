@@ -73,10 +73,10 @@ class PaymentProcessor extends \Cx\Modules\Shop\Model\Entity\PaymentProcessor im
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -365,6 +365,17 @@ class PaymentProcessor extends \Cx\Modules\Shop\Model\Entity\PaymentProcessor im
     /**
      * {@inheritDoc}
      */
+    public function __toString()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+
+        return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -398,6 +409,17 @@ class PaymentProcessor extends \Cx\Modules\Shop\Model\Entity\PaymentProcessor im
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -420,12 +442,12 @@ class PaymentProcessor extends \Cx\Modules\Shop\Model\Entity\PaymentProcessor im
     /**
      * {@inheritDoc}
      */
-    public function __toString()
+    public function getTranslatedFieldValue($fieldName)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
 
-        return parent::__toString();
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }

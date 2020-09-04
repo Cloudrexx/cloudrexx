@@ -73,10 +73,10 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual');
+            return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual');
+        return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -459,6 +459,17 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }

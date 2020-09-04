@@ -73,10 +73,10 @@ class RegistrationFormFieldValue extends \Cx\Modules\Calendar\Model\Entity\Regis
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual');
+            return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual');
+        return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -364,6 +364,17 @@ class RegistrationFormFieldValue extends \Cx\Modules\Calendar\Model\Entity\Regis
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

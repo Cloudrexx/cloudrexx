@@ -73,10 +73,10 @@ class Orders extends \Cx\Modules\Shop\Model\Entity\Orders implements \Doctrine\O
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'customerId', 'currencyId', 'sum', 'dateTime', 'status', 'gender', 'company', 'firstname', 'lastname', 'address', 'city', 'zip', 'countryId', 'phone', 'vatAmount', 'shipmentAmount', 'shipmentId', 'paymentId', 'paymentAmount', 'ip', 'langId', 'note', 'modifiedOn', 'modifiedBy', 'billingGender', 'billingCompany', 'billingFirstname', 'billingLastname', 'billingAddress', 'billingCity', 'billingZip', 'billingCountryId', 'billingPhone', 'billingFax', 'billingEmail', 'lsvs', 'orderItems', 'relCustomerCoupons', 'lang', 'currencies', 'shipper', 'payment', 'customer', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'customerId', 'currencyId', 'sum', 'dateTime', 'status', 'gender', 'company', 'firstname', 'lastname', 'address', 'city', 'zip', 'countryId', 'phone', 'vatAmount', 'shipmentAmount', 'shipmentId', 'paymentId', 'paymentAmount', 'ip', 'langId', 'note', 'modifiedOn', 'modifiedBy', 'billingGender', 'billingCompany', 'billingFirstname', 'billingLastname', 'billingAddress', 'billingCity', 'billingZip', 'billingCountryId', 'billingPhone', 'billingFax', 'billingEmail', 'lsvs', 'orderItems', 'relCustomerCoupons', 'lang', 'currencies', 'shipper', 'payment', 'customer', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'customerId', 'currencyId', 'sum', 'dateTime', 'status', 'gender', 'company', 'firstname', 'lastname', 'address', 'city', 'zip', 'countryId', 'phone', 'vatAmount', 'shipmentAmount', 'shipmentId', 'paymentId', 'paymentAmount', 'ip', 'langId', 'note', 'modifiedOn', 'modifiedBy', 'billingGender', 'billingCompany', 'billingFirstname', 'billingLastname', 'billingAddress', 'billingCity', 'billingZip', 'billingCountryId', 'billingPhone', 'billingFax', 'billingEmail', 'lsvs', 'orderItems', 'relCustomerCoupons', 'lang', 'currencies', 'shipper', 'payment', 'customer', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'customerId', 'currencyId', 'sum', 'dateTime', 'status', 'gender', 'company', 'firstname', 'lastname', 'address', 'city', 'zip', 'countryId', 'phone', 'vatAmount', 'shipmentAmount', 'shipmentId', 'paymentId', 'paymentAmount', 'ip', 'langId', 'note', 'modifiedOn', 'modifiedBy', 'billingGender', 'billingCompany', 'billingFirstname', 'billingLastname', 'billingAddress', 'billingCity', 'billingZip', 'billingCountryId', 'billingPhone', 'billingFax', 'billingEmail', 'lsvs', 'orderItems', 'relCustomerCoupons', 'lang', 'currencies', 'shipper', 'payment', 'customer', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -1212,6 +1212,17 @@ class Orders extends \Cx\Modules\Shop\Model\Entity\Orders implements \Doctrine\O
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -1229,6 +1240,17 @@ class Orders extends \Cx\Modules\Shop\Model\Entity\Orders implements \Doctrine\O
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

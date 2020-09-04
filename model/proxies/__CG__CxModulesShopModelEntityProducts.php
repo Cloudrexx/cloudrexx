@@ -73,10 +73,10 @@ class Products extends \Cx\Modules\Shop\Model\Entity\Products implements \Doctri
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'picture', 'distribution', 'normalprice', 'resellerprice', 'stock', 'stockVisible', 'discountprice', 'discountActive', 'active', 'b2b', 'b2c', 'dateStart', 'dateEnd', 'manufacturerId', 'ord', 'vatId', 'weight', 'flags', 'groupId', 'articleId', 'minimumOrderQuantity', 'uri', 'short', 'long', 'name', 'keys', 'code', 'discountCoupons', 'orderItems', 'relProductAttributes', 'manufacturer', 'discountgroupCountName', 'articleGroup', 'vat', 'categories', 'userGroups', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -1091,6 +1091,17 @@ class Products extends \Cx\Modules\Shop\Model\Entity\Products implements \Doctri
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -1108,6 +1119,17 @@ class Products extends \Cx\Modules\Shop\Model\Entity\Products implements \Doctri
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

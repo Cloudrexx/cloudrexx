@@ -73,10 +73,10 @@ class Payment extends \Cx\Modules\Shop\Model\Entity\Payment implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'processorId', 'fee', 'freeFrom', 'ord', 'active', 'name', 'discountCoupons', 'orders', 'paymentProcessor', 'zones', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'processorId', 'fee', 'freeFrom', 'type', 'ord', 'active', 'name', 'discountCoupons', 'orders', 'paymentProcessor', 'zones', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'processorId', 'fee', 'freeFrom', 'ord', 'active', 'name', 'discountCoupons', 'orders', 'paymentProcessor', 'zones', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'processorId', 'fee', 'freeFrom', 'type', 'ord', 'active', 'name', 'discountCoupons', 'orders', 'paymentProcessor', 'zones', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -272,6 +272,28 @@ class Payment extends \Cx\Modules\Shop\Model\Entity\Payment implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFreeFrom', array());
 
         return parent::getFreeFrom();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setType($type)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setType', array($type));
+
+        return parent::setType($type);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getType()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getType', array());
+
+        return parent::getType();
     }
 
     /**
@@ -508,6 +530,17 @@ class Payment extends \Cx\Modules\Shop\Model\Entity\Payment implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -525,6 +558,17 @@ class Payment extends \Cx\Modules\Shop\Model\Entity\Payment implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }
