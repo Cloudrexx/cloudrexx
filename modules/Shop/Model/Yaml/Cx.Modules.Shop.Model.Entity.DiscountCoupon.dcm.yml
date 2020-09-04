@@ -77,12 +77,6 @@ Cx\Modules\Shop\Model\Entity\DiscountCoupon:
         unsigned: true
         default: 0.00
       column: discount_amount
-    vatIncluded:
-      type: boolean
-      options:
-        unsigned: true
-        default: 0
-      column: vat_included
     discountRate:
       type: decimal
       precision: 3

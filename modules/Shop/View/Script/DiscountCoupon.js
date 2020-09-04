@@ -1,4 +1,3 @@
-/* global cx */
 cx.ready(function() {
     loadGenerateCodeButton();
 
@@ -39,7 +38,7 @@ cx.ready(function() {
 function loadGenerateCodeButton() {
     const codeInput = cx.jQuery('form.discountcoupon #form-0-code');
 
-    if (codeInput.length === 0 || codeInput.val().length > 0) {
+    if (codeInput.length == 0 || codeInput.val().length > 0) {
         return;
     }
 
@@ -52,7 +51,7 @@ function loadGenerateCodeButton() {
 }
 
 function toggleLimitedField(checkbox, oldValue) {
-    if (typeof oldValue === 'undefined') {
+    if (oldValue == undefined) {
         oldValue = checkbox.prev().val();
     }
     if (checkbox.is(':checked')) {
@@ -69,14 +68,14 @@ function toggleLimitedField(checkbox, oldValue) {
     return oldValue;
 }
 
-function toggleCouponType() {
+function toggleCouponType(oldValues) {
     if (cx.jQuery('#discountRate').is(':checked')) {
-        cx.jQuery('#group-0-discountAmount').hide();
-        cx.jQuery('#group-0-vatIncluded').hide();
-        cx.jQuery('#group-0-discountRate').show();
+        cx.jQuery('#form-0-discountAmount').parent().parent().hide();
+        cx.jQuery('#form-0-discountAmount').parent().parent().attr('disabled', true);
+        cx.jQuery('#form-0-discountRate').parent().parent().show();
     } else {
-        cx.jQuery('#group-0-discountRate').hide();
-        cx.jQuery('#group-0-discountAmount').show();
-        cx.jQuery('#group-0-vatIncluded').show();
+        cx.jQuery('#form-0-discountRate').parent().parent().hide();
+        cx.jQuery('#form-0-discountRate').parent().parent().attr('disabled', false);
+        cx.jQuery('#form-0-discountAmount').parent().parent().show();
     }
 }

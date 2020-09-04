@@ -103,11 +103,6 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     protected $discountAmount = '0.00';
 
     /**
-     * @var boolean
-     */
-    protected $vatIncluded = false;
-
-    /**
      * @var string
      */
     protected $discountRate = '0';
@@ -165,7 +160,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get code
      *
-     * @return string
+     * @return string 
      */
     public function getCode()
     {
@@ -185,7 +180,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get customerId
      *
-     * @return integer
+     * @return integer 
      */
     public function getCustomerId()
     {
@@ -205,7 +200,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get paymentId
      *
-     * @return integer
+     * @return integer 
      */
     public function getPaymentId()
     {
@@ -225,7 +220,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get productId
      *
-     * @return integer
+     * @return integer 
      */
     public function getProductId()
     {
@@ -245,7 +240,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get startTime
      *
-     * @return integer
+     * @return integer 
      */
     public function getStartTime()
     {
@@ -265,7 +260,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get endTime
      *
-     * @return integer
+     * @return integer 
      */
     public function getEndTime()
     {
@@ -285,7 +280,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get uses
      *
-     * @return integer
+     * @return integer 
      */
     public function getUses()
     {
@@ -305,7 +300,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get global
      *
-     * @return boolean
+     * @return boolean 
      */
     public function getGlobal()
     {
@@ -325,7 +320,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get minimumAmount
      *
-     * @return string
+     * @return string 
      */
     public function getMinimumAmount()
     {
@@ -345,31 +340,11 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get discountAmount
      *
-     * @return string
+     * @return string 
      */
     public function getDiscountAmount()
     {
         return $this->discountAmount;
-    }
-
-    /**
-     * Set vatIncluded
-     *
-     * @param boolean $vatIncluded
-     */
-    public function setVatIncluded($vatIncluded)
-    {
-        $this->vatIncluded = $vatIncluded;
-    }
-
-    /**
-     * Get vatIncluded
-     *
-     * @return boolean
-     */
-    public function getVatIncluded()
-    {
-        return $this->vatIncluded;
     }
 
     /**
@@ -385,7 +360,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get discountRate
      *
-     * @return string
+     * @return string 
      */
     public function getDiscountRate()
     {
@@ -425,7 +400,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     /**
      * Get payment
      *
-     * @return \Cx\Modules\Shop\Model\Entity\Payment
+     * @return \Cx\Modules\Shop\Model\Entity\Payment 
      */
     public function getPayment()
     {
