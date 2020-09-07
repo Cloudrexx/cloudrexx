@@ -73,10 +73,10 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'host', 'active', 'apiKey', 'apiVersion', 'urlTemplate', 'hostEntities', 'changes', 'state', 'lastUpdate', 'defaultUrlTemplate', 'validators', 'virtual');
     }
 
     /**
@@ -570,17 +570,6 @@ class Host extends \Cx\Core_Modules\Sync\Model\Entity\Host implements \Doctrine\
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

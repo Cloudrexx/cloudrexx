@@ -73,10 +73,10 @@ class Category extends \Cx\Modules\Shop\Model\Entity\Category implements \Doctri
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'parentId', 'ord', 'active', 'picture', 'flags', 'name', 'description', 'shortDescription', 'pricelists', 'products', 'children', 'parentCategory', 'stringRepresentationFields', 'validators', 'virtual', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'locale', 'id', 'parentId', 'ord', 'active', 'picture', 'flags', 'name', 'description', 'shortDescription', 'pricelists', 'products', 'children', 'parentCategory', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'parentId', 'ord', 'active', 'picture', 'flags', 'name', 'description', 'shortDescription', 'pricelists', 'products', 'children', 'parentCategory', 'stringRepresentationFields', 'validators', 'virtual', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'locale', 'id', 'parentId', 'ord', 'active', 'picture', 'flags', 'name', 'description', 'shortDescription', 'pricelists', 'products', 'children', 'parentCategory', 'validators', 'virtual');
     }
 
     /**
@@ -431,28 +431,6 @@ class Category extends \Cx\Modules\Shop\Model\Entity\Category implements \Doctri
     /**
      * {@inheritDoc}
      */
-    public function addProducts(\Cx\Modules\Shop\Model\Entity\Product $product)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addProducts', array($product));
-
-        return parent::addProducts($product);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeProducts(\Cx\Modules\Shop\Model\Entity\Product $product)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeProducts', array($product));
-
-        return parent::removeProducts($product);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function removeProduct(\Cx\Modules\Shop\Model\Entity\Product $product)
     {
 
@@ -530,28 +508,6 @@ class Category extends \Cx\Modules\Shop\Model\Entity\Category implements \Doctri
     /**
      * {@inheritDoc}
      */
-    public function isVirtual()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
-
-        return parent::isVirtual();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function makeClone($flagRecursive = false, $flagWithProducts = false)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'makeClone', array($flagRecursive, $flagWithProducts));
-
-        return parent::makeClone($flagRecursive, $flagWithProducts);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getComponentController()
     {
 
@@ -574,12 +530,12 @@ class Category extends \Cx\Modules\Shop\Model\Entity\Category implements \Doctri
     /**
      * {@inheritDoc}
      */
-    public function initializeValidators()
+    public function isVirtual()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
-        return parent::initializeValidators();
+        return parent::isVirtual();
     }
 
     /**
@@ -602,17 +558,6 @@ class Category extends \Cx\Modules\Shop\Model\Entity\Category implements \Doctri
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

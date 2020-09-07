@@ -73,10 +73,10 @@ class ProfileTitle extends \Cx\Core\User\Model\Entity\ProfileTitle implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'title', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'userProfile', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'title', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'userProfile', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'title', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'userProfile', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'title', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\ProfileTitle' . "\0" . 'userProfile', 'validators', 'virtual');
     }
 
     /**
@@ -338,17 +338,6 @@ class ProfileTitle extends \Cx\Core\User\Model\Entity\ProfileTitle implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

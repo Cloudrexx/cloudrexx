@@ -73,10 +73,10 @@ class PaymentProcessors extends \Cx\Modules\Shop\Model\Entity\PaymentProcessors 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'type', 'name', 'description', 'companyUrl', 'status', 'picture', 'payments', 'validators', 'virtual');
     }
 
     /**
@@ -398,17 +398,6 @@ class PaymentProcessors extends \Cx\Modules\Shop\Model\Entity\PaymentProcessors 
     /**
      * {@inheritDoc}
      */
-    public function initializeValidators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
-
-        return parent::initializeValidators();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function validate()
     {
 
@@ -426,17 +415,6 @@ class PaymentProcessors extends \Cx\Modules\Shop\Model\Entity\PaymentProcessors 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

@@ -73,10 +73,10 @@ class DiscountgroupCountName extends \Cx\Modules\Shop\Model\Entity\Discountgroup
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'cumulative', 'unit', 'name', 'discountgroupCountRates', 'products', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'locale', 'id', 'cumulative', 'unit', 'name', 'discountgroupCountRates', 'products', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'cumulative', 'unit', 'name', 'discountgroupCountRates', 'products', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'locale', 'id', 'cumulative', 'unit', 'name', 'discountgroupCountRates', 'products', 'validators', 'virtual');
     }
 
     /**
@@ -343,17 +343,6 @@ class DiscountgroupCountName extends \Cx\Modules\Shop\Model\Entity\Discountgroup
     /**
      * {@inheritDoc}
      */
-    public function __toString()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
-
-        return parent::__toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getComponentController()
     {
 
@@ -387,17 +376,6 @@ class DiscountgroupCountName extends \Cx\Modules\Shop\Model\Entity\Discountgroup
     /**
      * {@inheritDoc}
      */
-    public function initializeValidators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
-
-        return parent::initializeValidators();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function validate()
     {
 
@@ -420,12 +398,12 @@ class DiscountgroupCountName extends \Cx\Modules\Shop\Model\Entity\Discountgroup
     /**
      * {@inheritDoc}
      */
-    public function getTranslatedFieldValue($fieldName)
+    public function __toString()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
 
-        return parent::getTranslatedFieldValue($fieldName);
+        return parent::__toString();
     }
 
 }

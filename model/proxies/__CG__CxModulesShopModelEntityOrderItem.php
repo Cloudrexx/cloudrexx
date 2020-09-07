@@ -73,10 +73,10 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'orderId', 'productId', 'productName', 'price', 'quantity', 'vatRate', 'weight', 'discountCoupon', 'orderAttributes', 'order', 'product', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'orderId', 'productId', 'productName', 'price', 'quantity', 'vatRate', 'weight', 'orderAttributes', 'order', 'product', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'orderId', 'productId', 'productName', 'price', 'quantity', 'vatRate', 'weight', 'discountCoupon', 'orderAttributes', 'order', 'product', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'orderId', 'productId', 'productName', 'price', 'quantity', 'vatRate', 'weight', 'orderAttributes', 'order', 'product', 'validators', 'virtual');
     }
 
     /**
@@ -332,28 +332,6 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
     /**
      * {@inheritDoc}
      */
-    public function setDiscountCoupon($discountCoupon)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDiscountCoupon', array($discountCoupon));
-
-        return parent::setDiscountCoupon($discountCoupon);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getDiscountCoupon()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountCoupon', array());
-
-        return parent::getDiscountCoupon();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setWeight($weight)
     {
 
@@ -497,17 +475,6 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
     /**
      * {@inheritDoc}
      */
-    public function initializeValidators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
-
-        return parent::initializeValidators();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function validate()
     {
 
@@ -525,17 +492,6 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

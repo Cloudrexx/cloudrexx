@@ -73,10 +73,10 @@ class EventField extends \Cx\Modules\Calendar\Model\Entity\EventField implements
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual');
     }
 
     /**
@@ -540,17 +540,6 @@ class EventField extends \Cx\Modules\Calendar\Model\Entity\EventField implements
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

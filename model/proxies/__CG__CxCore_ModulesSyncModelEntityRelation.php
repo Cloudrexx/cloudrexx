@@ -73,10 +73,10 @@ class Relation extends \Cx\Core_Modules\Sync\Model\Entity\Relation implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual');
     }
 
     /**
@@ -514,17 +514,6 @@ class Relation extends \Cx\Core_Modules\Sync\Model\Entity\Relation implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTranslatedFieldValue($fieldName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
-
-        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**
