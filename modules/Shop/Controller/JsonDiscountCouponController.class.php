@@ -746,28 +746,37 @@ class JsonDiscountCouponController
     }
 
     /**
-     * Parses the discount amount in overview.
+     * Return the used and original discount amounts
      *
-     * For coupons that can be used once the remaining amount is shown.
-     * @param array $params contains the parameters of the callback function
-     *
-     * @return string Formatted amount
+     * Formats the numbers as amounts, as "<used amount> / <original amount>".
+     * Note that for DiscountCoupons redeemed by multiple Customers, the
+     * used amount may be greater than the original value.
+     * For coupons with a percent rate, the original amount is shown as "-.--".
+     * @param   array   $params     The callback function parameters
+     * @return  string              Formatted amount
      */
-    public function showDiscountAmount($params) {
-        if (!isset($params['data']) || $params['data'] == 0.00) {
-            return '-.--';
+    public function showDiscountAmount($params)
+    {
+        $used = '0.00';
+        $original = $params['data'];
+        $coupon = null;
+        if (!empty($params['rows']['id'])) {
+            $coupon = $this->cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+            )->find($params['rows']['id']);
         }
-        if (!isset($params['rows']) || !isset($params['rows']['id'])) {
-            return $params['data'];
+        if ($coupon) {
+            $used = CurrencyController::formatPrice(
+                $coupon->getUsedAmount()
+            );
+            if ($coupon->getDiscountAmount() > 0) {
+                $original = CurrencyController::formatPrice(
+                    $coupon->getDiscountAmount()
+                );
+            } else {
+                $original = '-.--';
+            }
         }
-        $coupon = $this->cx->getDb()->getEntityManager()->getRepository(
-            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
-        )->find($params['rows']['id']);
-        // Showing the remaining amount only makes sense if
-        // the coupon can only be used once.
-        if (!$coupon || $coupon->getUses() > 1) {
-            return $params['data'];
-        }
-        return $coupon->getUsedAmount() . ' / ' . $params['data'];
+        return $used . ' / ' . $original;
     }
 }
