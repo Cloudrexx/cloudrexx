@@ -491,7 +491,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
         $em = $cx->getDb()->getEntityManager();
         return $em->getRepository(
             'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        )->getUsedCount($this->code, $customerId);
+        )->getUsedCount($this, $customerId);
     }
 
     /**
@@ -515,7 +515,7 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
         $em = $cx->getDb()->getEntityManager();
         return $em->getRepository(
             'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        )->getUsedAmount($this->code, $customerId, $orderId);
+        )->getUsedAmount($this, $customerId, $orderId);
     }
 
     /**
