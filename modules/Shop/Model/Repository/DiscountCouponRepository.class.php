@@ -105,11 +105,10 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
         // Verify "ownership" first.  No point in setting status messages
         // that are inappropriate for other users.
         if ($objCoupon->getCustomerId()
-            && $objCoupon->getCustomerId() != intval($customerId)) {
-
+            && $objCoupon->getCustomerId() != $customerId) {
             return null;
         }
-        if ($objCoupon->getProductId() != intval($productId)) {
+        if ($objCoupon->getProductId() != $productId) {
             if ($objCoupon->getProductId()) {
                 if (!$this->hasMessage(
                     'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT'
@@ -124,7 +123,7 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
             return null;
         }
         if ($objCoupon->getPaymentId()
-            && $objCoupon->getPaymentId() != intval($paymentId)) {
+            && $objCoupon->getPaymentId() != $paymentId) {
             if (!$this->hasMessage(
                 'TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PAYMENT'
             )) {
@@ -159,8 +158,7 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
         ) {
             return null;
         }
-        if ($objCoupon->getMinimumAmount() > floatval($orderAmount)) {
-
+        if ($objCoupon->getMinimumAmount() > $orderAmount) {
             if (!$this->hasMessage('TXT_SHOP_COUPON_UNAVAILABLE_FOR_AMOUNT')) {
                 \Message::information(
                     sprintf(
