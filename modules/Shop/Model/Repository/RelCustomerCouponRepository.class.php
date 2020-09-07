@@ -11,10 +11,11 @@ namespace Cx\Modules\Shop\Model\Repository;
 class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
-     * Returns the count of the uses for the given code
+     * Return the use count of the given Coupon
      *
-     * The optional $customer_id limits the result to the uses of that
-     * Customer.
+     * This is the number of times the Coupon has already been redeemed.
+     * The optional $customerId limits the result to the uses of that
+     * Customer, except for "global" Coupons.
      * Returns 0 (zero) for codes not present in the relation (yet).
      * @param   DiscountCoupon  $coupon         The Coupon
      * @param   int             $customerId     The optional Customer ID
@@ -30,7 +31,7 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             ->from($this->_entityName, 'rcc')
             ->where($qb->expr()->eq('rcc.code', '?1'))
             ->setParameter(1, $code);
-        if (!empty($customerId)) {
+        if ($customerId && !$coupon->getGlobal()) {
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customerId);
         }
@@ -43,10 +44,11 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
 
 
     /**
-     * Returns the discount amount used with this Coupon
+     * Return the discount amount used with the given Coupon
      *
-     * The optional $customer_id and $order_id limit the result to the uses
-     * of that Customer and Order.
+     * The optional $customerId limits the result to the uses of that
+     * Customer, except for "global" Coupons.
+     * The $orderId limits to that Order, unless empty.
      * Returns 0 (zero) for Coupons that have not been used with the given
      * parameters, and thus are not present in the relation.
      * @param   DiscountCoupon  $coupon         The Coupon
@@ -64,7 +66,7 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             ->from($this->_entityName, 'rcc')
             ->where($qb->expr()->eq('rcc.code', '?1'))
             ->setParameter(1, $code);
-        if (!empty($customer_id)) {
+        if ($customerId && !$coupon->getGlobal()) {
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customer_id);
         }
