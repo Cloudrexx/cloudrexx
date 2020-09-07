@@ -151,10 +151,11 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
             }
             return null;
         }
-        // Deduct amounts already redeemed
-        if (floatval($objCoupon->getDiscountAmount()) > 0 &&
-            $objCoupon->getUsedAmount($customerId) >=
-            $objCoupon->getDiscountAmount()
+        $usedAmount = $objCoupon->getUsedAmount($customerId);
+        // Test the available amount first; only when available,
+        // test and inform about the minimum amount.
+        if ($objCoupon->getDiscountAmount() > 0
+            && $usedAmount >= $objCoupon->getDiscountAmount()
         ) {
             return null;
         }
@@ -171,21 +172,14 @@ class DiscountCouponRepository extends \Doctrine\ORM\EntityRepository
             }
             return null;
         }
-
-        // Unlimited uses
-        if ($objCoupon->getUses() > 1e9) return $objCoupon;
-
-        // Deduct the number of times the Coupon has been redeemed already:
-        // - If the Coupon's customer_id is empty, subtract all uses
-        // - Otherwise, subtract the current customer's uses only
-        $objCoupon->setUses(
-            $objCoupon->getUses()
-            - $objCoupon->getUsedCount(
-                ($objCoupon->getCustomerId() ? $customerId : null)
-            )
-        );
-        if ($objCoupon->getUses() <= 0) {
-
+        // Unlimited uses; always available
+        if ($objCoupon->getUses() > 1e9) {
+            return $objCoupon;
+        }
+        // Limited number of uses; no longer available
+        if ($objCoupon->getUses()
+            - $objCoupon->getUsedCount($customerId) <= 0
+        ) {
             if (!$this->hasMessage(
                 'TXT_SHOP_COUPON_UNAVAILABLE_CAUSE_USED_UP'
             )) {
