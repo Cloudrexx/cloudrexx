@@ -103,6 +103,11 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     protected $discountAmount = '0.00';
 
     /**
+     * @var boolean
+     */
+    protected $subjectToVat = false;
+
+    /**
      * @var string
      */
     protected $discountRate = '0';
@@ -345,6 +350,26 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     public function getDiscountAmount()
     {
         return $this->discountAmount;
+    }
+
+    /**
+     * Set subjectToVat
+     *
+     * @param boolean $subjectToVat
+     */
+    public function setSubjectToVat($subjectToVat)
+    {
+        $this->subjectToVat = $subjectToVat;
+    }
+
+    /**
+     * Get subjectToVat
+     *
+     * @return boolean
+     */
+    public function getSubjectToVat()
+    {
+        return $this->subjectToVat;
     }
 
     /**

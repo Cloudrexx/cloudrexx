@@ -1186,3 +1186,5 @@ $_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='The entr
 $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_NONE'] = 'No one';
 $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_RESELLER'] = "Reseller";
 $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE'] = 'Active for';
+$_ARRAYLANG['subjectToVat'] = 'Subject to VAT';
+$_ARRAYLANG['TXT_MODULE_SHOP_DISCOUNT_COUPON_SUBJECT_TO_VAT_INFO'] = '<b>Active:</b> The full product value is subject to VAT. The discount amount does not affect it.<br /><b>Inactive</b>: The discount amount is excluded from VAT.';

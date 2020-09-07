@@ -68,14 +68,14 @@ function toggleLimitedField(checkbox, oldValue) {
     return oldValue;
 }
 
-function toggleCouponType(oldValues) {
+function toggleCouponType() {
     if (cx.jQuery('#discountRate').is(':checked')) {
-        cx.jQuery('#form-0-discountAmount').parent().parent().hide();
-        cx.jQuery('#form-0-discountAmount').parent().parent().attr('disabled', true);
-        cx.jQuery('#form-0-discountRate').parent().parent().show();
+        cx.jQuery('#group-0-discountAmount').hide();
+        cx.jQuery('#group-0-subjectToVat').hide();
+        cx.jQuery('#group-0-discountRate').show();
     } else {
-        cx.jQuery('#form-0-discountRate').parent().parent().hide();
-        cx.jQuery('#form-0-discountRate').parent().parent().attr('disabled', false);
-        cx.jQuery('#form-0-discountAmount').parent().parent().show();
+        cx.jQuery('#group-0-discountRate').hide();
+        cx.jQuery('#group-0-discountAmount').show();
+        cx.jQuery('#group-0-subjectToVat').show();
     }
 }

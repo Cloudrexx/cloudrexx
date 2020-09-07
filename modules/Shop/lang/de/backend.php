@@ -1265,3 +1265,5 @@ $_ARRAYLANG['pdfTemplate'] = 'PDF Vorlage';
 $_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='Die Einträge wurden erfolgreich aktualisiert.';
 $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_NONE'] = 'Niemanden';
 $_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_RESELLER'] = "Wiederverkäufer";
+$_ARRAYLANG['subjectToVat'] = 'MwSt.-pflichtig';
+$_ARRAYLANG['TXT_MODULE_SHOP_DISCOUNT_COUPON_SUBJECT_TO_VAT_INFO'] = '<b>Aktiv:</b> Der Rabattbetrag hat keinen Einfluss auf die Mehrwertsteuer. Sie wird für den vollständigen Warenwert ausgewiesen.<br /><b>Inaktiv</b>: Der Rabattbetrag wird anteilig auf die Mehrwertsteuer angerechnet.';
