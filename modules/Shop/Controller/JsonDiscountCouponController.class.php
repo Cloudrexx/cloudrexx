@@ -56,7 +56,7 @@ class JsonDiscountCouponController
     /**
      * @var array messages from this controller
      */
-    protected $messages;
+    protected $messages = [];
 
     /**
      * Returns the internal name used as identifier for this adapter
