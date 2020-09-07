@@ -35,11 +35,8 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customerId);
         }
-
-        if (!empty($qb->getQuery()->getArrayResult()[0]['uses'])) {
-            return $qb->getQuery()->getArrayResult()[0]['uses'];
-        }
-        return 0;
+        // Result is NULL on zero rows
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
 
@@ -74,12 +71,8 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             $qb->andWhere($qb->expr()->eq('rcc.orderId', '?3'))
                 ->setParameter(3, $order_id);
         }
-
-        if (!empty($qb->getQuery()->getResult()[0]['amount'])) {
-            // The Coupon has been used for so much already
-            return $qb->getQuery()->getResult()[0]['amount'];
-        }
-        return 0;
+        // Result is NULL on zero rows
+        return (float) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
