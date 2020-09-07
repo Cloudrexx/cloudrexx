@@ -98,8 +98,6 @@ class JsonDiscountCouponController
             'getCouponLink',
             'showDiscountAmount',
             'parseOrderItemField',
-            'getSubjectToVat',
-            'getSubjectToVatCheckbox',
         );
     }
 
@@ -799,43 +797,4 @@ class JsonDiscountCouponController
             $fieldvalue->getOrder()->getId()
         ) . '</a>';
     }
-
-    /**
-     * Return text to be displayed in the table for the subjectToVat property
-     * @param   array   $params     The callback parameters
-     * @return  string
-     */
-    public function getSubjectToVat($params)
-    {
-        global $_ARRAYLANG;
-        return empty($params['data'])
-            ? $_ARRAYLANG['TXT_SHOP_NO']
-            : $_ARRAYLANG['TXT_SHOP_YES'];
-    }
-
-    /**
-     * Return a checkbox for the subjectToVat form field
-     * @param   array   $params     The callback parameters
-     * @return  string
-     */
-    public function getSubjectToVatCheckbox($params)
-    {
-        $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        // Necessary for being able to clear the flag
-        $hidden = new \Cx\Core\Html\Model\Entity\DataElement(
-            $params['name'], false
-        );
-        $hidden->setAttributes(['type' => 'hidden']);
-        $input = new \Cx\Core\Html\Model\Entity\DataElement(
-            $params['name'], true
-        );
-        $input->setAttributes(['type' => 'checkbox']);
-        if ($params['value'] ?? '') {
-            $input->setAttribute('checked', true);
-        }
-        $wrapper->addChild($hidden);
-        $wrapper->addChild($input);
-        return $wrapper;
-    }
-
 }

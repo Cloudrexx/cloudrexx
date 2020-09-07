@@ -3023,7 +3023,6 @@ CREATE TABLE `contrexx_module_shop_discount_coupon` (
   `minimum_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `discount_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `discount_rate` decimal(3,0) unsigned NOT NULL DEFAULT '0',
-  `subject_to_vat` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`code`,`customer_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_shop_discountgroup_count_name` (

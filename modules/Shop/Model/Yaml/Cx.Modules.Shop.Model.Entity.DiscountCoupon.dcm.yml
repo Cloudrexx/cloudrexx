@@ -77,12 +77,6 @@ Cx\Modules\Shop\Model\Entity\DiscountCoupon:
         unsigned: true
         default: 0.00
       column: discount_amount
-    subjectToVat:
-      type: boolean
-      options:
-        unsigned: true
-        default: 0
-      column: subject_to_vat
     discountRate:
       type: decimal
       precision: 3
