@@ -103,7 +103,7 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
                 ->setParameter(2, $customerId);
         }
-        if (!empty($orderId)) {
+        if ($orderId) {
             $qb->andWhere($qb->expr()->eq('rcc.orderId', '?3'))
                 ->setParameter(3, $orderId);
         }
