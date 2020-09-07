@@ -65,11 +65,11 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter(1, $code);
         if ($customerId && !$coupon->getGlobal()) {
             $qb->andWhere($qb->expr()->eq('rcc.customerId', '?2'))
-                ->setParameter(2, $customer_id);
+                ->setParameter(2, $customerId);
         }
         if ($orderId) {
             $qb->andWhere($qb->expr()->eq('rcc.orderId', '?3'))
-                ->setParameter(3, $order_id);
+                ->setParameter(3, $orderId);
         }
         // Result is NULL on zero rows
         return (float) $qb->getQuery()->getSingleScalarResult();
