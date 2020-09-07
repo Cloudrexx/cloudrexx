@@ -52,15 +52,15 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
      * The optional $customer_id limits the result to the uses of that
      * Customer.
      * Returns 0 (zero) for codes not present in the relation (yet).
-     *
-     * @param   string    $code           code of coupon
-     * @param   integer   $customerId     The optional Customer ID
-     *
-     * @return  mixed                     The number of uses of the code
-     *                                    on success, false otherwise
+     * @param   DiscountCoupon  $coupon         The Coupon
+     * @param   int             $customerId     The optional Customer ID
+     * @return  int                             The number of uses
      */
-    public function getUsedCount($code, $customerId = 0)
-    {
+    public function getUsedCount(
+        \Cx\Modules\Shop\Model\Entity\DiscountCoupon $coupon,
+        $customerId = 0
+    ) {
+        $code = $coupon->getCode();
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(rcc.count) as uses')
             ->from($this->_entityName, 'rcc')
@@ -85,16 +85,16 @@ class RelCustomerCouponRepository extends \Doctrine\ORM\EntityRepository
      * of that Customer and Order.
      * Returns 0 (zero) for Coupons that have not been used with the given
      * parameters, and thus are not present in the relation.
-     *
-     * @param   string    $code          The Coupon Code
-     * @param   integer   $customerId    The optional Customer ID
-     * @param   integer   $orderId       The optional Order ID
-     *
-     * @return  mixed                    The amount used with this Coupon
-     *                                   on success, false otherwise
+     * @param   DiscountCoupon  $coupon         The Coupon
+     * @param   int             $customerId     The optional Customer ID
+     * @param   int             $orderId        The optional Order ID
+     * @return  float                           The amount used
      */
-    public function getUsedAmount($code, $customerId=NULL, $orderId=NULL)
-    {
+    public function getUsedAmount(
+        \Cx\Modules\Shop\Model\Entity\DiscountCoupon $coupon,
+        $customerId = 0, $orderId = 0
+    ) {
+        $code = $coupon->getCode();
         $qb = $this->_em->createQueryBuilder();
         $qb->select('sum(rcc.amount) as amount')
             ->from($this->_entityName, 'rcc')
