@@ -73,10 +73,10 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'code', 'customerId', 'paymentId', 'productId', 'startTime', 'endTime', 'uses', 'global', 'minimumAmount', 'discountAmount', 'discountRate', 'payment', 'product', 'customer', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'code', 'customerId', 'paymentId', 'productId', 'startTime', 'endTime', 'uses', 'global', 'minimumAmount', 'discountAmount', 'subjectToVat', 'discountRate', 'orderItem', 'payment', 'product', 'customer', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'code', 'customerId', 'paymentId', 'productId', 'startTime', 'endTime', 'uses', 'global', 'minimumAmount', 'discountAmount', 'discountRate', 'payment', 'product', 'customer', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'code', 'customerId', 'paymentId', 'productId', 'startTime', 'endTime', 'uses', 'global', 'minimumAmount', 'discountAmount', 'subjectToVat', 'discountRate', 'orderItem', 'payment', 'product', 'customer', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -431,6 +431,28 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
     /**
      * {@inheritDoc}
      */
+    public function setSubjectToVat($subjectToVat)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSubjectToVat', array($subjectToVat));
+
+        return parent::setSubjectToVat($subjectToVat);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSubjectToVat()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSubjectToVat', array());
+
+        return parent::getSubjectToVat();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setDiscountRate($discountRate)
     {
 
@@ -448,6 +470,28 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountRate', array());
 
         return parent::getDiscountRate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOrderItem($orderItem)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOrderItem', array($orderItem));
+
+        return parent::setOrderItem($orderItem);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrderItem()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOrderItem', array());
+
+        return parent::getOrderItem();
     }
 
     /**
@@ -530,34 +574,34 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
     /**
      * {@inheritDoc}
      */
-    public function getUsedAmount($customer_id = NULL, $order_id = NULL)
+    public function getUsedAmount($customerId = NULL, $orderId = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsedAmount', array($customer_id, $order_id));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsedAmount', array($customerId, $orderId));
 
-        return parent::getUsedAmount($customer_id, $order_id);
+        return parent::getUsedAmount($customerId, $orderId);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDiscountAmountOrRate($amount, $customer_id = NULL)
+    public function getDiscountAmountOrRate($amount, $customerId = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountAmountOrRate', array($amount, $customer_id));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDiscountAmountOrRate', array($amount, $customerId));
 
-        return parent::getDiscountAmountOrRate($amount, $customer_id);
+        return parent::getDiscountAmountOrRate($amount, $customerId);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function redeem($order_id, $customer_id, $amount, $uses = 1)
+    public function redeem($orderId, $customerId, $amount, $uses = 1)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'redeem', array($order_id, $customer_id, $amount, $uses));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'redeem', array($orderId, $customerId, $amount, $uses));
 
-        return parent::redeem($order_id, $customer_id, $amount, $uses);
+        return parent::redeem($orderId, $customerId, $amount, $uses);
     }
 
     /**
@@ -596,6 +640,17 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -613,6 +668,17 @@ class DiscountCoupon extends \Cx\Modules\Shop\Model\Entity\DiscountCoupon implem
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**
