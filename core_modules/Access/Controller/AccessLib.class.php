@@ -324,7 +324,11 @@ class AccessLib
             break;
         case 'text':
         case 'mail':
-            $arrPlaceholders['_VALUE'] = $edit ? htmlentities($objUser->getProfileAttribute($attributeId, $historyId), ENT_QUOTES, CONTREXX_CHARSET) : html_entity_decode(nl2br($objUser->getProfileAttribute($attributeId, $historyId)), ENT_QUOTES, CONTREXX_CHARSET);
+            $value = $objUser->getProfileAttribute($attributeId, $historyId);
+                if ($objAttribute->isMultiline()) {
+                    $value = nl2br($value);
+                }
+                $arrPlaceholders['_VALUE'] = contrexx_raw2xhtml($value);
             break;
         case 'uri':
             $uri = $objUser->getProfileAttribute($attributeId, $historyId);
