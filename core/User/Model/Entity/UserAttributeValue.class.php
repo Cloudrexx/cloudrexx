@@ -66,6 +66,16 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     protected $userAttribute;
 
     /**
+     * {@inheritdoc}
+     */
+    protected $stringRepresentationFields = array('value');
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $stringRepresentationFormat = '%1$s';
+
+    /**
      * Set history
      *
      * @param integer $history
