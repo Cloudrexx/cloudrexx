@@ -6225,21 +6225,21 @@ END;
         );
 
         if (!empty($accountId)) {
-            $userRepo->find(intval($accountId));
+            $objUsers = $userRepo->find(intval($accountId));
 
-            if (!empty($user)) {
-                $email = $user->getEmail();
+            if ($objUsers) {
+                $email = $objUsers->getEmail();
             }
         }
 
         if (empty($accountId) && !empty ($accountEmail) && \FWValidator::isEmail($accountEmail)) {
-            $user = $userRepo->findOneBy(array('email' => $accountEmail));
-            if (!empty($user)) {
-                $id             = $user->getId();
-                $email          = $user->getEmail();
-                $company        = trim($user->getProfileAttribute('company'));
-                $lastname       = trim($user->getProfileAttribute('lastname'));
-                $firstname      = trim($user->getProfileAttribute('firstname'));
+            $objUsers = $userRepo->findOneBy(array('email' => $accountEmail));
+            if ($objUsers) {
+                $id             = $objUsers->getId();
+                $email          = $objUsers->getEmail();
+                $company        = trim($objUsers->getProfileAttribute('company'));
+                $lastname       = trim($objUsers->getProfileAttribute('lastname'));
+                $firstname      = trim($objUsers->getProfileAttribute('firstname'));
                 $defaultUser    = !empty ($company) ? trim($company.', '.$firstname.' '.$lastname) : trim($firstname.' '.$lastname);
                 $setDefaultUser = !empty ($defaultUser) ? $defaultUser : 'unknown';
             } else {
