@@ -717,7 +717,7 @@ class FWUser extends User_Setting
         }
         return "<a href='index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={$user->getId()}'
                     title='{$_CORELANG['TXT_EDIT_USER_ACCOUNT']}'>" .
-                    self::getParsedUserTitle($user) .
+                    contrexx_raw2xhtml(self::getParsedUserTitle($user)) .
                 "</a>" .
                 $crmDetailImg;
     }
