@@ -73,10 +73,10 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -547,6 +547,17 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

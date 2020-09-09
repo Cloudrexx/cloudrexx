@@ -73,10 +73,10 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'mandatory', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'sortType', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessSpecial', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userAttributeName', 'userAttributeValue', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userProfile', 'readAccessId', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'mandatory', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'sortType', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessSpecial', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userAttributeName', 'userAttributeValue', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userProfile', 'readAccessId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'mandatory', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'sortType', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessSpecial', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userAttributeName', 'userAttributeValue', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userProfile', 'readAccessId', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'type', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'mandatory', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'sortType', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'orderId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessSpecial', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userAttributeName', 'userAttributeValue', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'accessId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttribute' . "\0" . 'userProfile', 'readAccessId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -558,6 +558,17 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

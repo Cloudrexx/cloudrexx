@@ -73,10 +73,10 @@ class Currency extends \Cx\Modules\Crm\Model\Entity\Currency implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'id', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'name', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'active', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'pos', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'hourly_rate', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'default_currency', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'id', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'name', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'active', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'pos', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'hourly_rate', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'default_currency', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'id', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'name', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'active', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'pos', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'hourly_rate', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'default_currency', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'id', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'name', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'active', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'pos', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'hourly_rate', '' . "\0" . 'Cx\\Modules\\Crm\\Model\\Entity\\Currency' . "\0" . 'default_currency', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -382,6 +382,17 @@ class Currency extends \Cx\Modules\Crm\Model\Entity\Currency implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }
