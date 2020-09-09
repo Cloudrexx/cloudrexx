@@ -360,7 +360,7 @@ class JsonData {
      *              The supplied array must comply with the following structure:
      * <pre class="brush: php">
      *              $httpAuth = array(
-     *                  'httpAuthMethod'   => 'none|basic|disgest',
+     *                  'httpAuthMethod'   => 'none|basic|digest',
      *                  'httpAuthUsername' => '<username>',
      *                  'httpAuthPassword' => '<password>',
      *              );
@@ -402,7 +402,7 @@ class JsonData {
                         \HTTP_Request2::AUTH_BASIC
                     );
                     break;
-                case 'disgest':
+                case 'digest':
                     $request->setAuth(
                         $httpAuth['httpAuthUsername'],
                         $httpAuth['httpAuthPassword'],
