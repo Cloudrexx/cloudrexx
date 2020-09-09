@@ -324,11 +324,13 @@ class AccessLib
             break;
         case 'text':
         case 'mail':
-            $value = $objUser->getProfileAttribute($attributeId, $historyId);
-                if ($objAttribute->isMultiline()) {
-                    $value = nl2br($value);
-                }
-                $arrPlaceholders['_VALUE'] = contrexx_raw2xhtml($value);
+            $value = contrexx_raw2xhtml(
+                $objUser->getProfileAttribute($attributeId, $historyId)
+            );
+            if ($objAttribute->isMultiline()) {
+                $value = nl2br($value);
+            }
+            $arrPlaceholders['_VALUE'] = $value;
             break;
         case 'uri':
             $uri = $objUser->getProfileAttribute($attributeId, $historyId);
