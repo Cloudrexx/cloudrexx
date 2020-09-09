@@ -208,7 +208,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
                                         $url = "<a href='index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={$userId}'
                                        title='{$_ARRAYLANG['TXT_MODULE_ORDER_MODIY_USER_ACCOUNT']}'>" .
-                                            $userName .
+                                            contrexx_raw2xhtml($userName) .
                                             "</a>" .
                                             $crmDetailLink;
                                             return $url;
@@ -466,7 +466,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
                                     $url = "<a href='index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={$userId}'
                                        title='{$_ARRAYLANG['TXT_MODULE_ORDER_MODIY_USER_ACCOUNT']}'>" .
-                                            $userName .
+                                            contrexx_raw2xhtml($userName) .
                                             "</a>" .
                                             $crmDetailLink;
                                     return $url;
