@@ -73,10 +73,10 @@ class Page extends \Cx\Core\ContentManager\Model\Entity\Page implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'nodeIdShadowed', 'lang', 'title', 'content', 'sourceMode', 'customContent', 'useCustomContentForAllChannels', 'applicationTemplate', 'useCustomApplicationTemplateForAllChannels', 'cssName', 'metatitle', 'metadesc', 'metakeys', 'metarobots', 'metaimage', 'start', 'end', 'editingStatus', 'display', 'active', 'target', 'module', 'cmd', 'node', 'slugSuffix', 'slugBase', 'skin', 'useSkinForAllChannels', 'type', 'updatedAt', 'slug', 'contentTitle', 'linkTarget', 'frontendAccessId', 'backendAccessId', 'protection', 'cssNavName', 'updatedBy', 'isVirtual', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Page' . "\0" . 'caching', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'nodeIdShadowed', 'lang', 'title', 'content', 'sourceMode', 'customContent', 'useCustomContentForAllChannels', 'applicationTemplate', 'useCustomApplicationTemplateForAllChannels', 'cssName', 'metatitle', 'metadesc', 'metakeys', 'metarobots', 'metaimage', 'start', 'end', 'editingStatus', 'display', 'active', 'target', 'module', 'cmd', 'node', 'slugSuffix', 'slugBase', 'skin', 'useSkinForAllChannels', 'type', 'updatedAt', 'slug', 'contentTitle', 'linkTarget', 'frontendAccessId', 'backendAccessId', 'protection', 'cssNavName', 'updatedBy', 'isVirtual', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Page' . "\0" . 'caching', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'nodeIdShadowed', 'lang', 'title', 'content', 'sourceMode', 'customContent', 'useCustomContentForAllChannels', 'applicationTemplate', 'useCustomApplicationTemplateForAllChannels', 'cssName', 'metatitle', 'metadesc', 'metakeys', 'metarobots', 'metaimage', 'start', 'end', 'editingStatus', 'display', 'active', 'target', 'module', 'cmd', 'node', 'slugSuffix', 'slugBase', 'skin', 'useSkinForAllChannels', 'type', 'updatedAt', 'slug', 'contentTitle', 'linkTarget', 'frontendAccessId', 'backendAccessId', 'protection', 'cssNavName', 'updatedBy', 'isVirtual', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Page' . "\0" . 'caching', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'nodeIdShadowed', 'lang', 'title', 'content', 'sourceMode', 'customContent', 'useCustomContentForAllChannels', 'applicationTemplate', 'useCustomApplicationTemplateForAllChannels', 'cssName', 'metatitle', 'metadesc', 'metakeys', 'metarobots', 'metaimage', 'start', 'end', 'editingStatus', 'display', 'active', 'target', 'module', 'cmd', 'node', 'slugSuffix', 'slugBase', 'skin', 'useSkinForAllChannels', 'type', 'updatedAt', 'slug', 'contentTitle', 'linkTarget', 'frontendAccessId', 'backendAccessId', 'protection', 'cssNavName', 'updatedBy', 'isVirtual', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Page' . "\0" . 'caching', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -1537,6 +1537,17 @@ class Page extends \Cx\Core\ContentManager\Model\Entity\Page implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**
