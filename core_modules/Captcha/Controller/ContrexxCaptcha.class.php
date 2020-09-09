@@ -66,6 +66,9 @@ class ContrexxCaptcha implements CaptchaInterface {
 
     public function __construct($config)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $sessionObj = $cx->getComponent('Session')->getSession();
+
         srand ((double)microtime()*1000000);
 
         $this->strRandomString  = $this->createRandomString();

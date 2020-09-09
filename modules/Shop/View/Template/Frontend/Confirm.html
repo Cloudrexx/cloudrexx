@@ -52,7 +52,27 @@
                     </tr>
                     <!-- BEGIN shiprow -->
                     <tr class="row3 active" valign="top">
-                        <td colspan="2">{TXT_SHIPPING_METHOD}</td>
+                        <td colspan="2">
+                          {TXT_SHIPPING_METHOD}
+                          <!-- BEGIN shipment_discount_applied_info -->
+                          <span class="tooltip-trigger icon-info"></span>
+                          <span class="tooltip-message">
+                            {TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_APPLIED_INFO}
+                          </span>
+                          <!-- END shipment_discount_applied_info -->
+                          <!-- BEGIN shipment_discount_enabled_info -->
+                          <span class="tooltip-trigger icon-info"></span>
+                          <span class="tooltip-message">
+                            {TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_ENABLED_INFO}
+                          </span>
+                          <!-- END shipment_discount_enabled_info -->
+                          <!-- BEGIN shipment_discount_disabled_info -->
+                          <span class="tooltip-trigger icon-info"></span>
+                          <span class="tooltip-message">
+                            {TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_DISABLED_INFO}
+                          </span>
+                          <!-- END shipment_discount_disabled_info -->
+                        </td>
                         <td colspan="2">{SHOP_SHIPMENT}</td>
                         <td nowrap="nowrap" style="text-align: right;">{SHOP_SHIPMENT_PRICE} {SHOP_UNIT}</td>
                     </tr>

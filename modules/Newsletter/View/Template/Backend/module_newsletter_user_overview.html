@@ -14,13 +14,13 @@ var cxDataList = function() {
     var filterAttribute = '{NEWSLETTER_FILTER_ATTRIBUTE}';
     var filterStatus = '{NEWSLETTER_FILTER_STATUS}';
 
-    var htmlRow = '<tr class="row[i]"></tr>';
+    var htmlRow = '<tr class="row__I__"></tr>';
     var htmlTd = '<td style="white-space:nowrap;"></td>';
-    var htmlInput = '<input type="checkbox" name="userid[]" value="[id]" />';
-    var htmlAEditNewsletter = '<a href="index.php?cmd=Newsletter&act=users&tpl=edit&id=[id]" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
-    var htmlACopyUser = '<a href="index.php?cmd=Newsletter&act=users&tpl=edit&copy=1&id=[id]" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
-    var htmlAEditAccess = '<a href="index.php?cmd=Access&act=user&tpl=modify&id=[id]&source=newsletter" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
-    var htmlADelete = '<a href="javascript:void(0)" onclick="DeleteUser([id],\'[email]\')" title="{TXT_NEWSLETTER_DELETE_RECIPIENT}"></a>';
+    var htmlInput = '<input type="checkbox" name="userid[]" value="__ID__" />';
+    var htmlAEditNewsletter = '<a href="index.php?cmd=Newsletter&act=users&tpl=edit&id=__ID__" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
+    var htmlACopyUser = '<a href="index.php?cmd=Newsletter&act=users&tpl=edit&copy=1&id=__ID__" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
+    var htmlAEditAccess = '<a href="index.php?cmd=Access&act=user&tpl=modify&id=__ID__&source=newsletter" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"></a>';
+    var htmlADelete = '<a href="javascript:void(0)" onclick="DeleteUser(__ID__,\'__EMAIL__\')" title="{TXT_NEWSLETTER_DELETE_RECIPIENT}"></a>';
     var htmlUserFunctions = '<td style="text-align:right;"></td>';
     var htmlImageLedRed = '<img src="../core/Core/View/Media/icons/led_red.gif" title="{TXT_OPEN_ISSUE}" alt="{TXT_OPEN_ISSUE}" border="0" />';
     var htmlImageLedGreen = '<img src="../core/Core/View/Media/icons/led_green.gif" title="{TXT_ACTIVE}" alt="{TXT_ACTIVE}" border="0" />';
@@ -28,7 +28,7 @@ var cxDataList = function() {
     var htmlImageCopy = '<img src="../core/Core/View/Media/icons/copy.gif" title="{TXT_NEWSLETTER_COPY_RECIPIENT}" alt="{TXT_NEWSLETTER_COPY_RECIPIENT}" border="0" />';
     var htmlImageIconSpacer = '<img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" />';
     var htmlImageDelete = '<img src="../core/Core/View/Media/icons/delete.gif" title="{TXT_NEWSLETTER_DELETE_RECIPIENT}" alt="{TXT_NEWSLETTER_DELETE_RECIPIENT}" border="0" />';
-    var htmlAFeedback = '<a href="index.php?cmd=Newsletter&act=users&tpl=feedback&id=[id]&recipient_type=[type]" title="{TXT_NEWSLETTER_FEEDBACK_OVERVIEW}"></a>';
+    var htmlAFeedback = '<a href="index.php?cmd=Newsletter&act=users&tpl=feedback&id=__ID__&recipient_type=__TYPE__" title="{TXT_NEWSLETTER_FEEDBACK_OVERVIEW}"></a>';
 
     var searchFunc = function(keyword, attribute, status) {
         pagePos = 0;
@@ -148,17 +148,17 @@ var cxDataList = function() {
             userFunctions = $(htmlUserFunctions);
 
             if (user.type == 'newsletter') {
-                userFunctions.append($(htmlACopyUser.replace('[id]', user.id)).append($(htmlImageCopy)));
-                userFunctions.append($(htmlAEditNewsletter.replace('[id]', user.id)).append($(htmlImageEdit)));
-                userFunctions.append($(htmlADelete.replace('[id]', user.id).replace('[email]', user.email)).append($(htmlImageDelete)));
+                userFunctions.append($(htmlACopyUser.replace('__ID__', user.id)).append($(htmlImageCopy)));
+                userFunctions.append($(htmlAEditNewsletter.replace('__ID__', user.id)).append($(htmlImageEdit)));
+                userFunctions.append($(htmlADelete.replace('__ID__', user.id).replace('__EMAIL__', user.email)).append($(htmlImageDelete)));
             } else {
-                userFunctions.append($(htmlACopyUser.replace('[id]', user.id)).append($(htmlImageCopy)));
-                userFunctions.append($(htmlAEditAccess.replace('[id]', user.id)).append($(htmlImageEdit)));
+                userFunctions.append($(htmlACopyUser.replace('__ID__', user.id)).append($(htmlImageCopy)));
+                userFunctions.append($(htmlAEditAccess.replace('__ID__', user.id)).append($(htmlImageEdit)));
                 userFunctions.append($(htmlImageIconSpacer));
             }
 
-            recipientRow = $(htmlRow.replace('[i]',(i%2)+1));
-            recipientRow.append($(htmlTd).append($(htmlInput.replace('[id]', user.id)))
+            recipientRow = $(htmlRow.replace('__I__',(i%2)+1));
+            recipientRow.append($(htmlTd).append($(htmlInput.replace('__ID__', user.id)))
                                           .append(user.status == '1' ? $(htmlImageLedGreen) : $(htmlImageLedRed)));
             recipientRow.append($(htmlTd).append(user.email));
             recipientRow.append($(htmlTd).append(user.company));
@@ -170,7 +170,7 @@ var cxDataList = function() {
             recipientRow.append($(htmlTd).append(user.country));
             if (jQuery('#userFeedbackCol').length) {
                 if (user.feedback) {
-                    recipientRow.append($(htmlTd).append($(htmlAFeedback.replace('[id]', user.id).replace('[type]', user.type)).append(user.feedback)));
+                    recipientRow.append($(htmlTd).append($(htmlAFeedback.replace('__ID__', user.id).replace('__TYPE__', user.type)).append(user.feedback)));
                 } else {
                     recipientRow.append($(htmlTd).append(''));
                 }

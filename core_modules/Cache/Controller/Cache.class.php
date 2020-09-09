@@ -149,9 +149,9 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
         // sort out false-positives (header and ESI cache files)
         $cacheFileUserRegex = '';
-        if (isset($_COOKIE[session_name()])) {
-            $cacheFileUserRegex = '(?:_u(?:' . preg_quote($_COOKIE[session_name()]) . ')?)';
-        } else {
+        try {
+            $cacheFileUserRegex = '(?:_u(?:' . \Cx\Core\Session\Model\Entity\Session::getValidIdFromRequest() . ')?)';
+        } catch (\Exception $e) {
             $cacheFileUserRegex = '(?:_u0|)';
         }
         $cacheFileRegex = '/([0-9a-f]{32})_(([0-9]+)' . $cacheFileUserRegex . ')?$/';
@@ -359,11 +359,16 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
     public function writeCacheFileForRequest($page, $headers, $endcode, $forceUserbased = false) {
         $userbased = $forceUserbased;
         $pageId = '0';
+        try {
+            $activeSessionId = \Cx\Core\Session\Model\Entity\Session::getIdOfActiveSession();
+        } catch (\Exception $e) {
+            $activeSessionId = '';
+        }
         if ($page) {
             $pageId = $page->getId();
             if ($page->isFrontendProtected()) {
                 // if no session, abort (we don't cache permission errors)
-                if (empty($_COOKIE[session_name()])) {
+                if (empty($activeSessionId)) {
                     return;
                 }
                 $userbased = true;
@@ -374,12 +379,12 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             $sessionId = '0';
             // we need to sort out empty session IDs and session ID '0'
             // so _u-part does not match any of the other cases
-            if (!empty($_COOKIE[session_name()])) {
-                $sessionId = $_COOKIE[session_name()];
+            if (!empty($activeSessionId)) {
+                $sessionId = $activeSessionId;
             }
             $user = '_u' . $sessionId;
         }
-        if (!$userbased && isset($_COOKIE[session_name()])) {
+        if (!$userbased && $activeSessionId) {
             $user = '_u';
         }
 
@@ -405,23 +410,28 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
     /**
      * Removes all page cache files for a request
-     * @param string $filename Request hash (as in $this->strCacheFilename
+     * @param string $filename Request hash (as in $this->strCacheFilename)
      * @param int $pageId Page ID
      * @param boolean $userbased True if the current request is userbased, false otherwise
      */
     protected function cleanupCacheFiles($filename, $pageId, $userbased) {
+        // drop non-userbased cache files as they may contain invalid data
+        // as the request must be cached userbased
         if ($userbased) {
             $cacheFileSuffixes = array(
                 '', // no session, not userbased
                 '_u', // session, not userbased
             );
-        } else {
+        }
+        // drop userbased cache files as they may contain invalid data
+        // as the request must be cached non-userbased
+        else {
             $cacheFileSuffixes = array(
                 '_u0', // no session, userbased
             );
-            if (isset($_COOKIE[session_name()])) {
-                $cacheFileSuffixes[] = '_u' . $_COOKIE[session_name()]; // session, userbased
-            }
+            try {
+                $cacheFileSuffixes[] = '_u' . \Cx\Core\Session\Model\Entity\Session::getIdOfActiveSession(); // session, userbased
+            } catch (\Exception $e) {}
         }
         $cacheFileNames = array();
         foreach ($cacheFileSuffixes as $cacheFileSuffix) {

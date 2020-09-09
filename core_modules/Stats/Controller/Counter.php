@@ -303,9 +303,8 @@ class Counter
 
             foreach ($arrUriGets AS $elem) {
                 //avoid multiple entries for same request:
-                //check if Session-ID is traced by url (cookies are disabled)
-                //also skip the csrf and caching parameter (they are appended by the backend's preview link)
-                if (!preg_match("/(PHPSESSID|csrf|caching)/",$elem)) {
+                //skip the csrf and caching parameter (they are appended by the backend's preview link)
+                if (!preg_match("/(csrf|caching)/",$elem)) {
                     if ($elem != "") {
                         $uriString .="&".$elem;
                     }

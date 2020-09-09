@@ -387,7 +387,6 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
         $formId      = $this->form->getId();
         $formFields  = $this->contactLib->getFormFields($formId);
         $profileData = $this->getProfileData();
-        $this->handleUniqueId();
 
         // Check if the loaded form has form fields and
         // the template block 'contact_form' is exists otherwise return empty.
@@ -632,7 +631,8 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                 $checkboxSelected = '';
                 if (
                     $fieldValue == 1 ||
-                    !empty($_POST['contactFormField_' . $fieldId])
+                    !empty($_POST['contactFormField_' . $fieldId]) ||
+                    !empty($_GET[$fieldId])
                 ) {
                     $checkboxSelected = 'checked="checked"';
                 }
@@ -1001,26 +1001,61 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
             }
             $valueFromGet = '';
             if (isset($_GET[$fieldId])) {
-                $valueFromGet = contrexx_input2raw($_GET[$fieldId]);
+                $valueFromGet = contrexx_input2raw(
+                    $_GET[$fieldId]
+                );
             }
 
             $isOptionInPost = !empty($valueFromPost) && (
                 (
-                    is_array($valueFromPost) &&
-                    in_array($option, $valueFromPost)
+                    is_array($valueFromPost) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            in_array($index, $valueFromPost)
+                        ) || (
+                            $fieldType != 'recipient' &&
+                            in_array($option, $valueFromPost)
+                        )
+                    )
                 ) || (
                     !is_array($valueFromPost) && (
-                        $option == $valueFromPost ||
-                        strcasecmp($option, $valueFromPost) == 0
+                        (
+                            $fieldType == 'recipient' &&
+                            $index == $valueFromPost
+                        ) || (
+                            $fieldType != 'recipient' && (
+                                $option == $valueFromPost ||
+                                strcasecmp($option, $valueFromPost) == 0
+                            )
+                        )
                     )
                 )
             );
-            $isOptionInGet =
-                !empty($valueFromGet) &&
+            $isOptionInGet = !empty($valueFromGet) && (
                 (
-                    $option == $valueFromGet ||
-                    strcasecmp($option, $valueFromGet) == 0
-                );
+                    is_array($valueFromGet) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            in_array($index, $valueFromGet)
+                        ) || (
+                            $fieldType != 'recipient' &&
+                            in_array($option, $valueFromGet)
+                        )
+                    )
+                ) || (
+                    !is_array($valueFromGet) && (
+                        (
+                            $fieldType == 'recipient' &&
+                            $index == $valueFromGet
+                        ) || (
+                            $fieldType != 'recipient' && (
+                                $option == $valueFromGet ||
+                                strcasecmp($option, $valueFromGet) == 0
+                            )
+                        )
+                    )
+                )
+            );
             $isOptionInAccessAttr =
                 $isSpecialType &&
                 isset($profileData[strtoupper($accessAttrId)]) &&
@@ -1183,29 +1218,6 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * generates an unique id for each form and user.
-     */
-    protected function handleUniqueId()
-    {
-        $this->cx->getComponent('Session')->getSession();
-
-        $id = 0;
-        if (isset($_REQUEST['unique_id'])) {
-            // an id is specified - we're handling a page reload
-            $id = intval($_REQUEST['unique_id']);
-        } else { // generate a new id
-            if (!isset($_SESSION['contact_last_id'])) {
-                $_SESSION['contact_last_id'] = 1;
-            } else {
-                $_SESSION['contact_last_id'] += 1;
-            }
-
-            $id = $_SESSION['contact_last_id'];
-        }
-        $this->template->setVariable('CONTACT_UNIQUE_ID', $id);
-    }
-
-    /**
      * Initialize the Uploader
      *
      * @param \Cx\Core\Html\Sigma $template                  Template object
@@ -1225,7 +1237,65 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
         try {
             $session = $this->cx->getComponent('Session')->getSession();
 
-            $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+            // fetch existing upload id
+            $id = '';
+            if (!empty($_POST['contactFormUploadId_' . $fieldId])) {
+                $id = $_POST['contactFormUploadId_' . $fieldId];
+            } elseif (!empty($_GET[$fieldId])) {
+                $id = $_GET[$fieldId];
+            }
+
+            // initialize upload instance
+            $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader($id);
+            $uploaderId = $uploader->getId();
+
+            // initialize the widget displaying the folder contents
+            $folderWidget = new \Cx\Core_Modules\MediaBrowser\Model\Entity\FolderWidget(
+                $session->getTempPath() . '/'. $uploaderId
+            );
+
+            // handle special case pdf-view which does not support javascript
+            // and print-view which should not depend on javascript
+            if (in_array(
+                \Env::get('init')->getCurrentChannel(),
+                array(
+                    \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_PRINT,
+                    \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_PDF,
+                )
+            )) {
+                $jsonData =  new \Cx\Core\Json\JsonData();
+                $response = $jsonData->data(
+                    'MediaBrowser',
+                    'folderWidget',
+                    array(
+                        'get' => array(
+                            'id' => $folderWidget->getId(),
+                        ),
+                    )
+                );
+                if (
+                    !is_array($response['data']) ||
+                    empty($response['data'])
+                ) {
+                    $template->setVariable(array(
+                        'CONTACT_UPLOADER_FOLDER_WIDGET' => '',
+                    ));
+                    return '';
+                }
+
+                $ul = new \Cx\Core\Html\Model\Entity\HtmlElement('ul');
+                $ul->setClass('filelist');
+                foreach ($response['data'] as $file) {
+                    $li = new \Cx\Core\Html\Model\Entity\HtmlElement('li');
+                    $li->addChild(new \Cx\Core\Html\Model\Entity\TextElement(contrexx_raw2xhtml($file)));
+                    $ul->addChild($li);
+                }
+                $template->setVariable(array(
+                    'CONTACT_UPLOADER_FOLDER_WIDGET' => $ul,
+                ));
+                return '';
+            }
+
             // set instance name so we are able to catch the instance with js
             $uploader->setCallback('contactFormUploader_' . $fieldId);
 
@@ -1244,16 +1314,10 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                 ));
                 $uploader->setUploadLimit(1);
             }
-            $uploaderId = $uploader->getId();
             $uploader->setOptions(array(
                 'id'     => 'contactUploader_' . $uploaderId,
                 'style'  => 'display: none'
             ));
-
-            // initialize the widget displaying the folder contents
-            $folderWidget = new \Cx\Core_Modules\MediaBrowser\Model\Entity\FolderWidget(
-                $session->getTempPath() . '/'. $uploaderId
-            );
 
             if ($parseLegacyPlaceholder) {
                 $placeholders = array(

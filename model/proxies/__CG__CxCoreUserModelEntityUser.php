@@ -73,10 +73,10 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -838,12 +838,12 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function getProfileAttribute($profileId)
+    public function getProfileAttribute($attributeId)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProfileAttribute', array($profileId));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProfileAttribute', array($attributeId));
 
-        return parent::getProfileAttribute($profileId);
+        return parent::getProfileAttribute($attributeId);
     }
 
     /**
@@ -926,17 +926,6 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function initializeValidators()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
-
-        return parent::initializeValidators();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function validate()
     {
 
@@ -954,6 +943,17 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

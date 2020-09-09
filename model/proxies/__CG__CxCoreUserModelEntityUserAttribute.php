@@ -73,10 +73,10 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeNames', 'userAttributeValues', 'children', 'default', 'arrTypes', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeNames', 'userAttributeValues', 'children', 'default', 'arrTypes', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -185,6 +185,17 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
+    public function setTranslatableLocale($locale)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTranslatableLocale', array($locale));
+
+        return parent::setTranslatableLocale($locale);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getId()
     {
         if ($this->__isInitialized__ === false) {
@@ -217,6 +228,28 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getType', array());
 
         return parent::getType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setName($name)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', array($name));
+
+        return parent::setName($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', array());
+
+        return parent::getName();
     }
 
     /**
@@ -387,6 +420,28 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
+    public function setContext($context)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setContext', array($context));
+
+        return parent::setContext($context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getContext()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getContext', array());
+
+        return parent::getContext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
 
@@ -415,39 +470,6 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getChildren', array());
 
         return parent::getChildren();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addUserAttributeName', array($userAttributeName));
-
-        return parent::addUserAttributeName($userAttributeName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeUserAttributeName', array($userAttributeName));
-
-        return parent::removeUserAttributeName($userAttributeName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getUserAttributeNames()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeNames', array());
-
-        return parent::getUserAttributeNames();
     }
 
     /**
@@ -508,23 +530,12 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function getName($langId = 0)
+    public function hasReadPermission()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', array($langId));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'hasReadPermission', array());
 
-        return parent::getName($langId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function checkReadPermission()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'checkReadPermission', array());
-
-        return parent::checkReadPermission();
+        return parent::hasReadPermission();
     }
 
     /**
@@ -602,6 +613,17 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

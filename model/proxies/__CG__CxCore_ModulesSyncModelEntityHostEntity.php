@@ -73,10 +73,10 @@ class HostEntity extends \Cx\Core_Modules\Sync\Model\Entity\HostEntity implement
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual');
+            return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual');
+        return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -368,6 +368,17 @@ class HostEntity extends \Cx\Core_Modules\Sync\Model\Entity\HostEntity implement
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

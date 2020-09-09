@@ -75,19 +75,28 @@ class Uploader extends EntityBase
      */
     protected $cx;
 
-    function __construct()
-    {
+    public function __construct($id = '') {
         $this->cx = Cx::instanciate();
         $this->getComponentController()->addUploader($this);
+        $this->getComponent('Session')->getSession();
         if (!isset($_SESSION['uploader'])) {
             $_SESSION['uploader'] = array();
         }
         if (!isset($_SESSION['uploader']['handlers'])) {
             $_SESSION['uploader']['handlers'] = array();
         }
-        $i       = self::generateId();
-        $_SESSION['uploader']['handlers'][$i] = array('active' => true);
-        $this->id = $i;
+
+        // generate a new unique ID in case non has been supplied
+        // or it is not valid
+        if (
+            empty($id) ||
+            !static::isValidId($id)
+        ) {
+            $id = static::generateId();
+        }
+
+        $_SESSION['uploader']['handlers'][$id] = array('active' => true);
+        $this->id = $id;
         $this->options = array(
             'data-pl-upload',
             'data-uploader-id' => $this->id,
@@ -315,7 +324,11 @@ class Uploader extends EntityBase
         return $this->options['pl-Max-File-Size'];
     }
 
-    public static function generateId(){
+    /**
+     * Generate a new unique ID within the user's session
+     * @return  string  Unique new ID
+     */
+    protected static function generateId(){
         $uploaders = $_SESSION['uploader']['handlers'];
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randstring = '';
@@ -323,7 +336,7 @@ class Uploader extends EntityBase
             $randstring .= $characters[rand(0, strlen($characters) - 1)];
         }
         if (array_key_exists($randstring, $uploaders)){
-            return self::generateId();
+            return static::generateId();
         }
         return $randstring;
     }
@@ -336,5 +349,29 @@ class Uploader extends EntityBase
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Verifies that the ID $id is a valid upload ID
+     * of the current user's session
+     * @return  boolean TRUE if the ID $id is valid, otherwise FALSE.
+     */
+    public static function isValidId($id) {
+        return isset($_SESSION['uploader']['handlers'][$id]);
+    }
+
+    /**
+     * Drop the upload instance (it's session data) identified by ID $id.
+     * This should be called after the upload was successful and will no
+     * longer be used.
+     *
+     * @param   string  $id The ID of the upload instance to drop
+     */
+    public static function destroy($id) {
+        if (!static::isValidId($id)) {
+            return;
+        }
+
+        unset($_SESSION['uploader']['handlers'][$id]);
     }
 }

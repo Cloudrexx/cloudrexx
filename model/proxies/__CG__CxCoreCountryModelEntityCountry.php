@@ -73,10 +73,10 @@ class Country extends \Cx\Core\Country\Model\Entity\Country implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual');
+            return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual');
+        return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -371,6 +371,17 @@ class Country extends \Cx\Core\Country\Model\Entity\Country implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
 }

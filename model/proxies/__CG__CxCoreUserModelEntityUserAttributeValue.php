@@ -73,10 +73,10 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
+            return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'stringRepresentationFields', 'stringRepresentationFormat', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
+        return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'stringRepresentationFields', 'stringRepresentationFormat', 'validators', 'virtual');
     }
 
     /**
@@ -338,6 +338,17 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

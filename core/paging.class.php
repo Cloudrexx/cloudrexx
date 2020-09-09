@@ -132,9 +132,9 @@ class Paging
         // Set up the base navigation entries
         $array_paging = array(
             'first' => '<a class="pagingFirst" href="'.
-                Cx\Core\Routing\Url::encode_amp($firstUrl->toString().$csrf).'" rel="nofollow">',
+                contrexx_raw2xhtml($firstUrl->toString().$csrf).'" rel="nofollow">',
             'last'  => '<a class="pagingLast" href="'.
-                Cx\Core\Routing\Url::encode_amp($lastUrl->toString().$csrf).'" rel="nofollow">',
+                contrexx_raw2xhtml($lastUrl->toString().$csrf).'" rel="nofollow">',
             'total' => $numof_rows,
             'lower' => ($numof_rows ? $position + 1 : 0),
             'upper' => $numof_rows,
@@ -147,7 +147,7 @@ class Paging
             $previousUrl = clone $requestUrl;
             $previousUrl->setParam($parameter_name, ($position - $results_per_page));
             $array_paging['previous_link'] =
-                '<a href="'.Cx\Core\Routing\Url::encode_amp($previousUrl.$csrf).'">';
+                '<a href="'.contrexx_raw2xhtml($previousUrl.$csrf).'">';
 
             $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
             $link->setAttribute('href', $previousUrl->toString());
@@ -159,7 +159,7 @@ class Paging
             $nextUrl = clone $requestUrl;
             $nextUrl->setParam($parameter_name, $int_new_position);
             $array_paging['next_link'] =
-                '<a href="'.Cx\Core\Routing\Url::encode_amp($nextUrl.$csrf).'">';
+                '<a href="'.contrexx_raw2xhtml($nextUrl.$csrf).'">';
 
             $link = new \Cx\Core\Html\Model\Entity\HtmlElement('link');
             $link->setAttribute('href', $nextUrl->toString());
@@ -186,7 +186,7 @@ class Paging
                 $pageUrl->setParam($parameter_name, (($i-1) * $results_per_page));
                 $array_paging[$i] =
                     '<a class="pagingPage'.$i.'" href="'.
-                    Cx\Core\Routing\Url::encode_amp($pageUrl->toString().$csrf).'">'.$i.'</a>';
+                    contrexx_raw2xhtml($pageUrl->toString().$csrf).'">'.$i.'</a>';
             }
         }
         $paging =

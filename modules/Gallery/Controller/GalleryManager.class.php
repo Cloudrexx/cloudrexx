@@ -815,7 +815,7 @@ class GalleryManager extends GalleryLibrary
         foreach ($_POST as $strKey => $strValue) {
             if (preg_match("/^(category_name_|category_desc_)/", $strKey)) {
                 $arrExplode = explode('_',$strKey);
-                $arrValues[$arrExplode[2]][$arrExplode[1]] = htmlspecialchars(strip_tags($strValue), ENT_QUOTES, CONTREXX_CHARSET);
+                $arrValues[intval($arrExplode[2])][$arrExplode[1]] = htmlspecialchars(strip_tags($strValue), ENT_QUOTES, CONTREXX_CHARSET);
             }
         }
 
@@ -1215,7 +1215,7 @@ class GalleryManager extends GalleryLibrary
         foreach ($_POST as $strKey => $strValue) {
             if (preg_match('/^(category\_name\_|category\_desc\_)/', $strKey)) {
                 $arrExplode = explode('_',$strKey);
-                $arrValues[$arrExplode[2]][$arrExplode[1]] = htmlspecialchars(strip_tags($strValue), ENT_QUOTES, CONTREXX_CHARSET);
+                $arrValues[intval($arrExplode[2])][$arrExplode[1]] = htmlspecialchars(strip_tags($strValue), ENT_QUOTES, CONTREXX_CHARSET);
             }
         }
 
@@ -1308,21 +1308,16 @@ class GalleryManager extends GalleryLibrary
                 $arrInner['name'] = $_ARRAYLANG['TXT_GALLERY_CATEGORY_NO_NAME'];
             }
 
-            $objDatabase->Execute(' UPDATE    '.DBPREFIX.'module_gallery_language
-                                    SET       value="'.$arrInner['name'].'"
-                                    WHERE     gallery_id='.intval($categoryId).' AND
-                                              lang_id='.$intLangId.' AND
-                                              name="name"
-                                    LIMIT     1
-                                ');
-
-            $objDatabase->Execute(' UPDATE    '.DBPREFIX.'module_gallery_language
-                                    SET       value="'.$arrInner['desc'].'"
-                                    WHERE     gallery_id='.intval($categoryId).' AND
-                                              lang_id='.$intLangId.' AND
-                                              name="desc"
-                                    LIMIT     1
-                                ');
+            foreach (array('name', 'desc') as $meta) {
+                $objDatabase->Execute('
+                    INSERT INTO `'.DBPREFIX.'module_gallery_language`
+                       SET `value` = "' . $arrInner[$meta] . '",
+                           `gallery_id` = ' . intval($categoryId) . ',
+                           `lang_id` = ' . $intLangId . ',
+                           `name` = "' . $meta . '"
+                    ON DUPLICATE KEY UPDATE `value` = "'.$arrInner[$meta].'"
+                ');
+            }
         }
         $this->strOkMessage = $_ARRAYLANG['TXT_GALLERY_CATEGORY_STATUS_MESSAGE_CATEGORY_UPDATED'];
     }
@@ -1938,11 +1933,13 @@ class GalleryManager extends GalleryLibrary
                 } else {
                     $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
                 }
-                $objDatabase->Execute('    UPDATE     '.DBPREFIX.'module_gallery_language_pics
-                                        SET     name="'.$strValue.'"
-                                        WHERE     picture_id='.$intPicId.' AND
-                                                lang_id='.intval($arrExplode[1]).'
-                                        LIMIT    1');
+                $objDatabase->Execute('
+                    INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
+                       SET `name` = "' . $strValue . '",
+                           `picture_id` = ' . $intPicId . ',
+                           `lang_id` = ' . intval($arrExplode[1]) . '
+                    ON DUPLICATE KEY UPDATE `name` = "' . $strValue . '"
+                ');
             }
 
             if (substr($strKey,0,strlen('pictureDesc_')) == 'pictureDesc_') {
@@ -1950,11 +1947,13 @@ class GalleryManager extends GalleryLibrary
 
                 $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
 
-                $objDatabase->Execute('    UPDATE     '.DBPREFIX.'module_gallery_language_pics
-                                        SET     `desc`="'.$strValue.'"
-                                        WHERE     picture_id='.$intPicId.' AND
-                                                lang_id='.intval($arrExplode[1]).'
-                                        LIMIT    1');
+                $objDatabase->Execute('
+                    INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
+                       SET `desc` = "' . $strValue . '",
+                           `picture_id` = ' . $intPicId . ',
+                           `lang_id` = ' . intval($arrExplode[1]) . '
+                    ON DUPLICATE KEY UPDATE `desc` = "' . $strValue . '"
+                ');
             }
         }
 
@@ -2864,11 +2863,13 @@ class GalleryManager extends GalleryLibrary
                     $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
                 }
 
-                $objDatabase->Execute('    UPDATE     '.DBPREFIX.'module_gallery_language_pics
-                                        SET     name="'.$strValue.'"
-                                        WHERE     picture_id='.intval($_POST['validate_id']).' AND
-                                                lang_id='.intval($arrExplode[1]).'
-                                        LIMIT    1');
+                $objDatabase->Execute('
+                    INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
+                       SET `name` = "' . $strValue . '",
+                           `picture_id` = ' . intval($_POST['validate_id']) . ',
+                           `lang_id` = ' . intval($arrExplode[1]) . '
+                    ON DUPLICATE KEY UPDATE `name` = "' . $strValue . '"
+                ');
             }
         }
 
@@ -3003,11 +3004,13 @@ $strFileNew = '';
                     //language var
                     $arrExplode = explode('_',$strKey,3);
                     $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
-                    $objDatabase->Execute(' UPDATE     '.DBPREFIX.'module_gallery_language_pics
-                                            SET     name="'.$strValue.'"
-                                            WHERE     picture_id='.intval($arrExplode[1]).' AND
-                                                    lang_id='.intval($arrExplode[2]).'
-                                            LIMIT    1');
+                    $objDatabase->Execute('
+                        INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
+                           SET `name` = "' . $strValue . '",
+                               `picture_id` = ' . intval($arrExplode[1]) . ',
+                               `lang_id` = ' . intval($arrExplode[2]) . '
+                        ON DUPLICATE KEY UPDATE `name` = "' . $strValue . '"
+                    ');
                 }
             }
         }
