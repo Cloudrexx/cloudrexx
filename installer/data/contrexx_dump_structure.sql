@@ -112,6 +112,7 @@ CREATE TABLE `contrexx_access_users` (
   `restore_key` varchar(32) NOT NULL DEFAULT '',
   `restore_key_time` int unsigned NOT NULL DEFAULT '0',
   `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
+  `last_update` DATETIME NULL,
   PRIMARY KEY (`id`),
   KEY `username` (`username`),
   UNIQUE INDEX `UNIQ_7CD32875E7927C74` (`email`)

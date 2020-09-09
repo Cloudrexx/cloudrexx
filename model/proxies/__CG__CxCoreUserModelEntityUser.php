@@ -73,10 +73,10 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'lastUpdate', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'superUser', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'lastUpdate', 'groups', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -723,6 +723,28 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getU2uActive', array());
 
         return parent::getU2uActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setLastUpdate($lastUpdate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setLastUpdate', array($lastUpdate));
+
+        return parent::setLastUpdate($lastUpdate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLastUpdate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLastUpdate', array());
+
+        return parent::getLastUpdate();
     }
 
     /**

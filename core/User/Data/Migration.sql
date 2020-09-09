@@ -1,3 +1,5 @@
+ALTER TABLE `contrexx_access_users` ADD `last_update` DATETIME NULL AFTER `u2u_active`;
+
 ALTER TABLE contrexx_access_user_attribute
     ADD is_default TINYINT(1) DEFAULT '0' NOT NULL,
     ADD tmp_name TEXT;
