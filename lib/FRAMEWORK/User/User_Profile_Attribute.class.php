@@ -563,7 +563,7 @@ class User_Profile_Attribute
      * Find all default user attributes and store it in an
      * array
      */
-    function loadAttributes()
+    protected function loadAttributes()
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
@@ -770,7 +770,7 @@ class User_Profile_Attribute
      *
      * @param integer $id
      */
-    function load($id)
+    protected function load($id)
     {
         if ($this->isDefaultAttribute($id)) {
             $id = $this->getAttributeIdByDefaultAttributeId($id);

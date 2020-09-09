@@ -512,7 +512,7 @@ class FWUser extends User_Setting
 // original code:
 //        $objUser = $this->objUser->getUsers(
 //            array('email' => $email, 'is_active' => true), null, null, null, 1
-//        );/
+//        );
 // workaround code:
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
