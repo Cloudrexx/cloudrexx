@@ -156,24 +156,23 @@ class JsonUser implements JsonAdapter {
         }
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
-        $attributeNameRepo = $cx->getDb()->getEntityManager()->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttributeName'
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
         );
         $qb = $userRepo->createQueryBuilder('u');
-        $classMeta = $cx->getDb()->getEntityManager()->getClassMetadata('Cx\Core\User\Model\Entity\User');
+        $classMeta = $cx->getDb()->getEntityManager()->getClassMetadata(
+            'Cx\Core\User\Model\Entity\User'
+        );
+        $objAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
 
         // Get attribute ids of user attributes
         foreach ($searchFields as &$searchField) {
             if ($classMeta->hasField($searchField)) {
                 continue;
             }
-            // Get attribute id
-            $attributeName = $attributeNameRepo->findOneBy(array('name' => $searchField));
-
-            if ($attributeName) {
-                $searchField = $attributeName->getUserAttribute()->getId();
-            }
+            $searchField = $objAttribute->getAttributeIdByDefaultAttributeId(
+                $searchField
+            );
         }
 
         // AND-ed search is only available if 2 or less search fields are
