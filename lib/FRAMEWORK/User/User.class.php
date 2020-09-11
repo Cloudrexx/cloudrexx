@@ -1060,7 +1060,6 @@ class User extends User_Profile
         $this->clean();
     }
 
-
     public function generateAuthToken() {
         $this->setAuthToken(bin2hex(openssl_random_pseudo_bytes(16)));
         return $this->auth_token;
@@ -1747,7 +1746,6 @@ class User extends User_Profile
         return $this->loggedIn;
     }
 
-
     public function login($backend = false)
     {
 
@@ -2369,14 +2367,23 @@ class User extends User_Profile
     private function isLastAdmin()
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
         $qb = $userRepo->createQueryBuilder('u');
-        $qb->select('COUNT(u.id) AS numof_admin')
-           ->where($qb->expr()->eq('u.superUser', ':superUser'))
-           ->andWhere($qb->expr()->eq('u.active', ':active'))
-           ->setParameters(array('superUser' => 1, 'active' => 1));
+        $qb->select(
+            'COUNT(u.id) AS numof_admin'
+        )->where(
+            $qb->expr()->eq('u.superUser', ':superUser')
+        )->andWhere(
+            $qb->expr()->eq('u.active', ':active')
+        )->setParameters(
+            array(
+                'superUser' => 1,
+                'active' => 1,
+            )
+        );
         $count = $qb->getQuery()->getOneOrNullResult();
-
         return ($count < 2);
     }
 
