@@ -6223,7 +6223,7 @@ END;
             $objFWUser = \FWUser::getFWUserObject();
             $objUsers  = $objFWUser->objUser->getUsers($filter = array('id' => intval($accountId)));
             if ($objUsers) {
-                $email = $objUsers->getEmail();
+                $accountEmail = $objUsers->getEmail();
             }
         }
 
