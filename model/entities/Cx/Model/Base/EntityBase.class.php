@@ -112,6 +112,14 @@ class EntityBase {
     protected $stringRepresentationFormat = '';
 
     /**
+     * Whether blank string representations are valid
+     *
+     * @see getStringRepresentationBlank()
+     * @var boolean Whether blank string representations are valid
+     */
+    protected $stringRepresentationBlank = false;
+
+    /**
      * Counts the nesting level of __call()
      * @var int
      */
@@ -258,6 +266,15 @@ class EntityBase {
     }
 
     /**
+     * Whether blank string representations are valid
+     *
+     * @return boolean Whether blank string representations are valid
+     */
+    protected function getStringRepresentationBlank() {
+        return $this->stringRepresentationBlank;
+    }
+
+    /**
      * Returns a list of all locale codes ordered by fallback order
      *
      * - First entry is the current locale
@@ -391,7 +408,10 @@ class EntityBase {
             $this->getStringRepresentationFormat(),
             $fieldValues
         );
-        if ($stringRepresentation == '') {
+        if (
+            $stringRepresentation == '' &&
+            !$this->getStringRepresentationBlank()
+        ) {
             return $this->getKeyAsString();
         }
         return $stringRepresentation;
