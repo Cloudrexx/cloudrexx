@@ -318,7 +318,7 @@ class EntityBase {
         $entityClassMetadata = $em->getClassMetadata(get_class($this));
 
         // field has non-empty value in current locale
-        if ($entityClassMetadata->getFieldValue($this, $fieldName) != '') {
+        if ($entityClassMetadata->getFieldValue($this, $fieldName) !== '') {
             return $entityClassMetadata->getFieldValue($this, $fieldName);
         }
 
@@ -329,7 +329,10 @@ class EntityBase {
         );
 
         // field is not translatable
-        if (!in_array($fieldName, $config['fields'])) {
+        if (
+            empty($config['fields']) ||
+            !in_array($fieldName, $config['fields'])
+        ) {
             return '';
         }
 

@@ -6228,7 +6228,7 @@ END;
             $objUsers = $userRepo->find(intval($accountId));
 
             if ($objUsers) {
-                $email = $objUsers->getEmail();
+                $accountEmail = $objUsers->getEmail();
             }
         }
 
