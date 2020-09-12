@@ -329,7 +329,10 @@ class EntityBase {
         );
 
         // field is not translatable
-        if (!in_array($fieldName, $config['fields'])) {
+        if (
+            empty($config['fields']) ||
+            !in_array($fieldName, $config['fields'])
+        ) {
             return '';
         }
 
