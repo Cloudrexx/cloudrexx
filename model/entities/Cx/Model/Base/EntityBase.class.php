@@ -318,7 +318,7 @@ class EntityBase {
         $entityClassMetadata = $em->getClassMetadata(get_class($this));
 
         // field has non-empty value in current locale
-        if ($entityClassMetadata->getFieldValue($this, $fieldName) != '') {
+        if ($entityClassMetadata->getFieldValue($this, $fieldName) !== '') {
             return $entityClassMetadata->getFieldValue($this, $fieldName);
         }
 
