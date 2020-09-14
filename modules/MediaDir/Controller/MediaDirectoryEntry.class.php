@@ -1883,34 +1883,6 @@ JSCODE;
         return $this->recordCount;
     }
 
-
-
-    function getUsers($intEntryId=null)
-    {
-        global $objDatabase;
-
-// TODO: replace by FWUser::getParsedUserTitle()
-        $strDropdownUsers = '<select name="userId"style="width: 302px">';
-        $objFWUser = \FWUser::getFWUserObject();
-
-        if ($objUser = $objFWUser->objUser->getUsers(null,null,null,array('username'))) {
-            while (!$objUser->EOF) {
-                if(intval($objUser->getID()) == intval($this->arrEntries[$intEntryId]['entryAddedBy'])) {
-                    $strSelected = 'selected="selected"';
-                } else {
-                    $strSelected = '';
-                }
-
-                $strDropdownUsers .= '<option value="'.intval($objUser->getID()).'" '.$strSelected.' >'.contrexx_raw2xhtml($objUser->getUsername()).'</option>';
-                $objUser->next();
-            }
-        }
-
-        $strDropdownUsers .= '</select>';
-
-        return $strDropdownUsers;
-    }
-
     /**
      * Parse template blocks mediadir_category or mediadir_level
      */
