@@ -781,24 +781,3 @@ var typewatch = function(){
         timer = setTimeout(callback, ms);
     }
 }();
-function checkUserNameAvailablity(customer_id, email) {
-    $J.ajax({
-        url        : 'index.php?cmd=Crm&act=checkuseravailablity',
-        type       : 'get',
-        data       : 'id='+customer_id+'&term='+$J('#contact_email').val(),
-        dataType   : 'json',
-        success    : function(json) {
-            $J('.contact_user_container .error, .contact_user_container .success, .contact_user_container .progress').remove();
-            var html = '';
-            if (json['error']) {
-                html = "<span class='error'><br>"+ json['error'] +"</span>";
-            }
-            if (json['success']) {
-            //html = "<div class='success'>"+ json['success'] +"</div>";
-            }
-
-            $J('tr.contact_user_container').find('td').eq(1).append(html);
-        }
-    });
-    $J('#contact_username').val();
-}
