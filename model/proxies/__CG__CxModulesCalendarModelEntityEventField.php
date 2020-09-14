@@ -73,10 +73,10 @@ class EventField extends \Cx\Modules\Calendar\Model\Entity\EventField implements
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'eventId', 'title', 'langId', 'teaser', 'description', 'redirect', 'place', 'placeCity', 'placeCountry', 'orgName', 'orgCity', 'orgCountry', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

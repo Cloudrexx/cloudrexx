@@ -73,10 +73,10 @@ class Frontend extends \Cx\Core\View\Model\Entity\Frontend implements \Doctrine\
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'language', 'theme', 'channel', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'language', 'theme', 'channel', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'language', 'theme', 'channel', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'language', 'theme', 'channel', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

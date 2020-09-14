@@ -3294,63 +3294,6 @@ class CrmLibrary
     }
 
     /**
-     * Returns true if the given $username is valid
-     *
-     * @param string $username
-     *
-     * @return  boolean
-     */
-    protected function isValidUsername($username)
-    {
-        if (preg_match('/^[a-zA-Z0-9-_]+$/', $username)) {
-            return true;
-        }
-
-        if (\FWValidator::isEmail($username)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if $username is a unique user name
-     *
-     * Returns false if the test for uniqueness fails, or if the $username
-     * exists already.
-     * If non-empty, the given User ID is excluded from the search, so the
-     * User does not match herself.
-     *
-     * @param string  $email The email to test
-     * @param integer $id    The optional current User ID
-     *
-     * @return boolean True if the username is available,
-     *                 false otherwise
-     */
-    protected function isUniqueUsername($email, $id=0)
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $objResult = $objFWUser->objUser->isUniqueEmail($email, $id);
-        if (!$objResult) {
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $user = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\User'
-            )->findOneBy(array('email' => $email));
-            if (!empty($user)) {
-                $accountId = $user->getId();
-                if ($accountId != $id) {
-                    $error = $_ARRAYLANG['TXT_CRM_ERROR_EMAIL_USED_BY_OTHER_PERSON'];
-                } else {
-                    $error = $_ARRAYLANG['TXT_CRM_USER_EMAIL_ALERT'];
-                }
-                return $error;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Returns true or false for task edit and delete permission
      *
      * Returns true or false for task edit and delete permission.

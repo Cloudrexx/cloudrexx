@@ -73,10 +73,10 @@ class SystemComponent extends \Cx\Core\Core\Model\Entity\SystemComponent impleme
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'type', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'type', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'type', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . "\0" . 'type', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

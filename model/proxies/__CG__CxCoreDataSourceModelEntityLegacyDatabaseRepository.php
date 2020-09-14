@@ -73,10 +73,10 @@ class LegacyDatabaseRepository extends \Cx\Core\DataSource\Model\Entity\LegacyDa
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'fieldList', 'identifierFieldList', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'supportedOperations', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'fieldList', 'identifierFieldList', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'supportedOperations', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'fieldList', 'identifierFieldList', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'supportedOperations', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'fieldList', 'identifierFieldList', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'supportedOperations', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

@@ -73,10 +73,10 @@ class Registration extends \Cx\Modules\Calendar\Model\Entity\Registration implem
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

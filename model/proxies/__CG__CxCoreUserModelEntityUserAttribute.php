@@ -73,10 +73,10 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'locale', 'id', 'type', 'name', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeValues', 'children', 'default', 'context', 'arrTypes', 'arrDefaultAttributeTemplates', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

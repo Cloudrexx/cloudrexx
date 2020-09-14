@@ -73,10 +73,10 @@ class HostEntity extends \Cx\Core_Modules\Sync\Model\Entity\HostEntity implement
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'entityId', 'sync', 'host', 'syncId', 'hostId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

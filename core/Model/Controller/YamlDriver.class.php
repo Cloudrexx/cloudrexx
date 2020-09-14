@@ -143,7 +143,10 @@ class YamlDriver extends \Doctrine\ORM\Mapping\Driver\YamlDriver
     }
 
     protected function handleCustomEnumTypeClass($componentName, $entityName, $fieldName, &$fieldMapping) {
-        if ($fieldMapping['type'] != 'enum') {
+        if (
+            !isset($fieldMapping['type']) ||
+            $fieldMapping['type'] != 'enum'
+        ) {
             return;
         }
         $customEnumClassName = static::getEnumClassName(

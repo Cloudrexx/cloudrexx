@@ -166,9 +166,6 @@ class CrmManager extends CrmLibrary
         case 'customersearch':
                 $this->getCustomerSearch();
             break;
-        case 'checkuseravailablity':
-                $this->checkUserAvailablity();
-            break;
         case 'uploadProfilePhoto':
                 $this->uploadProfilePhoto();
             break;
@@ -5619,41 +5616,6 @@ END;
             }
         }
         echo json_encode($result);
-        exit();
-    }
-
-    /**
-     * Chek the user already exists in crm and user admin
-     *
-     * @global array $_ARRAYLANG
-     * @global object $objDatabase
-     * @return boolean
-     */
-    public function checkUserAvailablity()
-    {
-        global $objDatabase, $_ARRAYLANG;
-
-        $json = array();
-
-        $customerId = isset($_GET['id']) ?  intval($_GET['id']) : 0;
-        $term       = isset($_GET['term']) ?  contrexx_input2raw($_GET['term']) : '';
-        $userId     = 0;
-        if (!empty($term)) {
-            if ($customerId) {
-                $userId = $objDatabase->getOne("SELECT `user_account` FROM `". DBPREFIX ."module_{$this->moduleNameLC}_contacts` WHERE `id` = $customerId");
-            }
-
-            $jsonError = $this->isUniqueUsername($term, $userId);
-
-            if ($jsonError) {
-                $json['error']   = $jsonError;
-            } else {
-                $json['success'] = 'Available';
-
-            }
-        }
-
-        echo json_encode($json);
         exit();
     }
 

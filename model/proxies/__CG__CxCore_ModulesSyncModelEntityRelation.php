@@ -73,10 +73,10 @@ class Relation extends \Cx\Core_Modules\Sync\Model\Entity\Relation implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'lft', 'rgt', 'lvl', 'localFieldName', 'doSync', 'defaultEntityId', 'children', 'parent', 'relatedSync', 'foreignDataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
