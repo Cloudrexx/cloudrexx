@@ -73,10 +73,10 @@ class DoctrineRepository extends \Cx\Core\DataSource\Model\Entity\DoctrineReposi
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'supportedOperations', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

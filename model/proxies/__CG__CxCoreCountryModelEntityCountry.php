@@ -73,10 +73,10 @@ class Country extends \Cx\Core\Country\Model\Entity\Country implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'alpha2', 'alpha3', 'ord', 'locales', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

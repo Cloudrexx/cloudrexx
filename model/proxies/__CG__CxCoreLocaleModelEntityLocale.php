@@ -73,10 +73,10 @@ class Locale extends \Cx\Core\Locale\Model\Entity\Locale implements \Doctrine\OR
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'label', 'orderNo', 'locales', 'iso1', 'country', 'fallback', 'sourceLanguage', 'frontends', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'label', 'orderNo', 'locales', 'iso1', 'country', 'fallback', 'sourceLanguage', 'frontends', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'label', 'orderNo', 'locales', 'iso1', 'country', 'fallback', 'sourceLanguage', 'frontends', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'label', 'orderNo', 'locales', 'iso1', 'country', 'fallback', 'sourceLanguage', 'frontends', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

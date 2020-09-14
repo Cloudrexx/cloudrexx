@@ -73,10 +73,10 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

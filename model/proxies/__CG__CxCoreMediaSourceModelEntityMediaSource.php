@@ -73,10 +73,10 @@ class MediaSource extends \Cx\Core\MediaSource\Model\Entity\MediaSource implemen
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'supportedOperations', 'name', 'position', 'humanName', 'directory', 'accessIds', 'fileSystem', 'systemComponentController', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'supportedOperations', 'name', 'position', 'humanName', 'directory', 'accessIds', 'fileSystem', 'systemComponentController', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'supportedOperations', 'name', 'position', 'humanName', 'directory', 'accessIds', 'fileSystem', 'systemComponentController', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'supportedOperations', 'name', 'position', 'humanName', 'directory', 'accessIds', 'fileSystem', 'systemComponentController', 'id', 'identifier', 'type', 'options', 'dataAccesses', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

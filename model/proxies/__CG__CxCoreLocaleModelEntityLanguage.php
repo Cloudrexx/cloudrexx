@@ -73,10 +73,10 @@ class Language extends \Cx\Core\Locale\Model\Entity\Language implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'iso1', 'iso3', 'source', 'backend', 'localeRelatedBySourceLanguages', 'localeRelatedByIso1s', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

@@ -73,10 +73,10 @@ class RegistrationFormFieldValue extends \Cx\Modules\Calendar\Model\Entity\Regis
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'regId', 'fieldId', 'value', 'registration', 'registrationFormField', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
