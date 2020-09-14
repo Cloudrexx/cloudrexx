@@ -73,10 +73,10 @@ class DataAccessApiKey extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAcce
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'readOnly', 'apiKey', 'dataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'readOnly', 'apiKey', 'dataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'readOnly', 'apiKey', 'dataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'readOnly', 'apiKey', 'dataAccess', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

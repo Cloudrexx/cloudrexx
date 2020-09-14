@@ -73,10 +73,10 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

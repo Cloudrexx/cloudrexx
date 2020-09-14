@@ -73,10 +73,10 @@ class Change extends \Cx\Core_Modules\Sync\Model\Entity\Change implements \Doctr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'sync', 'originSync', 'hosts', 'eventType', 'condition', 'entityIndexData', 'originEntityIndexData', 'entity', 'contents', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'sync', 'originSync', 'hosts', 'eventType', 'condition', 'entityIndexData', 'originEntityIndexData', 'entity', 'contents', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'sync', 'originSync', 'hosts', 'eventType', 'condition', 'entityIndexData', 'originEntityIndexData', 'entity', 'contents', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'sync', 'originSync', 'hosts', 'eventType', 'condition', 'entityIndexData', 'originEntityIndexData', 'entity', 'contents', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**

@@ -73,10 +73,10 @@ class Mail extends \Cx\Modules\Calendar\Model\Entity\Mail implements \Doctrine\O
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'title', 'contentText', 'contentHtml', 'recipients', 'langId', 'actionId', 'isDefault', 'status', 'eventLangId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+            return array('__isInitialized__', 'id', 'title', 'contentText', 'contentHtml', 'recipients', 'langId', 'actionId', 'isDefault', 'status', 'eventLangId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'title', 'contentText', 'contentHtml', 'recipients', 'langId', 'actionId', 'isDefault', 'status', 'eventLangId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
+        return array('__isInitialized__', 'id', 'title', 'contentText', 'contentHtml', 'recipients', 'langId', 'actionId', 'isDefault', 'status', 'eventLangId', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
