@@ -2002,6 +2002,7 @@ class Config
             'none',
             'varnish',
             'nginx',
+            'cloudflare',
         );
         $reverseProxyTypeTexts = array();
         foreach ($reverseProxyTypes as $reverseProxyType) {

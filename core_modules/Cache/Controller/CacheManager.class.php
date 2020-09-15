@@ -260,6 +260,7 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'SETTINGS_CACHE_REVERSE_PROXY_NONE'  => ($this->arrSettings['cacheReverseProxy'] == 'none') ? 'selected' : '',
             'SETTINGS_CACHE_REVERSE_PROXY_VARNISH' => ($this->arrSettings['cacheReverseProxy'] == 'varnish') ? 'selected' : '',
             'SETTINGS_CACHE_REVERSE_PROXY_NGINX' => ($this->arrSettings['cacheReverseProxy'] == 'nginx') ? 'selected' : '',
+            'SETTINGS_CACHE_REVERSE_PROXY_CLOUDFLARE' => ($this->arrSettings['cacheReverseProxy'] == 'cloudflare') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_STATUS_INTERN'  => ($this->arrSettings['cacheSsiOutput'] == 'intern') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_STATUS_SSI' => ($this->arrSettings['cacheSsiOutput'] == 'ssi') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_STATUS_ESI' => ($this->arrSettings['cacheSsiOutput'] == 'esi') ? 'selected' : '',
