@@ -34,7 +34,6 @@
  * @link        http://www.cloudrexx.com/ cloudrexx homepage
  * @since       v5.0.0
  */
-
 namespace Cx\Lib\ReverseProxy\Model\Entity;
 
 /**
@@ -57,7 +56,6 @@ class ReverseProxyCloudflare extends ReverseProxy
      * @param string $domain Domain name to drop cache page of
      * @param int $port Port to drop cache page of
      */
-
     protected function clearCachePageForDomainAndPort($urlPattern, $domain, $port)
     {
         //config data of cloudflare instance
