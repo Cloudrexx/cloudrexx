@@ -168,11 +168,11 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $this->options = $options;
         $this->enableChosen = $enableChosen;
 
-        \Cx\Core\Html\Model\Entity\HtmlElement::__construct('div');
+        parent::__construct($this->wrapperName, '', 'div');
         $this->setAttribute('id', $this->wrapperName);
         $this->addClass('multi-select');
 
-	    // Split options in associated and not associated
+        // Split options in associated and not associated
         foreach ($options as $key => $value) {
             if (in_array($key, $selectedOptions)) {
                 $this->associatedValues[$key] = $value;
@@ -317,8 +317,8 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     /**
      * Get a select element that has additional attributes
      *
-     * @param string $name           name of the select element
-     * @param array  $values         values for select
+     * @param string $name   name of the select element
+     * @param array  $values values for select
      * @param array  $selectedValues the selected values
      *
      * @return DataElement
