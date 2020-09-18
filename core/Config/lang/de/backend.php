@@ -221,3 +221,5 @@ $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Virtuel
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'Die Option %s kann nicht deaktiviert werden, so lange mehrere Sprachversionen eingerichtet sind.';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'Datei-Upload-Limite';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'Die maximal erlaubte Grösse einer Datei, welche hochgeladen werden darf.';
+$_ARRAYLANG['TXT_CORE_CONFIG_SESSIONBINDING'] = 'Session-Bindung';
+$_ARRAYLANG['TXT_CORE_CONFIG_SESSIONBINDING_TOOLTIP_HELP'] = 'Mit <i>Session-Bindung</i> wird die Sicherheit des Systems erhöht, in dem die Benutzer-Sitzung an den Browser des Benutzers gebunden wird. Dadurch wird es einem Angreifer erschwert, die Benutzersitzung eines Opfers zu übernehmen.';

@@ -247,6 +247,10 @@ class Config
                     'value' => '',
                     'values' => '{src:\\' . __CLASS__ . '::getUserGroups()}',
                 ),
+                'sessionBinding' => array(
+                    'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
+                    'value' => 'on',
+                ),
             ),
             'contactInformation' => array(
                 'coreAdminName' => array(

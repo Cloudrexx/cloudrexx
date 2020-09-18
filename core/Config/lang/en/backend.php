@@ -210,3 +210,5 @@ $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Use vir
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'The option %s can not be deactivated as long as there are multiple locales defined.';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'File upload limit';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'File size limit of files being uploaded.';
+$_ARRAYLANG['TXT_CORE_CONFIG_SESSIONBINDING'] = 'Session Binding';
+$_ARRAYLANG['TXT_CORE_CONFIG_SESSIONBINDING_TOOLTIP_HELP'] = '<i>Session Binding</i> increases the overall security of the system by binding the user-session to the user\'s browser. This makes it more difficult for an attacker to steal a victim\'s session';
