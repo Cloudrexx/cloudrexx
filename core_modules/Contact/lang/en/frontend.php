@@ -63,3 +63,4 @@ $_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'] = "Please Select";
 $_ARRAYLANG['TXT_CONTACT_NOT_SPECIFIED'] = "Not Specified";
 $_ARRAYLANG['TXT_CONTACT_RECAPTCHA_ERROR'] = "Please fill out the following CAPTCHA:";
 $_ARRAYLANG['TXT_CONTACT_EMAIL'] = "E-mail";
+$_ARRAYLANG['TXT_CONTACT_UPLOAD_INIT_FAILED'] = 'Unable to transmit your attachment(s). Please try again.';

@@ -73,10 +73,10 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lft', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'rgt', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'lvl', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'children', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'pages', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'parent', '' . "\0" . 'Cx\\Core\\ContentManager\\Model\\Entity\\Node' . "\0" . 'instance', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -486,6 +486,17 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function isChildOf($parent)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isChildOf', array($parent));
+
+        return parent::isChildOf($parent);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -519,12 +530,34 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function __call($methodName, $arguments)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

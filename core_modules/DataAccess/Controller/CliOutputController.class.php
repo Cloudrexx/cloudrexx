@@ -146,6 +146,11 @@ class CliOutputController extends OutputController {
      * @return string Encoded data
      */
     public function parse($data) {
+        if (!$this->cx->isCliCall()) {
+            throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                'The CLI output module is only available from the command line'
+            );
+        }
         header('Content-Type: text/plain');
         if ($data['status'] == 'error') {
             return 'Error: ' . current($data['messages']['error']) . "\n";

@@ -535,13 +535,13 @@ class Coupon
                 $objCoupon->uses
               - $objCoupon->getUsedCount($customer_id));
         }
-        // Subtract the amount used with the Coupon
+
+        // Set coupon amount
+        // Note: this is the configured amount of the coupon.
+        // The remaining amount can be fetched through
+        // Coupon::getUsedAmount(null, $order_id)
         $objCoupon->discount_amount($objResult->fields['discount_amount']);
-        if ($objCoupon->uses < 1e9) {
-            $objCoupon->uses(
-                $objCoupon->uses
-              - $objCoupon->getUsedCount($customer_id));
-        }
+
 //DBG::log("Coupon::getByOrderId($order_id): Found ".(var_export($objCoupon, true)));
         return $objCoupon;
     }

@@ -100,4 +100,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function isInitialized() {
         return \Cx\Core\Session\Model\Entity\Session::isInitialized();
     }
+
+    /**
+     * Get the name of the session cookie
+     *
+     * @return  string  The name of the session cookie.
+     */
+    public function getSessionName() {
+        return \Cx\Core\Session\Model\Entity\Session::getSessionName();
+    }
 }

@@ -591,6 +591,9 @@ class Cart
         // ensure each VAT rate only occurs once
         $usedVatRates = array_unique($usedVatRates);
 
+        // remember used VAT rates for later (validation of coupon redemption)
+        $_SESSION['shop']['cart']['item_vat_rates'] = $usedVatRates;
+
         $_SESSION['shop']['cart']['items'] = $products;
 
         // Loop 2: Calculate Coupon discounts and VAT
@@ -610,21 +613,47 @@ class Cart
                 if ($objCoupon) {
                     $hasCoupon = true;
                     $discount_amount = $objCoupon->getDiscountAmount(
-                        $product['price'], $customer_id);
+                        $product['price'], $customer_id
+                    );
+                    // The amount already spent by that Customer
+                    $couponUsedAmount = $objCoupon->getUsedAmount($customer_id);
                     // In case the loaded coupon is a coupon of type value (of
                     // a certain amount) and if it has been used on a previous
                     // product, then we have to check if the discount (to be
                     // applied on the current product) will exceed the total
                     // coupon value
-                    if (   $objCoupon->discount_amount() > 0
-                        && ($total_discount_amount + $discount_amount)
-                            > $objCoupon->discount_amount()) {
+                    if (
+                        // coupon is of type value
+                        $objCoupon->discount_amount() > 0 &&
+                        // and sum of
+                        (
+                            // applied discount on previous product(s) of cart
+                            $total_discount_amount
+                            // and discount of current product
+                          + $discount_amount
+                        )
+                        // is greater
+                        >
+                        // than the remaining amount of discount that is still
+                        // available (in case the coupon has been used before
+                        // in other orders)
+                        (
+                            $objCoupon->discount_amount()
+                          - $couponUsedAmount
+                        )
+                    ) {
                         // Already applied discounts plus the discount of this
                         // product exceed the coupons total value. Therefore
                         // we must subtract the applied discounts from the
                         // coupon to get the remaining discount amount.
                         $discount_amount =
+                            // initial discount amount of coupon
                             $objCoupon->discount_amount()
+                            // already redeemed discount amount (from previous
+                            // orders)
+                          - $couponUsedAmount
+                            // already applied discount of previous products (
+                            // of cart)
                           - $total_discount_amount;
                     }
                     $total_discount_amount += $discount_amount;
@@ -677,29 +706,36 @@ class Cart
 
             if ($objCoupon) {
                 $hasCoupon = true;
-                $discount_amount = $objCoupon->getDiscountAmount(
-                    $total_price, $customer_id);
-                $total_discount_amount = $discount_amount;
-
+                $total_discount_amount = $objCoupon->getDiscountAmount(
+                    $total_price, $customer_id
+                );
                 // in case VAT is being used, we have to subtract the VAT of
                 // the discount from the total VAT amount of the products
+                $couponVatDiscount = 0;
                 if (Vat::isEnabled()) {
                     if ($objCoupon->discount_amount() > 0) {
                         $vatRate = current($usedVatRates);
                         // in case coupon is a discount of value, then we
                         // have to subtract the VAT amount of that value
                         if (Vat::isIncluded()) {
-                            $total_vat_amount -= $objCoupon->discount_amount() / (1 + $vatRate / 100) * $vatRate / 100;
+                            $couponVatDiscount =
+                                $total_discount_amount
+                                / (1 + $vatRate / 100) * $vatRate / 100;
                         } else {
-                            $total_vat_amount -= $objCoupon->discount_amount() * $vatRate / 100;
+                            $couponVatDiscount =
+                                $total_discount_amount
+                                * $vatRate / 100;
                         }
                     } else {
                         // in case coupon is a discount in percent, then we
                         // have to subtract the same percentage from the total
                         // VAT amount
-                        $total_vat_amount -= $total_vat_amount * $objCoupon->discount_rate() / 100;
+                        $couponVatDiscount =
+                            $total_vat_amount
+                            * $objCoupon->discount_rate()  / 100;
                     }
                 }
+                $total_vat_amount -= $couponVatDiscount;
             }
         }
 
@@ -711,9 +747,10 @@ class Cart
         //      then $total_discount_amount is the discount for all products (of the cart)
         if ($hasCoupon) {
             $total_price -= $total_discount_amount;
-        }
-        if ($hasCoupon) {
             \Message::clear();
+            $_SESSION['shop']['cart']['coupon_code'] = $objCoupon->code();
+        } else {
+            unset($_SESSION['shop']['cart']['coupon_code']);
         }
 
         // total discount amount
@@ -795,7 +832,7 @@ class Cart
     {
         if (empty($_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id]))
             return null;
-        return $_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id];
+        return $_SESSION['shop']['cart']['items'][$cart_id]['options'][$attribute_id]->toArray();
     }
 
 
@@ -1044,6 +1081,8 @@ die("Cart::view(): ERROR: No template");
                 'SHOP_TOTAL_TAX_AMOUNT' =>
                     self::get_vat_amount().
                     '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                'SHOP_TOTAL_TAX_AMOUNT_NO_SYMBOL' =>
+                    self::get_vat_amount(),
 
             ));
             if (Vat::isIncluded()) {
@@ -1319,4 +1358,16 @@ die("Cart::view(): ERROR: No template");
         return self::$products[$cart_id]['quantity'];
     }
 
+    /**
+     * Get currently redeemed coupon
+     *
+     * @return  \Cx\Modules\Shop\Controller\Coupon  The redeemed coupon or NULL
+     */
+    public static function getCoupon() {
+        if (empty($_SESSION['shop']['cart']['coupon_code'])) {
+            return null;
+        }
+
+        return Coupon::get($_SESSION['shop']['cart']['coupon_code']);
+    }
 }

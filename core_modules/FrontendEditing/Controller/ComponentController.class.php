@@ -211,7 +211,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         'FE',
                         'getToggleButton',
                         array(
-                            'user' => '$(HTTP_COOKIE{\'PHPSESSID\'})',
+                            'user' => '$(HTTP_COOKIE{\'' .
+                                $this->cx->getComponent('Session')->getSessionName() .
+                            '\'})',
                             'lang' => \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID),
                         )
                     ),

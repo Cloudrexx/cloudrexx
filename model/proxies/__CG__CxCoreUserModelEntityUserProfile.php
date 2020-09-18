@@ -73,10 +73,10 @@ class UserProfile extends \Cx\Core\User\Model\Entity\UserProfile implements \Doc
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'gender', 'designation', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'firstname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'lastname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'company', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'address', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'city', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'zip', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'country', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneOffice', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phonePrivate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneMobile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneFax', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'birthday', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'website', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'profession', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'interests', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'signature', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'picture', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'users', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userTitle', 'userAttributeValues', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'gender', 'designation', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'firstname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'lastname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'company', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'address', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'city', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'zip', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'country', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneOffice', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phonePrivate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneMobile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneFax', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'birthday', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'website', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'profession', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'interests', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'signature', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'picture', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'users', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userTitle', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'gender', 'designation', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'firstname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'lastname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'company', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'address', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'city', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'zip', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'country', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneOffice', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phonePrivate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneMobile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneFax', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'birthday', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'website', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'profession', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'interests', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'signature', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'picture', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'users', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userTitle', 'userAttributeValues', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'gender', 'designation', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'firstname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'lastname', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'company', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'address', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'city', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'zip', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'country', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneOffice', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phonePrivate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneMobile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'phoneFax', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'birthday', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'website', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'profession', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'interests', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'signature', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'picture', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'users', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserProfile' . "\0" . 'userTitle', 'userAttributeValues', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -750,6 +750,17 @@ class UserProfile extends \Cx\Core\User\Model\Entity\UserProfile implements \Doc
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -767,6 +778,17 @@ class UserProfile extends \Cx\Core\User\Model\Entity\UserProfile implements \Doc
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

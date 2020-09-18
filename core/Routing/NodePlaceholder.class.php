@@ -408,11 +408,12 @@ class NodePlaceholder {
 
         // ARGUMENTS
         if ($this->hasArguments()) {
-            $parts = array();
-            foreach ($this->arguments as $key=>$value) {
-                $parts[] = $key . '=' . $value;
-            }
-            $placeholder .= '?' . implode('&', $parts);
+            $placeholder .= '?' . http_build_query(
+                $this->arguments,
+                null,
+                '&',
+                PHP_QUERY_RFC3986
+            );
         }
         return $placeholder;
     }

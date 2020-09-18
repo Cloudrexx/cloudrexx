@@ -5,8 +5,8 @@ Cx\Core\DataSource\Model\Entity\DataSource:
   inheritanceType: SINGLE_TABLE
   discriminatorColumn:
     name: type
-    type: string
-    length: 50
+    type: enum
+    values: ['dataSource','mediaSource','ymlRepository','jsonDataSource','doctrineRepository','legacyDatabaseRepository']
   discriminatorMap:
     dataSource: DataSource
     mediaSource: \Cx\Core\MediaSource\Model\Entity\MediaSource

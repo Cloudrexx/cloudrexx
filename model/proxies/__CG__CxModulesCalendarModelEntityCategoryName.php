@@ -73,10 +73,10 @@ class CategoryName extends \Cx\Modules\Calendar\Model\Entity\CategoryName implem
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'catId', 'name', 'langId', 'category', 'validators', 'virtual');
+            return array('__isInitialized__', 'catId', 'name', 'langId', 'category', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'catId', 'name', 'langId', 'category', 'validators', 'virtual');
+        return array('__isInitialized__', 'catId', 'name', 'langId', 'category', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -314,6 +314,17 @@ class CategoryName extends \Cx\Modules\Calendar\Model\Entity\CategoryName implem
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -331,6 +342,17 @@ class CategoryName extends \Cx\Modules\Calendar\Model\Entity\CategoryName implem
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

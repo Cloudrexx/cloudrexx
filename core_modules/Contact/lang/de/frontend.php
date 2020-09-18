@@ -62,3 +62,4 @@ $_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'] = "Bitte wählen";
 $_ARRAYLANG['TXT_CONTACT_NOT_SPECIFIED'] = "Nicht angegeben";
 $_ARRAYLANG['TXT_CONTACT_RECAPTCHA_ERROR'] = "Bitte füllen Sie das CAPTCHA aus:";
 $_ARRAYLANG['TXT_CONTACT_EMAIL'] = "E-Mail";
+$_ARRAYLANG['TXT_CONTACT_UPLOAD_INIT_FAILED'] = 'Die Übermittlung der Datei(en) war leider nicht erfolgreich. Bitte laden Sie die Datei(en) nochmals hoch.';

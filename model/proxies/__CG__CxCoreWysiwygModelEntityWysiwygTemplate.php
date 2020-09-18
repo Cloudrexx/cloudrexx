@@ -73,10 +73,10 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -365,6 +365,17 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -382,6 +393,17 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

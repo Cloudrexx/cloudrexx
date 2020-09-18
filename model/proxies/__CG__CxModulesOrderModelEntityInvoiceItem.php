@@ -73,10 +73,10 @@ class InvoiceItem extends \Cx\Modules\Order\Model\Entity\InvoiceItem implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'price', 'description', 'invoice', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'price', 'description', 'vatRate', 'invoice', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
         }
 
-        return array('__isInitialized__', 'id', 'price', 'description', 'invoice', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'price', 'description', 'vatRate', 'invoice', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat');
     }
 
     /**
@@ -255,6 +255,28 @@ class InvoiceItem extends \Cx\Modules\Order\Model\Entity\InvoiceItem implements 
     /**
      * {@inheritDoc}
      */
+    public function getVatRate()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getVatRate', array());
+
+        return parent::getVatRate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setVatRate($vatRate)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setVatRate', array($vatRate));
+
+        return parent::setVatRate($vatRate);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getInvoice()
     {
 
@@ -310,6 +332,17 @@ class InvoiceItem extends \Cx\Modules\Order\Model\Entity\InvoiceItem implements 
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -327,6 +360,17 @@ class InvoiceItem extends \Cx\Modules\Order\Model\Entity\InvoiceItem implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

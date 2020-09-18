@@ -4615,6 +4615,7 @@ $WhereStatement = '';
                         $arrRecipientLists = $arrLists;
 
 // TODO: use FWUSER
+                        $arrRecipient['salutation'] = trim($arrRecipient['salutation']);
                         if (in_array($arrRecipient['salutation'], $this->_getRecipientTitles())) {
                             $arrRecipientTitles = array_flip($this->_getRecipientTitles());
                             $recipientSalutationId = $arrRecipientTitles[$arrRecipient['salutation']];

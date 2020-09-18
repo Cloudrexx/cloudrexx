@@ -73,10 +73,10 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -409,6 +409,17 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -426,6 +437,17 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

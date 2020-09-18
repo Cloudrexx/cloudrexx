@@ -529,3 +529,6 @@ $_ARRAYLANG['TXT_SHOP_PRODUCT_MULTIPLE_CART_STOCK_OUTOFF_ERROR'] = "The products
 $_ARRAYLANG['TXT_SHOP_CHOOSE_FILE'] = 'Choose File';
 $_ARRAYLANG['TXT_SHOP_REMOVE_FILE'] = 'Remove File';
 $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'] = 'We do not ship to %s. Please set a different address for shipment.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_APPLIED_INFO'] = 'The remaining amount from your coupon has been applied to the shipment cost.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_ENABLED_INFO'] = 'Your coupon has no value left, and therefore cannot be applied to the shipment cost.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_DISABLED_INFO'] = 'Your coupon cannot be applied to the shipment cost.';

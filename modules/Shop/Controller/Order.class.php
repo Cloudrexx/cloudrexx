@@ -1727,10 +1727,11 @@ class Order
         Vat::is_reseller($objCustomer->is_reseller());
         Vat::is_home_country(
             \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop') == $objOrder->country_id());
+        $currency = Currency::getCurrencySymbolById($objOrder->currency_id());
         $objTemplate->setGlobalVariable($_ARRAYLANG
           + array(
             'SHOP_CURRENCY' =>
-                Currency::getCurrencySymbolById($objOrder->currency_id())));
+                $currency));
 //DBG::log("Order sum: ".Currency::formatPrice($objOrder->sum()));
         $objTemplate->setVariable(array(
             'SHOP_CUSTOMER_ID' => $customer_id,
@@ -1877,16 +1878,61 @@ class Order
         // Coupon
         $objCoupon = Coupon::getByOrderId($order_id);
         if ($objCoupon) {
-            $discount = $objCoupon->discount_amount() != 0 ? $objCoupon->discount_amount() : $total_net_price/100*$objCoupon->discount_rate();
+            $discount = $objCoupon->discount_amount() != 0 ? $objCoupon->getUsedAmount(null, $order_id) : $total_net_price/100*$objCoupon->discount_rate();
+
+            // calculate applied shipment discount (if any)
+            $shipmentDiscountAmount = 0;
+            if (
+                // In case the discount is greater than the total costs of the
+                // ordered shop items, then the discount had been applied too
+                // on the shipment costs.
+                // This means that the option 'apply_coupon_code_on_shipment'
+                // was active for the time being when the order was submitted.
+                $discount > $total_net_price
+            ) {
+                // discount applied on shipment costs is the difference to the
+                // total cost of the ordered items
+                $shipmentDiscountAmount = Currency::formatPrice(
+                    $total_net_price - $discount
+                );
+
+                // reset discount applied on ordered items to the total sum of
+                // ordered items
+                $discount = $total_net_price;
+            }
+
+            // show coupon data
             $objTemplate->setVariable(array(
                 'SHOP_COUPON_NAME' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'],
                 'SHOP_COUPON_CODE' => $objCoupon->code(),
                 'SHOP_COUPON_AMOUNT' => Currency::formatPrice(
                     -$discount),
             ));
+            $objTemplate->touchBlock('coupon_row');
+
+            // show shipment discount
+            if ($shipmentDiscountAmount) {
+                $objTemplate->setVariable(array(
+                    'SHOP_COUPON_SHIPMENT_TXT' => sprintf(
+                        $_ARRAYLANG['TXT_SHOP_COUPON_SHIPMENT_DEDUCTION'],
+                        $objCoupon->code(),
+                        "$shipmentDiscountAmount $currency"
+                    ),
+                ));
+                $objTemplate->touchBlock('coupon_shipment_info');
+            } else {
+                $objTemplate->hideBlock('coupon_shipment_info');
+            }
+
+            // deduct item discount from total item costs
             $total_net_price -= $discount;
+
 //DBG::log("Order::view_detail(): Coupon: ".var_export($objCoupon, true));
+        } else {
+            $objTemplate->hideBlock('coupon_row');
+            $objTemplate->hideBlock('coupon_shipment_info');
         }
+
         $objTemplate->setVariable(array(
             'SHOP_ROWCLASS_NEW' => 'row'.(++$i % 2 + 1),
             'SHOP_TOTAL_WEIGHT' => Weight::getWeightString($total_weight),

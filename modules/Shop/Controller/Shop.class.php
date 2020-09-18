@@ -1052,11 +1052,7 @@ die("Failed to update the Cart!");
                 $catName = contrexx_raw2xhtml($objCategory->name());
                 $imageName = $objCategory->picture();
                 $shortDescription = $objCategory->shortDescription();
-                $shortDescription = nl2br(contrexx_raw2xhtml($shortDescription));
-                $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
                 $description = $objCategory->description();
-                $description = nl2br(contrexx_raw2xhtml($description));
-                $description = preg_replace('/[\n\r]/', '', $description);
                 self::$objTemplate->setVariable(array(
                     'SHOP_CATEGORY_CURRENT_ID'          => $id,
                     'SHOP_CATEGORY_CURRENT_NAME'        => $catName,
@@ -1064,7 +1060,7 @@ die("Failed to update the Cart!");
                     'SHOP_CATEGORY_CURRENT_DESCRIPTION' => $description,
                 ));
                 static::$pageTitle = $objCategory->name();
-                static::$pageMetaDesc = $objCategory->shortDescription();
+                static::$pageMetaDesc = contrexx_html2plaintext($objCategory->shortDescription());
                 if ($imageName) {
                     self::$objTemplate->setVariable(array(
                         'SHOP_CATEGORY_CURRENT_IMAGE'       => $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
@@ -1117,11 +1113,7 @@ die("Failed to update the Cart!");
             $imageName = $objCategory->picture();
             $thumbnailPath = self::$defaultImage;
             $shortDescription = $objCategory->shortDescription();
-            $shortDescription = nl2br(htmlentities($shortDescription, ENT_QUOTES, CONTREXX_CHARSET));
-            $shortDescription = preg_replace('/[\n\r]/', '', $shortDescription);
             $description = $objCategory->description();
-            $description = nl2br(htmlentities($description, ENT_QUOTES, CONTREXX_CHARSET));
-            $description = preg_replace('/[\n\r]/', '', $description);
             if (empty($arrDefaultImageSize)) {
 //\DBG::log("Shop::showCategories(): ".\Cx\Core\Core\Controller\Cx::instanciate()->getWebsitePath() . self::$defaultImage);
                 $arrDefaultImageSize = getimagesize($cx->getWebsitePath() . self::$defaultImage);
@@ -1577,6 +1569,7 @@ die("Failed to update the Cart!");
                     'THUMBNAIL_LINK' => $pictureLink,
                     'POPUP_LINK' => $pictureLink,
                     'IMAGE_PATH' => $imageFilePath,
+                    'IMAGE_NAME' => basename($imageFilePath),
                     'POPUP_LINK_NAME' => $_ARRAYLANG['TXT_SHOP_IMAGE'].' '.$index,
                     'THUMBNAIL_FORMATS' => $arrThumbnails,
                 );
@@ -1596,6 +1589,7 @@ die("Failed to update the Cart!");
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_THUMBNAIL_'.$i => $arrProductImage['THUMBNAIL'],
                     'SHOP_PRODUCT_THUMBNAIL_SIZE_'.$i => $arrProductImage['THUMBNAIL_SIZE'],
+                    'SHOP_PRODUCT_IMAGE_NAME_'.$i => $arrProductImage['IMAGE_NAME'],
                 ));
                 if (!empty($arrProductImage['THUMBNAIL_LINK'])) {
                     self::$objTemplate->setVariable(array(
@@ -1653,6 +1647,11 @@ die("Failed to update the Cart!");
             self::showDiscountInfo(
                 $groupCustomerId, $groupArticleId, $groupCountId, 1
             );
+
+            self::$objTemplate->setVariable(array(
+                'SHOP_PRODUCT_GROUP_ID' => $groupArticleId,
+            ));
+
 /* OLD
             $price = Currency::getCurrencyPrice(
                 $objProduct->getCustomerPrice(self::$objCustomer)
@@ -1931,6 +1930,18 @@ die("Failed to update the Cart!");
                 }
                 if (self::$objTemplate->blockExists('shop_product_not_in_stock')) {
                     self::$objTemplate->touchBlock('shop_product_not_in_stock');
+                }
+            }
+
+            // list assigned categories
+            if (self::$objTemplate->blockExists('shop_product_categories')) {
+                $categoryIds = $objProduct->category_id();
+                foreach (preg_split('/\s*,\s*/', $categoryIds) as $catId) {
+                    self::$objTemplate->setVariable(
+                        'SHOP_PRODUCT_CATEGORY_ID',
+                        $catId
+                    );
+                    self::$objTemplate->parse('shop_product_categories');
                 }
             }
 
@@ -2480,6 +2491,8 @@ die("Failed to update the Cart!");
                         // left old spelling for comatibility (obsolete)
                         'SHOP_PRODCUT_OPTION' => $selectValues,
                         'SHOP_PRODUCT_OPTION' => $selectValues,
+                        'SHOP_PRODUCT_OPTIONS_ID' => $objAttribute->getId(),
+                        'SHOP_PRODUCT_OPTIONS_TYPE_ID' => $objAttribute->getType(),
                         'SHOP_PRODUCT_OPTIONS_NAME' => $objAttribute->getName(),
                         'SHOP_PRODUCT_OPTIONS_TITLE' =>
                             '<a href="javascript:{}" onclick="toggleOptions('.
@@ -3488,6 +3501,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['agb'] = \Html::ATTRIBUTE_CHECKED;
         if (isset($_POST['cancellation_terms']))
             $_SESSION['shop']['cancellation_terms'] = \Html::ATTRIBUTE_CHECKED;
+        unset($_SESSION['shop']['shipment_discount_amount']);
         // if shipperId is not set, there is no use in trying to determine a shipment_price
         if (isset($_SESSION['shop']['shipperId'])) {
             $shipmentPrice = self::_calculateShipmentPrice(
@@ -3500,6 +3514,59 @@ die("Shop::processRedirect(): This method is obsolete!");
                 unset($_SESSION['shop']['shipperId']);
                 $_SESSION['shop']['shipment_price'] = '0.00';
             } else {
+                // deduct global coupon (if one is set)
+                $coupon = Cart::getCoupon();
+
+                // verify VAT of shipment
+                // ensure each VAT rate only occurs once
+                $usedVatRates = array_unique(
+                    array_merge(
+                        $_SESSION['shop']['cart']['item_vat_rates']->toArray(),
+                        // VAT for shipment
+                        array(Vat::getOtherRate())
+                    )
+                );
+
+                // check if we have to apply a discount on the shipment costs
+                $shipmentDiscount = 0;
+                if (
+                    // If the required option is enabled...
+                    \Cx\Core\Setting\Controller\Setting::getValue(
+                        'apply_coupon_code_on_shipment',
+                        'Shop'
+                    ) &&
+                    // ...and a coupon is being redeemed...
+                    $coupon &&
+                    // ...and the coupon is of type amount (not percentage)...
+                    $coupon->discount_amount() > 0 &&
+                    // ...and the cost of the selected items does not cover the
+                    // full discount...
+                    $coupon->discount_amount() - $coupon->getUsedAmount() - Cart::get_discount_amount() > 0 &&
+                    // ...and either VAT is not being used or everything uses the
+                    // same VAT rate...
+                    (
+                        !Vat::isEnabled() ||
+                        count($usedVatRates) <= 1
+                    )
+                ) {
+                    // ...then do calculate the discount on the shipment costs.
+                    $shipmentDiscount =
+                        $coupon->discount_amount()
+                        - $coupon->getUsedAmount()
+                        - Cart::get_discount_amount();
+
+                    // ensure discount is not greater than shipment costs
+                    $shipmentDiscount = min(
+                        $shipmentDiscount,
+                        $shipmentPrice
+                    );
+                }
+
+                // deduct discount from shipment costs
+                $shipmentPrice -= $shipmentDiscount;
+                $_SESSION['shop']['shipment_discount_amount'] = $shipmentDiscount;
+
+                // update shipment costs (after deducting coupon discount)
                 $_SESSION['shop']['shipment_price'] = $shipmentPrice;
             }
         } else {
@@ -3878,6 +3945,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     }
                 }
             }
+            static::viewShipmentDiscount();
         }
         if (   Cart::get_price()
             || $_SESSION['shop']['shipment_price']
@@ -3929,6 +3997,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_AMOUNT_TOTAL'],
                 'SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT' =>
                     Currency::formatPrice(-$total_discount_amount),
+                'SHOP_COUPON_UNIT' => Currency::getActiveCurrencySymbol(),
             ));
         }
         // Show the Coupon code field only if there is at least one defined
@@ -3954,6 +4023,8 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_TAX_PRICE' =>
                     $_SESSION['shop']['vat_price'].
                     '&nbsp;'.Currency::getActiveCurrencySymbol(),
+                'SHOP_TAX_PRICE_NO_SYMBOL' =>
+                    $_SESSION['shop']['vat_price'],
                 'SHOP_TAX_PRODUCTS_TXT' => $_SESSION['shop']['vat_products_txt'],
                 'SHOP_TAX_GRAND_TXT' => $_SESSION['shop']['vat_grand_txt'],
                 'TXT_TAX_RATE' => $_ARRAYLANG['TXT_SHOP_VAT_RATE'],
@@ -4289,6 +4360,7 @@ die("Shop::processRedirect(): This method is obsolete!");
 //                    'TXT_SHIPPING_METHOD' => $_ARRAYLANG['TXT_SHIPPING_METHOD'],
 //                    'TXT_SHIPPING_ADDRESS' => $_ARRAYLANG['TXT_SHIPPING_ADDRESS'],
             ));
+            static::viewShipmentDiscount();
         }
         // Custom.
         // Enable if Discount class is customized and in use.
@@ -4576,6 +4648,20 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Note that it is not redeemed yet (uses=0)!
 //\DBG::log("Shop::process(): Looking for global Coupon $coupon_code");
         if ($coupon_code) {
+            // Add shipment discount...
+            if (
+                // ...if the required option is enabled...
+                \Cx\Core\Setting\Controller\Setting::getValue(
+                    'apply_coupon_code_on_shipment',
+                    'Shop'
+                ) &&
+                // ...and a discount on the shipment costs has been applied.
+                !empty($_SESSION['shop']['shipment_discount_amount'])
+            ) {
+                $items_total += $_SESSION['shop']['shipment_discount_amount'];
+            }
+
+            // verify that the coupon to redeem has not been redeemed meanwhile
             $objCoupon = Coupon::available($coupon_code, $items_total,
                 self::$objCustomer->id(), null, $payment_id);
             if ($objCoupon) {
@@ -4767,6 +4853,61 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::destroyCart();
     }
 
+    /**
+     * Set up the Shipment discount template block
+     *
+     * Informs the Customer whether the Coupon applies to the Shipment cost.
+     * If shipping is required, not free, and a valid Coupon with amount > 0
+     * is used, touches one of these blocks:
+     *  - shipment_discount_applied_info
+     *      As much as possible of the remaining amount has been applied
+     *      to the Shipment cost.
+     *  - shipment_discount_enabled_info
+     *      Shipment discounts are enabled, but the Coupon has no value left.
+     *  - shipment_discount_disabled_info
+     *      Shipment discounts are disabled, and thus do not apply.
+     */
+    protected static function viewShipmentDiscount()
+    {
+        // Skip if there's no Shipment.
+        // Note that $_SESSION['shop']['shipment_price'] may be empty or zero
+        // in any case here!
+        $shipperId = $_SESSION['shop']['shipperId'] ?? 0;
+        if (!$shipperId) {
+            return; // Nothing to be discounted
+        }
+        // Has been set to any value > 0 by _initPaymentDetails()
+        // if and when the Coupon was applied to the shipment cost.
+        $shipmentDiscountAmount =
+            $_SESSION['shop']['shipment_discount_amount'] ?? 0;
+        if ($shipmentDiscountAmount > 0) {
+            if (static::$objTemplate->blockExists('shipment_discount_applied_info')) {
+                static::$objTemplate->touchBlock('shipment_discount_applied_info');
+            }
+            return;
+        }
+        // Skip if there's no valid Coupon with any amount.
+        $coupon = Cart::getCoupon();
+        if (!$coupon) {
+            return; // No Coupon used
+        }
+        if (!$coupon->discount_amount()) {
+            return; // Coupon has no amount
+        }
+        // May Coupons be applied to Shipment cost at all?
+        if (\Cx\Core\Setting\Controller\Setting::getValue(
+            'apply_coupon_code_on_shipment',
+            'Shop'
+        )) {
+            if (static::$objTemplate->blockExists('shipment_discount_enabled_info')) {
+                static::$objTemplate->touchBlock('shipment_discount_enabled_info');
+            }
+            return;
+        }
+        if (static::$objTemplate->blockExists('shipment_discount_disabled_info')) {
+            static::$objTemplate->touchBlock('shipment_discount_disabled_info');
+        }
+    }
 
     /**
      * Change the customers' password

@@ -60,6 +60,8 @@ class YamlSettingEventListenerException extends \Exception {}
 class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener {
     public function preUpdate($eventArgs) {
         global $_CONFIG,$_ARRAYLANG;
+        $cx = $this->cx;
+        $isCliCall = $cx->isCliCall();
         try {
             $objSetting = $eventArgs->getEntity();
             $value = $objSetting->getValue();
@@ -93,7 +95,7 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                                 $protocol = $_CONFIG['forceProtocolBackend'];
                             }
                             if (
-                                php_sapi_name() != 'cli' &&
+                                !$isCliCall &&
                                 !\Cx\Core\Config\Controller\Config::checkAccessibility($protocol, $domainUrl)
                             ) {
                                 \Message::add(sprintf($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_MAINDOMAIN'], $domainUrl), \Message::CLASS_ERROR);
@@ -108,7 +110,7 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                 case 'forceProtocolFrontend':
                     if ($_CONFIG['forceProtocolFrontend'] != $value) {
                         if (
-                            php_sapi_name() != 'cli' &&
+                            !$isCliCall &&
                             !\Cx\Core\Config\Controller\Config::checkAccessibility($value)
                         ) {
                             $domainAddr = $value . '://' . $_CONFIG['domainUrl'] . '/';
@@ -124,7 +126,7 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                 case 'forceProtocolBackend':
                     if ($_CONFIG['forceProtocolBackend'] != $value) {
                         if (
-                            php_sapi_name() != 'cli' &&
+                            !$isCliCall &&
                             !\Cx\Core\Config\Controller\Config::checkAccessibility($value)
                         ) {
                             $domainAddr = $value . '://' . $_CONFIG['domainUrl'] . '/';
@@ -144,7 +146,7 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         $protocol = 'https';
                     }
                     if (
-                        php_sapi_name() != 'cli' &&
+                        !$isCliCall &&
                         !\Cx\Core\Config\Controller\Config::checkAccessibility($protocol)
                     ) {
                         \Message::add($_ARRAYLANG['TXT_CONFIG_UNABLE_TO_FORCE_MAINDOMAIN'], \Message::CLASS_ERROR);

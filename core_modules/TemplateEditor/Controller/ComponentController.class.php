@@ -126,4 +126,59 @@ class ComponentController extends SystemComponentController
         return array('JsonController');
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+        global $_ARRAYLANG;
+
+        if ($this->cx->getMode() != Cx::MODE_BACKEND) {
+            return;
+        }
+        if ($page->getModule() != $this->getName()) {
+            return;
+        }
+
+        $this->getComponent('View')->addIntroSteps(
+            array(
+                array(
+                    'element' => '.option.layout',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_LAYOUT_OPTION'],
+                ),
+                array(
+                    'element' => '.option.preset',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_OPTION'],
+                ),
+                array(
+                    'element' => '.activate-preset',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_ACTIVATE'],
+                ),
+                array(
+                    'element' => '.add-preset',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_ADD'],
+                ),
+                array(
+                    'element' => '.reset-preset',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PRESET_RESET'],
+                ),
+                array(
+                    'element' => '.option.view',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_VIEW_OPTION'],
+                ),
+                array(
+                    'element' => '.option-list > .option',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_VIEW_OPTION_LIST'],
+                ),
+                array(
+                    'element' => '#preview-template-editor',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_PREVIEW'],
+                ),
+                array(
+                    'element' => 'button.save',
+                    'intro' => $_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_INTRO_SAVE'],
+                )
+            ),
+            'TemplateEditor'
+        );
+    }
 }

@@ -1364,10 +1364,6 @@ class ContactLib
                     $field_id = $objResult->fields['id_field'];
                     $arrData[$field_id] = $objResult->fields['formvalue'];
 
-// TODO: What is this good for?
-//                    if($field_id == 'unique_id') //skip unique id of each entry, we do not want to display this.
-//                        continue;
-
                     if (!in_array($field_id, $arrCols)) {
                         array_push($arrCols, $field_id);
                     }

@@ -343,7 +343,9 @@ class EsiWidget extends Widget {
                         $esiVarValue = \Env::get('init')->getCurrentChannel();
                         break;
                     case static::ESI_VAR_NAME_USER:
-                        $esiVarValue = '$(HTTP_COOKIE{\'PHPSESSID\'})';
+                        $esiVarValue = '$(HTTP_COOKIE{\'' .
+                            $this->cx->getComponent('Session')->getSessionName() .
+                        '\'})';
                         break;
                     case static::ESI_VAR_NAME_CURRENCY:
                         $esiVarValue = \Cx\Modules\Shop\Controller\Currency::getActiveCurrencySymbol();

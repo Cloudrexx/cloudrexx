@@ -99,9 +99,18 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
 
             $products = $qb->getQuery()->getResult();
 
+            $options = array();
+            if (!empty($filter['term'])) {
+                $options['like'] = array(
+                    array(
+                        's.note',
+                        $qb->expr()->literal('%' . contrexx_raw2db($filter['term']) . '%')
+                    ),
+                );
+            }
             foreach ($products as $product) {
                 $ids  = array();
-                $repo = $this->getEntityManager()->getRepository($product->getEntityClass());
+                $repo = $product->getEntityClass() ? $this->getEntityManager()->getRepository($product->getEntityClass()) : null;
                 if ($repo && method_exists($repo, 'findByTerm')) {
                     if (!empty($filter['term'])) {
                         $entities = $repo->findByTerm($filter['term']);
@@ -119,9 +128,15 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
                 }
 
                 if (!empty($filter['filterProduct'])) {
+                    if (!isset($options['in'])) {
+                        $options['in'] = array();
+                    }
                     $options['in'][]   = array('p.id', $filter['filterProduct']);
                 }
                 if (!empty($filter['filterState'])) {
+                    if (!isset($options['in'])) {
+                        $options['in'] = array();
+                    }
                     $options['in'][]   = array('s.state', $filter['filterState']);
                 }
                 $subscriptions = array_merge($subscriptions, $this->getSubscriptionsByCriteria($options));

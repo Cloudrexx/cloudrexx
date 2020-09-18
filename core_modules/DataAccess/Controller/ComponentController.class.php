@@ -39,6 +39,666 @@ namespace Cx\Core_Modules\DataAccess\Controller;
 /**
  * Main controller for DataAccess
  * 
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="Cloudrexx RESTful API",
+ *     description="The Cloudrexx RESTful API allows access to ...",
+ *     @OA\Contact(
+ *         name="Cloudrexx API Support",
+ *         url="https://www.cloudrexx.com/support",
+ *         email="info@cloudrexx.com"
+ *     ),
+ *     @OA\License(name="CLOUDREXX")
+ * )
+ * @OA\Server(
+ *     url=SWAGGER_API_HOST
+ * )
+ * @OA\Get(
+ *     path="/json/{endpoint}",
+ *     operationId="getFromEntityList",
+ *     summary="Get a list of entities of this type",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
+ *         name="order",
+ *         description="Sorts the output by one or more fields",
+ *         in="query",
+ *         required=false,
+ *         description="Orders the output",
+ *         @OA\Schema(
+ *             type="string",
+ *             pattern="^([a-zA-Z0-9]+/(ASC|DESC)(;|$))+$"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="filter",
+ *         description="Filters the output on one or more fields",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="object",
+ *             properties={
+ *             }
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="limit",
+ *         description="Limits the output (paging)",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="string",
+ *             pattern="^\d+(,\d+)?$"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/multiple_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * # see issue https://github.com/OAI/OpenAPI-Specification/issues/892#issuecomment-281449239
+ * @OA\Get(
+ *     path="/json/{endpoint}/{id}",
+ *     operationId="getFromEntity",
+ *     summary="Get a single entity of this type",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/single_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * @OA\Post(
+ *     path="/json/{endpoint}",
+ *     operationId="postNewEntity",
+ *     summary="Add new entity. All fields required by the entity need to be passed.",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/post_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * @OA\Put(
+ *     path="/json/{endpoint}/{id}",
+ *     operationId="updateEntityPut",
+ *     summary="Update a complete entity by passing all fields required by the entity.",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/putpatch_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * @OA\Patch(
+ *     path="/json/{endpoint}/{id}",
+ *     operationId="updateEntityPatch",
+ *     summary="Update an entity by passing only changed fields.",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/putpatch_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * @OA\Delete(
+ *     path="/json/{endpoint}/{id}",
+ *     operationId="deleteEntity",
+ *     summary="Delete an entity.",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/delete_success"
+ *     ),
+ *     @OA\Response(
+ *         response="4XX",
+ *         ref="#/components/responses/error"
+ *     )
+ * )
+ * @OA\Components(
+ *     @OA\Parameter(
+ *         name="endpoint",
+ *         description="One of the endpoints defined for your Cloudrexx instance.",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="apikey",
+ *         description="API key to grant access",
+ *         in="query",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="locale",
+ *         description="The frontend locale to get/set translatable fields in.",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="id",
+ *         description="Serialized ID of an entity",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string",
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response="single_success",
+ *         description="Successful query to an URL that returns a single entity",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="success or error"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                         @OA\Property(
+ *                             property="version",
+ *                             type="object",
+ *                             description="Current version number of returned element. Only present if endpoint supports versioned entities. Key is the entity's ID.",
+ *                             additionalProperties={
+ *                                 "type": "string"
+ *                             }
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="All fields of this entity, including relations as specified by the endpoint.",
+ *                     ),
+ *                     example={
+ *                         "status": "success",
+ *                         "meta": {
+ *                             "request": {},
+ *                             "version": {
+ *                                 "de/1": 7
+ *                             }
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {
+ *                             "locale": "de",
+ *                             "ref": 1,
+ *                             "name": "Lorem ipsum"
+ *                         }
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     ),
+ *     @OA\Response(
+ *         response="multiple_success",
+ *         description="Successful query to an URL that returns a list of entities",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="success or error"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                         @OA\Property(
+ *                             property="version",
+ *                             type="object",
+ *                             description="Current version number of returned elements. Only present if endpoint supports versioned entities. Key is the entity's ID.",
+ *                             additionalProperties={
+ *                                 "type": "string"
+ *                             }
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="All fields of all matching entities, including relations as specified by the endpoint. Grouped and indexed by the entity'd ID.",
+ *                     ),
+ *                     example={
+ *                         "status": "success",
+ *                         "meta": {
+ *                             "request": {},
+ *                             "version": {
+ *                                 "de/1": 7,
+ *                                 "de/2": 3
+ *                             }
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {
+ *                             "de/1": {
+ *                                 "locale": "de",
+ *                                 "ref": 1,
+ *                                 "name": "Lorem ipsum"
+ *                             },
+ *                             "de/2": {
+ *                                 "locale": "de",
+ *                                 "ref": 2,
+ *                                 "name": "Dolor sit amet"
+ *                             }
+ *                         }
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     ),
+ *     @OA\Response(
+ *         response="error",
+ *         description="Query can not be satisfied.",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="error"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="Empty object",
+ *                     ),
+ *                     example={
+ *                         "status": "error",
+ *                         "meta": {
+ *                             "request": {}
+ *                         },
+ *                         "messages": {
+ *                             "error": {
+ *                                 "Access denied"
+ *                             }
+ *                         },
+ *                         "data": {}
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     ),
+ *     @OA\Response(
+ *         response="post_success",
+ *         description="New entity was added.",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="ok"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="List of identifier fields of the newly created entity.",
+ *                     ),
+ *                     example={
+ *                         "status": "ok",
+ *                         "meta": {
+ *                             "request": {},
+ *                             "version": {
+ *                                 "de/3": 1
+ *                             }
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {
+ *                             "locale": "de",
+ *                             "ref": 3,
+ *                         }
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     ),
+ *     @OA\Response(
+ *         response="putpatch_success",
+ *         description="Entity was updated.",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="ok"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="Empty object",
+ *                     ),
+ *                     example={
+ *                         "status": "ok",
+ *                         "meta": {
+ *                             "request": {},
+ *                             "version": {
+ *                                 "de/3": 1
+ *                             }
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {}
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     ),
+ *     @OA\Response(
+ *         response="delete_success",
+ *         description="Entity was deleted.",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="ok"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request",
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="object",
+ *                         description="Lists of messages grouped by type",
+ *                         @OA\Property(
+ *                             property="success",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'success'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="error",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'error'"
+ *                         ),
+ *                         @OA\Property(
+ *                             property="info",
+ *                             type="array",
+ *                             items={
+ *                                 "type": "string"
+ *                             },
+ *                             description="List of messages of type 'info'"
+ *                         )
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="Empty object",
+ *                     ),
+ *                     example={
+ *                         "status": "ok",
+ *                         "meta": {
+ *                             "request": {}
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {}
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     )
+ * )
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -202,10 +862,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return void
      */
     public function apiV1($command, $arguments, $dataArguments) {
+        \Cx\Core\Csrf\Controller\Csrf::header('Access-Control-Allow-Origin: *');
         $method = $this->cx->getRequest()->getHttpRequestMethod();
         
         // handle CLI
-        if (php_sapi_name() == 'cli') {
+        if ($this->cx->isCliCall()) {
             try {
                 $this->getOutputModule(current($arguments));
             } catch (\Exception $e) {
@@ -235,17 +896,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (!empty($arguments[2])) {
-                $argumentKeys = array_keys($arguments);
-                $primaryKeyNames = $dataSource->getIdentifierFieldNames();
-                for ($i = 0; $i < count($arguments) - 2; $i++) {
-                    if (!is_numeric($argumentKeys[$i + 2])) {
-                        break;
+            if (isset($arguments[2])) {
+                // Positional keys are integers; skip the first two (see above)
+                $positionalArgumentKeys = array_filter(
+                    array_keys($arguments),
+                    function($key) {
+                        return is_int($key) && $key > 1;
                     }
-                    $elementId[$primaryKeyNames[$i]] = $arguments[$i + 2];
+                );
+                $primaryKeyNames = $dataSource->getIdentifierFieldNames();
+                if (!$primaryKeyNames || !is_array($primaryKeyNames)) {
+                    throw new \Cx\Core\Core\Controller\InstanceException(
+                        'Missing identifier'
+                    );
+                }
+                $keyName = null;
+                foreach ($positionalArgumentKeys as $index) {
+                    if ($primaryKeyNames) {
+                        $keyName = array_shift($primaryKeyNames);
+                        $elementId[$keyName] = '';
+                    }
+                    // Presume surplus values to be path components, and append
+                    // them to the last primary key value, separated by slashes.
+                    // $keyName is supposedly "filename" in this case.
+                    if (!empty($elementId[$keyName])) {
+                        $elementId[$keyName] .= '/';
+                    }
+                    $elementId[$keyName] .= $arguments[$index];
                 }
             }
-            
+
             $apiKey = null;
             if (isset($arguments['apikey'])) {
                 $apiKey = $arguments['apikey'];
@@ -261,6 +941,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (
                 $dataSource->isVersionable() &&
                 !$requestReadonly &&
+                $method != 'post' && // new entries are allowed without version
                 (
                     !isset($arguments['version']) ||
                     $dataSource->getCurrentVersion($elementId) != $arguments['version']
@@ -371,6 +1052,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 404 if ressource does not exist
                     // should be 409 (Conflict) if ressource already exists
                     $data = $dataSource->add($dataArguments);
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        $metaData['version'] = $dataSource->getCurrentVersion(
+                            $data
+                        );
+                    }
                     break;
                 case 'patch':
                 case 'put':
@@ -378,6 +1065,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 200 or 204 (No content)
                     // should be 404 if $elementId not set or not found
                     $data = $dataSource->update($elementId, $dataArguments);
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        $metaData['version'] = $dataSource->getCurrentVersion(
+                            $elementId
+                        );
+                    }
                     break;
                 case 'delete':
                     // delete entry
@@ -499,6 +1192,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $this->cx->getClassLoader()->loadFile(
                 $this->cx->getCodeBaseLibraryPath() . '/OpenApi/src/functions.php'
             );
+
+            define(
+                'SWAGGER_API_HOST',
+                \Cx\Core\Routing\Url::fromApi('v1', array())->toString()
+            );
+            $dbgMode = \DBG::getMode();
+            \DBG::activate(DBG_LOG_MEMORY);
             $openapi = \OpenApi\scan(
                 array(
                     $this->cx->getCodeBaseCorePath(),
@@ -506,8 +1206,21 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     $this->cx->getCodeBaseModulePath(),
                 )
             );
+            $apidoc = $openapi->toJson();
+            $logs = \DBG::getMemoryLogs();
+            \DBG::deactivate();
+            \DBG::activate($dbgMode);
+            array_shift($logs);
+
+            if (!empty($logs)) {
+                fwrite(STDERR, implode(PHP_EOL, $logs));
+                fwrite(STDERR, PHP_EOL . 'Please fix these errors' . PHP_EOL);
+                die();
+            }
+
+            $apidoc = $this->fixMultilineDoc($apidoc);
             $objFile = new \Cx\Lib\FileSystem\File($filename);
-            $objFile->write($openapi->toJson());
+            $objFile->write($apidoc . PHP_EOL);
         }
         // echo file contents:
         try {
@@ -516,6 +1229,31 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
         }
+    }
+
+    /**
+     * Fix multilines from API documentation
+     *
+     * The current implementation of the OpenAPI documentation parser does not
+     * support multiline. See https://github.com/zircote/swagger-php/issues/326
+     * As multilines are required to make use of markdown in the documentation,
+     * we do have to fix it manually.
+     * Note: multiline support might get added in an upcoming version of the
+     * OpenAPI parser (see https://github.com/doctrine/annotations/pull/75).
+     *
+     * @todo    Drop this method as soon as the OpenAPI parser does support
+     *          multilines.
+     * @param   string $doc The API documentation to fix.
+     * @return  string  The fixed string.
+     */
+    protected function fixMultilineDoc($doc) {
+        $formattedDoc = preg_replace('/\\\\n\s+\*\s/', '\\\\n', $doc);
+
+        // verify that the replacement did work
+        if ($formattedDoc === null) {
+            return $doc;
+        }
+        return $formattedDoc;
     }
 }
 

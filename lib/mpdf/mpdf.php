@@ -17197,8 +17197,8 @@ class mPDF
 		$use_h = $h;
 		$ratio = $actual_h / $use_w;
 
-		if ($overflow != 'hidden' && $overflow != 'visible') {
-			$target = $h / $w;
+		$target = $h / $w;
+		if ($target && $overflow != 'hidden' && $overflow != 'visible') {
 			if (($ratio / $target ) > 1) {
 				$nl = CEIL($actual_h / $this->lineheight);
 				$l = $use_w * $nl;

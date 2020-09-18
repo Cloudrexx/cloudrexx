@@ -30,7 +30,7 @@ namespace Cx\Core_Modules\Workbench\Controller;
 
 class SandboxException extends \Exception {}
 
-class Sandbox {
+class Sandbox extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     const MODE_DQL = 'dql';
     const MODE_PHP = 'php';
     protected $mode = self::MODE_DQL;
@@ -61,6 +61,8 @@ class Sandbox {
                 $this->code = 'return $em->getRepository(\'Cx\Core\ContentManager\Model\Entity\Node\')->verify();';
                 if (!empty($arguments['code'])) {
                     $this->code = contrexx_input2raw($arguments['code']);
+                } elseif (!empty($_SESSION['Workbench']['Sandbox']['code'])) {
+                    $this->code = contrexx_input2raw($_SESSION['Workbench']['Sandbox']['code']);
                 }
                 $this->result = '';
                 break;
@@ -78,7 +80,9 @@ class Sandbox {
                     }
                 );
                 try {
-                    $table = new \BackendTable($lister->getData());
+                    $table = new \BackendTable($lister->getData(
+                        \Cx\Core\Core\Controller\Cx::instanciate()->getRequest()->getParams()
+                    ));
                     $this->result = $table->toHtml().$lister;
                 } catch (\Exception $e) {
                     $this->result = 'Could not execute query (' . $e->getMessage() . ')!';
@@ -87,6 +91,17 @@ class Sandbox {
             case self::MODE_PHP:
                 $dbgMode = \DBG::getMode();
                 try {
+                    // remember inserted code in session
+                    if (!isset($_SESSION['Workbench'])) {
+                        $_SESSION['Workbench'] = array(
+                            'Sandbox' => array('code' => ''),
+                        );
+                    }
+                    if (!isset($_SESSION['Workbench']['Sandbox'])) {
+                        $_SESSION['Workbench']['Sandbox'] = array('code' => '');
+                    }
+                    $_SESSION['Workbench']['Sandbox']['code'] = $this->code;
+
                     // This error handler catches all Warnings and Notices and some Strict errors
                     \DBG::activate(DBG_PHP);
                     set_error_handler(array($this, 'phpErrorsAsExceptionsHandler'));

@@ -73,10 +73,10 @@ class Invite extends \Cx\Modules\Calendar\Model\Entity\Invite implements \Doctri
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'timestamp', 'inviteeType', 'inviteeId', 'email', 'token', 'registration', 'event', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'timestamp', 'inviteeType', 'inviteeId', 'email', 'token', 'registration', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'timestamp', 'inviteeType', 'inviteeId', 'email', 'token', 'registration', 'event', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'timestamp', 'inviteeType', 'inviteeId', 'email', 'token', 'registration', 'event', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -420,6 +420,17 @@ class Invite extends \Cx\Modules\Calendar\Model\Entity\Invite implements \Doctri
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -437,6 +448,17 @@ class Invite extends \Cx\Modules\Calendar\Model\Entity\Invite implements \Doctri
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**

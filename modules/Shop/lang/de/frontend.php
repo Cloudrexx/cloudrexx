@@ -530,3 +530,6 @@ $_ARRAYLANG['TXT_SHOP_PRODUCT_MULTIPLE_CART_STOCK_OUTOFF_ERROR'] = "Die Produkte
 $_ARRAYLANG['TXT_SHOP_CHOOSE_FILE'] = 'Datei wählen';
 $_ARRAYLANG['TXT_SHOP_REMOVE_FILE'] = 'Datei löschen';
 $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'] = 'Die Lieferung nach %s wird nicht angeboten. Bitte wählen Sie eine andere Lieferadresse.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_APPLIED_INFO'] = 'Das Restguthaben Ihres Gutscheins wurde soweit verfügbar auf die Versandkosten angerechnet.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_ENABLED_INFO'] = 'Das Guthaben Ihres Gutscheins ist aufgebraucht, und kann daher nicht auf die Versandkosten angewendet werden.';
+$_ARRAYLANG['TXT_MODULE_SHOP_SHIPMENT_DISCOUNT_DISABLED_INFO'] = 'Ein allfälliges Restguthaben Ihres Gutscheins kann nicht auf die Versandkosten angewendet werden.';

@@ -73,10 +73,10 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'required', 'order', 'affiliation', 'registrationFormFieldNames', 'registrationFormFieldValues', 'registrationForm', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'type', 'required', 'order', 'affiliation', 'registrationFormFieldNames', 'registrationFormFieldValues', 'registrationForm', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'required', 'order', 'affiliation', 'registrationFormFieldNames', 'registrationFormFieldValues', 'registrationForm', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'type', 'required', 'order', 'affiliation', 'registrationFormFieldNames', 'registrationFormFieldValues', 'registrationForm', 'validators', 'virtual', 'stringRepresentationFields', 'stringRepresentationFormat', 'stringRepresentationBlank');
     }
 
     /**
@@ -442,6 +442,17 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -459,6 +470,17 @@ class RegistrationFormField extends \Cx\Modules\Calendar\Model\Entity\Registrati
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTranslatedFieldValue($fieldName)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTranslatedFieldValue', array($fieldName));
+
+        return parent::getTranslatedFieldValue($fieldName);
     }
 
     /**
