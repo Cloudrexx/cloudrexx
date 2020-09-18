@@ -22,3 +22,9 @@ $_ARRAYLANG['TXT_CORE_HTML_CANT_UPDATE_STATUS'] = 'Status konnte nicht aktualisi
 $_ARRAYLANG['TXT_CORE_HTML_EXPORT'] = 'Mit aktuellem Filter zu CSV exportieren';
 $_ARRAYLANG['TXT_CORE_HTML_NEW_BUTTON_MOVED'] = 'Mit dieser Funktion können Sie neue Einträge hinzufügen.';
 $_ARRAYLANG['TXT_CORE_HTML_ENTRIES'] = 'Einträge';
+
+// Twin Select
+$_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_ADD_ENTRY'] = 'Zuweisen';
+$_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_REMOVE_ENTRY'] = 'Entfernen';
+$_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_SELECT_ALL'] = 'Alle auswählen';
+$_ARRAYLANG['TXT_CORE_HTML_MULTI_SELECT_DESELECT_ALL'] = 'Alle entfernen';
