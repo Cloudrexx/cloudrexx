@@ -56,6 +56,7 @@ $_CONFIG['recaptchaSiteKey']                    = "";
 $_CONFIG['recaptchaSecretKey']                  = "";
 $_CONFIG['allowClientsideScriptUpload']         = "nobody";
 $_CONFIG['allowClientSideScriptUploadOnGroups'] = "";
+$_CONFIG['sessionBinding']                      = "on";
 
 /**
 * -------------------------------------------------------------------------
