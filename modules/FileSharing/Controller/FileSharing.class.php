@@ -194,15 +194,18 @@ class FileSharing extends FileSharingLib
         if ($objResult !== false && $objResult->RecordCount() > 0) {
             $fileName = $objResult->fields["file"];
             $filePath = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsitePath() . \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath() . $objResult->fields["source"];
-            if (!file_exists($filePath))
+            if (!file_exists($filePath)) {
                 throw new FileSharingException('file_not_found');
+            }
 
-            ob_end_clean();
-            header("Pragma: public");
-            header("Content-Type: application/octet-stream");
-            header("Content-Disposition: attachment; filename=\"" . $fileName . "\"");
-            readfile($filePath);
-            die();
+            $objHTTPDownload = new \HTTP_Download();
+            $objHTTPDownload->setFile($filePath);
+            $objHTTPDownload->setContentDisposition(
+                \HTTP_DOWNLOAD_ATTACHMENT,
+                str_replace('"', '\"', $fileName)
+            );
+            $objHTTPDownload->send();
+            exit;
         } else {
             throw new FileSharingException('file_not_found');
         }
