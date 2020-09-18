@@ -204,6 +204,8 @@ class FileSharing extends FileSharingLib
                 \HTTP_DOWNLOAD_ATTACHMENT,
                 str_replace('"', '\"', $fileName)
             );
+            $contentType = mime_content_type($filePath);
+            $objHTTPDownload->setContentType($contentType);
             $objHTTPDownload->send();
             exit;
         } else {
