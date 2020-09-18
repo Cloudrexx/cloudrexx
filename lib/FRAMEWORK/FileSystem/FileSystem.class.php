@@ -172,11 +172,15 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        if (self::$ftpAuth) return true;
-
-        if (!$_FTPCONFIG['is_activated']) return false;
-        if (!self::$connection)
+        if (self::$ftpAuth) {
+            return true;
+        }
+        if (!$_FTPCONFIG['is_activated']) {
+            return static::hasPhpWriteAccess();
+        }
+        if (!self::$connection) {
             self::$connection = ftp_connect($_FTPCONFIG['host']);
+        }
         if (self::$connection) {
             self::$ftpPath = $_FTPCONFIG['path'] . \Env::get('cx')->getCodeBaseOffsetPath();
             if (@ftp_login(
@@ -193,6 +197,37 @@ class FileSystem
         // Shut down FTP completely
         self::$connection = null;
         $_FTPCONFIG['is_activated'] = false;
+        return false;
+    }
+
+    /**
+     * Check if PHP has write access to this installations files
+     */
+    public static function hasPhpWriteAccess() {
+        // get the user-ID of the user who owns the loaded file
+        //
+        // note: we should be checking any of the MediaSources to be
+        // absolute sure of the user-ID
+        $fileOwnerUserId = fileowner(__FILE__);
+        if (!$fileOwnerUserId) {
+            return false;
+        }
+
+        // get the user-ID of the user running the PHP-instance
+        if (function_exists('posix_getuid')) {
+            $phpUserId = posix_getuid();
+        } else {
+            $phpUserId = getmyuid();
+        }
+
+        // check if the file we're going to work with is owned by the PHP user
+        if ($fileOwnerUserId == $phpUserId) {
+            return true;
+        }
+
+        // as the user-ID of the PHP process is not the same as the owner
+        // of this script, we can assume that PHP will most likely
+        // not have write access when required
         return false;
     }
 
