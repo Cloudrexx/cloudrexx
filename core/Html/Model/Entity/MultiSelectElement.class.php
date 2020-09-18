@@ -77,11 +77,48 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     protected $notAssociatedName;
 
     /**
+     * Title of the associated select
+     *
+     * @var string
+     */
+    protected $associatedTitle;
+
+    /**
+     * Title of the not associated select
+     *
+     * @var string
+     */
+    protected $notAssociatedTitle;
+
+    /**
+     * Values of the associated select
+     *
+     * @var array
+     */
+    protected $associatedValues;
+
+    /**
+     * Values of the not associated select
+     *
+     * @var array
+     */
+    protected $notAssociatedValues;
+
+    /**
      * Delimiter with which parents and child elements are separated
      *
      * @var string
      */
     protected $delimiter = '\\';
+
+    /**
+     * Activate the "chosen" element. If the number of possible and selected values is less than or equal to a defined
+     * value (this can be changed in the Global Configuration), the "chosen" element is displayed, otherwise both
+     * selects are displayed.
+     *
+     * @var bool
+     */
+    protected $enableChosen = true;
 
     /**
      * The scope of all registered MultiSelectElements
@@ -118,31 +155,58 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $options,
         $selectedOptions,
         $form,
+        $enableChosen = true,
         $validator = null
     ) {
-        //get the language interface text
-        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
-        $langData = \Env::get('init')->getComponentSpecificLanguageData('Html', $frontend);
-
         $this->wrapperName = $wrapperName;
         $this->form = $form;
         $this->associatedName = $associatedName;
         $this->notAssociatedName = $notAssociatedName;
+        $this->associatedTitle = $associatedTitle;
+        $this->notAssociatedTitle = $notAssociatedTitle;
+        $this->validator = $validator;
+        $this->options = $options;
+        $this->enableChosen = $enableChosen;
 
-        parent::__construct($wrapperName, '', 'div');
-        $this->setAttribute('id', $wrapperName);
+        parent::__construct($this->wrapperName, '', 'div');
+        $this->setAttribute('id', $this->wrapperName);
         $this->addClass('multi-select');
 
         // Split options in associated and not associated
-        $associatedValues = array();
-        $notAssociatedValues = array();
         foreach ($options as $key => $value) {
             if (in_array($key, $selectedOptions)) {
-                $associatedValues[$key] = $value;
+                $this->associatedValues[$key] = $value;
             } else {
-                $notAssociatedValues[$key] = $value;
+                $this->notAssociatedValues[$key] = $value;
             }
         }
+
+        if (
+            $this->enableChosen &&
+            count($options) <= \Cx\Core\Setting\Controller\Setting::getValue('coreSimpleSelectLimit')
+        ) {
+            $this->initChosen();
+        } else {
+            $this->enableChosen = false;
+            $this->initMultiSelect();
+        }
+    }
+
+    public function initChosen()
+    {
+        $select = $this->getSelect(
+            $this->associatedName, $this->options, $this->associatedValues
+        );
+        $select->addClass('chzn-select');
+        $select->setAttribute('data-placeholder', $this->associatedTitle);
+        $this->addChild($select);
+    }
+
+    public function initMultiSelect()
+    {
+        //get the language interface text
+        $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Html', $frontend);
 
         // Associated and not associated Wrapper
         $associatedWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
@@ -152,10 +216,10 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
 
         // Selects
         $associatedSelector = $this->getSelect(
-            $associatedName, $associatedValues, $validator
+            $this->associatedName, $this->associatedValues, $this->validator
         );
         $notAssociatedSelector = $this->getSelect(
-            $notAssociatedName, $notAssociatedValues, $validator
+            $this->notAssociatedName, $this->notAssociatedValues, $this->validator
         );
 
         // Buttons
@@ -205,11 +269,11 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
         $notAssociatedLinkWrapper->addClass('multi-select-not-associated');
 
         // Add titles for select elements
-        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($associatedTitle);
+        $associatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($this->associatedTitle);
         $associatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
         $associatedTitleSpan->addChild($associatedTitleElement);
 
-        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($notAssociatedTitle);
+        $notAssociatedTitleElement = new \Cx\Core\Html\Model\Entity\TextElement($this->notAssociatedTitle);
         $notAssociatedTitleSpan = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
         $notAssociatedTitleSpan->addChild($notAssociatedTitleElement);
 
@@ -255,17 +319,17 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
      *
      * @param string $name   name of the select element
      * @param array  $values values for select
-     * @param \Cx\Core\Validate\Model\Entity\Validator $validator to validate
+     * @param array  $selectedValues the selected values
      *
      * @return DataElement
      */
-    protected function getSelect($name, $values, $validator)
+    protected function getSelect($name, $values, $selectedValues = array())
     {
         $selector = new \Cx\Core\Html\Model\Entity\DataElement(
             $name .'[]',
             '',
             'select',
-            $validator,
+            $this->validator,
             $values
         );
         $selector->setAttribute('class', $name);
@@ -277,6 +341,12 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
                 'title',
                 $values[$child->getAttribute('value')]
             );
+            if (!empty($selectedValues[$child->getAttribute('value')])) {
+                $child->setAttribute(
+                    'selected',
+                    true
+                );
+            }
         }
 
         return $selector;
@@ -335,10 +405,18 @@ class MultiSelectElement extends \Cx\Core\Html\Model\Entity\DataElement
     {
         $scope = 'multi-select-' . $this->wrapperName;
         static::addScope($scope);
-        // load MultiSelectElement JavaScript code and CSS styles
+
         $directory = $this->getComponentController()->getDirectory(
             true, true
         );
+
+        if ($this->enableChosen) {
+            \JS::activate('chosen');
+            \JS::registerJS($directory . '/View/Script/ChosenElement.js');
+            return parent::render();
+        }
+
+        // load MultiSelectElement JavaScript code and CSS styles
         \JS::registerCSS($directory . '/View/Style/MultiSelectElement.css');
         \JS::registerJS($directory . '/View/Script/MultiSelectElement.js');
 
