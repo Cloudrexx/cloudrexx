@@ -115,8 +115,7 @@ class Newsletter extends NewsletterLib
             ? contrexx_input2raw($_GET['category']) : '';
         $categoryIds = array();
         if (!empty($categoryId)) {
-            $categoryIds = array_map(
-                'contrexx_raw2db',
+            $categoryIds = contrexx_input2int(
                 explode('/', urldecode($categoryId))
             );
         }
