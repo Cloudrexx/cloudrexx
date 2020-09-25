@@ -55,6 +55,22 @@ class Request {
     protected $httpRequestMethod;
 
     /**
+     * List of accepted request methods
+     *
+     * @var array
+     */
+    const ACCEPTED_REQUEST_METHODS = array(
+        'get',
+        'post',
+        'put',
+        'patch',
+        'update',
+        'delete',
+        'options',
+        'head',
+    );
+
+    /**
      * Resolved url object
      *
      * @var \Cx\Core\Routing\Url
@@ -88,7 +104,7 @@ class Request {
      * @param Object $resolvedUrl
      */
     public function __construct($method, \Cx\Core\Routing\Url $resolvedUrl, $headers = array()) {
-        $this->httpRequestMethod = strtolower($method);
+        $this->setHttpRequestMethod($method);
         $this->url = $resolvedUrl;
         $this->headers = $headers;
         $this->postData = contrexx_input2raw($_POST);
@@ -105,11 +121,21 @@ class Request {
     }
 
     /**
-     * Get the httpRequest method
+     * Set the httpRequest method
      * 
      * @param String $method
      */
     public function setHttpRequestMethod($method) {
+        // validate request method
+        $method = strtolower($method);
+        if (
+            !in_array(
+                $method,
+                static::ACCEPTED_REQUEST_METHODS
+            )
+        ) {
+            $method = 'none';
+        }
         $this->httpRequestMethod = $method;
     }
     
