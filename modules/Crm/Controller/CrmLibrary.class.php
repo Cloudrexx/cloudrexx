@@ -1402,7 +1402,7 @@ class CrmLibrary
         $alphaFilter = isset($filter['companyname_filter']) ? contrexx_input2raw($filter['companyname_filter']) : '';
 
         if (!empty($alphaFilter)) {
-            $where[] = " (c.customer_name LIKE '".contrexx_input2raw($alphaFilter)."%')";
+            $where[] = " (c.customer_name LIKE '".contrexx_raw2db($alphaFilter)."%')";
         }
 
         $searchContactTypeFilter = isset($filter['contactSearch']) ? (array) $filter['contactSearch'] : array(1,2);
