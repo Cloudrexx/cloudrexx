@@ -232,11 +232,17 @@ class UploaderController {
 
             // Write file or chunk to appropriate temp location
             if ($conf['chunks']) {
-                self::writeFileTo("$file_path.dir.part" . DIRECTORY_SEPARATOR . $conf['chunk']);
+                $chunkDir = $file_path . '.dir.part';
+                // ensure location for chunk files exists before adding chunks
+                // as writeFileTo() only accepts existing storage locations
+                if (!file_exists($chunkDir) && !@mkdir($chunkDir, 0777, true)) {
+                    throw new UploaderException(static::PLUPLOAD_TMPDIR_ERR);
+                }
+                self::writeFileTo($chunkDir . DIRECTORY_SEPARATOR . $conf['chunk']);
 
                 // Check if all chunks already uploaded
                 if ($conf['chunk'] == $conf['chunks'] - 1) {
-                    self::writeChunksToFile("$file_path.dir.part", $tmp_path);
+                    self::writeChunksToFile($chunkDir, $tmp_path);
                 }
             } else {
                 self::writeFileTo($tmp_path);
@@ -296,7 +302,15 @@ class UploaderController {
         }
 
         $base_dir = dirname($file_path);
-        if (!file_exists($base_dir) && !@mkdir($base_dir, 0777, true)) {
+        // deny operation in case we're trying to upload into a non-existing
+        // location. in case the location is non-existent, then this means that
+        // the upload-request must be evil as the location would exist if:
+        // - the upload has been pushed through GET. in that case the location
+        //   would have been created by JsonUploader::upload()
+        // - the upload has been pushed through POST. in that case the upload
+        //   in only allowed into an existing folder of an authorized
+        //   MediaSource
+        if (!file_exists($base_dir)) {
             throw new UploaderException(static::PLUPLOAD_TMPDIR_ERR);
         }
 

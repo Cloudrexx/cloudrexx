@@ -111,6 +111,11 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
             $session = $this->cx->getComponent('Session')->getSession();
             $path = $session->getTempPath() . '/'.$id.'/';
             $tmpPath = $path;
+            if (!file_exists($path) && !@mkdir($path, 0777, true)) {
+                throw new UploaderException(
+                    UploaderController::PLUPLOAD_TMPDIR_ERR
+                );
+            }
         } elseif (isset($params['post']['path'])) {
             // This case is deprecated and should not be used!
             \DBG::msg('Using deprecated upload case without upload ID!');
