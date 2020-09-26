@@ -543,7 +543,7 @@ class FileSystem
         $webPath = $this->checkWebPath($webPath);
         if ($oldDirName != $newDirName) {
             if (file_exists($path.$newDirName)) {
-                $newDirName = $newDirName;
+                return $status;
             }
             if ($_FTPCONFIG['is_activated']) {
                 if (ftp_rename(self::$connection, $_FTPCONFIG['path'].$webPath.$oldDirName, $_FTPCONFIG['path'].$webPath.$newDirName)) {
