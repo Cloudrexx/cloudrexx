@@ -246,6 +246,16 @@ class FileSystem
         $orgWebPath=$this->checkWebPath($orgWebPath);
         $newWebPath=$this->checkWebPath($newWebPath);
 
+        // verify operation is done within system's document root
+        if (
+            !$this->verifyPath($orgPath . $orgDirName) ||
+            !$this->verifyPath(dirname($newPath . $newDirName)) ||
+            // prevent infinit copy loop
+            strpos($newPath . $newDirName, $orgPath . $orgDirName) === 0
+        ) {
+            return 'error';
+        }
+
         if (file_exists($newPath.$newDirName) && !$ignoreExists) {
             $newDirName = $newDirName.'_'.time();
         }
@@ -271,6 +281,14 @@ class FileSystem
 
     function copyFile($orgPath, $orgFileName, $newPath, $newFileName, $ignoreExists = false)
     {
+        // verify operation is done within system's document root
+        if (
+            !$this->verifyPath($orgPath . $orgFileName) ||
+            !$this->verifyPath(dirname($newPath . $newFileName))
+        ) {
+            return 'error';
+        }
+
         if (file_exists($newPath.$newFileName)) {
             $info   = pathinfo($newFileName);
             $exte   = $info['extension'];
@@ -469,10 +487,19 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
+        $status = 'error';
+
+        // verify operation is done within system's document root
+        if (
+            !$this->verifyPath($path . $oldFileName) ||
+            !$this->verifyPath(dirname($path . $newFileName))
+        ) {
+            return $status;
+        }
+
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);
-        $status = 'error';
         if ($oldFileName != $newFileName) {
             if (file_exists($path.$newFileName)) {
                 $info   = pathinfo($newFileName);
@@ -501,10 +528,19 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
+        $status = 'error';
+
+        // verify operation is done within system's document root
+        if (
+            !$this->verifyPath($path . $oldDirName) ||
+            !$this->verifyPath(dirname($path . $newDirName))
+        ) {
+            return $status;
+        }
+
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);
-        $status = 'error';
         if ($oldDirName != $newDirName) {
             if (file_exists($path.$newDirName)) {
                 $newDirName = $newDirName;
@@ -522,6 +558,33 @@ class FileSystem
             $status = $oldDirName;
         }
         return $status;
+    }
+
+    /**
+     * verify that the path $path is located within the system's document root
+     *
+     * @param   string  $path   Path to verify
+     * @return  boolean TRUE if $path is located within the system's document
+                        root. Otherwise FALSE.
+     */
+    protected function verifyPath($path) {
+        $path = realpath($path);
+        $documentRoot = realpath(
+            \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteDocumentRootPath()
+        );
+        if (
+            $path === false ||
+            $documentRoot === false
+        ) {
+            return false;
+        }
+        if (
+            strpos($path, $documentRoot) !== 0
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
 
