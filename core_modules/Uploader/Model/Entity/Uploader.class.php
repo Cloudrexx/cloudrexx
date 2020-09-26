@@ -78,7 +78,7 @@ class Uploader extends EntityBase
     public function __construct($id = '') {
         $this->cx = Cx::instanciate();
         $this->getComponentController()->addUploader($this);
-        $this->getComponent('Session')->getSession();
+        $this->cx->getComponent('Session')->getSession();
         if (!isset($_SESSION['uploader'])) {
             $_SESSION['uploader'] = array();
         }
