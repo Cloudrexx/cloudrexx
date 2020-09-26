@@ -254,6 +254,13 @@ class MediaSourceManager extends EntityBase
      * @return array
      */
     public function getMediaTypePathsbyNameAndOffset($name, $offset) {
+        if (!isset($this->mediaTypePaths[$name][$offset])) {
+            throw new MediaSourceManagerException(
+                'No MediaSource found ' .
+                'by identifier "' . contrexx_raw2xhtml($name) . '" ' .
+                'and offset "' . contrexx_raw2xhtml($offset) . '"'
+            );
+        }
         return $this->mediaTypePaths[$name][$offset];
     }
 
