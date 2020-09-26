@@ -162,20 +162,23 @@ class UploaderController {
 
         self::$_error = null; // start fresh
 
-        $conf = self::$conf = array_merge(array(
-            'file_data_name' => 'file',
-            'tmp_dir' => $session->getTempPath(),
-            'target_dir' => $session->getTempPath(),
-            'cleanup' => true,
-            'max_file_age' => 5 * 3600,
-            'chunk' => isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0,
-            'chunks' => isset($_REQUEST['chunks']) ? intval($_REQUEST['chunks']) : 0,
-            'fileName' => isset($_REQUEST['name']) ? $_REQUEST['name'] : false,
-            'allow_extensions' => false,
-            'delay' => 0,
-            'cb_sanitizeFileName' => array(__CLASS__, 'sanitizeFileName'),
-            'cb_check_file' => false,
-                ), $conf);
+        $conf = self::$conf = array_merge(
+            array(
+                'file_data_name' => 'file',
+                'tmp_dir' => $session->getTempPath(),
+                'target_dir' => $session->getTempPath(),
+                'cleanup' => true,
+                'max_file_age' => 5 * 3600,
+                'chunk' => isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0,
+                'chunks' => isset($_REQUEST['chunks']) ? intval($_REQUEST['chunks']) : 0,
+                'fileName' => isset($_REQUEST['name']) ? $_REQUEST['name'] : false,
+                'allow_extensions' => false,
+                'delay' => 0,
+                'cb_sanitizeFileName' => array(__CLASS__, 'sanitizeFileName'),
+                'cb_check_file' => false,
+            ),
+            $conf
+        );
         self::$conf['target_dir'] = realpath(self::$conf['target_dir']);
         $documentRoot = realpath($cx->getWebsiteDocumentRootPath());
         if (
