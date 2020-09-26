@@ -124,7 +124,17 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
             } else {
                 $path = current($params['mediaSource']->getDirectory());
             }
-            $path .= '/' . $path_part[1];
+            // verify that the target upload path is located in the
+            // MediaSource's filesystem
+            $mediaSourcePath = $path;
+            if (isset($path_part[1])) {
+                $path .= '/' . $path_part[1];
+            }
+            if (strpos(realpath($path), $mediaSourcePath) !== 0) {
+                throw new UploaderException(
+                    UploaderController::PLUPLOAD_SECURITY_ERR
+                );
+            }
             $session = $this->cx->getComponent('Session')->getSession();
             $tmpPath = $session->getTempPath();
         } else {
