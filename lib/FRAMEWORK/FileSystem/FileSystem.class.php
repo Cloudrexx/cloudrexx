@@ -251,7 +251,10 @@ class FileSystem
             !$this->verifyPath($orgPath . $orgDirName) ||
             !$this->verifyPath(dirname($newPath . $newDirName)) ||
             // prevent infinit copy loop
-            strpos($newPath . $newDirName, $orgPath . $orgDirName) === 0
+            (
+                strpos($newPath . $newDirName, $orgPath . $orgDirName) === 0 &&
+                substr($newPath . $newDirName, strlen($orgPath . $orgDirName), 1) === '/'
+            )
         ) {
             return 'error';
         }
