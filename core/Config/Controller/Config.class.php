@@ -1369,7 +1369,7 @@ class Config
             foreach($sectionValues as $sectionName => $sectionNameValue) {
                 $strBody .= sprintf("%-".$intMaxLen."s",'$_CONFIG[\''.$sectionName.'\']');
                 $strBody .= "= ";
-                $strBody .= (self::isANumber($sectionNameValue) ? $sectionNameValue : '"'.str_replace('"', '\"', $sectionNameValue).'"').";\n";
+                $strBody .= (self::isANumber($sectionNameValue) ? $sectionNameValue : "'" . str_replace("'", "\'", $sectionNameValue)."'").";\n";
             }
             $strBody .= "\n";
         }
