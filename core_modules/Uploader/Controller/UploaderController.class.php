@@ -176,6 +176,21 @@ class UploaderController {
             'cb_sanitizeFileName' => array(__CLASS__, 'sanitizeFileName'),
             'cb_check_file' => false,
                 ), $conf);
+        self::$conf['target_dir'] = realpath(self::$conf['target_dir']);
+        $documentRoot = realpath($cx->getWebsiteDocumentRootPath());
+        if (
+            self::$conf['target_dir'] === false ||
+            $documentRoot === false
+        ) {
+            throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
+        }
+        self::$conf['target_dir'] .= '/';
+        $documentRoot .= '/';
+        if (
+            strpos(self::$conf['target_dir'], $documentRoot) !== 0
+        ) {
+            throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
+        }
 
         try {
             if (!$conf['fileName']) {
