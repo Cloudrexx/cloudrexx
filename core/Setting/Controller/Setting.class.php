@@ -991,15 +991,29 @@ class Setting{
                         }
                         break;
                     case self::TYPE_CHECKBOX:
+                        $value = 1;
                         break;
+
                     case self::TYPE_DROPDOWN_MULTISELECT:
                         $value = array_flip($value);
+                        // intentionally no break
                     case self::TYPE_CHECKBOXGROUP:
                         $value = (is_array($value)
                             ? join(',', array_keys($value))
                             : $value);
+                        // intentionally no break
+                    case self::TYPE_DROPDOWN:
                     case self::TYPE_RADIO:
+                        if (
+                            !static::isValidInputFromSelection(
+                                explode(',', $value),
+                                $arrSettings[$name]['values']
+                            )
+                        ) {
+                            continue 2;
+                        }
                         break;
+
                   case self::TYPE_IMAGE:
                         $cx      = \Cx\Core\Core\Controller\Cx::instanciate();
                         $filePath = $cx->getWebsiteDocumentRootPath() . '/' . $value;
