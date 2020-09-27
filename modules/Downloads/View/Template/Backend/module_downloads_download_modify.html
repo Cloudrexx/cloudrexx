@@ -4,7 +4,6 @@
 var autoFileNaming = cx.variables.get('autoFileNaming', 'downloads');
 function downloadsSelectAll()
 {
-    downloadsSelectAllGroups(document.getElementById('downloads_download_associated_categories'))
     downloadsSelectAllGroups(document.getElementById('downloads_download_associated_downloads'))
     downloadsSelectAllGroups(document.getElementById('downloads_download_access_associated_groups'))
 }
@@ -485,6 +484,12 @@ window.onload = function () {
 // ]]>
 </script>
 
+<style>
+    .twin-select {
+        width: calc( 100% - 36px );
+    }
+</style>
+
 <form name="downloads_download_form" id="downloads_download_form" action="index.php?cmd=Downloads&amp;act=download&amp;id={DOWNLOADS_DOWNLOAD_ID}&amp;parent_id={DOWNLOADS_PARENT_CATEGORY_ID}&amp;category_sort={DOWNLOADS_DOWNLOAD_CATEGORY_SORT}&amp;category_by={DOWNLOADS_DOWNLOAD_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_DOWNLOAD_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_DOWNLOAD_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_DOWNLOAD_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_DOWNLOAD_DOWNLOAD_OFFSET}" onsubmit="downloadsSelectAll()" method="post">
     <table width="100%" class="adminlist downloads_download_language">
         <tr>
@@ -514,7 +519,7 @@ window.onload = function () {
         <li><a id="downloadsTab_downloadGeneral" class="active" href="javascript:void(0)" onclick="selectTab('downloadGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
         <li><a id="downloadsTab_downloadAdditionalOptions" href="javascript:void(0)" onclick="selectTab('downloadAdditionalOptions')" title="{TXT_DOWNLOADS_ADDITIONAL_OPTIONS}">{TXT_DOWNLOADS_ADDITIONAL_OPTIONS}</a></li>
         <li><a id="downloadsTab_downloadPicture" href="javascript:void(0)" onclick="selectTab('downloadPicture')" title="{TXT_DOWNLOADS_IMAGE}">{TXT_DOWNLOADS_IMAGE}</a></li>
-        <li><a id="downloadsTab_downloadCategories" href="javascript:void(0)" onclick="selectTab('downloadCategories')" title="{TXT_DOWNLOADS_CATEGORIES}">{TXT_DOWNLOADS_CATEGORIES}</a></li>
+        <li><a id="downloadsTab_downloadCategories" href="javascript:void(0)" onclick="selectTab('downloadCategories'); resizeMultiSelectElements()" title="{TXT_DOWNLOADS_CATEGORIES}">{TXT_DOWNLOADS_CATEGORIES}</a></li>
         <li><a id="downloadsTab_downloadRelatedDownloads" href="javascript:void(0)" onclick="selectTab('downloadRelatedDownloads')" title="{TXT_DOWNLOADS_RELATED_DOWNLOADS}">{TXT_DOWNLOADS_RELATED_DOWNLOADS}</a></li>
         <li><a id="downloadsTab_downloadPermissions" href="javascript:void(0)" onclick="selectTab('downloadPermissions')" title="{TXT_DOWNLOADS_PERMISSIONS}">{TXT_DOWNLOADS_PERMISSIONS}</a></li>
     </ul>
@@ -715,33 +720,12 @@ window.onload = function () {
             <tbody style="vertical-align:top;">
                 <tr class="row2">
                     <td>
-                        <table cellspacing="0" cellpadding="3" border="0" summary="user group assignements">
+                        <table cellspacing="0" cellpadding="3" border="0" summary="user group assignements" width="100%">
                             <tbody style="vertical-align:top;">
                                 <tr>
-                                    <td width="300" style="border-bottom:0px;">{TXT_DOWNLOADS_AVAILABLE_CATEGORIES}<br />
-                                        <select name="downloads_download_not_associated_categories[]" id="downloads_download_not_associated_categories" size="15" style="min-width:300px;" multiple="multiple">
-                                        {DOWNLOADS_DOWNLOAD_NOT_ASSOCIATED_CATEGORIES}
-                                        </select>
-                                        <br />
-                                        <a href="javascript:void(0);" onclick="downloadsSelectAllOptions(document.getElementById('downloads_download_not_associated_categories'))" title="{TXT_DOWNLOADS_CHECK_ALL}">{TXT_DOWNLOADS_CHECK_ALL}</a>
-                                        <br />
-                                        <a href="javascript:void(0);" onclick="downloadsDeselectAllOptions(document.getElementById('downloads_download_not_associated_categories'))" title="{TXT_DOWNLOADS_UNCHECK_ALL}">{TXT_DOWNLOADS_UNCHECK_ALL}</a>
+                                    <td style="border-bottom:0px;">
+                                        {DOWNLOADS_DOWNLOAD_CATEGORIES_MULTISELECT}
                                     </td>
-                                    <td width="45" style="border-bottom:0px; text-align:center;">
-                                        <br />
-                                        <input type="button" value="&gt;&gt;" name="addOption" onclick="downloadsAddOptionToList(document.getElementById('downloads_download_not_associated_categories'), document.getElementById('downloads_download_associated_categories'))" style="margin-bottom:2px;" />
-                                        <br />
-                                        <input type="button" value="&lt;&lt;" name="removeOption" onclick="downloadsRemoveOptionFromList(document.getElementById('downloads_download_not_associated_categories'), document.getElementById('downloads_download_associated_categories'))" />
-                                    </td>
-                                   <td width="100%" style="border-bottom:0px;">{TXT_DOWNLOADS_ASSIGNED_CATEGORIES}<br />
-                                        <select name="downloads_download_associated_categories[]" id="downloads_download_associated_categories" size="15" style="min-width:300px;" multiple="multiple">
-                                        {DOWNLOADS_DOWNLOAD_ASSOCIATED_CATEGORIES}
-                                        </select>
-                                        <br />
-                                        <a href="javascript:void(0);" onclick="downloadsSelectAllOptions(document.getElementById('downloads_download_associated_categories'))" title="{TXT_DOWNLOADS_CHECK_ALL}">{TXT_DOWNLOADS_CHECK_ALL}</a>
-                                        <br />
-                                        <a href="javascript:void(0);" onclick="downloadsDeselectAllOptions(document.getElementById('downloads_download_associated_categories'))" title="{TXT_DOWNLOADS_UNCHECK_ALL}">{TXT_DOWNLOADS_UNCHECK_ALL}</a>
-                                     </td>
                                 </tr>
                            </tbody>
                         </table>

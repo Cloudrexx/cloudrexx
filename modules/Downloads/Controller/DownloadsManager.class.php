@@ -1661,20 +1661,21 @@ class DownloadsManager extends DownloadsLibrary
 
         // parse associated categories
         $arrCategories = $this->getParsedCategoryListForDownloadAssociation();
-        $arrAssociatedCategories = $objDownload->getAssociatedCategoryIds();
+        $arrAssociatedCategoryIds = $objDownload->getAssociatedCategoryIds();
+        $availableCategories = array();
         $length = count($arrCategories);
         for ($i = 0; $i < $length; $i++) {
             if (// managers are allowed to change the category association
                 \Permission::checkAccess(143, 'static', true)
                 // the download isn't associated with the category
-                || !in_array($arrCategories[$i]['id'], $arrAssociatedCategories) && (
+                || !in_array($arrCategories[$i]['id'], $arrAssociatedCategoryIds) && (
                     // everyone is allowed to associate new files with this category
                     !$arrCategories[$i]['add_files_access_id']
                     // only those who have the sufficent permissions are allowed to add new files to this category
                     || \Permission::checkAccess($arrCategories[$i]['add_files_access_id'], 'dynamic', true)
                 )
                 // the download is associated with the category
-                || in_array($arrCategories[$i]['id'], $arrAssociatedCategories) && (
+                || in_array($arrCategories[$i]['id'], $arrAssociatedCategoryIds) && (
                     // every body is allowd to delete file associations of this category
                     !$arrCategories[$i]['manage_files_access_id']
                     // only those with sufficent permissions are allowed to delete file associations of this category
@@ -1687,21 +1688,23 @@ class DownloadsManager extends DownloadsLibrary
             } else {
                 $disabled = true;
             }
-            $option = '<option value="'.$arrCategories[$i]['id'].'"'.($disabled ? ' disabled="disabled"' : '').'>'.htmlentities($arrCategories[$i]['name'], ENT_QUOTES, CONTREXX_CHARSET).'</option>';
 
-            if (   in_array($arrCategories[$i]['id'], $arrAssociatedCategories)
-                   // automatically assign a new download to the currently viewed category
-                || (!$objDownload->getId() && $arrCategories[$i]['id'] == $this->parentCategoryId)
-            ) {
-                $arrAssociatedCategoryOptions[] = $option;
-            } else {
-                $arrNotAssociatedCategoryOptions[] = $option;
-            }
+            $availableCategories[$arrCategories[$i]['id']] = $arrCategories[$i]['name'];
         }
 
+        $multiSelectCategories = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
+            'categories',
+            'downloads_download_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_ASSIGNED_CATEGORIES'],
+            'downloads_download_not_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_AVAILABLE_CATEGORIES'],
+            $availableCategories,
+            $arrAssociatedCategoryIds,
+            'downloads_download_form'
+        );
+
         $this->objTemplate->setVariable(array(
-            'DOWNLOADS_DOWNLOAD_ASSOCIATED_CATEGORIES'  => implode("\n", $arrAssociatedCategoryOptions),
-            'DOWNLOADS_DOWNLOAD_NOT_ASSOCIATED_CATEGORIES'  => implode("\n", $arrNotAssociatedCategoryOptions)
+            'DOWNLOADS_DOWNLOAD_CATEGORIES_MULTISELECT' => $multiSelectCategories->render(),
         ));
 
         // parse related downloads
