@@ -65,7 +65,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
     }
 
     /**
-     * @todo The param $readonly is non-standard
+     * @inheritdoc
      */
     public function getFileList($directory, $recursive = true, $readonly = false) {
         if (isset($this->fileListCache[$directory][$recursive][$readonly])) {
