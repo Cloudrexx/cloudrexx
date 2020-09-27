@@ -61,10 +61,23 @@ class ContactEventListener extends DefaultEventListener  {
     {
         global $_ARRAYLANG;
         \Env::get('init')->loadLanguageData('Contact');
-        $mediaType = new MediaSource('attach',$_ARRAYLANG['TXT_CONTACT_UPLOADS'],array(
-            $this->cx->getWebsiteImagesAttachPath(),
-            $this->cx->getWebsiteImagesAttachWebPath(),
-        ));
+        $mediaType = new MediaSource(
+            'attach',
+            $_ARRAYLANG['TXT_CONTACT_UPLOADS'],
+            array(
+                $this->cx->getWebsiteImagesAttachPath(),
+                $this->cx->getWebsiteImagesAttachWebPath(),
+            ),
+            array(
+                'read' => array(),
+                'write' => array(
+                    'any' => array(
+                        84, // Forms
+                        85, // Settings
+                    ),
+                ),
+            )
+        );
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
 }
