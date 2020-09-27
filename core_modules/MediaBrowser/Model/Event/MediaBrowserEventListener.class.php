@@ -53,10 +53,19 @@ class MediaBrowserEventListener extends DefaultEventListener
     ) {
         global $_ARRAYLANG;
         \Env::get('init')->loadLanguageData('MediaBrowser');
-        $mediaType = new MediaSource('files', $_ARRAYLANG['TXT_FILEBROWSER_FILES'], array(
-            $this->cx->getWebsiteImagesContentPath(),
-            $this->cx->getWebsiteImagesContentWebPath(),
-        ), array(), 1);
+        $mediaType = new MediaSource(
+            'files',
+            $_ARRAYLANG['TXT_FILEBROWSER_FILES'],
+            array(
+                $this->cx->getWebsiteImagesContentPath(),
+                $this->cx->getWebsiteImagesContentWebPath(),
+            ),
+            array(
+                'ready' => array(),
+                'write' => array(32),
+            ),
+            1
+        );
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
 }
