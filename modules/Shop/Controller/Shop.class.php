@@ -4425,6 +4425,20 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("Shop::process(): New User username ".$_SESSION['shop']['username'].", email ".$_SESSION['shop']['email']);
                 self::$objCustomer->username($_SESSION['shop']['username']);
                 self::$objCustomer->email($_SESSION['shop']['email']);
+                // disable user account if customer chooses not to create one
+                // or if the registration feature is disabled
+                if (
+                    !empty($_SESSION['shop']['dont_register']) ||
+                    \Cx\Core\Setting\Controller\Setting::getValue(
+                        'register',
+                        'Shop'
+                    ) == self::REGISTER_NONE
+                ) {
+                    self::$objCustomer->active(false);
+                    $_SESSION['shop']['password'] = '';
+                } else {
+                    self::$objCustomer->active(true);
+                }
                 // Note that the password is unset when the Customer chooses
                 // to order without registration.  The generated one
                 // defaults to length 8, fulfilling the requirements for
@@ -4438,7 +4452,6 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd(
                         'Shop', 'account'));
                 }
-                self::$objCustomer->active(empty($_SESSION['shop']['dont_register']));
                 $new_customer = true;
             }
         }
