@@ -120,11 +120,16 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
             // This case is deprecated and should not be used!
             \DBG::msg('Using deprecated upload case without upload ID!');
             $path_part = explode('/', $params['post']['path'], 2);
+            // check if call was made through DataAccess (which will resolve
+            // permissions and then set $params['mediaSource'])
             if (!isset($params['mediaSource'])) {
+                // as the request was made through post, we have to ensure that
+                // the user who made the request has at write permissions
                 $mediaSourceManager = $this->cx->getMediaSourceManager();
                 $path = $mediaSourceManager->getMediaTypePathsbyNameAndOffset(
                     $path_part[0],
-                    0
+                    0,
+                    'write'
                 );
             } else {
                 $path = current($params['mediaSource']->getDirectory());
