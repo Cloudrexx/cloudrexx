@@ -62,14 +62,11 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      * Folders of webdesign templates that are not installed, will
      * not be returned.
      *
-     * @param            $directory
-     * @param bool|false $recursive
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getFileList($directory, $recursive = true, $readonly = false)
     {
-        $filesList = $this->getFullFileList($directory, $recursive);
+        $filesList = $this->getFullFileList($directory, $recursive, $readonly);
 
         // filter out folders of non-used themes
         $themeRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
@@ -95,11 +92,12 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      *
      * @param   string  $directory Path to fetch the directories and files of
      * @param   boolean $recursive Whether or not to return any subdirectories
+     * @param   boolean $readonly  Set to TRUE to make all files and folders readonly
      *                             and files.
      *
      * @return array List of directories and files in $directory
      */
-    public function getFullFileList($directory, $recursive = true) {
+    public function getFullFileList($directory, $recursive = true, $readonly = false) {
         $fileList = array();
 
         // fetch files from additional file systems
@@ -111,7 +109,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
         }
 
         // fetch files form local file system
-        $websiteFileList = parent::getFileList($directory, $recursive);
+        $websiteFileList = parent::getFileList($directory, $recursive, $readonly);
         if (!empty($websiteFileList)) {
             $fileList = $this->mergeFileList($fileList, $websiteFileList);
         }
