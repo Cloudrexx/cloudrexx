@@ -138,6 +138,50 @@ class MediaSource extends DataSource {
 
     /**
      * Array with access ids to use with \Permission::checkAccess($id, 'static', true)
+     *
+     * Accepts various formats. Most basic is as follows:
+     * <code>array(
+     *     <id>[,<id>,...]
+     * )</code>
+     *
+     * This will set the access as follows:
+     * - for both, read and write access, the user must have access to every
+     *   listed id (as specified by <id>).
+     *
+     * Use the following format instead, to change the requirement of having
+     * access to all listed IDs, but instead only one of the listed IDs:
+     * <code>array(
+     * 	   'any' => array(
+     *         <id>[,<id>,...]
+     *     ),
+     * )</code>
+     *
+     * To set different read and write access permissions, do specify as
+     * follows:
+     * <code>array(
+     *     'read' => array(
+     *         <id>[,<id>,...]
+     *     ),
+     *     'write' => array(
+     *         <id>[,<id>,...]
+     *     ),
+     * )</code>
+     *
+     * Again, to make the user only require having access to one of the listed
+     * IDs, do specify as follows:
+     * <code>array(
+     *     'read' => array(
+     *         'any' => array(
+     *             <id>[,<id>,...]
+     *         ),
+     *     ),
+     *     'write' => array(
+     *         'any' => array(
+     *             <id>[,<id>,...]
+     *         ),
+     *     ),
+     * )</code>
+     *
      * @var array
      */
     protected $accessIds = array();
@@ -213,7 +257,7 @@ class MediaSource extends DataSource {
     }
 
     /**
-     * @param array $accessIds
+     * @param array $accessIds See DocBlock of {link $this->accessIds}
      */
     public function setAccessIds($accessIds)
     {
@@ -221,14 +265,62 @@ class MediaSource extends DataSource {
     }
 
     /**
+     * @param   string  $scope  Set to 'read' or 'write' to check for specific
+     *                          access permissions.
      * @return bool
      */
-    public function checkAccess(){
-        foreach ($this->accessIds as $id){
-            if (!\Permission::checkAccess($id, 'static', true)){
+    public function checkAccess($scope = 'read'){
+        // fetch set access IDs on MediaSource
+        if (
+            !empty($scope) &&
+            isset($this->accessIds[$scope])
+        ) {
+            $accessIds = $this->accessIds[$scope];
+        } else {
+            $accessIds = $this->accessIds;
+        }
+
+        // check if the user must have permission to all access IDs
+        $requiresAll = true;
+        $modifier = 'all';
+        if (is_array(current($accessIds))) {
+            $modifier = current(array_keys($accessIds));
+            $accessIds = current($accessIds);
+        }
+        if ($modifier == 'any') {
+            $requiresAll = false;
+        }
+
+        // finally, perform access check
+        foreach ($accessIds as $id){
+            // in case the user requires having access to only one access ID,
+            // then we can stop now
+            if (
+                \Permission::checkAccess($id, 'static', true) &&
+                !$requiresAll
+            ) {
+                return true;
+            }
+
+            // in case the user requires having access to all specified access
+            // IDs, then we have to abort here in case the user is missing
+            // access to any IDs
+            if (
+                !\Permission::checkAccess($id, 'static', true) &&
+                $requiresAll
+            ) {
                 return false;
             }
         }
+
+        // in case the user only requires access to one access ID, but this
+        // line of code is reached, then this means that the user did not
+        // have access to any of the specified access IDs. Therefore, the
+        // user does not have access permission to this MediaSource.
+        if (!$requiresAll) {
+            return false;
+        }
+
         return true;
     }
 
