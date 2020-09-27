@@ -344,7 +344,9 @@ class Shop extends ShopLibrary
                 $objPaypal->ipnCheck();
                 exit;
             case 'sendpass':
-                self::view_sendpass();
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd('Login', 'lostpw')
+                );
                 break;
             case 'changepass';
                 self::_changepass();
@@ -3395,7 +3397,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'))))
                 || \Message::error(sprintf(
                 $_ARRAYLANG['TXT_SHOP_GOTO_SENDPASS'],
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'sendpass')));
+                \Cx\Core\Routing\Url::fromModuleAndCmd('Login', 'lostpw')));
             }
             \Message::restore();
         }
@@ -5001,40 +5003,6 @@ die("Shop::processRedirect(): This method is obsolete!");
         );
         return \Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate);
     }
-
-
-    /**
-     * Shows the form for entering the e-mail address
-     *
-     * After a valid address has been posted back, creates a new password
-     * and sends it to the Customer.
-     * Fails if changing or sending the password fails, and when the
-     * form isn't posted (i.e. on first loading the page).
-     * Returns true only after the new password has been sent successfully.
-     * @return    boolean                   True on success, false otherwise
-     */
-    static function view_sendpass()
-    {
-        global $_ARRAYLANG;
-
-        while (isset($_POST['shopEmail'])) {
-            $email = contrexx_input2raw($_POST['shopEmail']);
-            $password = \User::make_password();
-            if (!Customer::updatePassword($email, $password)) {
-                \Message::error($_ARRAYLANG['TXT_SHOP_UNABLE_SET_NEW_PASSWORD']);
-                break;
-            }
-            if (!self::sendLogin($email, $password)) {
-                \Message::error($_ARRAYLANG['TXT_SHOP_UNABLE_TO_SEND_EMAIL']);
-                break;
-            }
-            return \Message::ok($_ARRAYLANG['TXT_SHOP_ACCOUNT_DETAILS_SENT_SUCCESSFULLY']);
-        }
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-        self::$objTemplate->touchBlock('shop_sendpass');
-        return false;
-    }
-
 
     /**
      * Show the total pending order and the resulting discount amount.
