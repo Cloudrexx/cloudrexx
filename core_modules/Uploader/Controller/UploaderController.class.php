@@ -162,11 +162,31 @@ class UploaderController {
 
         self::$_error = null; // start fresh
 
+        // verify target location
+        if (isset($conf['target_dir'])) {
+            $conf['target_dir'] = realpath($conf['target_dir']);
+            $documentRoot = realpath($cx->getWebsiteDocumentRootPath());
+            if (
+                $conf['target_dir'] === false ||
+                $documentRoot === false
+            ) {
+                throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
+            }
+            $conf['target_dir'] .= '/';
+            $documentRoot .= '/';
+            if (
+                strpos($conf['target_dir'], $documentRoot) !== 0
+            ) {
+                throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
+            }
+        }
+
+        // init config
         $conf = self::$conf = array_merge(
             array(
                 'file_data_name' => 'file',
                 'tmp_dir' => $session->getTempPath(),
-                'target_dir' => $session->getTempPath(),
+                'target_dir' => $session->getTempPath() . '/',
                 'cleanup' => true,
                 'max_file_age' => 5 * 3600,
                 'chunk' => isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0,
@@ -179,22 +199,8 @@ class UploaderController {
             ),
             $conf
         );
-        self::$conf['target_dir'] = realpath(self::$conf['target_dir']);
-        $documentRoot = realpath($cx->getWebsiteDocumentRootPath());
-        if (
-            self::$conf['target_dir'] === false ||
-            $documentRoot === false
-        ) {
-            throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
-        }
-        self::$conf['target_dir'] .= '/';
-        $documentRoot .= '/';
-        if (
-            strpos(self::$conf['target_dir'], $documentRoot) !== 0
-        ) {
-            throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
-        }
 
+        // process upload
         try {
             if (!$conf['fileName']) {
                 if (!empty($_FILES)) {
