@@ -170,7 +170,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $page->setModule($this->getName());
 
             // restrict search result to specific branch 
-            $page->setCmd('[[NODE_' . intval($arguments['nodeId']) . ']]');
+            try {
+                $nodePlaceholder = \Cx\Core\Routing\NodePlaceholder::fromPlaceholder(
+                    $arguments['nodeId']
+                );
+                $page->setCmd($nodePlaceholder->getPlaceholder());
+            } catch (\Cx\Core\Routing\NodePlaceholderException $e) {
+                $page->setCmd('[[NODE_' . intval($arguments['nodeId']) . ']]');
+            }
         }
 
         $term               = isset($arguments['term']) ? contrexx_input2raw($arguments['term']) : '';
