@@ -53,11 +53,22 @@ class ViewManagerEventListener extends DefaultEventListener
     {
         global $_ARRAYLANG;
         $mediaType = new MediaSource(
-            'themes', $_ARRAYLANG['TXT_THEME_THEMES'],
+            'themes',
+            $_ARRAYLANG['TXT_THEME_THEMES'],
             array(
                 $this->cx->getWebsiteThemesPath(),
                 $this->cx->getWebsiteThemesWebPath(),
-            ), array(), '',
+            ),
+            array(
+                'read' => array(),
+                'write' => array(
+                    'any' => array(
+                        47, // Manage themes
+                        102, // Import/Export of themes
+                    ),
+                ),
+            ),
+            '',
             new ViewManagerFileSystem($this->cx->getWebsiteThemesPath())
         );
         $mediaSourceManager->addMediaType($mediaType);

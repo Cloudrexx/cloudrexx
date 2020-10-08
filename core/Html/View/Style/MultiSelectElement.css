@@ -1,0 +1,48 @@
+.multi-select select {
+    min-width: 300px;
+}
+.multi-select .control-links a {
+    display: block;
+}
+.multi-select .multi-select-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
+}
+.multi-select .control-buttons {
+    padding: 22px 10px;
+}
+.multi-select .control-buttons button {
+    display: block;
+    min-width: 100px;
+}
+.multi-select .control-buttons .removeBtn {
+    margin-top: 5px;
+}
+.multi-select.wide > .multi-select-wrapper {
+    display: block;
+}
+.multi-select {
+    width: 100%;
+}
+.multi-select.wide .control-buttons {
+    text-align: center;
+}
+.multi-select.wide select {
+    width: 100%;
+}
+.multi-select.wide .control-buttons button {
+    display: inline-block;
+}
+.multi-select.wide .control-links a {
+    display: inline-block;
+}
+.multi-select.wide .control-links a:first-child:after {
+    content: '|';
+    color: #444444;
+    margin: 0 5px;
+    pointer-events: none;
+}
+.multi-select span {
+    display: block;
+}

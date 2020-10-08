@@ -375,7 +375,7 @@ class Csrf {
             'TXT_CSRF_ABORT'    => $_CORELANG['TXT_CSRF_ABORT'],
             'CSRF_CONTINUE'     => $csrfContinue . '" tabindex="1',
             'CSRF_ABORT'        => $csrfAbort . '" tabindex="2',
-            'REQUEST_METHOD'    => strtolower($_SERVER['REQUEST_METHOD']),
+            'REQUEST_METHOD'    => $cx->getRequest()->getHttpRequestMethod(),
             'ACTION'            => $action,
             'FORM_ELEMENTS'     => $form,
             'IMAGES_PATH'       => ASCMS_ADMIN_WEB_PATH.'/images/csrfprotection',

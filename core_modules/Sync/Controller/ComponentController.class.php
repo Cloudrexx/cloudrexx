@@ -254,7 +254,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @todo update ID fields does not work as expected
      */
     public function sync($command, $arguments, $dataArguments) {
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
+        $method = $this->cx->getRequest()->getHttpRequestMethod();
         $apiVersion = array_shift($arguments); // shift api version
         
         if (!in_array($apiVersion, $this->supportedApiVersions)) {

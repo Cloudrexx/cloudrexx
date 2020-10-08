@@ -611,14 +611,9 @@ class Setting{
                         } 
                       });');
               case self::TYPE_DROPDOWN:
-                $matches   = null;
-                $arrValues = $arrSetting['values'];
-                if (preg_match('/^\{src:([a-z0-9_\\\:]+)\(\)\}$/i', $arrSetting['values'], $matches)) {
-                    $arrValues = call_user_func($matches[1]);
-                }
-                if (is_string($arrValues)) {
-                    $arrValues = self::splitValues($arrValues);
-                }
+                $arrValues = static::getValuesFromSelectionAsArray(
+                    $arrSetting['values']
+                );
                 $elementName   = $isMultiSelect ? $name.'[]' : $name;
                 $value         = $isMultiSelect ? self::splitValues($value) : $value;
                 $elementValue  = is_array($value) ? array_flip($value) : $value;
@@ -996,15 +991,29 @@ class Setting{
                         }
                         break;
                     case self::TYPE_CHECKBOX:
+                        $value = 1;
                         break;
+
                     case self::TYPE_DROPDOWN_MULTISELECT:
                         $value = array_flip($value);
+                        // intentionally no break
                     case self::TYPE_CHECKBOXGROUP:
                         $value = (is_array($value)
                             ? join(',', array_keys($value))
                             : $value);
+                        // intentionally no break
+                    case self::TYPE_DROPDOWN:
                     case self::TYPE_RADIO:
+                        if (
+                            !static::isValidInputFromSelection(
+                                explode(',', $value),
+                                $arrSettings[$name]['values']
+                            )
+                        ) {
+                            continue 2;
+                        }
                         break;
+
                   case self::TYPE_IMAGE:
                         $cx      = \Cx\Core\Core\Controller\Cx::instanciate();
                         $filePath = $cx->getWebsiteDocumentRootPath() . '/' . $value;
@@ -1104,6 +1113,52 @@ class Setting{
         }
         // There has been an error anyway
         return false;
+    }
+
+    /**
+     * Get selectable options as array from string definition
+     *
+     * @param   string  $selection  Definition of selectable options.
+     *                              Either as comma-separated list or in the
+     *                              for of '{src:/path/to/static/method}'
+     * @return  array   List of selectable options
+     */
+    protected static function getValuesFromSelectionAsArray($selection) {
+        $matches = null;
+        $values = $selection;
+        if (
+            preg_match(
+                '/^\{src:([a-z0-9_\\\:]+)\(\)\}$/i',
+                $selection,
+                $matches
+            )
+        ) {
+            $values = call_user_func($matches[1]);
+        }
+        if (is_string($values)) {
+            $values = self::splitValues($values);
+        }
+        return $values;
+    }
+
+    /**
+     * Verify that $input is a valid selection of $selection
+     *
+     * @param   mixed   $input  Either a string or an array of selected options
+     * @param   string  $selection  Definition of selections
+     * @return  boolean TRUE if $input is valid. Otherwise FALSE.
+     */
+    protected static function isValidInputFromSelection($input, $selection) {
+        $values = static::getValuesFromSelectionAsArray($selection);
+        if (!is_array($input)) {
+            $input = array($input);
+        }
+        foreach ($input as $value) {
+            if (!in_array($value, array_keys($values))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

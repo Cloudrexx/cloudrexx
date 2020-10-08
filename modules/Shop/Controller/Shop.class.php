@@ -344,7 +344,9 @@ class Shop extends ShopLibrary
                 $objPaypal->ipnCheck();
                 exit;
             case 'sendpass':
-                self::view_sendpass();
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd('Login', 'lostpw')
+                );
                 break;
             case 'changepass';
                 self::_changepass();
@@ -3395,7 +3397,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'))))
                 || \Message::error(sprintf(
                 $_ARRAYLANG['TXT_SHOP_GOTO_SENDPASS'],
-                \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'sendpass')));
+                \Cx\Core\Routing\Url::fromModuleAndCmd('Login', 'lostpw')));
             }
             \Message::restore();
         }
@@ -4423,6 +4425,20 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("Shop::process(): New User username ".$_SESSION['shop']['username'].", email ".$_SESSION['shop']['email']);
                 self::$objCustomer->username($_SESSION['shop']['username']);
                 self::$objCustomer->email($_SESSION['shop']['email']);
+                // disable user account if customer chooses not to create one
+                // or if the registration feature is disabled
+                if (
+                    !empty($_SESSION['shop']['dont_register']) ||
+                    \Cx\Core\Setting\Controller\Setting::getValue(
+                        'register',
+                        'Shop'
+                    ) == self::REGISTER_NONE
+                ) {
+                    self::$objCustomer->active(false);
+                    $_SESSION['shop']['password'] = '';
+                } else {
+                    self::$objCustomer->active(true);
+                }
                 // Note that the password is unset when the Customer chooses
                 // to order without registration.  The generated one
                 // defaults to length 8, fulfilling the requirements for
@@ -4436,7 +4452,6 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd(
                         'Shop', 'account'));
                 }
-                self::$objCustomer->active(empty($_SESSION['shop']['dont_register']));
                 $new_customer = true;
             }
         }
@@ -5001,40 +5016,6 @@ die("Shop::processRedirect(): This method is obsolete!");
         );
         return \Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate);
     }
-
-
-    /**
-     * Shows the form for entering the e-mail address
-     *
-     * After a valid address has been posted back, creates a new password
-     * and sends it to the Customer.
-     * Fails if changing or sending the password fails, and when the
-     * form isn't posted (i.e. on first loading the page).
-     * Returns true only after the new password has been sent successfully.
-     * @return    boolean                   True on success, false otherwise
-     */
-    static function view_sendpass()
-    {
-        global $_ARRAYLANG;
-
-        while (isset($_POST['shopEmail'])) {
-            $email = contrexx_input2raw($_POST['shopEmail']);
-            $password = \User::make_password();
-            if (!Customer::updatePassword($email, $password)) {
-                \Message::error($_ARRAYLANG['TXT_SHOP_UNABLE_SET_NEW_PASSWORD']);
-                break;
-            }
-            if (!self::sendLogin($email, $password)) {
-                \Message::error($_ARRAYLANG['TXT_SHOP_UNABLE_TO_SEND_EMAIL']);
-                break;
-            }
-            return \Message::ok($_ARRAYLANG['TXT_SHOP_ACCOUNT_DETAILS_SENT_SUCCESSFULLY']);
-        }
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-        self::$objTemplate->touchBlock('shop_sendpass');
-        return false;
-    }
-
 
     /**
      * Show the total pending order and the resulting discount amount.

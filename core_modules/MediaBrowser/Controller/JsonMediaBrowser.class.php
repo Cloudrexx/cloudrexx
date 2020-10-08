@@ -162,8 +162,15 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
             $recursive = $params['get']['recursive'];
         }
 
-        $mediaTypes = $this->cx->getMediaSourceManager()->getMediaTypes();
-        return $mediaTypes[$mediaType]->getFileSystem()->getFileList($filePath, $recursive);
+        $mediaSource = $this->cx->getMediaSourceManager()->getMediaType($mediaType);
+        if ($mediaSource->checkAccess('write')) {
+            $readonly = false;
+        } else {
+            $readonly = true;
+        }
+        $fileSystem = $mediaSource->getFileSystem();
+
+        return $fileSystem->getFileList($filePath, $recursive, $readonly);
     }
 
     /**
@@ -207,8 +214,15 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
             ? $params['get']['mediatype'] : 'files';
         $strPath = '/' . utf8_decode(join('/', $pathArray));
         $dir        = utf8_decode($params['post']['dir']) . '/';
+
+        $mediaSource = $this->cx->getMediaSourceManager()->getMediaType($mediaType);
+        if (!$mediaSource->checkAccess('write')) {
+            throw new \Exception('Permission denied');
+        }
+        $fileSystem = $mediaSource->getFileSystem();
+
         $this->setMessage(
-            $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem()->createDirectory(
+            $fileSystem->createDirectory(
                 $strPath, $dir
             )
         );
@@ -232,7 +246,11 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $pathArray = explode('/', $path);
         $strPath    = '/' . join('/', $pathArray);
 
-        $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
+        $mediaSource = $this->cx->getMediaSourceManager()->getMediaType($mediaType);
+        if (!$mediaSource->checkAccess('write')) {
+            throw new \Exception('Permission denied');
+        }
+        $fileSystem = $mediaSource->getFileSystem();
         $file = $fileSystem->getFileFromPath($strPath . $oldName);
 
         if (!$file) {
@@ -257,7 +275,11 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
             $pathArray = explode('/', $path);
             $strPath    = '/' . join('/', $pathArray);
 
-            $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
+            $mediaSource = $this->cx->getMediaSourceManager()->getMediaType($mediaType);
+            if (!$mediaSource->checkAccess('write')) {
+                throw new \Exception('Permission denied');
+            }
+            $fileSystem = $mediaSource->getFileSystem();
             $file = $fileSystem->getFileFromPath($strPath . $filename);
 
             if (!$file) {

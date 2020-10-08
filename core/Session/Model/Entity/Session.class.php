@@ -713,6 +713,16 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
             $this->userId = $objResult->fields['user_id'];
             $this->status = $objResult->fields['status'];
 
+            $sessionBinding = \Cx\Core\Setting\Controller\Setting::getValue(
+                'sessionBinding',
+                'Config'
+            );
+            // abort fingerprint verification of the client in case
+            // the related security option has been disabled
+            if ($sessionBinding === 'off') {
+                return '';
+            }
+
             // verify fingerprint of the client
             if ($objResult->fields['client_hash'] == $clientHash) {
                 return '';

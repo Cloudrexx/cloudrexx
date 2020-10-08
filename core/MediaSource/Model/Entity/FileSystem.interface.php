@@ -67,6 +67,7 @@ interface FileSystem {
      *         'hasPreview' => <has_preview>,
      *         'active' => <active>,
      *         'type' => <file_or_dir>,
+     *         'readonly' => <readonly>,
      *         'thumbnail' => array(
      *             <size> => <path>,
      *             ...
@@ -81,6 +82,7 @@ interface FileSystem {
      * <has_preview> is "1" if a preview is available, "" otherwise
      * <active> is used to highlight a file or folder to the user. Always set to false
      * <file_or_dir> is either "file" or "dir"
+     * <readonly> is "1" if the file or folder is readonly
      * <size> and <path> contain list all available thumbnail sizes
      * <nesting> is only set for directories and if $recursive is true. It
      *          contains the same structure again.
@@ -88,9 +90,10 @@ interface FileSystem {
      * @todo Sanitize files named "datainfo"
      * @param string $directory Path relative to this FS' root
      * @param boolean $recursive (optional) If set to false, recursion is skipped
+     * @param   boolean $readonly   Set to TRUE to make all files and folders readonly
      * @return array UTF8 encoded list of file names, see description
      */
-    public function getFileList($directory, $recursive = true);
+    public function getFileList($directory, $recursive = true, $readonly = false);
 
     /**
      * Removes the given file from the OS FS

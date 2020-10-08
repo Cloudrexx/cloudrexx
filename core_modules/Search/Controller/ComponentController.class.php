@@ -157,7 +157,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
         // limit the result to a content branch,
         // but only in case no restriction has already been set for the actual
-        // application
+        // application.
+        // this shall ensure that it is not possible to search throught the
+        // whole content, in case the search has been restricted to a subset
+        // of the content
         if (
             empty($page->getCmd()) &&
             !empty($arguments['nodeId'])
@@ -167,7 +170,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $page->setModule($this->getName());
 
             // restrict search result to specific branch 
-            $page->setCmd('[[NODE_' . intval($arguments['nodeId']) . ']]');
+            try {
+                $nodePlaceholder = \Cx\Core\Routing\NodePlaceholder::fromPlaceholder(
+                    $arguments['nodeId']
+                );
+                $page->setCmd($nodePlaceholder->getPlaceholder());
+            } catch (\Cx\Core\Routing\NodePlaceholderException $e) {
+                $page->setCmd('[[NODE_' . intval($arguments['nodeId']) . ']]');
+            }
         }
 
         $term               = isset($arguments['term']) ? contrexx_input2raw($arguments['term']) : '';

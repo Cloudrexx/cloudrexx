@@ -248,12 +248,52 @@ class MediaSourceManager extends EntityBase
     }
 
     /**
-     * @param $name
-     * @param $offset
+     * Get the path to the MediaSource's filesystem
      *
-     * @return array
+     * @param   string  $name   The identifier of the MediaSource
+     * @param   inteter $offset Set to one of:
+     *                          - 0: to return the absolute file system path to
+     *                               the MediaSource's filesystem
+     *                          - 1: to return the web path (relative to the
+     *                               document root) of the MeidaSource's
+     *                               filesystem
+     * @param   string  $scope  Set to one of:
+     *                          - read: verify read access permission
+     *                          - write: verify write access permission
+     *
+     * @return  string  The path to the MediaSource's filesystem. Either
+     *                  absoute (on the system's filesystem) or relativ to the
+     *                  document root, depending on the argument $offset.
+     * @todo    The naming of this method is misleading as it does not return
+     *          multiple paths as the method name woudl suggest.
      */
-    public function getMediaTypePathsbyNameAndOffset($name, $offset) {
+    public function getMediaTypePathsbyNameAndOffset($name, $offset, $scope = 'read') {
+        // check for availability of MediaSource
+        if (!isset($this->mediaTypePaths[$name][$offset])) {
+            throw new MediaSourceManagerException(
+                'No MediaSource found ' .
+                'by identifier "' . contrexx_raw2xhtml($name) . '" ' .
+                'and offset "' . contrexx_raw2xhtml($offset) . '"'
+            );
+        }
+
+        // verify access permission
+        // note: read access has already been check on instanciation of the
+        // MediaSourceManager. Therefore, the read access check is
+        // theoretically obsolete here. However, for easier code flow, we
+        // simply check every $scope here.
+        $mediaSource = $this->getMediaType($name);
+        if (!$mediaSource->checkAccess($scope)) {
+            throw new MediaSourceManagerException(
+                sprintf(
+                    'MediaSource %s is not available in scope "%s"',
+                    $name,
+                    $scope
+                )
+            );
+        }
+
+        // return the path to the MediaSource's filesystem
         return $this->mediaTypePaths[$name][$offset];
     }
 

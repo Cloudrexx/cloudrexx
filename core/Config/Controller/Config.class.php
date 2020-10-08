@@ -247,6 +247,10 @@ class Config
                     'value' => '',
                     'values' => '{src:\\' . __CLASS__ . '::getUserGroups()}',
                 ),
+                'sessionBinding' => array(
+                    'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
+                    'value' => 'on',
+                ),
             ),
             'contactInformation' => array(
                 'coreAdminName' => array(
@@ -295,6 +299,9 @@ class Config
                     'componentDependencies' => array('SystemInfo'),
                 ),
                 'corePagingLimit' => array(
+                    'value' => '30',
+                ),
+                'coreSimpleSelectLimit' => array(
                     'value' => '30',
                 ),
                 'searchDescriptionLength' => array(
@@ -1362,7 +1369,7 @@ class Config
             foreach($sectionValues as $sectionName => $sectionNameValue) {
                 $strBody .= sprintf("%-".$intMaxLen."s",'$_CONFIG[\''.$sectionName.'\']');
                 $strBody .= "= ";
-                $strBody .= (self::isANumber($sectionNameValue) ? $sectionNameValue : '"'.str_replace('"', '\"', $sectionNameValue).'"').";\n";
+                $strBody .= (self::isANumber($sectionNameValue) ? $sectionNameValue : "'" . str_replace("'", "\'", $sectionNameValue)."'").";\n";
             }
             $strBody .= "\n";
         }
