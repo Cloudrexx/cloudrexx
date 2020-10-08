@@ -949,10 +949,65 @@ class ViewGenerator {
      * @see getEntryId() for a description of VG-style variable format
      * @param string $param VG-style param
      * @return array|string The relevant contents of the supplied parameter
+     * @deprecated  Use getVgParamAsString() or getVgParamAsArray() instead
      */
     protected function getVgParam($param) {
         return static::getParam($this->viewId, $param);
     }
+
+    /**
+     * Extract the value for this VG instance from a combined VG-style
+     * variable of type string. The VG-style variable must have been generated
+     * with ViewGenerator::appendVgParam().
+     *
+     * @see getParam() for a description of VG-style variable format
+     * @param string $param VG-style param
+     * @return string The relevant contents of the supplied parameter
+     */
+    protected function getVgParamAsString($param) {
+        if (empty($param)) {
+            return '';
+        }
+        $data = static::getParam($this->viewId, $param);
+        if (empty($data)) {
+            return '';
+        }
+
+        // return empty string in case the param has been
+        // processed as array
+        if (is_array($data)) {
+            return '';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Extract the values for this VG instance from a combined VG-style
+     * variable of type array. The VG-style variable must have been generated
+     * with ViewGenerator::appendVgParam().
+     *
+     * @see getParam() for a description of VG-style variable format
+     * @param string $param VG-style param
+     * @return array The relevant contents of the supplied parameter
+     */
+    protected function getVgParamAsArray($param) {
+        if (empty($param)) {
+            return array();
+        }
+        $data = static::getParam($this->viewId, $param);
+        if (empty($data)) {
+            return array();
+        }
+
+        // return empty array in case the param has not been
+        // processed as array
+        if (!is_array($data)) {
+            return array();
+        }
+
+        return $data;
+	}
 
     /**
      * Extracts values for a VG instance from a combined VG-style variable
