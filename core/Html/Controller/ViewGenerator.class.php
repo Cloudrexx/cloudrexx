@@ -962,29 +962,75 @@ class ViewGenerator {
      * @return array|string The relevant contents of the supplied parameter
      */
     public static function getParam($vgId, $param) {
+        // Format of $param: {<param>},{<param>},..
+        //
+        // <param>  A ViewGenerator specific parameter. The format is as
+        //          follows: <id>,<data>
+        //
+        //          <id>    ID of ViewGenerator instance
+        //          <data>  Supplied data, either as simple value or as
+        //                  key-value pair:
+        //                  - val
+        //                  - arg=val
+        //
+        // Examples:
+        //
+        // Paging position set to 30 for ViewGenerator instance #0 set through
+        // argument 'pos': {0,30}
+        //
+        // Search filter for ViewGenerator instance #0 set to firstname=John
+        // and lastname=Smith as well as filter for ViewGenerator instance #1
+        // set to name=foo: {0,firstname=John},{0,lastname=Smith},{1,name=foo}
+        //
         $inner = preg_replace('/^(?:{|%7B)(.*)(?:}|%7D)$/', '\1', $param);
+        // $inner = <param>},{<param>
         $parts = preg_split('/},{|%7D%2C%7B/', $inner);
         $value = array();
+        // $parts = array(
+        //     <id>,<data>,
+        //     <id>,<data>,
+        // )
         foreach ($parts as $part) {
             $part = preg_split('/,|%2C/', $part, 2);
+            // $part = array(
+            //     <id>,
+            //     <data>,
+            // )
             if ($part[0] != $vgId) {
                 continue;
             }
             $keyVal = preg_split('/=|%3D/', $part[1], 2);
+            // $keyVal can have one of the following structures:
+            //     array(
+            //         val,
+            //     )
+            // or:
+            //     array(
+            //         arg,
+            //         val,
+            //     )
             if (count($keyVal) == 1) {
                 if (empty(current($keyVal))) {
                     continue;
                 }
+                // this is the case for simple params like
+                // 'pos' = {0,30}
                 $value[] = current($keyVal);
             } else {
+                // this is the case for associative params like
+                // 'search' = {0,firstname=John}
                 $value[$keyVal[0]] = $keyVal[1];
             }
         }
         if (count($value) == 1) {
             if (key($value) === 0) {
+                // this is the case for simple params like
+                // 'pos' = {0,30}
                 return current($value);
             }
         }
+        // this is the case for associative params like
+        // 'search' = {0,firstname=John}
         return $value;
     }
 
