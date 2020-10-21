@@ -4054,9 +4054,32 @@ if ($test === NULL) {
             ));
         }
         self::$objTemplate->setCurrentBlock('shopGroupName');
+        $customerDiscountLink = $this->getAnchorTag(
+            $_ARRAYLANG['TXT_SHOP_DISCOUNTS_CUSTOMER'],
+            \Cx\Core\Routing\Url::fromBackend(
+                'Shop',
+                'customers',
+                0,
+                array('tpl' => 'discounts')
+            )
+        );
+        $customerGroupLink = $this->getAnchorTag(
+            $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_CUSTOMER'],
+            \Cx\Core\Routing\Url::fromBackend(
+                'Shop',
+                'customers',
+                0,
+                array('tpl' => 'groups')
+            )
+        );
         self::$objTemplate->setVariable(array(
             'SHOP_GROUP_ID_EDIT' => $id,
             'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
+            'SHOP_DISCOUNT_GROUP_ARTICLE_INFO_TXT' => sprintf(
+                $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_ARTICLE_INFO'],
+                $customerDiscountLink,
+                $customerGroupLink
+            ),
         ));
         if (isset($arrGroups[$id])) {
             self::$objTemplate->setVariable('SHOP_GROUP_NAME', $arrGroups[$id]['name']);
