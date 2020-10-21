@@ -385,14 +385,23 @@ class BackendTable extends HTML_Table {
                     } else if (gettype($data) == 'boolean') {
                         $data = '<i>' . ($data ? $_ARRAYLANG['TXT_YES'] : $_ARRAYLANG['TXT_NO']) . '</i>';
                         $encode = false;
-                    } else if ($data === null) {
+                    } else if (
+                        $data === null &&
+                        !empty($options['parsing']['showNA'])
+                    ) {
                         $data = '<i>' . $_ARRAYLANG['TXT_CORE_NONE'] . '</i>';
                         $encode = false;
-                    } else if (empty($data)) {
+                    } else if (
+                        empty($data) &&
+                        !empty($options['parsing']['showNA'])
+                    ) {
                         $data = '<i>(empty)</i>';
                         $encode = false;
                     } else if (is_object($data) && get_class($data) == 'Cx\Core\Model\Model\Entity\Password') {
                         $data = '******';
+                    } else if (empty($data)) {
+                        $data = '';
+                        $encode = false;
                     }
                     $cellAttrs = array();
                     if (
