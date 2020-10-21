@@ -306,12 +306,14 @@ function disableButtons(from, dest, add, remove) {
         <td>{TXT_RESELLER_PRICE}</td>
         <td>
           <input maxlength="255" name="reseller_price" size="40" value="{SHOP_RESELLER_PRICE}" />
+	  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{SHOP_RESELLER_PRICE_DESC}</span>
         </td>
       </tr>
       <tr class="row1">
         <td>{TXT_SPECIAL_OFFER}</td>
         <td>
           <input maxlength="10" name="discount_price" size="40" value="{SHOP_DISCOUNT}" />
+	  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_SHOP_SPECIAL_OFFER_DESC}</span>
           <input type="checkbox" name="discount_active" value="1" {SHOP_SPECIAL_OFFER} />
           &nbsp;{TXT_ACTIVE}
         </td>
