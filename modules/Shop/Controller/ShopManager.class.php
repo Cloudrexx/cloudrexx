@@ -2242,6 +2242,24 @@ if ($test === NULL) {
 //DBG::log("Dates from ".$objProduct->date_start()." ($start_time, $start_date) to ".$objProduct->date_start()." ($end_time, $end_date)");
         $websiteImagesShopPath    = $cx->getWebsiteImagesShopPath() . '/';
         $websiteImagesShopWebPath = $cx->getWebsiteImagesShopWebPath() . '/';
+        $articleGroupLink = $this->getAnchorTag(
+            $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_ARTICLE'],
+            \Cx\Core\Routing\Url::fromBackend(
+                'Shop',
+                'products',
+                0,
+                array('tpl' => 'groups')
+            )
+        );
+        $customerDiscountLink = $this->getAnchorTag(
+            $_ARRAYLANG['TXT_SHOP_DISCOUNTS_CUSTOMER'],
+            \Cx\Core\Routing\Url::fromBackend(
+                'Shop',
+                'customers',
+                0,
+                array('tpl' => 'discounts')
+            )
+        );
         self::$objTemplate->setVariable(array(
             'SHOP_PRODUCT_ID' => (isset($_REQUEST['new']) ? 0 : $objProduct->id()),
             'SHOP_PRODUCT_CODE' => contrexx_raw2xhtml($objProduct->code()),
@@ -2254,6 +2272,12 @@ if ($test === NULL) {
                 Currency::formatPrice($objProduct->price())),
             'SHOP_RESELLER_PRICE' => contrexx_raw2xhtml(
                 Currency::formatPrice($objProduct->resellerprice())),
+            'SHOP_RESELLER_PRICE_DESC' => sprintf(
+                $_ARRAYLANG['TXT_SHOP_RESELLER_PRICE_DESC'],
+                $articleGroupLink,
+                $customerDiscountLink,
+                '100%'
+            ),
             'SHOP_DISCOUNT' => contrexx_raw2xhtml(
                 Currency::formatPrice($objProduct->discountprice())),
             'SHOP_SPECIAL_OFFER' => ($objProduct->discount_active() ? \Html::ATTRIBUTE_CHECKED : ''),
@@ -4169,5 +4193,29 @@ die("Shopmanager::delete_article_group(): Obsolete method called");
         }
 
         return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_SHOP_EDIT_OR_ADD_IMAGE']);
+    }
+
+    /**
+     * Get HTML-a tag
+     *
+     * Generate a HTML-a-tag with label (inner text-node) $label and URL
+     * (href-attribute) set to $url
+     *
+     * @param   $label  string  Label to use as inner text-node of anchor tag
+     * @param   $url    \Cx\Core\Routing\Url    Url to use as href-attribute
+     * @return  \Cx\Core\Html\Model\Entity\HtmlElement  HtmlElement of type a
+     */
+    protected function getAnchorTag($label, $url) {
+        $anchor = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+        $anchor->setAttribute(
+            'href',
+            $url
+        );
+        $anchor->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement(
+                $label
+            )
+        );
+        return $anchor;
     }
 }

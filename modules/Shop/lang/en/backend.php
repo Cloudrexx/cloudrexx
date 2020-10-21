@@ -320,6 +320,7 @@ $_ARRAYLANG['TXT_REPLACEMENT_DIRECTORY'] = "Placeholder directory";
 $_ARRAYLANG['TXT_REPLACEMENT_NOT_AVAILABLE'] = "Note: these placeholders will not be replaced when sending a message from the backend.";
 $_ARRAYLANG['TXT_RESELLER'] = "Reseller";
 $_ARRAYLANG['TXT_RESELLER_PRICE'] = "Price for reseller";
+$_ARRAYLANG['TXT_SHOP_RESELLER_PRICE_DESC'] = "Without a dedicated reseller price (when entering 0.00), the product will be sold to resellers on the regular price, less any configured VAT. To distribute the product free of charge to resellers, do set up an %1\$s and grant a discount of %3\$s on it in section %2\$s.";
 $_ARRAYLANG['TXT_RESET'] = "Reset";
 $_ARRAYLANG['TXT_RESET_PASSWORD'] = "Reset password";
 $_ARRAYLANG['TXT_SAFERPAY'] = "Saferpay (old interface)";

@@ -330,6 +330,7 @@ $_ARRAYLANG['TXT_REPLACEMENT_DIRECTORY'] = "Platzhalter Verzeichnis";
 $_ARRAYLANG['TXT_REPLACEMENT_NOT_AVAILABLE'] = "Diese Platzhalter sind beim direkten Senden, von der Administrations Konsole aus, nicht vorhanden!";
 $_ARRAYLANG['TXT_RESELLER'] = "Reseller";
 $_ARRAYLANG['TXT_RESELLER_PRICE'] = "Preis für Reseller";
+$_ARRAYLANG['TXT_SHOP_RESELLER_PRICE_DESC'] = "Ohne separate Preisangabe (bei Eingabe von 0.00) wird das Produkt zum Endkundenpreis, abzüglich allfälliger MwSt. (sofern konfiguriert), an Reseller zum Verkauf angeboten. Um das Produkt kostenlos an Reseller zu vertreiben, richten Sie eine %1\$s ein und weisen Sie dieser unter %2\$s einen Rabatt von %3\$s zu.";
 $_ARRAYLANG['TXT_RESET'] = "Zurücksetzen";
 $_ARRAYLANG['TXT_RESET_PASSWORD'] = "Passwort neu setzen";
 $_ARRAYLANG['TXT_SAFERPAY'] = "Saferpay (alte Schnittstelle)";
