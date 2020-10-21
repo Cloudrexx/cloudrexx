@@ -916,6 +916,7 @@ $_ARRAYLANG['TXT_SHORT_DESCRIPTION'] = "Kurzbeschreibung";
 $_ARRAYLANG['TXT_SHOW_DETAILS'] = "Zeige Details";
 $_ARRAYLANG['TXT_SORT_ORDER'] = "Treffer sortiert nach";
 $_ARRAYLANG['TXT_SPECIAL_OFFER'] = "Sonderangebot";
+$_ARRAYLANG['TXT_SHOP_SPECIAL_OFFER_DESC'] = "Der Sonderangebotspreis (sofern aktiv) übersteuert den Endkunden- und Resellerpreis.";
 $_ARRAYLANG['TXT_START_DATE'] = "Startdatum";
 $_ARRAYLANG['TXT_STATEMENT'] = "Angaben";
 $_ARRAYLANG['TXT_STATISTIC'] = "Statistik";

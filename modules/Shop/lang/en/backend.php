@@ -907,6 +907,7 @@ $_ARRAYLANG['TXT_SHORT_DESCRIPTION'] = "Short description";
 $_ARRAYLANG['TXT_SHOW_DETAILS'] = "Show details";
 $_ARRAYLANG['TXT_SORT_ORDER'] = "Sort results ordered by";
 $_ARRAYLANG['TXT_SPECIAL_OFFER'] = "Special offer";
+$_ARRAYLANG['TXT_SHOP_SPECIAL_OFFER_DESC'] = "The special offer price (if active) will have precedence over the regular customer and reseller price.";
 $_ARRAYLANG['TXT_START_DATE'] = "Start date";
 $_ARRAYLANG['TXT_STATEMENT'] = "Details";
 $_ARRAYLANG['TXT_STATISTIC'] = "Statistics";
