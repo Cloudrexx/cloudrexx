@@ -521,14 +521,18 @@ class BackendTable extends HTML_Table {
             if (isset($options['rowAttributes'])) {
                 $row = $headerRowIdx;
                 $callback = $options['rowAttributes'];
-                foreach ($attrs as $rowname=>$rows) {
+                // get list of row data
+                $tableData = $attrs->toArray(false);
+                // add an empty row at the beginning (used for the header-row)
+                array_unshift($tableData, array());
+                foreach ($tableData as $rowData) {
                     $originalAttributes = $this->getRowAttributes($row);
                     $data = $originalAttributes;
                     try {
                         $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
                             $callback,
                             array(
-                                'data' => $rows,
+                                'data' => $rowData,
                                 'attributes' => $originalAttributes,
                             )
                         );
