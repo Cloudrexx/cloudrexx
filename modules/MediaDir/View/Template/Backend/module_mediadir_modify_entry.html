@@ -154,7 +154,11 @@ cx.jQuery(document).ready(function() {
 
     <!-- BEGIN mediadirInputfieldList -->
     <tr class="{MEDIADIR_INPUTFIELD_ROW_CLASS}">
-        <td width="200" valign="top">{TXT_MEDIADIR_INPUTFIELD_NAME}</td>
+        <td width="200" valign="top">{TXT_MEDIADIR_INPUTFIELD_NAME}
+            <!-- BEGIN mediadirInputfieldTooltip -->
+            <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{MEDIADIR_INPUTFIELD_FIELD_TOOLTIP}</span>
+            <!-- END mediadirInputfieldTooltip -->
+        </td>
         <td>
             {MEDIADIR_INPUTFIELD_FIELD}
         </td>

@@ -471,6 +471,18 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                             $this->moduleLangVar.'_INPUTFIELD_FIELD' => $strInputfield,
                             $this->moduleLangVar.'_INPUTFIELD_ROW_CLASS' => $i%2==0 ? 'row1' : 'row2',
                         ));
+                        if (!empty($arrInputfield['info'][$langId])) {
+                            $objTpl->setVariable(
+                                $this->moduleLangVar.'_INPUTFIELD_FIELD_TOOLTIP',
+                                // note: the 'info' property is already
+                                // HTML-entity-escaped as it is being stored
+                                // escaped in the database
+                                $arrInputfield['info'][$langId]
+                            );
+                            $objTpl->parse($this->moduleNameLC . 'InputfieldTooltip');
+                        } else {
+                            $objTpl->hideBlock($this->moduleNameLC . 'InputfieldTooltip');
+                        }
 
                         $i++;
                         $objTpl->parse($this->moduleNameLC.'InputfieldList');
