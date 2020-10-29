@@ -112,8 +112,9 @@ class Net_DNS2_RR_CAA extends Net_DNS2_RR
         $this->flags    = array_shift($rdata);
         $this->tag      = array_shift($rdata);
 
-        $this->value    = trim($this->cleanString(implode($rdata, ' ')), '"');
-        
+        // CLX customizing: CLX-2477 Fix order of parameters
+        $this->value    = trim($this->cleanString(implode(' ', $rdata)), '"');
+
         return true;
     }
 
