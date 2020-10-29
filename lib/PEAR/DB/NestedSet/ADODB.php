@@ -155,7 +155,7 @@ class DB_NestedSet_ADODB extends DB_NestedSet {
      */
     public function _quote($str)
     {
-        return $this->db->qstr($str, CONTREXX_ESCAPE_GPC);
+        return $this->db->qstr($str);
     }
 
     /**

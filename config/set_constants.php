@@ -51,7 +51,6 @@ define('ASCMS_BACKEND_PATH',                '/cadmin');
 define('ASCMS_PROTOCOL',                    empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http' : 'https');
 define('ASCMS_WEBSERVER_SOFTWARE',          !empty($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'apache') ? 'apache' : (!empty($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'iis') ? 'iis' : ''));
 
-define('CONTREXX_ESCAPE_GPC',               get_magic_quotes_gpc());
 define('CONTREXX_CHARSET',                  $_CONFIG['coreCharacterEncoding']);
 define('CONTREXX_PHP5',                     version_compare(PHP_VERSION, '5', '>='));
 define('CONTREXX_DIRECTORY_INDEX',          'index.php');

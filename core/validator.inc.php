@@ -52,7 +52,6 @@ if (stristr(__FILE__, $_SERVER['PHP_SELF'])) {
  */
 function contrexx_strip_tags($string)
 {
-    if (CONTREXX_ESCAPE_GPC) return strip_tags($string);
     return addslashes(strip_tags($string));
 }
 
@@ -64,9 +63,6 @@ function contrexx_strip_tags($string)
  */
 function contrexx_addslashes($string)
 {
-    // If magic quotes is on the string is already quoted,
-    // just return it
-    if (CONTREXX_ESCAPE_GPC) return $string;
     return addslashes($string);
 }
 
@@ -78,7 +74,6 @@ function contrexx_addslashes($string)
  */
 function contrexx_stripslashes($string)
 {
-    if (CONTREXX_ESCAPE_GPC) return stripslashes($string);
     return $string;
 }
 
