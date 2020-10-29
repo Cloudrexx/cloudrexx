@@ -591,12 +591,12 @@ class FeedManager extends FeedLibrary
             {
                 if ($_POST['form_file_name'] != '0' and $_POST['form_link'] == '' or $_POST['form_file_name'] == '0' and $_POST['form_link'] != ''){
                     $category  = intval($_POST['form_category']);
-                    $name      = get_magic_quotes_gpc() ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                    $name      = addslashes(strip_tags($_POST['form_name']));
                     if ($_POST['form_file_name'] != '0'){
                         $link     = '';
-                        $filename = get_magic_quotes_gpc() ? strip_tags($_POST['form_file_name']) : addslashes(strip_tags($_POST['form_file_name']));
+                        $filename = addslashes(strip_tags($_POST['form_file_name']));
                     }else{
-                        $link     = get_magic_quotes_gpc() ? strip_tags($_POST['form_link']) : addslashes(strip_tags($_POST['form_link']));
+                        $link     = addslashes(strip_tags($_POST['form_link']));
                         $filename = '';
                     }
                     $articles  = intval($_POST['form_articles']);
@@ -1057,15 +1057,15 @@ class FeedManager extends FeedLibrary
                 {
                     $id       = intval($_POST['form_id']);
                     $subid    = intval($_POST['form_category']);
-                    $name     = get_magic_quotes_gpc() ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                    $name     = addslashes(strip_tags($_POST['form_name']));
                     if ($_POST['form_file_name'] != '0')
                     {
                         $link     = '';
-                        $filename = get_magic_quotes_gpc() ? strip_tags($_POST['form_file_name']) : addslashes(strip_tags($_POST['form_file_name']));
+                        $filename = addslashes(strip_tags($_POST['form_file_name']));
                     }
                     else
                     {
-                        $link     = get_magic_quotes_gpc() ? strip_tags($_POST['form_link']) : addslashes(strip_tags($_POST['form_link']));
+                        $link     = addslashes(strip_tags($_POST['form_link']));
                         $filename = '';
                     }
                     $articles = intval($_POST['form_articles']);

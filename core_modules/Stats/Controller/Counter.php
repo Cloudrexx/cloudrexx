@@ -268,7 +268,8 @@ class Counter
             $mode = $_GET['mode'];
             if ($mode == "script") {
                 $this->pageId = intval($_GET['pageId']);
-                $this->screenResolution = !empty($_GET['screen']) ? (get_magic_quotes_gpc() ? $_GET['screen'] : addslashes($_GET['screen'])) : '';
+                $this->screenResolution = !empty($_GET['screen'])
+                    ? addslashes($_GET['screen']) : '';
                 $this->colorDepth = !empty($_GET['color_depth']) ? intval($_GET['color_depth']) : 0;
                 $this->javascriptEnabled = 1;
             }
@@ -325,7 +326,7 @@ class Counter
         } elseif ($isAlias) {
             $this->requestedUrl = "/".addslashes(substr($uriString,1));
         } else {
-            $this->requestedUrl = "/index.php?".(get_magic_quotes_gpc() ? substr($uriString,1) : addslashes(substr($uriString,1)));
+            $this->requestedUrl = "/index.php?" . addslashes(substr($uriString, 1));
         }
     }
 

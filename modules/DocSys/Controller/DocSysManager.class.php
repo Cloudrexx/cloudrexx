@@ -613,8 +613,7 @@ class DocSysManager extends DocSysLibrary
         ));
         // Add a new category
         if (isset($_POST['addCat']) AND ($_POST['addCat'] == true)) {
-            $catName = get_magic_quotes_gpc() ? strip_tags($_POST['newCatName'])
-                    : addslashes(strip_tags($_POST['newCatName']));
+            $catName = addslashes(strip_tags($_POST['newCatName']));
             if ($objDatabase->Execute("INSERT INTO " . DBPREFIX . "module_docsys" . MODULE_INDEX . "_categories (name,lang)
                                  VALUES ('$catName','$this->langId')")) {
                 $this->strOkMessage = $_ARRAYLANG['TXT_DATA_RECORD_ADDED_SUCCESSFUL'];
@@ -625,7 +624,7 @@ class DocSysManager extends DocSysLibrary
         // Modify a category
         if (isset($_POST['modCat']) AND ($_POST['modCat'] == true)) {
             foreach ($_POST['catName'] as $id => $name) {
-                $name = get_magic_quotes_gpc() ? strip_tags($name) : addslashes(strip_tags($name));
+                $name = addslashes(strip_tags($name));
                 $id = intval($id);
 
                 $sorting = !empty($_REQUEST['sortStyle'][$id]) ? contrexx_addslashes($_REQUEST['sortStyle'][$id])

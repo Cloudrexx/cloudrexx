@@ -1931,7 +1931,7 @@ class GalleryManager extends GalleryLibrary
                 if (empty($strValue)) {
                     $strValue = $_ARRAYLANG['TXT_GALLERY_CATEGORY_NO_NAME'];
                 } else {
-                    $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
+                    $strValue = addslashes(strip_tags($strValue));
                 }
                 $objDatabase->Execute('
                     INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
@@ -1945,7 +1945,7 @@ class GalleryManager extends GalleryLibrary
             if (substr($strKey,0,strlen('pictureDesc_')) == 'pictureDesc_') {
                 $arrExplode = explode('_',$strKey,2);
 
-                $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
+                $strValue = addslashes(strip_tags($strValue));
 
                 $objDatabase->Execute('
                     INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
@@ -1957,7 +1957,7 @@ class GalleryManager extends GalleryLibrary
             }
         }
 
-        $_POST['pictureLink'] = get_magic_quotes_gpc() ? strip_tags($_POST['pictureLink']) : addslashes(strip_tags($_POST['pictureLink']));
+        $_POST['pictureLink'] = addslashes(strip_tags($_POST['pictureLink']));
 
         $boolSizeShow = isset($_POST['pictureSizeShow']) ? 1 : 0;
         $objResult = $objDatabase->Execute('UPDATE     '.DBPREFIX.'module_gallery_pictures
@@ -2860,7 +2860,7 @@ class GalleryManager extends GalleryLibrary
                 if (empty($strValue)) {
                     $strValue = $_ARRAYLANG['TXT_GALLERY_CATEGORY_NO_NAME'];
                 } else {
-                    $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
+                    $strValue = addslashes(strip_tags($strValue));
                 }
 
                 $objDatabase->Execute('
@@ -3003,7 +3003,7 @@ $strFileNew = '';
                 if (substr($strKey,0,strlen('imageName_')) == 'imageName_') {
                     //language var
                     $arrExplode = explode('_',$strKey,3);
-                    $strValue = get_magic_quotes_gpc() ? strip_tags($strValue) : addslashes(strip_tags($strValue));
+                    $strValue = addslashes(strip_tags($strValue));
                     $objDatabase->Execute('
                         INSERT INTO `'.DBPREFIX.'module_gallery_language_pics`
                            SET `name` = "' . $strValue . '",

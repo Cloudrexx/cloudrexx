@@ -686,13 +686,13 @@ class JobsManager extends JobsLibrary
         $id = intval($_POST['id']);
         $userId = $objFWUser->objUser->getId();
         $changelog = time();
-        $title = get_magic_quotes_gpc() ? strip_tags($_POST['jobsTitle']) : addslashes(strip_tags($_POST['jobsTitle']));
-        $text = get_magic_quotes_gpc() ? $_POST['jobsText'] : addslashes($_POST['jobsText']);
+        $title = addslashes(strip_tags($_POST['jobsTitle']));
+        $text = addslashes($_POST['jobsText']);
         $title= str_replace("ß","ss",$title);
         $text = $this->filterBodyTag($text);
         $text = str_replace("ß","ss",$text);
-        $workloc    = get_magic_quotes_gpc() ? strip_tags($_POST['workloc']) : addslashes(strip_tags($_POST['workloc']));
-        $workload = get_magic_quotes_gpc() ? strip_tags($_POST['workload']) : addslashes(strip_tags($_POST['workload']));
+        $workloc    = addslashes(strip_tags($_POST['workloc']));
+        $workload = addslashes(strip_tags($_POST['workload']));
         $hotOffer = isset($_POST['hotOffer']) ? contrexx_input2int($_POST['hotOffer']) : 0;
         $paid = isset($_POST['paid']) ? contrexx_input2int($_POST['paid']) : 0;
         if (empty($_POST['work_start']))
@@ -705,9 +705,9 @@ class JobsManager extends JobsLibrary
 
         $catId = intval($_POST['jobsCat']);
         $status = (!empty($_POST['status'])) ? intval($_POST['status']) : 0;
-        $startDate = get_magic_quotes_gpc() ? strip_tags($_POST['startDate']) : addslashes(strip_tags($_POST['startDate']));
-        $endDate = get_magic_quotes_gpc() ? strip_tags($_POST['endDate']) : addslashes(strip_tags($_POST['endDate']));
-        $author =  get_magic_quotes_gpc() ? strip_tags($_POST['author']) : addslashes(strip_tags($_POST['author']));
+        $startDate = addslashes(strip_tags($_POST['startDate']));
+        $endDate = addslashes(strip_tags($_POST['endDate']));
+        $author =  addslashes(strip_tags($_POST['author']));
 
         $date = $this->_checkDate(date('H:i:s d.m.Y'));
         $dberr = false;
@@ -1003,14 +1003,14 @@ class JobsManager extends JobsLibrary
 
         $objFWUser = \FWUser::getFWUserObject();
         $date = $this->_checkDate($_POST['creation_date']);
-        $title = get_magic_quotes_gpc() ? strip_tags($_POST['jobsTitle']) : addslashes(strip_tags($_POST['jobsTitle']));
-        $author = get_magic_quotes_gpc() ? strip_tags($_POST['author']) : addslashes(strip_tags($_POST['author']));
-        $text = get_magic_quotes_gpc() ? $_POST['jobsText'] : addslashes($_POST['jobsText']);
+        $title = addslashes(strip_tags($_POST['jobsTitle']));
+        $author = addslashes(strip_tags($_POST['author']));
+        $text = addslashes($_POST['jobsText']);
         $title = str_replace("ß","ss",$title);
         $text = str_replace("ß","ss",$text);
         $text = $this->filterBodyTag($text);
-        $workloc = get_magic_quotes_gpc() ? strip_tags($_POST['workloc']) : addslashes(strip_tags($_POST['workloc']));
-        $workload = get_magic_quotes_gpc() ? strip_tags($_POST['workload']) : addslashes(strip_tags($_POST['workload']));
+        $workloc = addslashes(strip_tags($_POST['workloc']));
+        $workload = addslashes(strip_tags($_POST['workload']));
         $hotOffer = isset($_POST['hotOffer']) ? contrexx_input2int($_POST['hotOffer']) : 0;
         $paid = isset($_POST['paid']) ? contrexx_input2int($_POST['paid']) : 0;
         if (empty($_POST['work_start']))
@@ -1023,8 +1023,8 @@ class JobsManager extends JobsLibrary
 
         $cat = intval($_POST['jobsCat']);
         $userid = $objFWUser->objUser->getId();
-        $startDate = get_magic_quotes_gpc() ? strip_tags($_POST['startDate']) : addslashes(strip_tags($_POST['startDate']));
-        $endDate = get_magic_quotes_gpc() ? strip_tags($_POST['endDate']) : addslashes(strip_tags($_POST['endDate']));
+        $startDate = addslashes(strip_tags($_POST['startDate']));
+        $endDate = addslashes(strip_tags($_POST['endDate']));
 
         $status = intval($_POST['status']);
 
@@ -1142,7 +1142,7 @@ class JobsManager extends JobsLibrary
 
         // Add a new category
         if (isset($_POST['addCat']) AND ($_POST['addCat']==true)) {
-             $catName = get_magic_quotes_gpc() ? strip_tags($_POST['newCatName']) : addslashes(strip_tags($_POST['newCatName']));
+             $catName = addslashes(strip_tags($_POST['newCatName']));
              if ($objDatabase->Execute("INSERT INTO ".DBPREFIX."module_jobs_categories (name,lang)
                                  VALUES ('$catName','$this->langId')")) {
                  \Message::ok($_ARRAYLANG['TXT_DATA_RECORD_ADDED_SUCCESSFUL']);
@@ -1156,7 +1156,7 @@ class JobsManager extends JobsLibrary
         if (isset($_POST['modCat']) AND ($_POST['modCat']==true)) {
             $status = true;
             foreach ($_POST['catName'] as $id => $name) {
-                $name = get_magic_quotes_gpc() ? strip_tags($name) : addslashes(strip_tags($name));
+                $name = addslashes(strip_tags($name));
                 $id=intval($id);
 
                 $sorting = !empty($_REQUEST['sortStyle'][$id]) ? contrexx_addslashes($_REQUEST['sortStyle'][$id]) : 'alpha';
@@ -1267,7 +1267,7 @@ class JobsManager extends JobsLibrary
 
         // Add a new category
         if (isset($_POST['addLoc']) AND ($_POST['addLoc']==true)) {
-             $locName = get_magic_quotes_gpc() ? strip_tags($_POST['newLocName']) : addslashes(strip_tags($_POST['newLocName']));
+             $locName = addslashes(strip_tags($_POST['newLocName']));
              if ($objDatabase->Execute("INSERT INTO ".DBPREFIX."module_jobs_location (name)
                                  VALUES ('$locName')")) {
                  \Message::ok($_ARRAYLANG['TXT_DATA_RECORD_ADDED_SUCCESSFUL']);
@@ -1281,7 +1281,7 @@ class JobsManager extends JobsLibrary
         if (isset($_POST['modLoc']) AND ($_POST['modLoc']==true)) {
             $status = true;
             foreach ($_POST['locName'] as $id => $name) {
-                $name = get_magic_quotes_gpc() ? strip_tags($name) : addslashes(strip_tags($name));
+                $name = addslashes(strip_tags($name));
                 $id=intval($id);
 
 // Unused

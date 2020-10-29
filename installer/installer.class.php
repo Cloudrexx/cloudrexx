@@ -636,11 +636,6 @@ class Installer
                 // check general configuration options
                 if (!$_SESSION['installer']['config']['general'] && (!isset($_SESSION['installer']['setPermissions']) || !$_SESSION['installer']['setPermissions'])) {
                     // get options
-                    if (get_magic_quotes_gpc()) {
-                        $_POST['documentRoot'] = stripslashes($_POST['documentRoot']);
-                        $_POST['offsetPath'] = stripslashes($_POST['offsetPath']);
-                    }
-
                     $_POST['documentRoot']  = preg_replace("/"."\\".DIRECTORY_SEPARATOR."*$/", "", $_POST['documentRoot']);
                     $_POST['offsetPath']  = preg_replace("/"."\\".DIRECTORY_SEPARATOR."*$/", "", $_POST['offsetPath']);
 
@@ -659,23 +654,13 @@ class Installer
                 }
 
                 if (empty($_SESSION['installer']['config']['timezone']) || ($_POST['timezone'] != $_SESSION['installer']['config']['timezone'])) {
-                    $_SESSION['installer']['config']['timezone'] = get_magic_quotes_gpc() ? stripslashes($_POST['timezone']) : $_POST['timezone'];
+                    $_SESSION['installer']['config']['timezone'] =
+                        $_POST['timezone'];
                 }
 
                 // check database configuration options
                 if (!isset($_SESSION['installer']['checkDatabaseTables']) || !$_SESSION['installer']['checkDatabaseTables']) {
                     // get options
-                    if (get_magic_quotes_gpc()) {
-                        $_POST['dbHostname'] = stripslashes($_POST['dbHostname']);
-                        $_POST['dbUsername'] = stripslashes($_POST['dbUsername']);
-                        $_POST['dbPassword'] = stripslashes($_POST['dbPassword']);
-                        $_POST['dbDatabaseName'] = stripslashes($_POST['dbDatabaseName']);
-                        $_POST['dbTablePrefix'] = stripslashes($_POST['dbTablePrefix']);
-                        if (isset($_POST['dbCollation'])) {
-                            $_POST['dbCollation'] = stripslashes($_POST['dbCollation']);
-                        }
-                    }
-
                     if (!isset($_POST['createDatabase'])) {
                         $_POST['createDatabase'] = 0;
                     }
@@ -726,11 +711,6 @@ class Installer
                 // check ftp configuration options
                 if (!isset($_SESSION['installer']['setPermissions']) || !$_SESSION['installer']['setPermissions']) {
                     // get ftp configuration options
-                    if (get_magic_quotes_gpc()) {
-                        $_POST['ftpHostname'] = stripslashes($_POST['ftpHostname']);
-                        $_POST['ftpUsername'] = stripslashes($_POST['ftpUsername']);
-                        $_POST['ftpPassword'] = stripslashes($_POST['ftpPassword']);
-                    }
                     if ($_SESSION['installer']['config']['forceFtp']) {
                         $_POST['useFtp'] = 1;
                     } elseif (!isset($_POST['useFtp'])) {
