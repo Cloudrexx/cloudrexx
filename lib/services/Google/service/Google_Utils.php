@@ -1,4 +1,7 @@
 <?php
+
+// CLX customizing: CLX-2477 Replace deprecated string offset syntax
+
 /*
  * Copyright 2011 Google Inc.
  *
@@ -55,7 +58,7 @@ class Google_Utils {
     $strlenVar = strlen($str);
     $d = $ret = 0;
     for ($count = 0; $count < $strlenVar; ++ $count) {
-      $ordinalValue = ord($str{$ret});
+      $ordinalValue = ord($str[$ret]);
       switch (true) {
         case (($ordinalValue >= 0x20) && ($ordinalValue <= 0x7F)):
           // characters U-00000000 - U-0000007F (same as ASCII)

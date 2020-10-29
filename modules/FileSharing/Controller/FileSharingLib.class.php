@@ -140,7 +140,7 @@ CODE;
         $hash = '';
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
         for ($i = 0; $i < 10; $i++) {
-            $hash .= $chars{rand(0, 62)};
+            $hash .= $chars[rand(0, 62)];
         }
         return $hash;
     }

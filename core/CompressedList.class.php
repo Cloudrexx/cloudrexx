@@ -671,11 +671,11 @@ class CompressedList
             $ord = ord($value[$i]);
 //echo("ord: $ord\n");
             if ($ord == 48) { // 0, zero
-                $value{$i} = '9';
+                $value[$i] = '9';
             } elseif ($ord == 65) { // A
-                $value{$i} = 'Z';
+                $value[$i] = 'Z';
             } elseif ($ord == 97) { // a
-                $value{$i} = 'z';
+                $value[$i] = 'z';
             } else {
                 // No underrun
                 $value[$i] = chr($ord-1);

@@ -994,7 +994,7 @@ class FWUser extends User_Setting
         $max   = strlen($chars) -1;
         $ret = '';
         for ($i = 0; $i < 4; ++$i) {
-            $ret .= $chars{rand(0, $max)};
+            $ret .= $chars[rand(0, $max)];
         }
         return $ret;
     }

@@ -1,4 +1,7 @@
 <?php
+
+// CLX customizing: CLX-2477 Replace deprecated string offset syntax
+
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
@@ -319,7 +322,7 @@ class HTTP
                 $_SERVER['REQUEST_URI'] : $_SERVER['PHP_SELF'];
         }
 
-        if ($url{0} == '/') {
+        if ($url[0] == '/') {
             return $server . $url;
         }
 

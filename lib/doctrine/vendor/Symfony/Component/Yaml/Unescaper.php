@@ -1,5 +1,7 @@
 <?php
 
+// CLX customizing: CLX-2477 Replace deprecated string offset syntax
+
 /*
  * This file is part of the Symfony package.
  *
@@ -67,7 +69,7 @@ class Unescaper
      */
     public function unescapeCharacter($value)
     {
-        switch ($value{1}) {
+        switch ($value[1]) {
             case '0':
                 return "\x0";
             case 'a':
