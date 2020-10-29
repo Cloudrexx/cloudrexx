@@ -163,7 +163,7 @@ abstract class Engine implements EngineInterface {
     {
         if ($this->section !== $section
          || $this->group !== $group) {
-            if (!parent::init($section, $group)) return false;
+            if (!static::init($section, $group)) return false;
         }
         return $this->arrSettings;
     }
