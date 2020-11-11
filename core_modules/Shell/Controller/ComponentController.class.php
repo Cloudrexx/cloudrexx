@@ -34,10 +34,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     protected $prompt = '> ';
 
     public function getCommandsForCommandMode() {
+        $cliOnlyPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            array(),
+            array('cli'),
+            false
+        );
         if ($this->commandRunning) {
-            return array('exit', 'prompt', 'sh');
+            return array(
+                'exit' => $cliOnlyPermission,
+                'prompt' => $cliOnlyPermission,
+                'sh' => $cliOnlyPermission,
+            );
         }
-        return array('shell', 'sh');
+        return array(
+            'shell' => $cliOnlyPermission,
+            'sh' => $cliOnlyPermission,
+        );
     }
 
     public function getCommandDescription($command, $short = false) {
