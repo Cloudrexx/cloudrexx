@@ -83,7 +83,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getCommandsForCommandMode()
     {
-        return array('Order');
+        return array(
+            'Order' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array(),
+                array('cli'),
+                false
+            )
+        );
     }
 
     /**
