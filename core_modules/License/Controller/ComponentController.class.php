@@ -202,7 +202,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of command names
      */
     public function getCommandsForCommandMode() {
-        return array('licup');
+        return array(
+            // License update over HTTP (or the backend) is no longer supported
+            'licup' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array(),
+                array('cli'),
+                false
+            )
+        );
     }
 
     /**
