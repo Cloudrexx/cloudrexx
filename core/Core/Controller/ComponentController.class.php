@@ -85,7 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             ),
             'status' => $cliOnlyPermission,
             'diff' => $cliOnlyPermission,
-            'version',
+            'version' => $cliOnlyPermission,
             'install' => $cliOnlyPermission,
             'activate' => $cliOnlyPermission,
             'deactivate' => $cliOnlyPermission,
