@@ -53,7 +53,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     public function getCommandsForCommandMode() {
-        return array('workbench', 'wb');
+        $cliOnlyPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            array(),
+            array('cli'),
+            false
+        );
+        return array(
+            'workbench' => $cliOnlyPermission,
+            'wb' => $cliOnlyPermission,
+        );
     }
 
     public function getCommandDescription($command, $short = false) {
