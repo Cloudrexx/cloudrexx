@@ -58,6 +58,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getCommandsForCommandMode()
     {
+        // No restriction here, but the 'autoclean' subcommand is limited
+        // to cli mode in executeCommand().
         return array('Newsletter');
     }
 
@@ -103,6 +105,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case 'Newsletter':
                 switch ($subcommand) {
                     case 'autoclean':
+                        if (!$this->cx->isCliCall()) {
+                            return;
+                        }
                         $newsletterLib = new NewsletterLib();
                         $newsletterLib->autoCleanRegisters();
                         break;
