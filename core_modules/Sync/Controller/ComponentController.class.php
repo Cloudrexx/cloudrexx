@@ -194,6 +194,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     
                     // local side code
                     if (count($arguments) == 1 && $arguments[0] == 'push') {
+                        if (!$this->cx->isCliCall()) {
+                            return;
+                        }
                         $this->pushChanges();
                         break;
                     }
