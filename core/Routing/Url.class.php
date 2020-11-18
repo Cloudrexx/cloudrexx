@@ -615,7 +615,7 @@ class Url {
         if ($cx->isCliCall()) {
             return new Url('file://' . getcwd());
         }
-        $s = empty($_SERVER['HTTPS']) ? '' : ($_SERVER['HTTPS'] == 'on') ? 's' : '';
+        $s = ($_SERVER['HTTPS'] ?? '') === 'on' ? 's' : '';
         $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
         $protocol = substr($sp, 0, strpos($sp, '/')) . $s;
         $port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (':'.$_SERVER['SERVER_PORT']);

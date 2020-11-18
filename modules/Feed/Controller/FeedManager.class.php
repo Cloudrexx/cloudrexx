@@ -591,12 +591,12 @@ class FeedManager extends FeedLibrary
             {
                 if ($_POST['form_file_name'] != '0' and $_POST['form_link'] == '' or $_POST['form_file_name'] == '0' and $_POST['form_link'] != ''){
                     $category  = intval($_POST['form_category']);
-                    $name      = get_magic_quotes_gpc() ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                    $name      = addslashes(strip_tags($_POST['form_name']));
                     if ($_POST['form_file_name'] != '0'){
                         $link     = '';
-                        $filename = get_magic_quotes_gpc() ? strip_tags($_POST['form_file_name']) : addslashes(strip_tags($_POST['form_file_name']));
+                        $filename = addslashes(strip_tags($_POST['form_file_name']));
                     }else{
-                        $link     = get_magic_quotes_gpc() ? strip_tags($_POST['form_link']) : addslashes(strip_tags($_POST['form_link']));
+                        $link     = addslashes(strip_tags($_POST['form_link']));
                         $filename = '';
                     }
                     $articles  = intval($_POST['form_articles']);
@@ -1057,15 +1057,15 @@ class FeedManager extends FeedLibrary
                 {
                     $id       = intval($_POST['form_id']);
                     $subid    = intval($_POST['form_category']);
-                    $name     = get_magic_quotes_gpc() ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                    $name     = addslashes(strip_tags($_POST['form_name']));
                     if ($_POST['form_file_name'] != '0')
                     {
                         $link     = '';
-                        $filename = get_magic_quotes_gpc() ? strip_tags($_POST['form_file_name']) : addslashes(strip_tags($_POST['form_file_name']));
+                        $filename = addslashes(strip_tags($_POST['form_file_name']));
                     }
                     else
                     {
-                        $link     = get_magic_quotes_gpc() ? strip_tags($_POST['form_link']) : addslashes(strip_tags($_POST['form_link']));
+                        $link     = addslashes(strip_tags($_POST['form_link']));
                         $filename = '';
                     }
                     $articles = intval($_POST['form_articles']);
@@ -1312,7 +1312,7 @@ class FeedManager extends FeedLibrary
         //new
         if (isset($_GET['new']) and $_GET['new'] == 1) {
             if (isset($_POST['form_name']) and isset($_POST['form_lang']) and isset($_POST['form_status'])) {
-                $name   = CONTREXX_ESCAPE_GPC ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                $name   = addslashes(strip_tags($_POST['form_name']));
                 $lang   = intval($_POST['form_lang']);
                 $status = intval($_POST['form_status']);
                 $time   = time();
@@ -1640,7 +1640,7 @@ class FeedManager extends FeedLibrary
         if (isset($_GET['set']) and $_GET['set'] == 1) {
             if ($_POST['form_id'] != '' and $_POST['form_name'] != '' and $_POST['form_status'] != '' and $_POST['form_lang'] != '') {
                 $id       = intval($_POST['form_id']);
-                $name     = CONTREXX_ESCAPE_GPC ? strip_tags($_POST['form_name']) : addslashes(strip_tags($_POST['form_name']));
+                $name     = addslashes(strip_tags($_POST['form_name']));
                 $status   = intval($_POST['form_status']);
                 $time     = time();
                 $lang     = intval($_POST['form_lang']);

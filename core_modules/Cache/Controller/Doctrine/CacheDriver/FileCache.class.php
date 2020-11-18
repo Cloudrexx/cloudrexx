@@ -125,7 +125,7 @@ abstract class FileCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\Cach
     protected function getFilename($id)
     {
         $hash = hash('sha256', $id);
-        $path = implode(str_split($hash, 16), DIRECTORY_SEPARATOR);
+        $path = implode(DIRECTORY_SEPARATOR, str_split($hash, 16));
         $path = $this->directory . DIRECTORY_SEPARATOR . $path;
         $id   = preg_replace('@[\\\/:"*?<>|]+@', '', $id);
 

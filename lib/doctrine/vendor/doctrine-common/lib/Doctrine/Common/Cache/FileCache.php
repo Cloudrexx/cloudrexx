@@ -126,7 +126,8 @@ abstract class FileCache extends CacheProvider
     {
         return $this->directory
             . DIRECTORY_SEPARATOR
-            . implode(str_split(hash('sha256', $id), 2), DIRECTORY_SEPARATOR)
+            // CLX customizing: CLX-2477 Fix order of parameters
+            . implode(DIRECTORY_SEPARATOR, str_split(hash('sha256', $id), 2))
             . DIRECTORY_SEPARATOR
             . preg_replace($this->disallowedCharacterPatterns, $this->replacementCharacters, $id)
             . $this->extension;

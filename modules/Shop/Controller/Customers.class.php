@@ -86,7 +86,7 @@ class Customers
 //                $search = preg_quote($search, '/');
             }
             // "Listletter" search
-            $search = '^'.$search{0};
+            $search = '^'.$search[0];
             $filter = array('REGEXP' => $search);
             $arrCustomerId = array();
             foreach (array(

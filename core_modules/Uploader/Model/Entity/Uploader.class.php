@@ -335,7 +335,7 @@ class Uploader extends EntityBase
         for ($i = 0; $i < 10; $i++) {
             $randstring .= $characters[rand(0, strlen($characters) - 1)];
         }
-        if (array_key_exists($randstring, $uploaders)){
+        if (isset($uploaders[$randstring])) {
             return static::generateId();
         }
         return $randstring;

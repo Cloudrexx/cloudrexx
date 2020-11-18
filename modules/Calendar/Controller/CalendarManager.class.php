@@ -740,7 +740,9 @@ class CalendarManager extends CalendarLibrary
 
         //parse access
         for ($i = 0; $i < 2; $i++) {
-            $selectedAccess = $eventId == 0 && $i == 0 ? 'selected="selected"' : $objEvent->access == $i ? 'selected="selected"' : '';
+            $selectedAccess = $eventId == 0 && $i == 0
+                ? 'selected="selected"'
+                : ($objEvent->access == $i ? 'selected="selected"' : '');
 
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_EVENT_ACCESS'            => $i,
@@ -763,7 +765,9 @@ class CalendarManager extends CalendarLibrary
 
         //parse priority
         for ($i = 1; $i <= 5; $i++) {
-            $selectedPriority = $eventId == 0 && $i == 3 ? 'selected="selected"' : $objEvent->priority == $i ? 'selected="selected"' : '';
+            $selectedPriority = $eventId == 0 && $i == 3
+                ? 'selected="selected"'
+                : ($objEvent->priority == $i ? 'selected="selected"' : '');
 
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_EVENT_PRIORITY'          => $i,

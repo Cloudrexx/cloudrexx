@@ -357,8 +357,10 @@ class FWUser extends User_Setting
             $net = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Net');
             $remoteHost = $net->getHostByAddr($_SERVER['REMOTE_ADDR']);
             $referer = isset($_SERVER['HTTP_REFERER']) ? contrexx_strip_tags(strtolower($_SERVER['HTTP_REFERER'])) : '';
-            $httpUserAgent = get_magic_quotes_gpc() ? strip_tags($_SERVER['HTTP_USER_AGENT']) : addslashes(strip_tags($_SERVER['HTTP_USER_AGENT']));
-            $httpAcceptLanguage = get_magic_quotes_gpc() ? strip_tags($_SERVER['HTTP_ACCEPT_LANGUAGE']) : addslashes(strip_tags($_SERVER['HTTP_ACCEPT_LANGUAGE']));
+            $httpUserAgent =
+                addslashes(strip_tags($_SERVER['HTTP_USER_AGENT']));
+            $httpAcceptLanguage =
+                addslashes(strip_tags($_SERVER['HTTP_ACCEPT_LANGUAGE']));
 
             $objFWUser = FWUser::getFWUserObject();
             $objDatabase->Execute("INSERT INTO ".DBPREFIX."log
@@ -992,7 +994,7 @@ class FWUser extends User_Setting
         $max   = strlen($chars) -1;
         $ret = '';
         for ($i = 0; $i < 4; ++$i) {
-            $ret .= $chars{rand(0, $max)};
+            $ret .= $chars[rand(0, $max)];
         }
         return $ret;
     }
