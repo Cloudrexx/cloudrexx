@@ -526,18 +526,21 @@ class MarketLibrary
 
         foreach($array as $entryId) {
                $status = "";
-               $objResult = $objDatabase->Execute('SELECT picture FROM '.DBPREFIX.'module_market WHERE id = '.$entryId.' LIMIT 1');
+               $objResult = $objDatabase->Execute('SELECT picture FROM '.DBPREFIX.'module_market WHERE id = '.intval($entryId).' LIMIT 1');
             if($objResult !== false){
                 $picture = $objResult->fields['picture'];
             }
 
             if($picture != ''){
+                if (strpos($picture, '..') !== false) {
+                    throw new \Cx\Core\Controller\InstanceException('Invalid image path');
+                }
                 $objFile = new \File();
                 $status = $objFile->delFile($this->mediaPath, $this->mediaWebPath, "pictures/".$picture);
             }
 
             if($status != "error"){
-                $objResultDel = $objDatabase->Execute('DELETE FROM '.DBPREFIX.'module_market WHERE id = '.$entryId.'');
+                $objResultDel = $objDatabase->Execute('DELETE FROM '.DBPREFIX.'module_market WHERE id = '.intval($entryId).'');
                 if($objResultDel !== false){
                     $this->strOkMessage = $_ARRAYLANG['TXT_MARKET_DELETE_SUCCESS'];
                 }else{
