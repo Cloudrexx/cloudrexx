@@ -92,6 +92,7 @@ class MarketLibrary
         if($where != '' && $like != ''){
             $where = "WHERE ".contrexx_input2db($where)." LIKE ".contrexx_input2db($like);
         }
+
         $specFieldCount = $objDatabase->Execute("SELECT COUNT(*) AS `count` FROM `" . DBPREFIX . "module_market_spez_fields`");
         $specFieldCount = $specFieldCount->fields['count'];
         $objResultEntries = $objDatabase->Execute('SELECT * FROM '.DBPREFIX.'module_market '.$where.' '.$orderBy);
@@ -592,6 +593,7 @@ class MarketLibrary
             $specialFieldCount = $dbCon->Execute("SELECT COUNT(*) AS `count` FROM `" . DBPREFIX . "module_market_spez_fields` WHERE `lang_id` = 1");
             $specialFieldCount = $specialFieldCount->fields['count'];
         }
+
         for ($i = 1; $i <= $specialFieldCount; ++$i) {
             $value = '';
             // Data needs to  be updated or inserted
@@ -608,6 +610,7 @@ class MarketLibrary
             }
             $specialFields[] = 'spez_field_' . $i . $value;
         }
+
         $specialFields = join(' '.$chainingOperator.' ', $specialFields);
         return $specialFields;
     }
@@ -665,5 +668,4 @@ class MarketLibrary
         }
         $template->setVariable($specialVariables);
     }
-
 }

@@ -159,6 +159,7 @@ class Market extends MarketLibrary
         $categorieRowWidth         = substr(100/$catRows, 0, 2)."%";
         $categorieRows            = array();
         $arrRowsIndex            = array();
+        $insertFeeds = '';
 
         for($x = 1; $x <= $catRows; $x++) {
             $categorieRows[$x] = "";
@@ -243,7 +244,7 @@ class Market extends MarketLibrary
 
         //select View
         if  ($this->settings['indexview']['value'] == 1) {
-            $categorieRows ='';
+            $categorieRows = array();
             sort($arrRowsIndex);
 
             $i = 0;
@@ -279,10 +280,10 @@ class Market extends MarketLibrary
 
         // set variables
         $this->_objTpl->setVariable(array(
-            'MARKET_SEARCH_PAGING'            => $paging,
+            'MARKET_SEARCH_PAGING'            => '',//$paging,
             'MARKET_CATEGORY_ROW_WIDTH'        => $categorieRowWidth,
-            'MARKET_CATEGORY_ROW1'            => $categorieRows[1]."<br />",
-            'MARKET_CATEGORY_ROW2'            => $categorieRows[2]."<br />",
+            'MARKET_CATEGORY_ROW1'            => isset($categorieRows[1]) ? $categorieRows[1] : '' ."<br />",
+            'MARKET_CATEGORY_ROW2'            => isset($categorieRows[2]) ? $categorieRows[2] : '' ."<br />",
             'MARKET_CATEGORY_TITLE'            => $title,
             'MARKET_CATEGORY_DESCRIPTION'    => $description,
             'DIRECTORY_INSERT_ENTRIES'        => $insertFeeds,
@@ -371,7 +372,10 @@ class Market extends MarketLibrary
         }
 
         /////// START PAGING ///////
-        $pos= intval($_GET['pos']);
+        $pos = 0;
+        if (!empty($_GET['pos'])) {
+            $pos= intval($_GET['pos']);
+        }
 
         if ($sort == 'price') {
             $specialFieldsQuery = $this->getSpecialFieldsQueryPart($objDatabase);
@@ -382,6 +386,7 @@ class Market extends MarketLibrary
 
         $objResult = $objDatabase->Execute($query);
         $count = $objResult->RecordCount();
+        $paging = '';
         if ($count > $this->settings['paging']) {
             $paging = getPaging($count, $pos, "&amp;section=Market&amp;id=".$catId.$typePaging.$sortPaging.$wayPaging, "<b>Inserate</b>", true, $this->settings['paging']);
         }
@@ -482,10 +487,7 @@ class Market extends MarketLibrary
                 $i++;
                 $objResult->MoveNext();
                }
-
            }
-
-
 
            if ($count <= 0) {
             $this->_objTpl->setVariable(array(
@@ -494,8 +496,6 @@ class Market extends MarketLibrary
 
             $this->_objTpl->parse('noEntries');
         }
-
-
     }
 
     function showLatestEntries()
@@ -533,10 +533,9 @@ class Market extends MarketLibrary
 
                     $width != '' ? $width = 'width="'.$width.'"' : $width = '';
                     $height != '' ? $height = 'height="'.$height.'"' : $height = '';
+                    $image = '<img src="'.$this->mediaWebPath.'pictures/'.$pic.'" '.$width.' '.$height.' border="0" alt="'.$objEntries->fields['title'].'" />';
 
-                       $image = '<img src="'.$this->mediaWebPath.'pictures/'.$pic.'" '.$width.' '.$height.' border="0" alt="'.$objEntries->fields['title'].'" />';
-
-                       $this->_objTpl->setVariable(array(
+                    $this->_objTpl->setVariable(array(
                         'MARKET_TITLE'                => htmlentities($objEntries->fields['title'], ENT_QUOTES, CONTREXX_CHARSET),
                         'MARKET_PICTURE'            => $image,
                         'MARKET_ROW'                => ($entryNr % 2 == ($rowNr % 2) ? 'description' : 'description'),
