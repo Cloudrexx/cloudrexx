@@ -92,6 +92,7 @@ class MarketLibrary
         if($where != '' && $like != ''){
             $where = "WHERE ".contrexx_input2db($where)." LIKE ".contrexx_input2db($like);
         }
+
         $specFieldCount = $objDatabase->Execute("SELECT COUNT(*) AS `count` FROM `" . DBPREFIX . "module_market_spez_fields`");
         $specFieldCount = $specFieldCount->fields['count'];
         $objResultEntries = $objDatabase->Execute('SELECT * FROM '.DBPREFIX.'module_market '.$where.' '.$orderBy);
@@ -525,18 +526,21 @@ class MarketLibrary
 
         foreach($array as $entryId) {
                $status = "";
-               $objResult = $objDatabase->Execute('SELECT picture FROM '.DBPREFIX.'module_market WHERE id = '.$entryId.' LIMIT 1');
+               $objResult = $objDatabase->Execute('SELECT picture FROM '.DBPREFIX.'module_market WHERE id = '.intval($entryId).' LIMIT 1');
             if($objResult !== false){
                 $picture = $objResult->fields['picture'];
             }
 
             if($picture != ''){
+                if (strpos($picture, '..') !== false) {
+                    throw new \Cx\Core\Controller\InstanceException('Invalid image path');
+                }
                 $objFile = new \File();
                 $status = $objFile->delFile($this->mediaPath, $this->mediaWebPath, "pictures/".$picture);
             }
 
             if($status != "error"){
-                $objResultDel = $objDatabase->Execute('DELETE FROM '.DBPREFIX.'module_market WHERE id = '.$entryId.'');
+                $objResultDel = $objDatabase->Execute('DELETE FROM '.DBPREFIX.'module_market WHERE id = '.intval($entryId).'');
                 if($objResultDel !== false){
                     $this->strOkMessage = $_ARRAYLANG['TXT_MARKET_DELETE_SUCCESS'];
                 }else{
@@ -592,6 +596,7 @@ class MarketLibrary
             $specialFieldCount = $dbCon->Execute("SELECT COUNT(*) AS `count` FROM `" . DBPREFIX . "module_market_spez_fields` WHERE `lang_id` = 1");
             $specialFieldCount = $specialFieldCount->fields['count'];
         }
+
         for ($i = 1; $i <= $specialFieldCount; ++$i) {
             $value = '';
             // Data needs to  be updated or inserted
@@ -608,6 +613,7 @@ class MarketLibrary
             }
             $specialFields[] = 'spez_field_' . $i . $value;
         }
+
         $specialFields = join(' '.$chainingOperator.' ', $specialFields);
         return $specialFields;
     }
@@ -665,5 +671,4 @@ class MarketLibrary
         }
         $template->setVariable($specialVariables);
     }
-
 }

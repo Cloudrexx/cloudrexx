@@ -159,6 +159,7 @@ class Market extends MarketLibrary
         $categorieRowWidth         = substr(100/$catRows, 0, 2)."%";
         $categorieRows            = array();
         $arrRowsIndex            = array();
+        $insertFeeds = '';
 
         for($x = 1; $x <= $catRows; $x++) {
             $categorieRows[$x] = "";
@@ -232,7 +233,7 @@ class Market extends MarketLibrary
                 break;
             }
             //typselector
-            $selector = '<span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.$_GET['id'].'\')" '.$selectionAll.' />'.$_ARRAYLANG['TXT_MARKET_ALL'].'&nbsp;</label></span><span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.$_GET['id'].'&amp;type=offer\')" '.$selectionOffer.' />'.$_ARRAYLANG['TXT_MARKET_OFFERS'].'&nbsp;</label></span><span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.$_GET['id'].'&amp;type=search\')" '.$selectionSearch.' />'.$_ARRAYLANG['TXT_MARKET_REQUEST'].'</label></span>';
+            $selector = '<span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.intval($_GET['id']).'\')" '.$selectionAll.' />'.$_ARRAYLANG['TXT_MARKET_ALL'].'&nbsp;</label></span><span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.intval($_GET['id']).'&amp;type=offer\')" '.$selectionOffer.' />'.$_ARRAYLANG['TXT_MARKET_OFFERS'].'&nbsp;</label></span><span class="radio"><label><input type="radio" name="type" onclick="location.replace(\'index.php?section=Market&amp;id='.intval($_GET['id']).'&amp;type=search\')" '.$selectionSearch.' />'.$_ARRAYLANG['TXT_MARKET_REQUEST'].'</label></span>';
             //get entries
             $this->showEntries($_GET['id']);
 
@@ -243,7 +244,7 @@ class Market extends MarketLibrary
 
         //select View
         if  ($this->settings['indexview']['value'] == 1) {
-            $categorieRows ='';
+            $categorieRows = array();
             sort($arrRowsIndex);
 
             $i = 0;
@@ -279,10 +280,10 @@ class Market extends MarketLibrary
 
         // set variables
         $this->_objTpl->setVariable(array(
-            'MARKET_SEARCH_PAGING'            => $paging,
+            'MARKET_SEARCH_PAGING'            => '',//$paging,
             'MARKET_CATEGORY_ROW_WIDTH'        => $categorieRowWidth,
-            'MARKET_CATEGORY_ROW1'            => $categorieRows[1]."<br />",
-            'MARKET_CATEGORY_ROW2'            => $categorieRows[2]."<br />",
+            'MARKET_CATEGORY_ROW1'            => isset($categorieRows[1]) ? $categorieRows[1] : '' ."<br />",
+            'MARKET_CATEGORY_ROW2'            => isset($categorieRows[2]) ? $categorieRows[2] : '' ."<br />",
             'MARKET_CATEGORY_TITLE'            => $title,
             'MARKET_CATEGORY_DESCRIPTION'    => $description,
             'DIRECTORY_INSERT_ENTRIES'        => $insertFeeds,
@@ -349,7 +350,10 @@ class Market extends MarketLibrary
             break;
         }
 
-        if (isset($_GET['way'])) {
+        if (
+            isset($_GET['way']) &&
+            in_array($_GET['way'], array('ASC', 'DESC'))
+        ) {
             $way         = $_GET['way']=='ASC' ? 'DESC' : 'ASC';
             $wayPaging     = '&amp;way='.$_GET['way'];
         }else{
@@ -358,10 +362,10 @@ class Market extends MarketLibrary
         }
 
         $this->_objTpl->setVariable(array(
-            'MARKET_ENDDATE_SORT' => "index.php?section=Market&amp;id=".$catId."&amp;type=".$_GET['type']."&amp;sort=enddate&amp;way=".$way,
-            'MARKET_TITLE_SORT'   => "index.php?section=Market&amp;id=".$catId."&amp;type=".$_GET['type']."&amp;sort=title&amp;way=".$way,
-            'MARKET_PRICE_SORT'   => "index.php?section=Market&amp;id=".$catId."&amp;type=".$_GET['type']."&amp;sort=price&amp;way=".$way,
-            'MARKET_CITY_SORT'    => "index.php?section=Market&amp;id=".$catId."&amp;type=".$_GET['type']."&amp;sort=residence&amp;way=".$way,
+            'MARKET_ENDDATE_SORT' => "index.php?section=Market&amp;id=".intval($catId)."&amp;type=".contrexx_input2xhtml($_GET['type'])."&amp;sort=enddate&amp;way=".$way,
+            'MARKET_TITLE_SORT'   => "index.php?section=Market&amp;id=".intval($catId)."&amp;type=".contrexx_input2xhtml($_GET['type'])."&amp;sort=title&amp;way=".$way,
+            'MARKET_PRICE_SORT'   => "index.php?section=Market&amp;id=".intval($catId)."&amp;type=".contrexx_input2xhtml($_GET['type'])."&amp;sort=price&amp;way=".$way,
+            'MARKET_CITY_SORT'    => "index.php?section=Market&amp;id=".intval($catId)."&amp;type=".contrexx_input2xhtml($_GET['type'])."&amp;sort=residence&amp;way=".$way,
         ));
 
         if ($this->settings['maxdayStatus'] == 0) {
@@ -371,19 +375,23 @@ class Market extends MarketLibrary
         }
 
         /////// START PAGING ///////
-        $pos= intval($_GET['pos']);
+        $pos = 0;
+        if (!empty($_GET['pos'])) {
+            $pos= intval($_GET['pos']);
+        }
 
         if ($sort == 'price') {
             $specialFieldsQuery = $this->getSpecialFieldsQueryPart($objDatabase);
-            $query='SELECT `id`,`name`,`email`,`type`,`title`,`description`,`premium`,`picture`,`catid`, CAST(`price` AS UNSIGNED) as `price`,`regdate`,`enddate`,`userid`,`userdetails`,`status`,`regkey`,`paypal`, ' . $specialFieldsQuery . ' FROM '.DBPREFIX.'module_market WHERE catid = "'.contrexx_addslashes($catId).'" AND status="1" '.$where.' '.$type.' ORDER BY '.$sort.' '.$way;
+            $query='SELECT `id`,`name`,`email`,`type`,`title`,`description`,`premium`,`picture`,`catid`, CAST(`price` AS UNSIGNED) as `price`,`regdate`,`enddate`,`userid`,`userdetails`,`status`,`regkey`,`paypal`, ' . $specialFieldsQuery . ' FROM '.DBPREFIX.'module_market WHERE catid = "'.intval($catId).'" AND status="1" '.$where.' '.$type.' ORDER BY '.$sort.' '.$way;
         }else{
-            $query='SELECT * FROM '.DBPREFIX.'module_market WHERE catid = "'.contrexx_addslashes($catId).'" AND status="1" '.$where.' '.$type.' ORDER BY '.$sort.' '.$way;
+            $query='SELECT * FROM '.DBPREFIX.'module_market WHERE catid = "'.intval($catId).'" AND status="1" '.$where.' '.$type.' ORDER BY '.$sort.' '.$way;
         }
 
         $objResult = $objDatabase->Execute($query);
         $count = $objResult->RecordCount();
+        $paging = '';
         if ($count > $this->settings['paging']) {
-            $paging = getPaging($count, $pos, "&amp;section=Market&amp;id=".$catId.$typePaging.$sortPaging.$wayPaging, "<b>Inserate</b>", true, $this->settings['paging']);
+            $paging = getPaging($count, $pos, "&amp;section=Market&amp;id=".intval($catId).$typePaging.$sortPaging.$wayPaging, "<b>Inserate</b>", true, $this->settings['paging']);
         }
 
         $this->_objTpl->setVariable('SEARCH_PAGING', $paging);
@@ -482,10 +490,7 @@ class Market extends MarketLibrary
                 $i++;
                 $objResult->MoveNext();
                }
-
            }
-
-
 
            if ($count <= 0) {
             $this->_objTpl->setVariable(array(
@@ -494,8 +499,6 @@ class Market extends MarketLibrary
 
             $this->_objTpl->parse('noEntries');
         }
-
-
     }
 
     function showLatestEntries()
@@ -533,10 +536,9 @@ class Market extends MarketLibrary
 
                     $width != '' ? $width = 'width="'.$width.'"' : $width = '';
                     $height != '' ? $height = 'height="'.$height.'"' : $height = '';
+                    $image = '<img src="'.$this->mediaWebPath.'pictures/'.$pic.'" '.$width.' '.$height.' border="0" alt="'.$objEntries->fields['title'].'" />';
 
-                       $image = '<img src="'.$this->mediaWebPath.'pictures/'.$pic.'" '.$width.' '.$height.' border="0" alt="'.$objEntries->fields['title'].'" />';
-
-                       $this->_objTpl->setVariable(array(
+                    $this->_objTpl->setVariable(array(
                         'MARKET_TITLE'                => htmlentities($objEntries->fields['title'], ENT_QUOTES, CONTREXX_CHARSET),
                         'MARKET_PICTURE'            => $image,
                         'MARKET_ROW'                => ($entryNr % 2 == ($rowNr % 2) ? 'description' : 'description'),
@@ -741,7 +743,7 @@ class Market extends MarketLibrary
          $objResult = $objDatabase->Execute("SELECT  id, name FROM ".DBPREFIX."module_market_categories WHERE status = '1' AND id = '".contrexx_addslashes($catId)."'");
         if ($objResult !== false)    {
             if ($objResult->fields['name'] != '') {
-                $verlauf = "&nbsp;&raquo;&nbsp;<a href='index.php?section=Market&amp;id=".$catId."'>".$objResult->fields['name']."</a>";
+                $verlauf = "&nbsp;&raquo;&nbsp;<a href='index.php?section=Market&amp;id=".intval($catId)."'>".$objResult->fields['name']."</a>";
             }else{
                 $verlauf = "";
             }
@@ -1485,7 +1487,7 @@ class Market extends MarketLibrary
         $this->_objTpl->setTemplate($this->pageContent, true, true);
 
         if (!$this->settings['editEntry'] == '1' || (!$this->communityModul && $this->settings['addEntry_only_community'] == '1')) {
-            \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.$_POST['id']);
+            \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.intval($_POST['id']));
             exit;
         }elseif ($this->settings['addEntry_only_community'] == '1') {
             $objFWUser = \FWUser::getFWUserObject();
@@ -1642,7 +1644,7 @@ class Market extends MarketLibrary
                         ));
                            $objResult->MoveNext();
                        }else{
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.$_GET['id']);
+                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.intval($_GET['id']));
                         exit;
                     }
                 }
@@ -1652,6 +1654,9 @@ class Market extends MarketLibrary
             }
         }else{
             if (isset($_POST['submitEntry'])) {
+                if (strpos($_POST['picOld'], '..') !== false) {
+                    throw new \Cx\Core\Controller\InstanceException('Invalid image path');
+                }
                 if ($_POST['uploadImage'] != "") {
                     $picture = $this->uploadPicture();
                     if ($picture != "error") {
@@ -1689,18 +1694,18 @@ class Market extends MarketLibrary
                                           WHERE id='".contrexx_addslashes($_POST['id'])."'");
 
                     if ($objResult !== false) {
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.$_POST['id']);
+                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.intval($_POST['id']));
                         exit;
                     }else{
 // TODO: Never used
 //                        $error = $_CORELANG['TXT_DATABASE_QUERY_ERROR'];
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=edit&id='.$_POST['id']);
+                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=edit&id='.intval($_POST['id']));
                         exit;
                     }
                 }else{
 // TODO: Never used
 //                    $error = $_CORELANG['TXT_MARKET_IMAGE_UPLOAD_ERROR'];
-                    \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=edit&id='.$_POST['id']);
+                    \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=edit&id='.intval($_POST['id']));
                     exit;
                 }
             }else{
@@ -1719,7 +1724,7 @@ class Market extends MarketLibrary
         $this->_objTpl->setTemplate($this->pageContent, true, true);
 
         if (!$this->settings['editEntry'] == '1' || (!$this->communityModul && $this->settings['addEntry_only_community'] == '1')) {
-            \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.$_POST['id']);
+            \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.intval($_POST['id']));
             exit;
         }elseif ($this->settings['addEntry_only_community'] == '1') {
             $objFWUser = \FWUser::getFWUserObject();
@@ -1758,7 +1763,7 @@ class Market extends MarketLibrary
 
                         $objResult->MoveNext();
                     }else{
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.$_GET['id']);
+                        \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Market&cmd=detail&id='.intval($_GET['id']));
                         exit;
                     }
                 }

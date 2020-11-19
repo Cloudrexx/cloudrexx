@@ -212,6 +212,7 @@ class KnowledgeTags
     {
         global $objDatabase;
 
+        $id = intval($id);
         $query = "  SELECT  tags.name as tagname,
                             relation.article as articleid
                     FROM `".DBPREFIX."module_knowledge_tags_articles` as relation
