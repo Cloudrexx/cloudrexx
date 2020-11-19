@@ -448,7 +448,7 @@ class Knowledge extends KnowledgeLibrary
             $tag = $this->tags->getArticlesByTag($id);
             $this->articles->readArticles();
         } catch (DatabaseError $e) {
-            echo $e->plain();
+            \DBG::dump($e->plain());
             return;
         }
 
