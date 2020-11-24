@@ -386,7 +386,7 @@ Available options are:
     --db-pass=<password>            Sets database password to <password>
     --php-image=<dockerImageName>   Name of the docker image to use. Default is 'cloudrexx/web:PHP<php_version>-with-mysql'.
     --db-image=<dockerImageName>    Name of the docker image to use. Default is 'mariadb'.
-    --php-version=<php-version>     Sets PHP version to <php-version> (example: 7.2), default is based on Cloudrexx version
+    --php-version=<php-version>     Sets PHP version to <php-version> (example: 7.4), default is based on Cloudrexx version
     --hostname=<hostname>           Sets installation hostname to <hostname>, defaults to parent directory name
     --port=<port>                   Sets installation port to <port>, defaults to 80"
                     ;;
@@ -1492,7 +1492,7 @@ function get_config_array {
     if [[ "${CONFIG["php-version"]}" == "" ]]; then
         CONFIG["php-version"]="5.6"
         if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
-            CONFIG["php-version"]="7.2"
+            CONFIG["php-version"]="7.4"
         elif [[ "${CONFIG["cms-version"]:0:1}" -lt 3 ]]; then
             CONFIG["php-version"]="5.3"
         fi
