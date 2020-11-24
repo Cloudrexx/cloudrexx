@@ -1,6 +1,6 @@
 <?php
 /**
-	@version   v5.20.5  10-Aug-2016
+	@version   v5.20.18  28-Jun-2020
 	@copyright (c) 2000-2013 John Lim (jlim#natsoft.com). All rights reserved.
 	@copyright (c) 2014      Damien Regad, Mark Newnham and the ADOdb community
 
@@ -10,7 +10,7 @@
 
 	Set tabs to 4 for best viewing.
 
-	Latest version is available at http://adodb.sourceforge.net
+	Latest version is available at http://adodb.org/
 
 	Requires ODBC. Works on Windows and Unix.
 
@@ -230,7 +230,7 @@ class ADODB_pdo extends ADOConnection {
 		$save = $this->_driver->fetchMode;
 		$this->_driver->fetchMode = $this->fetchMode;
 		$this->_driver->debug = $this->debug;
-		$ret = $this->_driver->SelectLimit($sql,$nrows,(integer)$offset,$inputarr,$secs2cache);
+		$ret = $this->_driver->SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
 		$this->_driver->fetchMode = $save;
 		return $ret;
 	}
@@ -335,6 +335,17 @@ class ADODB_pdo extends ADOConnection {
 		return $err;
 	}
 
+    /**
+     * @param bool $auto_commit
+     * @return void
+     */
+	function SetAutoCommit($auto_commit)
+    {
+        if(method_exists($this->_driver, 'SetAutoCommit')) {
+            $this->_driver->SetAutoCommit($auto_commit);
+        }
+    }
+
 	function SetTransactionMode($transaction_mode)
 	{
 		if(method_exists($this->_driver, 'SetTransactionMode')) {
@@ -358,7 +369,7 @@ class ADODB_pdo extends ADOConnection {
 		}
 		$this->transCnt += 1;
 		$this->_autocommit = false;
-		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT,false);
+		$this->SetAutoCommit(false);
 
 		return $this->_connectionID->beginTransaction();
 	}
@@ -384,7 +395,7 @@ class ADODB_pdo extends ADOConnection {
 		$this->_autocommit = true;
 
 		$ret = $this->_connectionID->commit();
-		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT,true);
+		$this->SetAutoCommit(true);
 		return $ret;
 	}
 
@@ -406,7 +417,7 @@ class ADODB_pdo extends ADOConnection {
 		$this->_autocommit = true;
 
 		$ret = $this->_connectionID->rollback();
-		$this->_connectionID->setAttribute(PDO::ATTR_AUTOCOMMIT,true);
+		$this->SetAutoCommit(true);
 		return $ret;
 	}
 
@@ -461,6 +472,7 @@ class ADODB_pdo extends ADOConnection {
 	/* returns queryID or false */
 	function _query($sql,$inputarr=false)
 	{
+		$ok = false;
 		if (is_array($sql)) {
 			$stmt = $sql[1];
 		} else {
@@ -469,9 +481,7 @@ class ADODB_pdo extends ADOConnection {
 		#adodb_backtrace();
 		#var_dump($this->_bindInputArray);
 		if ($stmt) {
-                        if (isset($this->_driver)) {
-                            $this->_driver->debug = $this->debug;
-                        }
+			$this->_driver->debug = $this->debug;
 			if ($inputarr) {
 				$ok = $stmt->execute($inputarr);
 			}
@@ -520,6 +530,30 @@ class ADODB_pdo extends ADOConnection {
 	{
 		return ($this->_connectionID) ? $this->_connectionID->lastInsertId() : 0;
 	}
+
+	/**
+	 * Quotes a string to be sent to the database.
+	 * If we have an active connection, delegates quoting to the underlying
+	 * PDO object. Otherwise, replace "'" by the value of $replaceQuote (same
+	 * behavior as mysqli driver)
+	 * @param string  $s            The string to quote
+	 * @param boolean $magic_quotes If false, use PDO::quote().
+	 * @return string Quoted string
+	 */
+	function qstr($s, $magic_quotes = false)
+	{
+		if (!$magic_quotes) {
+			if ($this->_connectionID) {
+				return $this->_connectionID->quote($s);
+			}
+			return "'" . str_replace("'", $this->replaceQuote, $s) . "'";
+		}
+
+		// undo magic quotes for "
+		$s = str_replace('\\"', '"', $s);
+		return "'$s'";
+	}
+
 }
 
 class ADODB_pdo_base extends ADODB_pdo {
@@ -752,16 +786,8 @@ class ADORecordSet_pdo extends ADORecordSet {
 		if (!$this->_queryID) {
 			return false;
 		}
-                /**
-		 * THIS IS A BUGFIX BY CLOUDRXX AG
-		 * ONE CAN NOT CALL fetch() FOR UPDATE AND DELETE QUERIES
-		 * (added try catch)
-		 */
-		try {
-                    $this->fields = $this->_queryID->fetch($this->fetchMode);
-		} catch (PDOException $e) {
-                    return false;
-		}
+
+		$this->fields = $this->_queryID->fetch($this->fetchMode);
 		return !empty($this->fields);
 	}
 
