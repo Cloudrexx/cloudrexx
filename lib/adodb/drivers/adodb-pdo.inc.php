@@ -230,7 +230,7 @@ class ADODB_pdo extends ADOConnection {
 		$save = $this->_driver->fetchMode;
 		$this->_driver->fetchMode = $this->fetchMode;
 		$this->_driver->debug = $this->debug;
-		$ret = $this->_driver->SelectLimit($sql,$nrows,$offset,$inputarr,$secs2cache);
+		$ret = $this->_driver->SelectLimit($sql,$nrows,(integer)$offset,$inputarr,$secs2cache);
 		$this->_driver->fetchMode = $save;
 		return $ret;
 	}
@@ -786,8 +786,16 @@ class ADORecordSet_pdo extends ADORecordSet {
 		if (!$this->_queryID) {
 			return false;
 		}
-
+        /**
+		 * THIS IS A BUGFIX BY CLOUDRXX AG
+		 * ONE CAN NOT CALL fetch() FOR UPDATE AND DELETE QUERIES
+		 * (added try catch)
+		 */
+		try {
 		$this->fields = $this->_queryID->fetch($this->fetchMode);
+		} catch (PDOException $e) {
+                    return false;
+		}
 		return !empty($this->fields);
 	}
 
