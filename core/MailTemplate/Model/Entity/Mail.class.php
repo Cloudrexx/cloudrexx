@@ -89,6 +89,44 @@ class Mail extends \PHPMailer
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function addAnAddress($kind, $address, $name = '') {
+        \DBG::log('MailTemplate: add address (' . $kind . '): ' . $name . ' <' . $address . '>');
+        parent::addAnAddress($kind, $address, $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function preSend() {
+        $status = parent::preSend();
+        if ($status === false) {
+            \DBG::log('MailTemplate: init failed: ' . $this->ErrorInfo);
+        }
+        return $status;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function postSend() {
+        \DBG::log(
+            sprintf(
+                'MailTemplate: from "%s <%s>": %s',
+                $this->FromName,
+                $this->From,
+                $this->Subject
+            )
+        );
+        $status = parent::postSend();
+        if ($status === false) {
+            \DBG::log('MailTemplate: send failed: ' . $this->ErrorInfo);
+        }
+        return $status;
+    }
+
+    /**
      * Turn off sendmail options for non-sendmail MTA
      *
      * If the "sendmail" program is not sendmail itself we need to assume that
