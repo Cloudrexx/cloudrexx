@@ -1092,10 +1092,12 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
     ) {
         global $_ARRAYLANG;
 
+        $valuePlaceholderRaw = '';
         if ($parseLegacyPlaceholder) {
             $valuePlaceholder = $fieldId . '_VALUE';
         } else {
             $valuePlaceholder = 'CONTACT_FORM_FIELD_VALUE';
+            $valuePlaceholderRaw = 'CONTACT_FORM_FIELD_VALUE_RAW';
         }
 
         $fieldPlaceholder = $fieldValue;
@@ -1139,6 +1141,11 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
             $valuePlaceholder,
             contrexx_raw2xhtml($fieldValue)
         );
+        if ($valuePlaceholderRaw
+            && $template->placeholderExists($valuePlaceholderRaw)
+        ) {
+            $template->setVariable($valuePlaceholderRaw, $fieldValue);
+        }
     }
 
     /**
