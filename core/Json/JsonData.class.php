@@ -368,6 +368,7 @@ class JsonData {
      * @param array $files Key is the POST field name, value is the file path
      * @param boolean $sendJson Whether to encode data as JSON, default false
      * @param int $timeout Max. time in seconds the request may take. 0 for no timeout
+     * @param bool $exceptions If set to true exceptions are thrown on error (instead of returning false)
      * @return stdClass|boolean Decoded JSON on success, false otherwise
      */
     public function getJson(
@@ -377,7 +378,8 @@ class JsonData {
         $httpAuth=array(),
         $files = array(),
         $sendJson = false,
-        $timeout = 0
+        $timeout = 0,
+        $exceptions = false
     ) {
         if (count($data)) {
             $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_POST);
@@ -463,6 +465,9 @@ class JsonData {
             \DBG::msg('URL: '.$url);
             \DBG::dump($data);
             \DBG::dump($response->getBody());
+            if ($exceptions) {
+                throw new \Exception($response->getBody(), $response->getStatus());
+            }
             return false;
         }
 
