@@ -69,12 +69,9 @@ class BackendController extends SystemComponentBackendController
     }
 
     /**
-     * Use this to parse your backend page
+     * Unused.
      *
-     * You will get the template located in /View/Template/{CMD}.html
-     * You can access Cx class using $this->cx
-     * To show messages, use \Message class
-     *
+     * Note that this view does not exist in production, and is never called.
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
      */
