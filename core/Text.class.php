@@ -553,31 +553,32 @@ die("Obsolete method Text::getByKey() called");
      * given language, or any other language if that is not found.
      * If no record to update is found, a new one is created.
      * The parameters are applied, and the Text is then stored.
-     * @param   integer     $id             The Text ID
-     * @param   integer     $lang_id        The language ID
-     * @param   integer     $section        The section
-     * @param   string      $key            The key
-     * @param   string      $strText        The text
-     * @return  integer                     The Text ID on success,
-     *                                      null otherwise
+     * @param   int     $id             The Text ID
+     * @param   int     $lang_id        The language ID
+     * @param   int     $section        The section
+     * @param   string  $key            The key
+     * @param   string  $strText        The text
+     * @return  int                     The Text ID on success,
+     *                                  0 (zero) otherwise
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
     static function replace($id, $lang_id, $section, $key, $strText)
     {
-//DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Entered");
-
         $objText = Text::getById($id, $section, $key, $lang_id);
-//echo("replace($id, $lang_id, $strText, $section, $key): got by ID: ".$objText->content()."<br />");
-//        if (!$objText) {
-//            $objText = new Text('', 0, $section, $key, $id);
-//        }
+        // Avoid updating the slow table index
+        if ($objText->content() === $strText) {
+            return $id;
+        }
         $objText->content($strText);
         // The language may be empty!
         $objText->lang_id($lang_id);
-//DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Storing ".var_export($objText, true));
         if (!$objText->store()) {
-DBG::log("Text::replace($id, $lang_id, $section, $key, $strText): Error: failed to store Text");
-            return null;
+            \DBG::log(__METHOD__ . '('
+                . $id . ', ' . $lang_id . ', '
+                . $section . ', ' . $key . ', ' . $strText
+                . '): Error: failed to store'
+            );
+            return 0;
         }
         return $objText->id;
     }
