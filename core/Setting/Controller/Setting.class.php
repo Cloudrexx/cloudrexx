@@ -467,9 +467,8 @@ class Setting{
      *  - TXT_CORE_SETTING_NAME
      *  - TXT_CORE_SETTING_VALUE
      *
-     * The template object is given by reference, and if the block
-     * 'core_setting_row' is not present, is replaced by the default backend
-     * template.
+     * If the template object given does not contain the block
+     * 'core_setting_row', is replaced by the default backend template.
      * $uriBase *SHOULD* be the URI for the current module page.
      * If you want your settings to be stored, you *MUST* handle the post
      * request, check for the 'bsubmit' index in the $_POST array, and call
@@ -495,7 +494,7 @@ class Setting{
      *                   I.e. if the language variable for an option is TXT_CORE_MODULE_MULTISITE_INSTANCESPATH,
      *                   then the option's tooltip language variable key would be TXT_CORE_MODULE_MULTISITE_INSTANCESPATH_TOOLTIP
      */
-    static function show(&$objTemplateLocal, $uriBase, $section = '', $tab_name = '', $prefix = 'TXT_', $readOnly = false)
+    static function show($objTemplateLocal, $uriBase, $section = '', $tab_name = '', $prefix = 'TXT_', $readOnly = false)
     {
         global $_CORELANG;
         $arrSettings = self::getCurrentSettings();
@@ -556,8 +555,7 @@ class Setting{
      * Display a section of settings present in the $arrSettings class array
      *
      * See the description of {@see show()} for details.
-     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The Template object,
-     *                                                  by reference
+     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The Template object
      * @param   string              $section      The optional section header
      *                                            text to add
      * @param   string              $prefix       The optional prefix for
@@ -565,7 +563,8 @@ class Setting{
      *                                            Defaults to 'TXT_'
      * @return  boolean                           True on success, false otherwise
      */
-    static function show_section(&$objTemplateLocal, $section = '', $prefix = 'TXT_', $readOnly = false)
+    static function show_section($objTemplateLocal, $section = '',
+        $prefix = 'TXT_', $readOnly = false)
     {
         global $_ARRAYLANG, $_CORELANG;
         $arrSettings = self::getCurrentSettings();
@@ -677,6 +676,7 @@ class Setting{
                         // "values" defines the MIME types allowed
                         $arrSetting['values'],
                         'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : ''), true,
+// TODO: This condition would better be handled outside of the parameter list
                         ($value
                           ? $value
                           : 'media/'.
@@ -720,8 +720,16 @@ class Setting{
                 $arrValues = self::splitValues($arrSetting['values']);
                 $value_true = current($arrValues);
                 $element =
-                    \Html::getCheckbox($name, $value_true, false,
-                        in_array($value, $arrValues), '', ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
+                        // Unchecked boxes are not included in the request,
+                        // as there is no value for that state.
+                        // Thus, it is impossible to clear a checkbox, unless
+                        // a hidden field with the same name is prepended.
+                        // The last value in the post, which will be applied,
+                        // will be the checkboxes', if checked.
+                        \Html::getHidden($name, 0)
+                        . \Html::getCheckbox($name, $value_true, false,
+                            in_array($value, $arrValues), '',
+                            ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
                 break;
               case self::TYPE_CHECKBOXGROUP:
                 $checked = self::splitValues($value);
@@ -850,7 +858,7 @@ class Setting{
      * @param   string              $content            The external content
      * @return  boolean                                 True on success
      */
-    static function show_external( &$objTemplateLocal, $tab_name, $content)
+    static function show_external($objTemplateLocal, $tab_name, $content)
     {
         if (empty($objTemplateLocal) || !$objTemplateLocal->blockExists('core_setting_row')) {
             $objTemplateLocal = new \Cx\Core\Html\Sigma(
@@ -887,10 +895,10 @@ class Setting{
      *
      * Die()s if the template given is invalid, and Form.html cannot be
      * loaded to replace it.
-     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The template,
-     *                                                  by reference
+     * @param   \Cx\Core\Html\Sigma|null    $objTemplateLocal   The template
+     * @return  \Cx\Core\Html\Sigma
      */
-    static function verify_template(&$objTemplateLocal)
+    static function verify_template($objTemplateLocal)
     {
         // "instanceof" considers subclasses of Sigma to be a Sigma, too!
         if (!($objTemplateLocal instanceof \Cx\Core\Html\Sigma)) {
