@@ -403,10 +403,10 @@ cx.jQuery(function() {
 
     /**
      * Check the given value is in valid date format(d.M.Y H:i:s) or not
-     *
      * @param string $value input value
-     *
      * @return boolean true|false
+     * @todo    Remove!  This method is complete crap, and unused
+     *          (except for the DataSet class, which *abuses* it).
      */
     public function isValidDate($value) {
         if (empty($value)) {
