@@ -395,7 +395,9 @@ class Coupon
 //DBG::log("Coupon::available($code, $order_amount, $customer_id, $product_id, $payment_id): Wrong Customer ID");
             return null;
         }
-        if ($objCoupon->product_id != intval($product_id)) {
+        if ($objCoupon->product_id != 0
+            && $objCoupon->product_id != intval($product_id)
+        ) {
 //DBG::log("Coupon::available($code, $order_amount, $customer_id, $product_id, $payment_id): Wrong Product ID, need ".$objCoupon->product_id);
             if ($objCoupon->product_id) {
                 if (!self::hasMessage('TXT_SHOP_COUPON_UNAVAILABLE_FOR_THIS_PRODUCT')) {
