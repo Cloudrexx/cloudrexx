@@ -830,7 +830,8 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
 
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_CATEGORY_LANG_ID' => $arrLang['id'],
-                $this->moduleLangVar.'_CATEGORY_NAME' => $strCategoryName,
+		 $this->moduleLangVar.'_CATEGORY_NAME' => $strCategoryName,
+		 $this->moduleLangVar.'_CATEGORY_CSS_NAME' => str_replace(' ', '', $strCategoryName),
                 $this->moduleLangVar.'_CATEGORY_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg("categoryDescription[{$arrLang['id']}]", $strCategoryDescription),
                 $this->moduleLangVar.'_CATEGORY_META_DESCRIPTION' => $categoryMetaDescription,
                 $this->moduleLangVar.'_CATEGORY_BLOCK_DISPLAY' => $first ? 'display:block;' : 'display:none;'
